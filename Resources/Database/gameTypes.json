@@ -1,0 +1,11 @@
+[
+  {"id":0,"name":"Deathmatch","shortname":"DM","bitmap":2},
+  {"id":1,"name":"Team Deathmatch","shortname":"TDM","bitmap":32},
+  {"id":2,"name":"Cooperative","shortname":"CP","bitmap":1},
+  {"id":3,"name":"Team King of the Hill","shortname":"TKOTH","bitmap":64},
+  {"id":4,"name":"King of the Hill","shortname":"KOTH","bitmap":4},
+  {"id":5,"name":"Search and Destroy","shortname":"SD","bitmap":128},
+  {"id":6,"name":"Attack and Defend","shortname":"AD","bitmap":0},
+  {"id":7,"name":"Capture the Flag","shortname":"CTF","bitmap":16},
+  {"id":8,"name":"Flagball","shortname":"FB","bitmap":8}
+]

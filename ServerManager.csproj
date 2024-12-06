@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{94DC673A-3A08-4CB7-9EEA-F440D8590602}</ProjectGuid>
+        <OutputType>WinExe</OutputType>
+        <RootNamespace>ServerManager</RootNamespace>
+        <AssemblyName>ServerManager</AssemblyName>
+        <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <Deterministic>true</Deterministic>
+        <ApplicationIcon>Resources\Icons\default.ico</ApplicationIcon>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+        </Reference>
+        <Reference Include="mscorlib" />
+        <Reference Include="Newtonsoft.Json">
+          <HintPath>E:\Solutions\HawkSync\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+        </Reference>
+        <Reference Include="System"/>
+        <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Core"/>
+        <Reference Include="System.IO.Pipelines, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.IO.Pipelines.9.0.0\lib\net462\System.IO.Pipelines.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Management" />
+        <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Numerics" />
+        <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Text.Encodings.Web, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Text.Encodings.Web.9.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Text.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Text.Json.9.0.0\lib\net462\System.Text.Json.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+        </Reference>
+        <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+        </Reference>
+        <Reference Include="System.Xml.Linq"/>
+        <Reference Include="System.Data.DataSetExtensions"/>
+        <Reference Include="Microsoft.CSharp"/>
+        <Reference Include="System.Data"/>
+        <Reference Include="System.Deployment"/>
+        <Reference Include="System.Drawing"/>
+        <Reference Include="System.Net.Http"/>
+        <Reference Include="System.Windows.Forms"/>
+        <Reference Include="System.Xml"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Classes\Enviroment\ServerEnvironment.cs" />
+        <Compile Include="Classes\Enviroment\ServerInstance.cs" />
+        <Compile Include="Classes\Enviroment\ServerProfiles.cs" />
+        <Compile Include="Classes\Enviroment\ServerSettings.cs" />
+        <Compile Include="Classes\Modules\ProgramConfigurations.cs" />
+        <Compile Include="Classes\Modules\Ticker.cs" />
+        <Compile Include="Classes\Objects\DefaultMaps.cs" />
+        <Compile Include="Classes\Objects\GameTypes.cs" />
+        <Compile Include="Classes\Objects\InstanceProcess.cs" />
+        <Compile Include="Classes\Objects\NetworkInfo.cs" />
+        <Compile Include="Classes\Objects\CountryCodes.cs" />
+        <Compile Include="Classes\Objects\Mods.cs" />
+        <Compile Include="Classes\Objects\PlayerRoles.cs" />
+        <Compile Include="Classes\Objects\WeaponTypes.cs" />
+        <Compile Include="Classes\System\ProcessHandler.cs" />
+        <Compile Include="Panels\ServerManager.cs">
+          <SubType>Form</SubType>
+        </Compile>
+        <Compile Include="Panels\ServerManager.Designer.cs">
+          <DependentUpon>ServerManager.cs</DependentUpon>
+        </Compile>
+        <Compile Include="Panels\ServerProfileEditor.cs">
+          <SubType>Form</SubType>
+        </Compile>
+        <Compile Include="Panels\ServerProfileEditor.Designer.cs">
+          <DependentUpon>ServerProfileEditor.cs</DependentUpon>
+        </Compile>
+        <Compile Include="Program.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <EmbeddedResource Include="Panels\ServerManager.resx">
+          <DependentUpon>ServerManager.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Panels\ServerProfileEditor.resx">
+          <DependentUpon>ServerProfileEditor.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Properties\Resources.en.resx">
+          <DependentUpon>Resources.resx</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Properties\Resources.fr.resx">
+          <DependentUpon>Resources.resx</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+            <SubType>Designer</SubType>
+        </EmbeddedResource>
+        <Compile Include="Properties\Resources.Designer.cs">
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <None Include="packages.config" />
+        <None Include="Properties\Settings.settings">
+            <Generator>SettingsSingleFileGenerator</Generator>
+            <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+        </None>
+        <Compile Include="Properties\Settings.Designer.cs">
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Settings.settings</DependentUpon>
+            <DesignTimeSharedInput>True</DesignTimeSharedInput>
+        </Compile>
+        <EmbeddedResource Include="Resources\Images\Mods\bhd.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\bhdts.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\bo.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\dj.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\ic.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\ice.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\jo.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\joe.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\real.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\sg.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\sna.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\snajo.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\swat.gif" />
+        <EmbeddedResource Include="Resources\Images\Mods\wot.gif" />
+        <EmbeddedResource Include="Resources\Images\States\hosting.gif">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Resources\Images\States\loading.gif">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Resources\Images\States\notactive.gif">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Resources\Images\States\nothosting.gif">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Resources\Images\States\scoring.gif">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="App.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\Database\countryCodes.json" />
+      <EmbeddedResource Include="Resources\Database\defaultMaps.json" />
+      <EmbeddedResource Include="Resources\Database\gameTypes.json" />
+      <EmbeddedResource Include="Resources\Database\mods.json" />
+      <Content Include="Resources\Database\settings.sqlite">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <EmbeddedResource Include="Resources\Icons\default.ico" />
+      <EmbeddedResource Include="Resources\Icons\updater.ico">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
+</Project>
