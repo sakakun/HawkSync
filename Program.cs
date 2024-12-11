@@ -54,13 +54,16 @@ public class Program
         }
     }
 
-    public static void DebugLog(string message)
+    public static void DebugLog(string message, bool messageBox = false)
     {
         string logFilePath = "./ServerManager.log"; // Specify your log file path
 
         string source = Assembly.GetExecutingAssembly().GetName().Name;
         bool isDebugMode = Environment.GetCommandLineArgs().Contains("/debug");
 
+        if (messageBox)
+            MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        
         if (isDebugMode)
         {
             File.AppendAllText(logFilePath, $"{DateTime.Now}: {message}{Environment.NewLine}");

@@ -47,6 +47,9 @@
           <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
         </Reference>
         <Reference Include="System.Core"/>
+        <Reference Include="System.Drawing.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Drawing.Common.9.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
+        </Reference>
         <Reference Include="System.IO.Pipelines, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
           <HintPath>..\packages\System.IO.Pipelines.9.0.0\lib\net462\System.IO.Pipelines.dll</HintPath>
         </Reference>
@@ -182,6 +185,7 @@
       <EmbeddedResource Include="Resources\Database\defaultMaps.json" />
       <EmbeddedResource Include="Resources\Database\gameTypes.json" />
       <EmbeddedResource Include="Resources\Database\mods.json" />
+      <Content Include="README.md" />
       <Content Include="Resources\Database\settings.sqlite">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>

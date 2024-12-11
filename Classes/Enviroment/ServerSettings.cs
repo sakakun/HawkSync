@@ -132,7 +132,7 @@ public class ServerSettings
 
     }
     
-    private void SaveSettings()
+    public void SaveSettings()
     {
         var settingsData = new SettingsData
         {

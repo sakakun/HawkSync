@@ -29,12 +29,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerManager));
             this.panel_notificationBar = new System.Windows.Forms.Panel();
             this.tabControl_ProfileList = new System.Windows.Forms.TabControl();
             this.tab_Profiles = new System.Windows.Forms.TabPage();
             this.groupBox_profiles = new System.Windows.Forms.GroupBox();
             this.dataGrid_profiles = new System.Windows.Forms.DataGridView();
+            this.profileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.statusByte = new System.Windows.Forms.DataGridViewImageColumn();
+            this.serverPlayerCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.currentMap = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.currentMapGameType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.currentTimer = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.serverStatStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel_profileControls = new System.Windows.Forms.Panel();
             this.groupBox_legend = new System.Windows.Forms.GroupBox();
             this.pictureBox5_scoring = new System.Windows.Forms.PictureBox();
@@ -86,7 +94,6 @@
             // 
             // tabControl_ProfileList
             // 
-            this.tabControl_ProfileList.Appearance = System.Windows.Forms.TabAppearance.FlatButtons;
             this.tabControl_ProfileList.Controls.Add(this.tab_Profiles);
             this.tabControl_ProfileList.Controls.Add(this.tab_Options);
             this.tabControl_ProfileList.Controls.Add(this.tab_Mods);
@@ -137,13 +144,74 @@
             // 
             this.dataGrid_profiles.AllowUserToAddRows = false;
             this.dataGrid_profiles.AllowUserToDeleteRows = false;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGrid_profiles.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGrid_profiles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGrid_profiles.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { this.profileName, this.statusByte, this.serverPlayerCount, this.currentMap, this.currentMapGameType, this.currentTimer, this.serverStatStatus });
             this.dataGrid_profiles.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGrid_profiles.Location = new System.Drawing.Point(7, 18);
             this.dataGrid_profiles.Name = "dataGrid_profiles";
             this.dataGrid_profiles.ReadOnly = true;
             this.dataGrid_profiles.Size = new System.Drawing.Size(1003, 309);
             this.dataGrid_profiles.TabIndex = 0;
+            this.dataGrid_profiles.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.profileList_focus);
+            // 
+            // profileName
+            // 
+            this.profileName.HeaderText = "Game Profile";
+            this.profileName.MaxInputLength = 16;
+            this.profileName.MinimumWidth = 150;
+            this.profileName.Name = "profileName";
+            this.profileName.ReadOnly = true;
+            this.profileName.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.profileName.Width = 150;
+            // 
+            // statusByte
+            // 
+            this.statusByte.HeaderText = "";
+            this.statusByte.MinimumWidth = 50;
+            this.statusByte.Name = "statusByte";
+            this.statusByte.ReadOnly = true;
+            this.statusByte.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.statusByte.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.statusByte.Width = 50;
+            // 
+            // serverPlayerCount
+            // 
+            this.serverPlayerCount.HeaderText = "Players";
+            this.serverPlayerCount.Name = "serverPlayerCount";
+            this.serverPlayerCount.ReadOnly = true;
+            // 
+            // currentMap
+            // 
+            this.currentMap.HeaderText = "Map";
+            this.currentMap.Name = "currentMap";
+            this.currentMap.ReadOnly = true;
+            // 
+            // currentMapGameType
+            // 
+            this.currentMapGameType.HeaderText = "GameType";
+            this.currentMapGameType.Name = "currentMapGameType";
+            this.currentMapGameType.ReadOnly = true;
+            // 
+            // currentTimer
+            // 
+            this.currentTimer.HeaderText = "Timer";
+            this.currentTimer.Name = "currentTimer";
+            this.currentTimer.ReadOnly = true;
+            // 
+            // serverStatStatus
+            // 
+            this.serverStatStatus.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.serverStatStatus.HeaderText = "Status";
+            this.serverStatStatus.Name = "serverStatStatus";
+            this.serverStatStatus.ReadOnly = true;
             // 
             // panel_profileControls
             // 
@@ -179,7 +247,7 @@
             // pictureBox5_scoring
             // 
             this.pictureBox5_scoring.ErrorImage = null;
-            this.pictureBox5_scoring.Image = global::ServerManager.Properties.Resources.scoring;
+            this.pictureBox5_scoring.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox5_scoring.Image")));
             this.pictureBox5_scoring.InitialImage = null;
             this.pictureBox5_scoring.Location = new System.Drawing.Point(243, 45);
             this.pictureBox5_scoring.Name = "pictureBox5_scoring";
@@ -211,9 +279,9 @@
             // pictureBox4_legend
             // 
             this.pictureBox4_legend.ErrorImage = null;
-            this.pictureBox4_legend.Image = global::ServerManager.Properties.Resources.nothosting;
+            this.pictureBox4_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4_legend.Image")));
             this.pictureBox4_legend.InitialImage = null;
-            this.pictureBox4_legend.Location = new System.Drawing.Point(244, 69);
+            this.pictureBox4_legend.Location = new System.Drawing.Point(243, 69);
             this.pictureBox4_legend.Name = "pictureBox4_legend";
             this.pictureBox4_legend.Size = new System.Drawing.Size(24, 24);
             this.pictureBox4_legend.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -233,7 +301,7 @@
             // pictureBox3_legend
             // 
             this.pictureBox3_legend.ErrorImage = null;
-            this.pictureBox3_legend.Image = global::ServerManager.Properties.Resources.hosting;
+            this.pictureBox3_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3_legend.Image")));
             this.pictureBox3_legend.InitialImage = null;
             this.pictureBox3_legend.Location = new System.Drawing.Point(13, 69);
             this.pictureBox3_legend.Name = "pictureBox3_legend";
@@ -255,7 +323,7 @@
             // pictureBox2_legend
             // 
             this.pictureBox2_legend.ErrorImage = null;
-            this.pictureBox2_legend.Image = global::ServerManager.Properties.Resources.loading;
+            this.pictureBox2_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2_legend.Image")));
             this.pictureBox2_legend.InitialImage = null;
             this.pictureBox2_legend.Location = new System.Drawing.Point(13, 45);
             this.pictureBox2_legend.Name = "pictureBox2_legend";
@@ -277,7 +345,7 @@
             // pictureBox1_legend
             // 
             this.pictureBox1_legend.ErrorImage = null;
-            this.pictureBox1_legend.Image = global::ServerManager.Properties.Resources.notactive;
+            this.pictureBox1_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1_legend.Image")));
             this.pictureBox1_legend.InitialImage = null;
             this.pictureBox1_legend.Location = new System.Drawing.Point(13, 21);
             this.pictureBox1_legend.Name = "pictureBox1_legend";
@@ -312,6 +380,7 @@
             this.button6.TabIndex = 6;
             this.button6.Text = "Quit";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.click_quit);
             // 
             // button5
             // 
@@ -321,6 +390,7 @@
             this.button5.TabIndex = 5;
             this.button5.Text = "Delete Profile";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.click_removeProfile);
             // 
             // button4
             // 
@@ -330,6 +400,7 @@
             this.button4.TabIndex = 4;
             this.button4.Text = "Edit Profile";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.click_editProfile);
             // 
             // button3
             // 
@@ -339,6 +410,7 @@
             this.button3.TabIndex = 3;
             this.button3.Text = "Add Profile";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.click_addProfile);
             // 
             // button2
             // 
@@ -456,6 +528,20 @@
             this.groupBox_options.ResumeLayout(false);
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.DataGridViewTextBoxColumn serverStatStatus;
+
+        private System.Windows.Forms.DataGridViewTextBoxColumn currentTimer;
+
+        private System.Windows.Forms.DataGridViewTextBoxColumn currentMapGameType;
+
+        private System.Windows.Forms.DataGridViewTextBoxColumn currentMap;
+
+        private System.Windows.Forms.DataGridViewTextBoxColumn serverPlayerCount;
+
+        private System.Windows.Forms.DataGridViewImageColumn statusByte;
+
+        private System.Windows.Forms.DataGridViewTextBoxColumn profileName;
 
         private System.Windows.Forms.Button button6;
 

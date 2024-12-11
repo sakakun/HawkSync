@@ -33,7 +33,7 @@ public class ServerProfiles
         LoadProfiles();
     }
     
-    public ServerInstance AddProfile(string profileName, string profilePath, string serverPath)
+    public bool AddProfile(string profileName, string profilePath, string serverPath)
     {
         var backupProfiles = new List<ServerProfile>(ServerProfileList);
         try
@@ -42,8 +42,8 @@ public class ServerProfiles
             if (ServerProfileList.Exists(p => p.ProfileName.Equals(profileName, StringComparison.OrdinalIgnoreCase) || 
                                                p.ProfilePath.Equals(profilePath, StringComparison.OrdinalIgnoreCase)))
             {
-                Program.DebugLog("Duplicate Profile Name or Path detected.");
-                return null; 
+                Program.DebugLog("Duplicate Profile Name or Path detected.",true);
+                return false;
             }
             
             // Create Profile
@@ -58,24 +58,55 @@ public class ServerProfiles
             
             // Save the Profile Files
             SaveProfiles();
+
+            MessageBox.Show("Profile Added.  Next list refresh will reflect the changes.");
             
-            return newInstance;    
+            return true;    
         } 
         catch(Exception ex)
         {
-            Program.DebugLog("Failure (Adding & Saving Profile Record): " + ex.Message);
+            Program.DebugLog("Add Profile Error: " + ex.Message, true);
             ServerProfileList = backupProfiles;
-            return null;    
+            return false;    
         }
     }
+
+    public bool EditProfile(ServerProfile profile, string profileName, string profilePath, string serverPath)
+    {
+        if (profile.ProfilePath != profilePath && profile.ProfileName != profilePath)
+        {
+            try
+            {
+                Directory.Move(profile.ProfilePath, profilePath);
+            }
+            catch (Exception ex)
+            {
+                Program.DebugLog("Edit Profile Error: " + ex.Message, true);
+                return false;
+            }
+
+            profile.ProfilePath = profilePath;
+            profile.ProfileName = profileName;
+        }
+
+        if (profile.ServerPath != serverPath) 
+        {
+            profile.ServerPath = serverPath;
+        }
+        
+        SaveProfiles();
+        
+        MessageBox.Show("Profile Changed.  Next list refresh will reflect the changes.");
+        
+        return true;
+    }
     
-    public bool RemoveProfile(string profileName)
+    public bool RemoveProfile(ServerProfile profileToRemove)
     {
         var backupProfiles = new List<ServerProfile>(ServerProfileList);
         
         try
         {
-            var profileToRemove = ServerProfileList.Find(p => p.ProfileName.Equals(profileName, StringComparison.OrdinalIgnoreCase));
             if (profileToRemove != null)
             {
                 // Remove Server Instance if it Exists
@@ -104,7 +135,7 @@ public class ServerProfiles
         } 
         catch(Exception ex)
         {
-            Program.DebugLog("Failure (Removing Profile Record): " + ex.Message);
+            Program.DebugLog("Remove Profile Error: " + ex.Message, true);
             ServerProfileList = backupProfiles;
             return false;    
         }
@@ -113,7 +144,7 @@ public class ServerProfiles
     private void SaveProfiles()
     {
         var json = JsonSerializer.Serialize(ServerProfileList);
-        Directory.CreateDirectory(Path.GetDirectoryName(_profilePath)); 
+        Directory.CreateDirectory(Path.GetDirectoryName(_profilePath)!); 
         File.WriteAllText(_profilePath, json);
     }
 
@@ -123,6 +154,14 @@ public class ServerProfiles
         {
             var json = File.ReadAllText(_profilePath);
             ServerProfileList = JsonSerializer.Deserialize<List<ServerProfile>>(json) ?? new List<ServerProfile>();
+            foreach (var profile in ServerProfileList)
+            {
+                // Build Instance
+                ServerInstance newInstance = new ServerInstance(profile);
+            
+                // Add to active instances
+                Env._serverInstances.Add(profile, newInstance);
+            }
         }
     }
 }
