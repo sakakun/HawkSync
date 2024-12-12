@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Security.AccessControl;
 using System.Windows.Forms;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ namespace ServerManager.Panels
             Load += ServerManager_Load;
             InitializeComponent();
         }
-        
+        // Application Load
         private void ServerManager_Load(object sender, EventArgs e)
         {
             // Load Enviroment
@@ -28,14 +29,30 @@ namespace ServerManager.Panels
             _ticker = new Ticker();
             _ticker.Start("Sever Manager Tick", 5000, ServerManager_tickEvent);
         }
-
-        // Create new profile
+        
+        // Action: Profile List CellClick
+        private void DataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // Check if the clicked cell is in the correct column (7)
+            if (e.ColumnIndex == 7 && e.RowIndex >= 0) // e.RowIndex >= 0 to avoid header click
+            {
+                string profileName = dataGrid_profiles.Rows[e.RowIndex].Cells["profileName"].Value.ToString();
+                ServerProfile profile = Env._serverProfiles.ServerProfileList.Find(p => p.ProfileName == profileName);
+                if (Env._serverInstances.TryGetValue(profile, out ServerInstance serverInstance))
+                {
+                    (new GameManager(serverInstance)).ShowDialog();
+                }
+            }
+        }
+        
+        // Action: Create new profile
         private void click_addProfile(object sender, EventArgs e)
         {
             (new ServerProfileEditor(false)).ShowDialog();
         }
 
-        private void click_editProfile(object sender, EventArgs e)
+        // Action: Remove Profile
+        private void click_removeProfile(object sender, EventArgs e)
         {
             // Is profile selected?
             if (dataGrid_profiles.SelectedRows.Count < 1) { return; }
@@ -44,18 +61,36 @@ namespace ServerManager.Panels
             // Is Instance Running?
             if (Env._serverInstances.TryGetValue(profile, out ServerInstance serverInstance))
             {
-                if (serverInstance.instance_Status().isRunning) { return;}    
+                if (serverInstance.instance_Status().isRunning)
+                {
+                    MessageBox.Show("This profile is currently running.");
+                    return;
+                }    
             }
-            // As long as its not running you can edit.
-            (new ServerProfileEditor(true, profile)).ShowDialog();
-        }
 
+            if (Env._serverProfiles.RemoveProfile(profile))
+            {
+                MessageBox.Show("Profile Removed.");
+                tickEvent_profileStatusUpdate();                 
+            }
+        }
+        // Action: Close Application
+        private void click_quit(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+        
+        //
+        // Tick Events
+        //
+        
+        // Trigger for Tick Events for Application
         public void ServerManager_tickEvent()
         {
             // Profile Status Update
             tickEvent_profileStatusUpdate();
         }
-
+        // Tick Event: Grab Profile Status
         private void tickEvent_profileStatusUpdate()
         {
             // Check if we need to invoke on the UI thread
@@ -84,52 +119,14 @@ namespace ServerManager.Panels
                 row.Cells[4].Value = thisVar.currentMapGameType; // Assuming index 4 corresponds to currentMapGameType
                 row.Cells[5].Value = thisVar.currentTimer; // Assuming index 5 corresponds to currentTimer
                 row.Cells[6].Value = thisVar.serverStatStatus; // Assuming index 6 corresponds to serverStatStatus
-
+                row.Cells[7].Value = "MANAGE";
+                row.Cells[7].Style.Font = new Font("Ariel", 8);
+        
                 // Add the row to the DataGridView
                 dataGrid_profiles.Rows.Add(row);
                 dataGrid_profiles.Refresh();
-                profileList_unfocus(null, null);
             }
         }
-
-        private void profileList_unfocus(object sender, EventArgs e)
-        {
-            button4.Enabled = false;
-            button5.Enabled = false;
-        }
-
-        private void profileList_focus(object sender, DataGridViewCellEventArgs e)
-        {
-            button4.Enabled = true;
-            button5.Enabled = true;
-        }
-
-        private void click_removeProfile(object sender, EventArgs e)
-        {
-            // Is profile selected?
-            if (dataGrid_profiles.SelectedRows.Count < 1) { return; }
-            string profileName = dataGrid_profiles.SelectedRows[0].Cells["profileName"].Value.ToString();
-            ServerProfile profile = Env._serverProfiles.ServerProfileList.Find(p => p.ProfileName == profileName);
-            // Is Instance Running?
-            if (Env._serverInstances.TryGetValue(profile, out ServerInstance serverInstance))
-            {
-                if (serverInstance.instance_Status().isRunning)
-                {
-                    MessageBox.Show("This profile is currently running.");
-                    return;
-                }    
-            }
-
-            if (Env._serverProfiles.RemoveProfile(profile))
-            {
-                MessageBox.Show("Profile Removed.");
-                tickEvent_profileStatusUpdate();                 
-            }
-        }
-
-        private void click_quit(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
+        
     }
 }

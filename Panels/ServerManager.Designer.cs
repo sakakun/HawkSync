@@ -43,6 +43,7 @@
             this.currentMapGameType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.currentTimer = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.serverStatStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.profileOpenBtn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.panel_profileControls = new System.Windows.Forms.Panel();
             this.groupBox_legend = new System.Windows.Forms.GroupBox();
             this.pictureBox5_scoring = new System.Windows.Forms.PictureBox();
@@ -57,11 +58,7 @@
             this.pictureBox1_legend = new System.Windows.Forms.PictureBox();
             this.groupBox_options = new System.Windows.Forms.GroupBox();
             this.button6 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this.tab_Options = new System.Windows.Forms.TabPage();
             this.tab_Mods = new System.Windows.Forms.TabPage();
             this.tab_Plugins = new System.Windows.Forms.TabPage();
@@ -153,14 +150,14 @@
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGrid_profiles.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGrid_profiles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGrid_profiles.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { this.profileName, this.statusByte, this.serverPlayerCount, this.currentMap, this.currentMapGameType, this.currentTimer, this.serverStatStatus });
+            this.dataGrid_profiles.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { this.profileName, this.statusByte, this.serverPlayerCount, this.currentMap, this.currentMapGameType, this.currentTimer, this.serverStatStatus, this.profileOpenBtn });
             this.dataGrid_profiles.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGrid_profiles.Location = new System.Drawing.Point(7, 18);
             this.dataGrid_profiles.Name = "dataGrid_profiles";
             this.dataGrid_profiles.ReadOnly = true;
             this.dataGrid_profiles.Size = new System.Drawing.Size(1003, 309);
             this.dataGrid_profiles.TabIndex = 0;
-            this.dataGrid_profiles.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.profileList_focus);
+            this.dataGrid_profiles.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellClick);
             // 
             // profileName
             // 
@@ -212,6 +209,12 @@
             this.serverStatStatus.HeaderText = "Status";
             this.serverStatStatus.Name = "serverStatStatus";
             this.serverStatStatus.ReadOnly = true;
+            // 
+            // profileOpenBtn
+            // 
+            this.profileOpenBtn.HeaderText = "";
+            this.profileOpenBtn.Name = "profileOpenBtn";
+            this.profileOpenBtn.ReadOnly = true;
             // 
             // panel_profileControls
             // 
@@ -357,11 +360,7 @@
             // groupBox_options
             // 
             this.groupBox_options.Controls.Add(this.button6);
-            this.groupBox_options.Controls.Add(this.button5);
-            this.groupBox_options.Controls.Add(this.button4);
             this.groupBox_options.Controls.Add(this.button3);
-            this.groupBox_options.Controls.Add(this.button2);
-            this.groupBox_options.Controls.Add(this.button1);
             this.groupBox_options.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox_options.Location = new System.Drawing.Point(0, 0);
             this.groupBox_options.Margin = new System.Windows.Forms.Padding(5);
@@ -374,7 +373,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(584, 37);
+            this.button6.Location = new System.Drawing.Point(593, 37);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(100, 40);
             this.button6.TabIndex = 6;
@@ -382,53 +381,15 @@
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.click_quit);
             // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(468, 37);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(110, 40);
-            this.button5.TabIndex = 5;
-            this.button5.Text = "Delete Profile";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.click_removeProfile);
-            // 
-            // button4
-            // 
-            this.button4.Location = new System.Drawing.Point(362, 37);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(100, 40);
-            this.button4.TabIndex = 4;
-            this.button4.Text = "Edit Profile";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.click_editProfile);
-            // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(256, 37);
+            this.button3.Location = new System.Drawing.Point(50, 37);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(100, 40);
             this.button3.TabIndex = 3;
             this.button3.Text = "Add Profile";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.click_addProfile);
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(150, 37);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(100, 40);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Start Game";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(44, 37);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 40);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Attach";
-            this.button1.UseVisualStyleBackColor = true;
             // 
             // tab_Options
             // 
@@ -513,6 +474,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ServerManager";
             this.Padding = new System.Windows.Forms.Padding(10, 5, 10, 5);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "HawkSync Server Manager";
             this.tabControl_ProfileList.ResumeLayout(false);
             this.tab_Profiles.ResumeLayout(false);
@@ -528,6 +490,8 @@
             this.groupBox_options.ResumeLayout(false);
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.DataGridViewButtonColumn profileOpenBtn;
 
         private System.Windows.Forms.DataGridViewTextBoxColumn serverStatStatus;
 
@@ -545,12 +509,7 @@
 
         private System.Windows.Forms.Button button6;
 
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-
-        private System.Windows.Forms.Button button1;
 
         private System.Windows.Forms.Label label_scoring;
         private System.Windows.Forms.PictureBox pictureBox5_scoring;

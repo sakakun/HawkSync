@@ -102,6 +102,12 @@
         <Compile Include="Classes\Objects\PlayerRoles.cs" />
         <Compile Include="Classes\Objects\WeaponTypes.cs" />
         <Compile Include="Classes\System\ProcessHandler.cs" />
+        <Compile Include="Panels\GameManager.cs">
+          <SubType>Form</SubType>
+        </Compile>
+        <Compile Include="Panels\GameManager.Designer.cs">
+          <DependentUpon>GameManager.cs</DependentUpon>
+        </Compile>
         <Compile Include="Panels\ServerManager.cs">
           <SubType>Form</SubType>
         </Compile>
@@ -116,6 +122,9 @@
         </Compile>
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <EmbeddedResource Include="Panels\GameManager.resx">
+          <DependentUpon>GameManager.cs</DependentUpon>
+        </EmbeddedResource>
         <EmbeddedResource Include="Panels\ServerManager.resx">
           <DependentUpon>ServerManager.cs</DependentUpon>
         </EmbeddedResource>
