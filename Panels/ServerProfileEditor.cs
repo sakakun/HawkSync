@@ -12,13 +12,10 @@ public partial class ServerProfileEditor : Form
     private ServerEnvironment Env;
     private string profilePath;
     private bool editMode;
-    private ServerProfile serverProfile;
 
     public ServerProfileEditor(bool editMode, ServerProfile serverProfile = null)
     {
-        Env = ServerEnvironment.Instance;
         this.editMode = editMode;
-        this.serverProfile = serverProfile;
 
         InitializeComponent();
         loadProfile(editMode, serverProfile);
@@ -94,7 +91,7 @@ public partial class ServerProfileEditor : Form
         
         try
         {
-            if (editMode && serverProfile != null)
+            /*if (editMode && serverProfile != null)
             {
                 if (Env._serverProfiles.EditProfile(serverProfile, textBox_profileName.Text, profilePath, textBox_serverPath.Text))
                     Close();
@@ -104,7 +101,7 @@ public partial class ServerProfileEditor : Form
 
             if (Env._serverProfiles.AddProfile(textBox_profileName.Text, profilePath, textBox_serverPath.Text))
                 Close();
-            
+            */
         }
         catch (Exception ex)
         {

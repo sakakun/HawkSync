@@ -1,43 +1,39 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
-
-namespace ServerManager.Classes.Objects;
+using ServerManager.Properties;
 
 public class CountryCode
 {
+    public int Id { get; set; }
     public string Iso { get; set; }
+    public string Name { get; set; }
     public string Nicename { get; set; }
+    public string Iso3 { get; set; }
+    public int? Numcode { get; set; }
+    public int? Phonecode { get; set; }
 }
 
 public class CountryCodes
 {
     public List<CountryCode> CountryCodesList { get; private set; }
-    
+
     public CountryCodes()
     {
-        // Load JSON data from embedded resource
-        var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "ServerManager.Resources.Database.countryCodes.json"; 
-
-        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-        using (StreamReader reader = new StreamReader(stream))
+        try
         {
-            string jsonData = reader.ReadToEnd();
-            var data = JsonConvert.DeserializeObject<dynamic[]>(jsonData);
+            // Load JSON data from embedded resource
+            string jsonData = Resources.countryCodes;
 
-            var result = new List<CountryCode>();
+            // Deserialize JSON data into a list of CountryCode
+            var data = JsonConvert.DeserializeObject<List<CountryCode>>(jsonData);
 
-            foreach (var country in data)
-            {
-                result.Add(new CountryCode
-                {
-                    Iso = country.iso,
-                    Nicename = country.nicename
-                });
-            }
-            CountryCodesList = result;
+            CountryCodesList = data;
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        
     }
 }

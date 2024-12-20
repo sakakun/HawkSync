@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms.VisualStyles;
 using ServerManager.Classes.Objects;
 using ServerManager.Properties;
@@ -31,7 +32,8 @@ namespace ServerManager.Classes.Enviroment
         // Game Server - Server Settings
         public ServerSettings           serverSettings;
         // Game Server - Chat Management
-        // Game Server - Map Management 
+        // Game Server - Map Management
+        public ServerMapManagement      mapManagement;
         // Game Server - Player Management
         // Game Server - Stat Management
 
@@ -50,6 +52,7 @@ namespace ServerManager.Classes.Enviroment
         private void loadInstance()
         {
             serverSettings = new ServerSettings(this);
+            mapManagement = new ServerMapManagement(this);
 
         }
         // This will call all save functions nested above and for the profile itself.
@@ -70,17 +73,6 @@ namespace ServerManager.Classes.Enviroment
 
             try
             {
-                // Assuming Resources.nothosting is a Bitmap
-                using (Bitmap bitmap = Resources.notactive)
-                {
-                    // Convert Bitmap to byte array
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        bitmap.Save(memoryStream, ImageFormat.Png); // Save as PNG or any desired format
-                        thisVar.statusByte = memoryStream.ToArray(); // Convert to byte array
-                    }
-                }
-
                 thisVar.profileName = serverProfile.ProfileName;
                 thisVar.serverPlayerCount = "";
                 thisVar.currentMap = "";
@@ -88,6 +80,7 @@ namespace ServerManager.Classes.Enviroment
                 thisVar.currentTimer = "";
                 thisVar.serverStatStatus = "";
                 thisVar.isRunning = false;
+                thisVar.statusByte = statusByte("notactive");
             }
             catch (Exception ex)
             {
@@ -96,6 +89,20 @@ namespace ServerManager.Classes.Enviroment
             }
 
             return thisVar;
+        }
+
+        public static byte[] statusByte(string statusType)
+        {
+            byte[] statusByte = null;
+            string resourceName = $"ServerManager.Resources.Images.States.{statusType}.gif"; // Adjust namespace
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+            using (Bitmap bitmap = (Bitmap)Image.FromStream(stream))
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                bitmap.Save(memoryStream, ImageFormat.Png);
+                statusByte = memoryStream.ToArray();
+            }
+            return statusByte;
         }
     }
 }

@@ -10,20 +10,22 @@ namespace ServerManager.Panels
 {
     public partial class ServerManager : Form
     {
-        protected ServerEnvironment Env;
+        protected ServerEnvironment _env;
         protected Ticker _ticker;
         
         public ServerManager()
         {
+            Program._env = ServerEnvironment.Instance;
+            _env = Program._env;
+            
             Load += ServerManager_Load;
             InitializeComponent();
+            
+            
         }
         // Application Load
         private void ServerManager_Load(object sender, EventArgs e)
         {
-            // Load Enviroment
-            Env = ServerEnvironment.Instance;
-            
             // Tick Event (Instant & 5 Seconds)
             ServerManager_tickEvent();
             _ticker = new Ticker();
@@ -37,8 +39,8 @@ namespace ServerManager.Panels
             if (e.ColumnIndex == 7 && e.RowIndex >= 0) // e.RowIndex >= 0 to avoid header click
             {
                 string profileName = dataGrid_profiles.Rows[e.RowIndex].Cells["profileName"].Value.ToString();
-                ServerProfile profile = Env._serverProfiles.ServerProfileList.Find(p => p.ProfileName == profileName);
-                if (Env._serverInstances.TryGetValue(profile, out ServerInstance serverInstance))
+                ServerProfile profile =_env._serverProfiles.ServerProfileList.Find(p => p.ProfileName == profileName);
+                if (_env._serverInstances.TryGetValue(profile, out ServerInstance serverInstance))
                 {
                     (new GameManager(serverInstance)).ShowDialog();
                 }
@@ -57,9 +59,9 @@ namespace ServerManager.Panels
             // Is profile selected?
             if (dataGrid_profiles.SelectedRows.Count < 1) { return; }
             string profileName = dataGrid_profiles.SelectedRows[0].Cells["profileName"].Value.ToString();
-            ServerProfile profile = Env._serverProfiles.ServerProfileList.Find(p => p.ProfileName == profileName);
+            ServerProfile profile = _env._serverProfiles.ServerProfileList.Find(p => p.ProfileName == profileName);
             // Is Instance Running?
-            if (Env._serverInstances.TryGetValue(profile, out ServerInstance serverInstance))
+            if (_env._serverInstances.TryGetValue(profile, out ServerInstance serverInstance))
             {
                 if (serverInstance.instance_Status().isRunning)
                 {
@@ -68,7 +70,7 @@ namespace ServerManager.Panels
                 }    
             }
 
-            if (Env._serverProfiles.RemoveProfile(profile))
+            if (_env._serverProfiles.RemoveProfile(profile))
             {
                 MessageBox.Show("Profile Removed.");
                 tickEvent_profileStatusUpdate();                 
@@ -103,7 +105,7 @@ namespace ServerManager.Panels
             
             // Update Profiles
             dataGrid_profiles.Rows.Clear();
-            foreach (var profile in Env._serverInstances)
+            foreach (var profile in _env._serverInstances)
             {
                 // Instance Object
                 ServerInstance instance = profile.Value;

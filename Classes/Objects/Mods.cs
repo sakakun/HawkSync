@@ -39,11 +39,26 @@ public class Mods
 
             foreach (var mod in data)
             {
-                Bitmap iconResource = (Bitmap) Properties.Resources.ResourceManager.GetObject(mod.icon.ToString());
-                MemoryStream tempStream = new MemoryStream();
-                iconResource.Save(tempStream, ImageFormat.Png);
-                byte[] ModIcon = tempStream.ToArray();
+                // Construct the resource name for the mod icon
+                string iconResourceName = $"ServerManager.Resources.Images.Mods.{mod.id}.gif";
             
+                byte[] ModIcon;
+                using (Stream iconStream = assembly.GetManifestResourceStream(iconResourceName))
+                {
+                    if (iconStream != null)
+                    {
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            iconStream.CopyTo(ms);
+                            ModIcon = ms.ToArray();
+                        }
+                    }
+                    else
+                    {
+                        ModIcon = null; // Handle case where icon is not found
+                    }
+                }
+
                 result.Add(new ObjectMod
                 {
                     Id = mod.id,
@@ -54,8 +69,10 @@ public class Mods
                     ModIcon = ModIcon
                 }); 
             }
-            
+        
             DefaultModList = result;
         }
-    } 
+    }
+    
+    
 }

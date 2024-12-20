@@ -24,11 +24,17 @@ namespace ServerManager.Classes.Enviroment
         
         // Singleton instance
         private static ServerEnvironment            _instance;
+        private static readonly object _lock = new object(); // Lock object for thread safety
 
         // Private constructor
         private ServerEnvironment()
         {
-        
+            
+        }
+
+        public void init_Instance()
+        {
+            Console.WriteLine("Init. Vars");
             // Initialize your properties here
             _programConfig = new ProgramConfigurations();
             _systemTicker = new Ticker();
@@ -45,17 +51,25 @@ namespace ServerManager.Classes.Enviroment
             
             // Load Profiles & Init. Instances
             _serverProfiles = new ServerProfiles(this);
-            
         }
-
+        
+        
         // Static property to access the instance
         public static ServerEnvironment Instance
         {
             get
             {
+                // Double-check locking for thread safety
                 if (_instance == null)
                 {
-                    _instance = new ServerEnvironment();
+                    lock (_lock)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new ServerEnvironment();
+                            _instance.init_Instance();
+                        }
+                    }
                 }
                 return _instance;
             }

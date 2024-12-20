@@ -89,6 +89,7 @@
     <ItemGroup>
         <Compile Include="Classes\Enviroment\ServerEnvironment.cs" />
         <Compile Include="Classes\Enviroment\ServerInstance.cs" />
+        <Compile Include="Classes\Enviroment\ServerMapManagement.cs" />
         <Compile Include="Classes\Enviroment\ServerProfiles.cs" />
         <Compile Include="Classes\Enviroment\ServerSettings.cs" />
         <Compile Include="Classes\Modules\ProgramConfigurations.cs" />
@@ -131,31 +132,25 @@
         <EmbeddedResource Include="Panels\ServerProfileEditor.resx">
           <DependentUpon>ServerProfileEditor.cs</DependentUpon>
         </EmbeddedResource>
-        <EmbeddedResource Include="Properties\Resources.en.resx">
-          <DependentUpon>Resources.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Include="Properties\Resources.fr.resx">
-          <DependentUpon>Resources.resx</DependentUpon>
-        </EmbeddedResource>
-        <EmbeddedResource Include="Properties\Resources.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-            <SubType>Designer</SubType>
-        </EmbeddedResource>
-        <Compile Include="Properties\Resources.Designer.cs">
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
         <None Include="packages.config" />
         <None Include="Properties\Settings.settings">
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </None>
+        <Compile Include="Properties\Resources.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
         <Compile Include="Properties\Settings.Designer.cs">
             <AutoGen>True</AutoGen>
             <DependentUpon>Settings.settings</DependentUpon>
             <DesignTimeSharedInput>True</DesignTimeSharedInput>
         </Compile>
+        <EmbeddedResource Include="Properties\Resources.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
         <EmbeddedResource Include="Resources\Images\Mods\bhd.gif" />
         <EmbeddedResource Include="Resources\Images\Mods\bhdts.gif" />
         <EmbeddedResource Include="Resources\Images\Mods\bo.gif" />
@@ -170,26 +165,27 @@
         <EmbeddedResource Include="Resources\Images\Mods\snajo.gif" />
         <EmbeddedResource Include="Resources\Images\Mods\swat.gif" />
         <EmbeddedResource Include="Resources\Images\Mods\wot.gif" />
-        <EmbeddedResource Include="Resources\Images\States\hosting.gif">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </EmbeddedResource>
-        <EmbeddedResource Include="Resources\Images\States\loading.gif">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </EmbeddedResource>
-        <EmbeddedResource Include="Resources\Images\States\notactive.gif">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </EmbeddedResource>
-        <EmbeddedResource Include="Resources\Images\States\nothosting.gif">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </EmbeddedResource>
-        <EmbeddedResource Include="Resources\Images\States\scoring.gif">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </EmbeddedResource>
+        <EmbeddedResource Include="Resources\Images\States\hosting.gif" />
+        <EmbeddedResource Include="Resources\Images\States\loading.gif" />
+        <EmbeddedResource Include="Resources\Images\States\notactive.gif" />
+        <EmbeddedResource Include="Resources\Images\States\scoring.gif" />
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="Resources\Images\PlayerManager\tiles\playerTile-black.png" />
+      <Content Include="Resources\Images\PlayerManager\tiles\playerTile-blue.png" />
+      <Content Include="Resources\Images\PlayerManager\tiles\playerTile-red.png" />
+      <Content Include="Resources\Images\Static\arrows-rotate.png" />
+      <Content Include="Resources\Images\Static\download.png" />
+      <Content Include="Resources\Images\Static\eraser.png" />
+      <Content Include="Resources\Images\Static\floppy-disk.png" />
+      <Content Include="Resources\Images\Static\folder-minus.png" />
+      <Content Include="Resources\Images\Static\folder-open.png" />
+      <Content Include="Resources\Images\Static\folder-plus.png" />
+      <Content Include="Resources\Images\Static\upload.png" />
+      <EmbeddedResource Include="Resources\Images\States\nothosting.gif" />
       <EmbeddedResource Include="Resources\Database\countryCodes.json" />
       <EmbeddedResource Include="Resources\Database\defaultMaps.json" />
       <EmbeddedResource Include="Resources\Database\gameTypes.json" />

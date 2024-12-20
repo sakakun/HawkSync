@@ -62,9 +62,48 @@ namespace ServerManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap bhd {
+        internal static System.Drawing.Bitmap arrowsRotate {
             get {
-                object obj = ResourceManager.GetObject("bhd", resourceCulture);
+                object obj = ResourceManager.GetObject("arrowsRotate", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [
+        ///  {&quot;id&quot;:1,&quot;iso&quot;:&quot;AF&quot;,&quot;name&quot;:&quot;AFGHANISTAN&quot;,&quot;nicename&quot;:&quot;Afghanistan&quot;,&quot;iso3&quot;:&quot;AFG&quot;,&quot;numcode&quot;:4,&quot;phonecode&quot;:93},
+        ///  {&quot;id&quot;:2,&quot;iso&quot;:&quot;AL&quot;,&quot;name&quot;:&quot;ALBANIA&quot;,&quot;nicename&quot;:&quot;Albania&quot;,&quot;iso3&quot;:&quot;ALB&quot;,&quot;numcode&quot;:8,&quot;phonecode&quot;:355},
+        ///  {&quot;id&quot;:3,&quot;iso&quot;:&quot;DZ&quot;,&quot;name&quot;:&quot;ALGERIA&quot;,&quot;nicename&quot;:&quot;Algeria&quot;,&quot;iso3&quot;:&quot;DZA&quot;,&quot;numcode&quot;:12,&quot;phonecode&quot;:213},
+        ///  {&quot;id&quot;:4,&quot;iso&quot;:&quot;AS&quot;,&quot;name&quot;:&quot;AMERICAN SAMOA&quot;,&quot;nicename&quot;:&quot;American Samoa&quot;,&quot;iso3&quot;:&quot;ASM&quot;,&quot;numcode&quot;:16,&quot;phonecode&quot;:1684},
+        ///  {&quot;id&quot;:5,&quot;iso&quot;:&quot;AD&quot;,&quot;name&quot;:&quot;ANDORRA&quot;,&quot;nicename&quot;:&quot;Andorra&quot;,&quot;iso3&quot;:&....
+        /// </summary>
+        internal static string countryCodes {
+            get {
+                return ResourceManager.GetString("countryCodes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [
+        ///  {&quot;id&quot;:1,&quot;mission_name&quot;:&quot;Road Rage&quot;,&quot;mission_file&quot;:&quot;DMK_01A.BMS&quot;,&quot;game&quot;:0,&quot;gametype&quot;:&quot;DM&quot;},
+        ///  {&quot;id&quot;:2,&quot;mission_name&quot;:&quot;City Madness&quot;,&quot;mission_file&quot;:&quot;DMM_01A.BMS&quot;,&quot;game&quot;:0,&quot;gametype&quot;:&quot;DM&quot;},
+        ///  {&quot;id&quot;:3,&quot;mission_name&quot;:&quot;Cracked&quot;,&quot;mission_file&quot;:&quot;DMM_01E.BMS&quot;,&quot;game&quot;:0,&quot;gametype&quot;:&quot;DM&quot;},
+        ///  {&quot;id&quot;:4,&quot;mission_name&quot;:&quot;Walled In&quot;,&quot;mission_file&quot;:&quot;DMM_01G.BMS&quot;,&quot;game&quot;:0,&quot;gametype&quot;:&quot;DM&quot;},
+        ///  {&quot;id&quot;:5,&quot;mission_name&quot;:&quot;Mines Eye&quot;,&quot;mission_file&quot;:&quot;DMM_01H.BMS&quot;,&quot;game&quot;:0,&quot;gametype&quot;:&quot;DM&quot;},
+        ///  {&quot;id&quot;:6,&quot;mission_name&quot;:&quot;Stadium Riot&quot;,&quot;mis [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string defaultMaps {
+            get {
+                return ResourceManager.GetString("defaultMaps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap download {
+            get {
+                object obj = ResourceManager.GetObject("download", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -72,9 +111,9 @@ namespace ServerManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap bhdts {
+        internal static System.Drawing.Bitmap eraser {
             get {
-                object obj = ResourceManager.GetObject("bhdts", resourceCulture);
+                object obj = ResourceManager.GetObject("eraser", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -82,9 +121,9 @@ namespace ServerManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap bo {
+        internal static System.Drawing.Bitmap folderMinus {
             get {
-                object obj = ResourceManager.GetObject("bo", resourceCulture);
+                object obj = ResourceManager.GetObject("folderMinus", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -92,9 +131,19 @@ namespace ServerManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap dj {
+        internal static System.Drawing.Bitmap folderOpen {
             get {
-                object obj = ResourceManager.GetObject("dj", resourceCulture);
+                object obj = ResourceManager.GetObject("folderOpen", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap folderPlus {
+            get {
+                object obj = ResourceManager.GetObject("folderPlus", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -105,46 +154,6 @@ namespace ServerManager.Properties {
         internal static System.Drawing.Bitmap hosting {
             get {
                 object obj = ResourceManager.GetObject("hosting", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ic {
-            get {
-                object obj = ResourceManager.GetObject("ic", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ice {
-            get {
-                object obj = ResourceManager.GetObject("ice", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap jo {
-            get {
-                object obj = ResourceManager.GetObject("jo", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap joe {
-            get {
-                object obj = ResourceManager.GetObject("joe", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -182,9 +191,39 @@ namespace ServerManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap real {
+        internal static System.Drawing.Bitmap playerTileBlack {
             get {
-                object obj = ResourceManager.GetObject("real", resourceCulture);
+                object obj = ResourceManager.GetObject("playerTileBlack", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap playerTileBlue {
+            get {
+                object obj = ResourceManager.GetObject("playerTileBlue", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap playerTileRed {
+            get {
+                object obj = ResourceManager.GetObject("playerTileRed", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap save {
+            get {
+                object obj = ResourceManager.GetObject("save", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -202,49 +241,9 @@ namespace ServerManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap sg {
+        internal static System.Drawing.Bitmap upload {
             get {
-                object obj = ResourceManager.GetObject("sg", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap sna {
-            get {
-                object obj = ResourceManager.GetObject("sna", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap snajo {
-            get {
-                object obj = ResourceManager.GetObject("snajo", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap swat {
-            get {
-                object obj = ResourceManager.GetObject("swat", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap wot {
-            get {
-                object obj = ResourceManager.GetObject("wot", resourceCulture);
+                object obj = ResourceManager.GetObject("upload", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

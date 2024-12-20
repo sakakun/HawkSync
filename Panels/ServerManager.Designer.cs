@@ -1,4 +1,7 @@
-﻿namespace ServerManager.Panels
+﻿using System.Drawing;
+using ServerManager.Classes.Objects;
+
+namespace ServerManager.Panels
 {
     partial class ServerManager
     {
@@ -46,6 +49,7 @@
             this.profileOpenBtn = new System.Windows.Forms.DataGridViewButtonColumn();
             this.panel_profileControls = new System.Windows.Forms.Panel();
             this.groupBox_legend = new System.Windows.Forms.GroupBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox5_scoring = new System.Windows.Forms.PictureBox();
             this.label_scoring = new System.Windows.Forms.Label();
             this.label_notHosting = new System.Windows.Forms.Label();
@@ -55,7 +59,6 @@
             this.label_loading = new System.Windows.Forms.Label();
             this.pictureBox2_legend = new System.Windows.Forms.PictureBox();
             this.label_notActive = new System.Windows.Forms.Label();
-            this.pictureBox1_legend = new System.Windows.Forms.PictureBox();
             this.groupBox_options = new System.Windows.Forms.GroupBox();
             this.button6 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
@@ -72,11 +75,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid_profiles)).BeginInit();
             this.panel_profileControls.SuspendLayout();
             this.groupBox_legend.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5_scoring)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4_legend)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3_legend)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2_legend)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1_legend)).BeginInit();
             this.groupBox_options.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -228,6 +231,7 @@
             // 
             // groupBox_legend
             // 
+            this.groupBox_legend.Controls.Add(this.pictureBox1);
             this.groupBox_legend.Controls.Add(this.pictureBox5_scoring);
             this.groupBox_legend.Controls.Add(this.label_scoring);
             this.groupBox_legend.Controls.Add(this.label_notHosting);
@@ -237,7 +241,6 @@
             this.groupBox_legend.Controls.Add(this.label_loading);
             this.groupBox_legend.Controls.Add(this.pictureBox2_legend);
             this.groupBox_legend.Controls.Add(this.label_notActive);
-            this.groupBox_legend.Controls.Add(this.pictureBox1_legend);
             this.groupBox_legend.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupBox_legend.Location = new System.Drawing.Point(742, 0);
             this.groupBox_legend.Name = "groupBox_legend";
@@ -247,10 +250,22 @@
             this.groupBox_legend.TabStop = false;
             this.groupBox_legend.Text = "Legend";
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.ErrorImage = null;
+            this.pictureBox1.Image = global::ServerManager.Properties.Resources.notactive;
+            this.pictureBox1.InitialImage = null;
+            this.pictureBox1.Location = new System.Drawing.Point(13, 21);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(24, 24);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox1.TabIndex = 10;
+            this.pictureBox1.TabStop = false;
+            // 
             // pictureBox5_scoring
             // 
             this.pictureBox5_scoring.ErrorImage = null;
-            this.pictureBox5_scoring.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox5_scoring.Image")));
+            this.pictureBox5_scoring.Image = global::ServerManager.Properties.Resources.scoring;
             this.pictureBox5_scoring.InitialImage = null;
             this.pictureBox5_scoring.Location = new System.Drawing.Point(243, 45);
             this.pictureBox5_scoring.Name = "pictureBox5_scoring";
@@ -282,7 +297,7 @@
             // pictureBox4_legend
             // 
             this.pictureBox4_legend.ErrorImage = null;
-            this.pictureBox4_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4_legend.Image")));
+            this.pictureBox4_legend.Image = global::ServerManager.Properties.Resources.nothosting;
             this.pictureBox4_legend.InitialImage = null;
             this.pictureBox4_legend.Location = new System.Drawing.Point(243, 69);
             this.pictureBox4_legend.Name = "pictureBox4_legend";
@@ -304,7 +319,7 @@
             // pictureBox3_legend
             // 
             this.pictureBox3_legend.ErrorImage = null;
-            this.pictureBox3_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3_legend.Image")));
+            this.pictureBox3_legend.Image = global::ServerManager.Properties.Resources.hosting;
             this.pictureBox3_legend.InitialImage = null;
             this.pictureBox3_legend.Location = new System.Drawing.Point(13, 69);
             this.pictureBox3_legend.Name = "pictureBox3_legend";
@@ -326,7 +341,7 @@
             // pictureBox2_legend
             // 
             this.pictureBox2_legend.ErrorImage = null;
-            this.pictureBox2_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2_legend.Image")));
+            this.pictureBox2_legend.Image = global::ServerManager.Properties.Resources.loading;
             this.pictureBox2_legend.InitialImage = null;
             this.pictureBox2_legend.Location = new System.Drawing.Point(13, 45);
             this.pictureBox2_legend.Name = "pictureBox2_legend";
@@ -344,18 +359,6 @@
             this.label_notActive.TabIndex = 1;
             this.label_notActive.Text = "Offline";
             this.label_notActive.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // pictureBox1_legend
-            // 
-            this.pictureBox1_legend.ErrorImage = null;
-            this.pictureBox1_legend.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1_legend.Image")));
-            this.pictureBox1_legend.InitialImage = null;
-            this.pictureBox1_legend.Location = new System.Drawing.Point(13, 21);
-            this.pictureBox1_legend.Name = "pictureBox1_legend";
-            this.pictureBox1_legend.Size = new System.Drawing.Size(24, 24);
-            this.pictureBox1_legend.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1_legend.TabIndex = 0;
-            this.pictureBox1_legend.TabStop = false;
             // 
             // groupBox_options
             // 
@@ -482,14 +485,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid_profiles)).EndInit();
             this.panel_profileControls.ResumeLayout(false);
             this.groupBox_legend.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5_scoring)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4_legend)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3_legend)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2_legend)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1_legend)).EndInit();
             this.groupBox_options.ResumeLayout(false);
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.PictureBox pictureBox1;
 
         private System.Windows.Forms.DataGridViewButtonColumn profileOpenBtn;
 
@@ -523,8 +528,6 @@
         private System.Windows.Forms.PictureBox pictureBox3_legend;
 
         private System.Windows.Forms.Label label_notActive;
-
-        private System.Windows.Forms.PictureBox pictureBox1_legend;
 
         private System.Windows.Forms.DataGridView dataGrid_profiles;
 

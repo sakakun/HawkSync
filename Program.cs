@@ -12,7 +12,7 @@ namespace ServerManager;
 
 public class Program
 {
-    public static ServerEnvironment ServerEnvironment;
+    public static ServerEnvironment _env;
     
     [STAThread]
     static void Main()

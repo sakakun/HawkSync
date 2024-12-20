@@ -5,55 +5,74 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using ServerManager.Properties;
 
 namespace ServerManager.Classes.Objects;
 
 public class ObjectMap
 {
-    public string MapFile { get; set; }
-    public string MapName { get; set; }
-    public string GameType { get; set; }
-    public bool CustomMap { get; set; }
+    public int id { get; set; }
+    public string mission_name { get; set; }
+    public string mission_file { get; set; }
+    public string gametype  { get; set; }
+    public int game { get; set; }
+    public bool CustomMap  { get; set; }
     public List<int> GameTypes { get; set; }
+
+    public ObjectMap()
+    {
+        GameTypes = new List<int>();
+    }
 }
 
 public class DefaultMaps
 {
     public List<ObjectMap> DefaultMapList { get; private set; }
-    
+
     public DefaultMaps(List<GameType> gameTypes, int modId)
     {
-        // Load JSON data from embedded resource
-        var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "ServerManager.Resources.Database.defaultMaps.json"; 
-
-        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-        using (StreamReader reader = new StreamReader(stream))
-        {
-            string jsonData = reader.ReadToEnd();
-            var data = JsonConvert.DeserializeObject<dynamic[]>(jsonData);
-
-            var result = new List<ObjectMap>();
-
-            foreach (var map in data)
+        string jsonData = Resources.defaultMaps;
+        var data = JsonConvert.DeserializeObject<List<ObjectMap>>(jsonData); // Deserialize to List<ObjectMap>
+        
+        DefaultMapList = data
+            .Where(map => map.game == modId) // Filter maps by GameType
+            .Select(map => new ObjectMap
             {
-                if (map.game == modId)
+                mission_file = map.mission_file,
+                mission_name = map.mission_name,
+                CustomMap = false,
+                gametype = map.gametype,
+                GameTypes = new List<int>
                 {
-                   List<int> types = new List<int>();
-            
-                    types.Add( gameTypes.FirstOrDefault(gt => gt.ShortName == map.gametype.ToString())!.DatabaseId );
-                
-                    result.Add(new ObjectMap
-                    {
-                        MapFile = map.mission_file,
-                        MapName = map.mission_name,
-                        CustomMap = false,
-                        GameTypes = types
-                    }); 
+                    gameTypes.FirstOrDefault(gt => gt.ShortName == map.gametype)?.Bitmap ?? 0 // Populate GameTypes
                 }
-            }
-            
-            DefaultMapList = result;
+            })
+            .ToList(); // Convert to List<ObjectMap>
+        
+    }
+    
+    public static void sum_up_recursive(List<int> numbers, int target, List<int> partial, ref ObjectMap map)
+    {
+        int s = 0;
+        foreach (int x in partial) s += x;
+
+        if (s == target)
+        {
+            map.GameTypes = partial; // Update GameTypes with the found combination
+        }
+
+        if (s >= target)
+            return;
+
+        for (int i = 0; i < numbers.Count; i++)
+        {
+            List<int> remaining = new List<int>();
+            int n = numbers[i];
+            for (int j = i + 1; j < numbers.Count; j++) remaining.Add(numbers[j]);
+
+            List<int> partial_rec = new List<int>(partial);
+            partial_rec.Add(n);
+            sum_up_recursive(remaining, target, partial_rec, ref map);
         }
     }
 }
