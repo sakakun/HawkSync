@@ -906,7 +906,7 @@ namespace BHD_ServerManager.Forms
 
         private void ActionClick_AdminNewUser(object sender, EventArgs e)
         {
-            btn_adminAdd.Enabled = false;
+            btn_adminAdd.Enabled = true;
             btn_adminSave.Enabled = false;
             btn_adminDelete.Enabled = false;
             cb_adminRole.SelectedItem = null;
