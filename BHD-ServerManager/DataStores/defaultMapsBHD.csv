@@ -1,0 +1,123 @@
+MapID,MapName,MapFile,ProfileServerType,GameType
+1,Road Rage,DMK_01A.BMS,0,DM
+2,City Madness,DMM_01A.BMS,0,DM
+3,Cracked,DMM_01E.BMS,0,DM
+4,Walled In,DMM_01G.BMS,0,DM
+5,Mines Eye,DMM_01H.BMS,0,DM
+6,Stadium Riot,DMM_01K.BMS,0,DM
+7,Desert Funeral,DMM_02A.BMS,0,DM
+8,Devil Dogs,DMM_03A.BMS,0,DM
+9,Squirrels Nest,DMP_01A.BMS,0,DM
+10,Culture Clash A,TDMK_01A.BMS,0,TDM
+11,Culture Clash B,TDMK_01B.BMS,0,TDM
+12,Mean Streets A,TDMM_01A.BMS,0,TDM
+13,Mean Streets B,TDMM_01B.BMS,0,TDM
+14,Panic Attack A,TDMM_01E.BMS,0,TDM
+15,Panic Attack B,TDMM_01F.BMS,0,TDM
+16,Rampage A,TDMM_01G.BMS,0,TDM
+17,Rampage B,TDMM_01H.BMS,0,TDM
+18,Double Barrel A,TDMM_01K.BMS,0,TDM
+19,Double Barrel B,TDMM_01L.BMS,0,TDM
+20,Hornets Nest A,TDMM_02A.BMS,0,TDM
+21,Hornets Nest B,TDMM_02B.BMS,0,TDM
+22,Sidewinder A,TDMM_03A.BMS,0,TDM
+23,Sidewinder B,TDMM_03B.BMS,0,TDM
+24,Clue Map A,TDMP_01A.BMS,0,TDM
+25,Clue Map B,TDMP_01B.BMS,0,TDM
+26,Meat Grinder A,TKHK_01A.BMS,0,TKOTH
+27,Mean Grinder B,TKHK_01B.BMS,0,TKOTH
+28,House of Pain A,TKHM_01A.BMS,0,TKOTH
+29,House of Pain B,TKHM_01B.BMS,0,TKOTH
+30,Eye of the Dead A,TKHM_01E.BMS,0,TKOTH
+31,Eye of the Dead B,TKHM_01F.BMS,0,TKOTH
+32,Dust Devil A,TKHM_01G.BMS,0,TKOTH
+33,Dust Devil B,TKHM_01H.BMS,0,TKOTH
+34,Spider Web A,TKHM_01K.BMS,0,TKOTH
+35,Spider Web B,TKHM_01L.BMS,0,TKOTH
+36,Desert Insertion A,TKHM_02A.BMS,0,TKOTH
+37,Desert Insertion A,TKHM_02B.BMS,0,TKOTH
+38,Desert Fox A,TKHM_03A.BMS,0,TKOTH
+39,Desert Fox B,TKHM_03B.BMS,0,TKOTH
+40,Tunnel Trouble A,TKHP_01A.BMS,0,TKOTH
+41,Tunnel Trouble B,TKHP_01B.BMS,0,TKOTH
+42,Mog Mayhem A,SDK_01A.BMS,0,SD
+43,Mog Mayhem B,SDK_01B.BMS,0,SD
+44,Firefighter A,SDM_01A.BMS,0,SD
+45,Firefighter B,SDM_01B.BMS,0,SD
+46,Roof Stalker A,SDM_01E.BMS,0,SD
+47,Roof Stalker B,SDM_01F.BMS,0,SD
+48,Savannah Town A,SDM_01G.BMS,0,SD
+49,Savannah Town B,SDM_01H.BMS,0,SD
+50,Stadium Feud A,SDM_01K.BMS,0,SD
+51,Stadium Feud B,SDM_01L.BMS,0,SD
+52,Sky Raiders A,SDM_02A.BMS,0,SD
+53,Sky Raiders B,SDM_02B.BMS,0,SD
+54,Trail Blazer A,SDM_03A.BMS,0,SD
+55,Trail Blazer B,SDM_03B.BMS,0,SD
+56,The Hidden A,SDP_01A.BMS,0,SD
+57,The Hidden B,SDP_01B.BMS,0,SD
+58,Crossfire A,ADK_01A.BMS,0,AD
+59,Crossfire B,ADK_01B.BMS,0,AD
+60,Urban Raid A,ADK_02A.BMS,0,AD
+61,Urban Raid B,ADK_02B.BMS,0,AD
+62,Rapid Fire A,ADM_01A.BMS,0,AD
+63,Rapid Fire B,ADM_01B.BMS,0,AD
+64,Ground Fire A,ADM_01E.BMS,0,AD
+65,Ground Fire B,ADM_01F.BMS,0,AD
+66,Dust and Bones A,ADM_01G.BMS,0,AD
+67,Dust and Bones B,ADM_01H.BMS,0,AD
+68,Valkyrie A,ADM_02A.BMS,0,AD
+69,Valkyrie B,ADM_02B.BMS,0,AD
+70,Snake Pit A,ADM_03A.BMS,0,AD
+71,Snake Pit B,ADM_03B.BMS,0,AD
+72,Lost and Dead A,ADP_01A.BMS,0,AD
+73,Lost and Dead B,ADP_01B.BMS,0,AD
+74,Defensive Assault A,ADP_11A.BMS,0,AD
+75,Defensive Assault B,ADP_11B.BMS,0,AD
+76,The Barrens A,CTFK_01A.BMS,0,CTF
+77,The Barrens B,CTFK_01B.BMS,0,CTF
+78,Tug O War A,CTFK_02A.BMS,0,CTF
+79,Tug O War B,CTFK_02B.BMS,0,CTF
+80,Groundhog Day A,CTFK_03A.BMS,0,CTF
+81,Groundhog Day B,CTFK_03B.BMS,0,CTF
+82,Block Mayhem A,CTFM_01A.BMS,0,CTF
+83,Block Mayhem B,CTFM_01B.BMS,0,CTF
+84,Burned Asphalt A,CTFM_01E.BMS,0,CTF
+85,Burned Asphalt B,CTFM_01F.BMS,0,CTF
+86,Desert Trap A,CTFM_01G.BMS,0,CTF
+87,Desert Trap B,CTFM_01H.BMS,0,CTF
+88,Snake Eyes A,CTFM_01I.BMS,0,CTF
+89,Snake Eyes B,CTFM_01J.BMS,0,CTF
+90,Storage Space A,CTFM_01K.BMS,0,CTF
+91,Storage Space B,CTFM_01L.BMS,0,CTF
+92,Dead Zone A,CTFM_02A.BMS,0,CTF
+93,Dead Zone B,CTFM_02B.BMS,0,CTF
+94,Hit and Run A,CTFM_03A.BMS,0,CTF
+95,Hit and Run B,CTFM_03B.BMS,0,CTF
+96,Bad Juju A,CTFM_05A.BMS,0,CTF
+97,Bad Juju B,CTFM_05B.BMS,0,CTF
+98,Ribcage A,CTFP_01A.BMS,0,CTF
+99,Ribcage B,CTFP_01B.BMS,0,CTF
+100,Scrimmage Line A,FBK_01A.BMS,0,FB
+101,Scrimmage Line B,FBK_01B.BMS,0,FB
+102,Blitzkrig A,FBK_03A.BMS,0,FB
+103,Blitzkrig B,FBK_03B.BMS,0,FB
+104,Pigskin A,FBM_01A.BMS,0,FB
+105,Pigskin B,FBM_01B.BMS,0,FB
+106,Wall Jumper A,FBM_01E.BMS,0,FB
+107,Wall Jumper B,FBM_01F.BMS,0,FB
+108,Desert Scarab A,FBM_01G.BMS,0,FB
+109,Desert Scarab B,FBM_01H.BMS,0,FB
+110,Bloodball A,FBM_01K.BMS,0,FB
+111,Bloodball B,FBM_01L.BMS,0,FB
+112,Sky Fire A,FBM_02A.BMS,0,FB
+113,Sky Fire B,FBM_02B.BMS,0,FB
+114,Frontal Assult A,FBM_03A.BMS,0,FB
+115,Frontal Assult B,FBM_03B.BMS,0,FB
+116,Frantic Traffic A,FBP_01A.BMS,0,FB
+117,Frantic Traffic B,FBP_01B.BMS,0,FB
+118,Meat Grinder A,KHM_01A.BMS,0,KOTH
+119,Eye of the Dead A,KHM_01E.BMS,0,KOTH
+120,Dust Devil A,KHM_01G.BMS,0,KOTH
+121,Desert Insertion A,KHM_02A.BMS,0,KOTH
+122,Desert Fox A,KHM_03A.BMS,0,KOTH

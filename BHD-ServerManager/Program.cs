@@ -1,0 +1,41 @@
+using BHD_SharedResources.Classes.CoreObjects;
+using BHD_SharedResources.Classes.StatsManagement;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_SharedResources.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.StatsManagement;
+using BHD_SharedResources.Classes.GameManagement;
+using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Forms;
+
+namespace BHD_ServerManager
+{
+    public static class Program
+    {
+
+        public static ServerManager? ServerManagerUI { get; private set; }
+
+        [STAThread]
+        static void Main()
+        {
+            // Initialize the Instance of the Application
+            CommonCore.InitializeCore();
+
+
+
+            // Setup the Instance Managers
+            theInstanceManager.Implementation = new serverTheInstanceManager();
+            banInstanceManager.Implementation = new serverBanInstanceManager();
+            chatInstanceManagers.Implementation = new serverChatInterfaceManager();
+            mapInstanceManager.Implementation = new serverMapInstanceManager();
+            adminInstanceManager.Implementation = new serverAdminInstanceManager();
+
+            StatsManager.Implementation = new serverStatsManager();
+            GameManager.Implementation = new serverGameManager();
+
+            ApplicationConfiguration.Initialize();
+            ServerManagerUI = new ServerManager();
+
+            Application.Run(ServerManagerUI);
+        }
+    }
+}

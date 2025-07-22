@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Text.Json;
+using System.Security.Cryptography;
+
+namespace BHD_SharedResources.Classes.Instances
+{
+    public class adminInstance
+    {
+        public List<AdminAccount>   Admins  { get; set; } = new List<AdminAccount>();
+        public List<AdminLog>       Logs    { get; set; } = new List<AdminLog>();
+    }
+
+    public class AdminAccount
+    {
+        public int UserId { get; set; } = 0;
+        public required string Username { get; set; } = string.Empty;
+        public required string Password { get; set; } = string.Empty;
+        public AdminRoles Role { get; set; } = AdminRoles.None;
+    }
+
+    public class AdminLog
+    {
+        public int LogId { get; set; } = 0;
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public int UserId { get; set; } = 0;
+        public required string Action { get; set; } = string.Empty;
+    }
+
+    public enum AdminRoles
+    {
+        None = 0,
+        Moderator = 1,
+        Admin = 2
+    }
+}
