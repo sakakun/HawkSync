@@ -184,7 +184,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
         public static string GenerateImportData()
         {
             string importData = string.Empty;
-            importData += "ServerID: " + theInstance.WebStatsProfileID + "\n";
+            importData += "ServerID " + theInstance.WebStatsProfileID + "\n";
             importData += GenerateGameLine() + "\n";
             foreach (var playerStat in instanceStats.playerStatsList.Values)
             {
