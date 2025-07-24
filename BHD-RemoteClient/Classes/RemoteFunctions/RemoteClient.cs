@@ -26,7 +26,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
         public SslStream? _commStream;
         private SslStream? _updateStream;
         private CancellationTokenSource? _cts;
-        public string AuthToken;
+        public string AuthToken = string.Empty;
 
         public RemoteClient(string serverAddress, int commPort, int updatePort)
         {
@@ -50,12 +50,12 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
 
                 // Connect communication channel
                 _commClient = new TcpClient(_serverAddress, _commPort);
-                _commStream = new SslStream(_commClient.GetStream(), false, ValidateServerCertificate, null);
+                _commStream = new SslStream(_commClient.GetStream(), false, ValidateServerCertificate!, null);
                 _commStream.AuthenticateAsClient(_serverAddress);
 
                 // Connect update channel
                 _updateClient = new TcpClient(_serverAddress, _updatePort);
-                _updateStream = new SslStream(_updateClient.GetStream(), false, ValidateServerCertificate, null);
+                _updateStream = new SslStream(_updateClient.GetStream(), false, ValidateServerCertificate!, null);
                 _updateStream.AuthenticateAsClient(_serverAddress);
 
                 // Start listening for updates
@@ -97,11 +97,11 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             }
         }
 
-        public CommandResponse? ReceiveCommandResponse(SslStream sslStream)
+        public CommandResponse? ReceiveCommandResponse(SslStream sslStream, int timeoutMs = 5000)
         {
             try
             {
-                sslStream.ReadTimeout = 5000; // 5 seconds
+                sslStream.ReadTimeout = timeoutMs;
                 Span<byte> lengthBytes = stackalloc byte[4];
                 int read = sslStream.Read(lengthBytes);
                 if (read < 4) return null;
@@ -130,14 +130,17 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             bool authenticated = false;
             var handshakeStart = DateTime.UtcNow;
 
+            // Allocate buffer once outside the loop
+            byte[] lengthBytes = new byte[4];
+
             // Authentication handshake loop with timeout
             while (!token.IsCancellationRequested && stream.CanRead && !authenticated)
             {
                 try
                 {
                     stream.ReadTimeout = 5000; // 5 seconds
-                    Span<byte> lengthBytes = stackalloc byte[4];
-                    int read = stream.Read(lengthBytes);
+                    Array.Clear(lengthBytes, 0, lengthBytes.Length);
+                    int read = stream.Read(lengthBytes, 0, lengthBytes.Length);
                     if (read < 4) break;
 
                     int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
@@ -200,8 +203,8 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                 try
                 {
                     stream.ReadTimeout = 10000; // 10 seconds
-                    Span<byte> lengthBytes = stackalloc byte[4];
-                    int read = stream.Read(lengthBytes);
+                    Array.Clear(lengthBytes, 0, lengthBytes.Length);
+                    int read = stream.Read(lengthBytes, 0, lengthBytes.Length);
                     if (read < 4)
                     {
                         AppDebug.Log("RemoteClient", "Stream closed or insufficient data, breaking update loop.");

@@ -15,7 +15,6 @@ namespace BHD_SharedResources.Classes.GameManagement
         public static bool stopGame() => Implementation.stopGame();
 
         // Game Server Memory Management
-        public static void attachProcess() => Implementation.attachProcess();
         public static int getGameTypeID(string gameType) => Implementation.getGameTypeID(gameType);
         public static void UpdatePlayerHostName() => Implementation.UpdatePlayerHostName();
         public static void UpdateMapListCount() => Implementation.UpdateMapListCount();

@@ -56,7 +56,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.functionEvent_UpdateAdminList();
             });
             adminInstanceManager.UpdateAdminLogDialog();
-            theInstanceManager.HighlightDifferences();
+            SafeInvoke(thisServer, () => theInstanceManager.HighlightDifferences());
             tickerEvent_checkMapDiff();
 
             // Only run the rest if it's time for an update

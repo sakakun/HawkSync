@@ -16,8 +16,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
         // Game Server Memory Management
-
-        public void attachProcess() => ServerMemory.attachProcess();
         public int  getGameTypeID(string gameType) => ServerMemory.getGameTypeID(gameType);
         public void UpdatePlayerHostName() => ServerMemory.UpdatePlayerHostName();
         public void UpdateMapListCount() => ServerMemory.UpdateMapListCount();

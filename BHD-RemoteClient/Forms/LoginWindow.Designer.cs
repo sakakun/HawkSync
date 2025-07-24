@@ -34,7 +34,6 @@
             tb_password = new TextBox();
             cb_rememberPassword = new CheckBox();
             btn_login = new Button();
-            btn_open = new Button();
             ((System.ComponentModel.ISupportInitialize)num_serverPort).BeginInit();
             SuspendLayout();
             // 
@@ -94,23 +93,11 @@
             btn_login.UseVisualStyleBackColor = true;
             btn_login.Click += btnLogin_Click;
             // 
-            // btn_open
-            // 
-            btn_open.Location = new Point(12, 95);
-            btn_open.Name = "btn_open";
-            btn_open.Size = new Size(75, 23);
-            btn_open.TabIndex = 6;
-            btn_open.Text = "Open";
-            btn_open.UseVisualStyleBackColor = true;
-            btn_open.Visible = false;
-            btn_open.Click += actionClick_openServerManager;
-            // 
             // LoginWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(272, 131);
-            Controls.Add(btn_open);
             Controls.Add(btn_login);
             Controls.Add(cb_rememberPassword);
             Controls.Add(tb_password);
@@ -137,6 +124,5 @@
         private TextBox tb_password;
         private CheckBox cb_rememberPassword;
         private Button btn_login;
-        private Button btn_open;
     }
 }

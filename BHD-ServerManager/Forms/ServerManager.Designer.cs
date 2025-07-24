@@ -2414,6 +2414,7 @@ namespace BHD_ServerManager.Forms
             panel5.Dock = DockStyle.Fill;
             panel5.Location = new Point(0, 0);
             panel5.Name = "panel5";
+            panel5.Padding = new Padding(0, 0, 0, 27);
             panel5.Size = new Size(902, 362);
             panel5.TabIndex = 1;
             // 
@@ -2437,7 +2438,7 @@ namespace BHD_ServerManager.Forms
             dataGridView_chatMessages.Location = new Point(0, 0);
             dataGridView_chatMessages.Name = "dataGridView_chatMessages";
             dataGridView_chatMessages.RowHeadersVisible = false;
-            dataGridView_chatMessages.Size = new Size(902, 362);
+            dataGridView_chatMessages.Size = new Size(902, 335);
             dataGridView_chatMessages.TabIndex = 0;
             // 
             // dateTime

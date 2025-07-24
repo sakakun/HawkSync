@@ -8,8 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -72,7 +72,6 @@ namespace BHD_RemoteClient.Forms
             catch (Exception ex)
             {
                 AppDebug.Log("LoginWindow", $"Error loading settings: {ex.Message}");
-                // Optionally log ex.Message
                 // Fallback to defaults
                 username = "";
                 password = "";
@@ -103,15 +102,12 @@ namespace BHD_RemoteClient.Forms
             }
             catch (Exception ex)
             {
-                AppDebug.Log("LoginWindow", $"Error loading settings: {ex.Message}");
-                // Optionally log ex.Message
-                // Swallow exception to prevent crash
+                AppDebug.Log("LoginWindow", $"Error saving settings: {ex.Message}");
             }
         }
 
         private void function_UpdateUI(bool setVariables = false)
         {
-            // If setVariables is true, update the private variables with the UI control values
             if (setVariables)
             {
                 username = tb_username.Text;
@@ -122,7 +118,6 @@ namespace BHD_RemoteClient.Forms
             }
             else
             {
-                // Otherwise, update the UI controls with the private variable values
                 tb_username.Text = username;
                 tb_password.Text = password;
                 tb_serverAddress.Text = serverAddress;
@@ -133,22 +128,8 @@ namespace BHD_RemoteClient.Forms
 
         private async void btnLogin_Click(object sender, EventArgs e)
         {
-            if (cb_rememberPassword.Checked)
-            {
-                function_UpdateUI(true);
-                SaveSettings();
-            }
-            else
-            {
-                // If not remembering, clear the password field
-                username = "";
-                password = "";
-                serverAddress = "";
-                serverPort = 8083;
-                rememberMe = false;
-                function_UpdateUI(false);
-                SaveSettings();
-            }
+            // Always update variables from UI first to capture latest user input
+            function_UpdateUI(true);
 
             btn_login.Enabled = false;
 
@@ -157,38 +138,38 @@ namespace BHD_RemoteClient.Forms
                 Program.theRemoteClient = new RemoteClient(serverAddress, serverPort, serverPort + 1);
 
                 bool loginSuccess = await Task.Run(() => CmdValidateUser.Login(username, password));
+
                 if (loginSuccess)
                 {
                     MessageBox.Show("Login successful!", "Login", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                     if (cb_rememberPassword.Checked)
                     {
-                        // Save the login details if "Remember Me" is checked
                         SaveSettings();
                     }
                     else
                     {
-                        // Clear the login details if not remembering
+                        // Clear the login details if not remembering, after login attempt
                         username = "";
                         password = "";
                         serverAddress = "";
                         serverPort = 8083;
                         rememberMe = false;
                         function_UpdateUI(false);
+                        SaveSettings();
                     }
 
-                    btn_login.Text = "Disconnect";
-                    btn_login.Enabled = true;
-                    btn_open.Visible = true;
-                    btn_login.Click -= btnLogin_Click!;
-                    btn_login.Click += btn_Disconnect_Click!;
-
-                    MessageBox.Show("You are now connected to the server.", "Connection Established", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     // Initialize the server manager
                     Program.ServerManagerUI = new ServerManager();
 
                     // Start Tickers
                     theInstanceManager.InitializeTickers();
 
+                    // Hide the login window and show the server manager UI
+                    this.Hide();
+                    Program.ServerManagerUI.FormClosed -= ServerManagerUI_FormClosed;
+                    Program.ServerManagerUI.FormClosed += ServerManagerUI_FormClosed;
+                    Program.ServerManagerUI.Show();
                 }
                 else
                 {
@@ -203,35 +184,17 @@ namespace BHD_RemoteClient.Forms
             }
         }
 
-        private void btn_Disconnect_Click(object sender, EventArgs e)
+        private void ServerManagerUI_FormClosed(object? sender, FormClosedEventArgs e)
         {
+            this.Show();
+
             if (Program.theRemoteClient != null)
             {
                 Program.theRemoteClient.Disconnect();
                 Program.theRemoteClient = null;
 
-                btn_login.Enabled = true;
-                btn_login.Text = "Login";
-                btn_open.Visible = false;
-                btn_login.Click -= btn_Disconnect_Click!;
-                btn_login.Click += btnLogin_Click!;
-
                 MessageBox.Show("You have been disconnected from the server.", "Disconnected", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-        }
-
-        private void actionClick_openServerManager(object sender, EventArgs e)
-        {
-            Program.ServerManagerUI!.FormClosed -= ServerManagerUI_FormClosed; // Prevent multiple subscriptions
-            Program.ServerManagerUI!.FormClosed += ServerManagerUI_FormClosed;
-            this.Hide(); // Hide the LoginWindow
-            Program.ServerManagerUI.Show(); // Show the ServerManagerUI
-        }
-
-        private void ServerManagerUI_FormClosed(object? sender, FormClosedEventArgs e)
-        {
-            this.Show(); // Show the LoginWindow again
-            btn_Disconnect_Click(sender!, e); // Ensure the disconnect logic is executed
         }
     }
 

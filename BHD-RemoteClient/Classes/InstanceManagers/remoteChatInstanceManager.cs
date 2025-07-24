@@ -18,9 +18,10 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
     {
         private static ServerManager thisServer => Program.ServerManagerUI!;
         private static chatInstance chatInstance => CommonCore.instanceChat!;
+        private static bool _chatGridFirstLoad = true;
+
 
         public void AddAutoMessage(string messageText, int tiggerSeconds) => CmdAddAutoMessage.ProcessCommand(messageText, tiggerSeconds);
-
         public void AddSlapMessage(string messageText) => CmdAddSlapMessage.ProcessCommand(messageText);
 
         public IReadOnlyList<SlapMessages> GetSlapMessages()
@@ -48,17 +49,23 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
 
         public static void UpdateChatMessagesGrid()
         {
-            if (thisServer.dataGridView_chatMessages.InvokeRequired)
+            var dgv = thisServer.dataGridView_chatMessages;
+
+            if (dgv.InvokeRequired)
             {
-                thisServer.dataGridView_chatMessages.Invoke(new Action(() => remoteChatInstanceManager.UpdateChatMessagesGrid()));
+                dgv.Invoke(new Action(UpdateChatMessagesGrid));
                 return;
             }
 
-            thisServer.dataGridView_chatMessages.Rows.Clear();
+            // Save scroll position
+            int firstDisplayedRow = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
+            int visibleRows = dgv.DisplayedRowCount(false);
+            bool wasAtBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
 
-            for (int i = 0; i < chatInstance.ChatLog.Count(); i++)
+            // Clear and repopulate
+            dgv.Rows.Clear();
+            foreach (var entry in CommonCore.instanceChat!.ChatLog)
             {
-                var entry = chatInstance.ChatLog[i];
                 string teamString = entry.MessageType switch
                 {
                     0 => "Server",
@@ -73,10 +80,9 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
                     _ => "Other"
                 };
 
-                // Sanitize player name
                 entry.PlayerName = Functions.SanitizePlayerName(entry.PlayerName);
 
-                thisServer.dataGridView_chatMessages.Rows.Add(
+                dgv.Rows.Add(
                     entry.MessageTimeStamp.ToString("HH:mm:ss"),
                     teamString,
                     entry.PlayerName,
@@ -84,7 +90,42 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
                 );
             }
 
+            // Restore scroll position safely
+            if (dgv.Rows.Count > 0)
+            {
+                int targetRow;
+                if (_chatGridFirstLoad)
+                {
+                    // Always scroll to bottom on first load
+                    targetRow = dgv.Rows.Count - visibleRows;
+                    if (targetRow < 0) targetRow = 0;
+                    _chatGridFirstLoad = false;
+                }
+                else if (wasAtBottom)
+                {
+                    if (visibleRows >= dgv.Rows.Count)
+                    {
+                        targetRow = 0;
+                    }
+                    else
+                    {
+                        targetRow = dgv.Rows.Count - visibleRows;
+                        if (targetRow < 0) targetRow = 0;
+                    }
+                }
+                else
+                {
+                    targetRow = firstDisplayedRow;
+                    if (targetRow >= dgv.Rows.Count) targetRow = dgv.Rows.Count - 1;
+                    if (targetRow < 0) targetRow = 0;
+                }
 
+                // Only set scroll index if valid
+                if (targetRow >= 0 && targetRow < dgv.Rows.Count)
+                {
+                    dgv.FirstDisplayedScrollingRowIndex = targetRow;
+                }
+            }
         }
 
     }

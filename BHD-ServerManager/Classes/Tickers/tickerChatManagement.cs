@@ -200,15 +200,17 @@ namespace BHD_ServerManager.Classes.Tickers
 
         private static void UpdateChatMessagesGrid(ServerManager thisServer)
         {
-            int lastChatLogIndex = instanceChat.lastChatLogIndex;
-            List<ChatLogObject> chatLog = instanceChat.ChatLog;
+            var dgv = thisServer.dataGridView_chatMessages;
 
-            if (chatLog == null || chatLog.Count == 0 || lastChatLogIndex >= chatLog.Count)
-                return;
+            // Save scroll position
+            int firstDisplayedRow = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
+            int visibleRows = dgv.DisplayedRowCount(false);
+            bool wasAtBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
 
-            for (int i = lastChatLogIndex; i < chatLog.Count; i++)
+            // Clear and repopulate
+            dgv.Rows.Clear();
+            foreach (var entry in CommonCore.instanceChat!.ChatLog)
             {
-                var entry = chatLog[i];
                 string teamString = entry.MessageType switch
                 {
                     0 => "Server",
@@ -223,10 +225,9 @@ namespace BHD_ServerManager.Classes.Tickers
                     _ => "Other"
                 };
 
-                // Sanitize player name
                 entry.PlayerName = Functions.SanitizePlayerName(entry.PlayerName);
 
-                thisServer.dataGridView_chatMessages.Rows.Add(
+                dgv.Rows.Add(
                     entry.MessageTimeStamp.ToString("HH:mm:ss"),
                     teamString,
                     entry.PlayerName,
@@ -234,13 +235,22 @@ namespace BHD_ServerManager.Classes.Tickers
                 );
             }
 
-            instanceChat.lastChatLogIndex = chatLog.Count;
-
-            // Auto-scroll to the bottom if there are rows
-            var dgv = thisServer.dataGridView_chatMessages;
+            // Restore scroll position safely
             if (dgv.Rows.Count > 0)
             {
-                dgv.FirstDisplayedScrollingRowIndex = dgv.Rows.Count - 1;
+                int targetRow;
+                if (wasAtBottom)
+                {
+                    targetRow = dgv.Rows.Count - visibleRows;
+                    if (targetRow < 0) targetRow = 0;
+                }
+                else
+                {
+                    targetRow = firstDisplayedRow;
+                    if (targetRow >= dgv.Rows.Count) targetRow = dgv.Rows.Count - 1;
+                    if (targetRow < 0) targetRow = 0;
+                }
+                dgv.FirstDisplayedScrollingRowIndex = targetRow;
             }
         }
     }

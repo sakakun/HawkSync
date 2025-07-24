@@ -388,8 +388,10 @@ namespace BHD_ServerManager.Classes.GameManagement
                             AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
                             thisInstance.instanceAttachedPID = searchProcess.Id;
                             thisInstance.instanceProcessHandle = searchProcess.Handle;
-
+                            
                             SetProcessWindowTitle(searchProcess, windowTitle);
+
+                            ServerMemory.AttachToGameProcess();
 
                             return true;
                         }
@@ -425,6 +427,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                 thisInstance.instanceProcessHandle = process.Handle;
 
                 SetProcessWindowTitle(process, windowTitle);
+
+                ServerMemory.AttachToGameProcess();
             }
             catch (Exception e)
             {
@@ -456,12 +460,15 @@ namespace BHD_ServerManager.Classes.GameManagement
                 {
                     try
                     {
+                        ServerMemory.DetachFromGameProcess();
+                        
                         var process = Process.GetProcessById(thisInstance.instanceAttachedPID.Value);
                         if (!process.HasExited)
                         {
                             process.Kill(true); // true for entire process tree (.NET 5+)
                             process.WaitForExit(5000); // Wait up to 5 seconds for exit
                         }
+
                     }
                     catch (ArgumentException)
                     {

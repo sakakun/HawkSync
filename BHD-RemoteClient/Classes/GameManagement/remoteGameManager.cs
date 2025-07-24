@@ -12,10 +12,6 @@ namespace BHD_RemoteClient.Classes.GameManagement
 {
     public class remoteGameManager : GameInterface
     {
-        void GameInterface.attachProcess()
-        {
-            AppDebug.Log("Not Implemented", "Not Implemented");
-        }
 
         int GameInterface.getGameTypeID(string gameType)
         {

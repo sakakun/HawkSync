@@ -13,7 +13,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
     {
 
         private static RemoteClient theRemoteClient => Program.theRemoteClient!;
-        public static bool ProcessCommand(string EncodedPlayerName,IPAddress ipAddress = null, int submask = 0)
+        public static bool ProcessCommand(string EncodedPlayerName,IPAddress ipAddress = null!, int submask = 0)
         {
             var packet = new CommandPacket
             {

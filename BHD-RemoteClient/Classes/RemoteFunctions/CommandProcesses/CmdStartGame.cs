@@ -22,7 +22,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
             };
 
             theRemoteClient.SendCommandPacket(theRemoteClient._commStream!, packet);
-            var response = theRemoteClient.ReceiveCommandResponse(theRemoteClient._commStream!);
+            var response = theRemoteClient.ReceiveCommandResponse(theRemoteClient._commStream!, 30000);
 
             AppDebug.Log("startGame", JsonSerializer.Serialize(response));
 

@@ -13,7 +13,6 @@ namespace BHD_SharedResources.Classes.GameManagement
         bool stopGame();
 
         // Game Server Memory Management
-        void attachProcess();
         int getGameTypeID(string gameType);
         void UpdatePlayerHostName();
         void UpdateMapListCount();

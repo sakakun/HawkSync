@@ -58,11 +58,23 @@ namespace BHD_ServerManager.Classes.GameManagement
         //
 
         // Function: attachProcess, Attach to the Game Process, used by all memory functions.
-        public static void attachProcess()
+        public static void AttachToGameProcess()
         {
-            gameProcess = Process.GetProcessById((int)thisInstance.instanceAttachedPID!);
-            windowHandle = gameProcess.MainWindowHandle;
-            processHandle = OpenProcess(PROCESS_WM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION, false, gameProcess.Id);
+            if (gameProcess == null || gameProcess.HasExited)
+            {
+                gameProcess = Process.GetProcessById((int)thisInstance.instanceAttachedPID!);
+                windowHandle = gameProcess.MainWindowHandle;
+                processHandle = OpenProcess(PROCESS_WM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION, false, gameProcess.Id);
+            }
+        }
+
+        // Call this ONCE when server is shutting down
+        public static void DetachFromGameProcess()
+        {
+            gameProcess?.Dispose();
+            gameProcess = null;
+            windowHandle = nint.Zero;
+            processHandle = nint.Zero;
         }
         // Function: GetGameTypeID, Converts the GameType ShortName to and INT value.
         public static int getGameTypeID(string gameType)
@@ -100,7 +112,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: UpdatePlayerHostName, Set the player name of the "Host" for the Game Server.
         public static void UpdatePlayerHostName()
         {
-            attachProcess();
+
 
             int buffer = 0;
             byte[] PointerAddr = new byte[4];
@@ -111,13 +123,13 @@ namespace BHD_ServerManager.Classes.GameManagement
             var Address2HostName = BitConverter.ToInt32(PointerAddr, 0);
             WriteProcessMemory((int)processHandle, Address2HostName + 0x3C, Hostname, Hostname.Length, ref buffer2);
 
-            gameProcess!.Dispose();
+            
 
         }
         // Function: UpdateMapListCount, Set the Map Count for the Game Server, for looping purposes.
         public static void UpdateMapListCount()
         {
-            attachProcess();
+
 
             int MapListMoveGarbageAddress = baseAddr + 0x5EA7B8;
             byte[] CurrentAddressBytes = new byte[4];
@@ -145,12 +157,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int TotalnumberofMapsWritten = 0;
             WriteProcessMemory((int)processHandle, mapListNumberOfMaps, TotalnumberOfMaps, TotalnumberOfMaps.Length, ref TotalnumberofMapsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateAllowCustomSkins
         public static void UpdateAllowCustomSkins()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -166,12 +178,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] AllowCustomSkinsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameCustomSkins));
             WriteProcessMemory((int)processHandle, Ptr1Addr, AllowCustomSkinsWrite, AllowCustomSkinsWrite.Length, ref AllowCustomSkinsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateDestroyBuildings
         public static void UpdateDestroyBuildings()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -188,12 +200,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             DestroyBuildingsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameDestroyBuildings));
             WriteProcessMemory((int)processHandle, Ptr1Addr, DestroyBuildingsWrite, DestroyBuildingsWrite.Length, ref DestroyBuildingsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateFatBullets
         public static void UpdateFatBullets()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -211,12 +223,12 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             WriteProcessMemory((int)processHandle, Ptr1Addr, FatBulletsWrite, FatBulletsWrite.Length, ref FatBulletsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateFlagReturnTime
         public static void UpdateFlagReturnTime()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -232,12 +244,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] FlagReturnTimeWrite = BitConverter.GetBytes(thisInstance.gameFlagReturnTime * 60);
             WriteProcessMemory((int)processHandle, Ptr1Addr, FlagReturnTimeWrite, FlagReturnTimeWrite.Length, ref FlagReturnTimeWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMaxPing
         public static void UpdateMinPing()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -251,12 +263,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] MinPingWrite = BitConverter.GetBytes(thisInstance.gameMinPing);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MinPingWrite, MinPingWrite.Length, ref MinPingWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMinPingValue
         public static void UpdateMinPingValue()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -272,12 +284,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] MinPingValueWrite = BitConverter.GetBytes(thisInstance.gameMinPingValue);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MinPingValueWrite, MinPingValueWrite.Length, ref MinPingValueWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMaxPing
         public static void UpdateMaxPing()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -295,12 +307,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int MaxPingWritten = 0;
             WriteProcessMemory((int)processHandle, Ptr1Addr + 0x4, MaxPingWrite, MaxPingWrite.Length, ref MaxPingWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMaxPingValue
         public static void UpdateMaxPingValue()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -316,12 +328,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] MaxPingValueWrite = BitConverter.GetBytes(thisInstance.gameMaxPingValue);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MaxPingValueWrite, MaxPingValueWrite.Length, ref MaxPingValueWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMaxTeamLives
         public static void UpdateMaxTeamLives()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -337,12 +349,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] MaxTeamLivesWrite = BitConverter.GetBytes(thisInstance.gameMaxTeamLives);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MaxTeamLivesWrite, MaxTeamLivesWrite.Length, ref MaxTeamLivesWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateOneShotKills
         public static void UpdateOneShotKills()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -360,12 +372,12 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             WriteProcessMemory((int)processHandle, Ptr1Addr, OneShotKillsWrite, OneShotKillsWrite.Length, ref OneShotKillsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdatePSPTakeOverTime
         public static void UpdatePSPTakeOverTime()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -381,12 +393,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] PSPTakeOverTimeWrite = BitConverter.GetBytes(thisInstance.gamePSPTOTimer);
             WriteProcessMemory((int)processHandle, Ptr1Addr + 0x4, PSPTakeOverTimeWrite, PSPTakeOverTimeWrite.Length, ref PSPTakeOverTimeWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateRequireNovaLogin
         public static void UpdateRequireNovaLogin()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -402,12 +414,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] RequireNovaWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameRequireNova));
             WriteProcessMemory((int)processHandle, Ptr1Addr, RequireNovaWrite, RequireNovaWrite.Length, ref RequireNovaWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateRespawnTime
         public static void UpdateRespawnTime()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -423,12 +435,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] RespawnTimeWrite = BitConverter.GetBytes(thisInstance.gameRespawnTime);
             WriteProcessMemory((int)processHandle, Ptr1Addr, RespawnTimeWrite, RespawnTimeWrite.Length, ref RespawnTimeWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateWeapon Restrictions
         public static void UpdateWeaponRestrictions()
         {
-            attachProcess();
+
 
             byte[] Ptr1Bytes = new byte[4];
             int Ptr1Read = 0;
@@ -557,12 +569,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int WPN_AT4Written = 0;
             WriteProcessMemory((int)processHandle, WeaponEntry_WPN_AT4, WPN_AT4Bytes, WPN_AT4Bytes.Length, ref WPN_AT4Written);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateGamePlayOptions
         public static void UpdateGamePlayOptions()
         {
-            attachProcess();
+
             int gameOptions = 0;
             try
             {
@@ -588,12 +600,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int GamePlayOptionsOneWritten = 0;
             WriteProcessMemory((int)processHandle, Ptr1Addr, gameOptionsBytes, gameOptionsBytes.Length, ref GamePlayOptionsOneWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateServerName
         public static void UpdateServerName()
         {
-            attachProcess();
+
 
             // Server Query Name
             byte[] Ptr1 = new byte[4];
@@ -625,12 +637,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             WriteProcessMemory((int)processHandle, ServerDisplayerName, ServerNameBytes, ServerNameBytes.Length, ref bytesWritten);
             WriteProcessMemory((int)processHandle, Ptr2, ServerNameBytes, ServerNameBytes.Length, ref bytesWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMOTD
         public static void UpdateMOTD()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -646,12 +658,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] MOTDWrite = Encoding.Default.GetBytes(thisInstance.gameMOTD);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MOTDWrite, MOTDWrite.Length, ref MOTDWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateTimeLimit
         public static void UpdateTimeLimit()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -667,12 +679,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] TimeLimitWrite = BitConverter.GetBytes(thisInstance.gameTimeLimit);
             WriteProcessMemory((int)processHandle, Ptr1Addr, TimeLimitWrite, TimeLimitWrite.Length, ref TimeLimitWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateLoopMaps
         public static void UpdateLoopMaps()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -688,12 +700,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] LoopMapsWrite = BitConverter.GetBytes(thisInstance.gameLoopMaps);
             WriteProcessMemory((int)processHandle, Ptr1Addr, LoopMapsWrite, LoopMapsWrite.Length, ref LoopMapsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateStartDelay
         public static void UpdateStartDelay()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -709,12 +721,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] StartDelayWrite = BitConverter.GetBytes(thisInstance.gameStartDelay);
             WriteProcessMemory((int)processHandle, Ptr1Addr, StartDelayWrite, StartDelayWrite.Length, ref StartDelayWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMaxSlots
         public static void UpdateMaxSlots()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -730,12 +742,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] MaxSlotsWrite = BitConverter.GetBytes(thisInstance.gameMaxSlots);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MaxSlotsWrite, MaxSlotsWrite.Length, ref MaxSlotsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateFriendlyFireKills
         public static void UpdateFriendlyFireKills()
         {
-            attachProcess();
+
 
             var baseAddr = 0x400000;
 
@@ -753,12 +765,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] FriendlyFireKillsWrite = BitConverter.GetBytes(thisInstance.gameFriendlyFireKills);
             WriteProcessMemory((int)processHandle, Ptr1Addr, FriendlyFireKillsWrite, FriendlyFireKillsWrite.Length, ref FriendlyFireKillsWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateBluePassword
         public static void UpdateBluePassword()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -778,12 +790,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int BluePasswordWritten = 0;
             WriteProcessMemory((int)processHandle, Ptr1Addr, BluePasswordWrite, BluePasswordWrite.Length, ref BluePasswordWritten);
             
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateRedPassword
         public static void UpdateRedPassword()
         {
-            attachProcess();
+
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -803,7 +815,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int RedPasswordWritten = 0;
             WriteProcessMemory((int)processHandle, Ptr1Addr + 0x33, RedPasswordWrite, RedPasswordWrite.Length, ref RedPasswordWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMapCycle1
         // Clears the current map cycle and fills it with empty maps
@@ -814,7 +826,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 throw new Exception("Someway, somehow, someone bypassed the maplist checks. You are NOT allowed to have more than 128 maps. #88");
             }
 
-            attachProcess();
+
 
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;
@@ -850,7 +862,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 mapCycleList += 0x24;
             }
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateMapCycle2
         // Actually updates the memory of the game server with the current map list
@@ -861,7 +873,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 throw new Exception("Someway, somehow, someone bypassed the maplist checks. You are NOT allowed to have more than 128 maps. #89");
             }
 
-            attachProcess();
+
 
             byte[] Pointer1Bytes = new byte[4];
             int Pointer1Read = 0;
@@ -922,7 +934,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int mapCycleClientWritten = 0;
             WriteProcessMemory((int)processHandle, mapCycleClientAddress, mapCycleClientBytes, mapCycleClientBytes.Length, ref mapCycleClientWritten);
 
-            gameProcess!.Dispose();
+            
 
             UpdateSecondaryMapList();
         }
@@ -930,7 +942,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Updates the secondary map list in the server memory
         public static void UpdateSecondaryMapList()
         {
-            attachProcess();
+
 
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;
@@ -971,7 +983,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 mapCycleList += 0x24;
             }
 
-            gameProcess!.Dispose();
+            
 
         }
         // Function: UpdateNovaID
@@ -982,7 +994,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return; // since we are requiring nova login, just return.
             }
 
-            attachProcess();
+
 
             byte[] CurrentAppIDBytes = new byte[4];
             int currentAppIDRead = 0;
@@ -996,12 +1008,12 @@ namespace BHD_ServerManager.Classes.GameManagement
                 WriteProcessMemory((int)processHandle, 0x009DDA44, WriteAppIDBytes, WriteAppIDBytes.Length, ref WriteAppIDWritten);
             }
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateGlobalGameType
         public static void UpdateGlobalGameType()
         {
-            attachProcess();
+
 
             // this function is responsible for adjusting the Pinger Queries to the current game type
             var startingPtr = baseAddr + 0xACE0E8; // pinger query
@@ -1022,12 +1034,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 int UpdatePingerQuery = 0;
                 WriteProcessMemory((int)processHandle, startingPtr, read_currentgametype, read_currentgametype.Length, ref UpdatePingerQuery);
-                gameProcess!.Dispose();
+                
                 return;
             }
             else
             {
-                gameProcess!.Dispose();
+                
                 // no update required... Exit the function.
                 return;
             }
@@ -1035,7 +1047,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: UpdateMapCycleCounter
         public static void UpdateMapCycleCounter()
         {
-            attachProcess();
+
 
             byte[] currentMapCycleCountBytes = new byte[4];
             int currentMapCycleCountRead = 0;
@@ -1048,12 +1060,12 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             thisInstance.gameInfoMapCycleIndex = currentMapCycleCount;
             
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateScoreBoardTimer
         public static void UpdateScoreBoardTimer()
         {
-            attachProcess();
+
 
             // This function updates the scoreboard timer in the server memory
             var instanceTimer = baseAddr + 0x5DAE00;
@@ -1061,12 +1073,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int bytesWritten = 0;
             WriteProcessMemory((int)processHandle, instanceTimer, endTimerBytes, endTimerBytes.Length, ref bytesWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: UpdateNextMapGameType
         public static void UpdateNextMapGameType()
         {
-            attachProcess();
+
 
             // This will grab the current map index.
             var startingPtr = baseAddr + 0x005ED5F8;
@@ -1108,11 +1120,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] nextMaptypeBytes = BitConverter.GetBytes(nextMapType);
                 int nextMaptypeBytesWrite = 0;
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
-                gameProcess!.Dispose();
+                
             }
             catch (Exception ex)
             {
-                gameProcess!.Dispose();
+                
                 AppDebug.Log("ServerMemory", "Something went wrong with ScoringProcessHandler: " + ex);
                 throw new Exception("Something went wrong with ScoringProcessHandler: " + ex);
             }
@@ -1126,7 +1138,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return;
             }
             
-            attachProcess();
+
             
             // This changes the score needed to win on the next map played.
             int nextGameScore = 0;
@@ -1160,7 +1172,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             WriteProcessMemory((int)processHandle, startingPtr1, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten1);
             WriteProcessMemory((int)processHandle, startingPtr2, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten2);
 
-            gameProcess!.Dispose();
+            
         }
         // Function UpdatePlayerTeam
         public static void UpdatePlayerTeam()
@@ -1177,7 +1189,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
             else
             {
-                attachProcess();
+    
 
                 int buffer = 0;
                 byte[] PointerAddr9 = new byte[4];
@@ -1204,13 +1216,13 @@ namespace BHD_ServerManager.Classes.GameManagement
                     thisInstance.playerChangeTeamList.RemoveAt(ii);
                 }
 
-                gameProcess!.Dispose();
+                
             }
         }
         // Function: UpdatePlayMapNext
         public static void UpdateNextMap(int NextMapIndex)
         {
-            attachProcess();
+
 
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;
@@ -1230,7 +1242,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int newMapIndexBytesWritten = 0;
             WriteProcessMemory((int)processHandle, MapCycleIndex, newMapIndexBytes, newMapIndexBytes.Length, ref newMapIndexBytesWritten);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: WriteMemoryScoreMap
         public static void WriteMemoryScoreMap()
@@ -1240,7 +1252,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return;
             }
 
-            attachProcess();
+
 
             var startingPtr1 = 0;
             startingPtr1 = baseAddr + 0x5F3740;
@@ -1248,7 +1260,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int timerWritten1 = 0;
             WriteProcessMemory((int)processHandle, startingPtr1, timerBytes, timerBytes.Length, ref timerWritten1);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: WriteMemorySendChatMessage
         public static void WriteMemorySendChatMessage(int MsgLocation, string Msg)
@@ -1256,7 +1268,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int colorbuffer_written = 0;
             byte[] colorcode;
 
-            attachProcess();
+
 
             switch (MsgLocation)
             {
@@ -1295,24 +1307,24 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] revert_colorcode = Functions.ToByteArray("6A 01".Replace(" ", ""));
             WriteProcessMemory((int)processHandle, 0x00462ABA, revert_colorcode, revert_colorcode.Length, ref revert_colorbuffer);
             
-            gameProcess!.Dispose();
+            
 
         }
         // Function: WriteMemoryChatCountDownKiller
         public static void WriteMemoryChatCountDownKiller(int ChatLogAddr)
         {
-            attachProcess();
+
 
             byte[] countDownKiller = BitConverter.GetBytes(0);
             int countDownKillerWrite = 0;
             WriteProcessMemory((int)processHandle, ChatLogAddr + 0x7C, countDownKiller, countDownKiller.Length, ref countDownKillerWrite);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: WriteMemoryDisarmPlayer
         public static void WriteMemoryDisarmPlayer(int playerSlot)
         {
-            attachProcess();
+
 
             int buffer = 0;
             byte[] PointerAddr9 = new byte[4];
@@ -1333,12 +1345,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int disablePlayerWeaponWrite = 0;
             WriteProcessMemory((int)processHandle, playerlistStartingLocation + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: WriteMemoryArmPlayer
         public static void WriteMemoryArmPlayer(int playerSlot)
         {
-            attachProcess();
+
 
             int buffer = 0;
             byte[] PointerAddr9 = new byte[4];
@@ -1359,13 +1371,13 @@ namespace BHD_ServerManager.Classes.GameManagement
             int disablePlayerWeaponWrite = 0;
             WriteProcessMemory((int)processHandle, playerlistStartingLocation + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: WriteMemoryKillPlayer
         public static void WriteMemoryKillPlayer(int playerSlot)
         {
 
-            attachProcess();
+
 
             int buffer = 0;
             byte[] PointerAddr9 = new byte[4];
@@ -1394,12 +1406,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0x138, setPlayerHealth, setPlayerHealth.Length, ref setPlayerHealthWrite);
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0xE2, setPlayerHealth, setPlayerHealth.Length, ref setPlayerHealthWrite);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: WriteMemoryTogglePlayerGodMode
         public static void WriteMemoryTogglePlayerGodMode(int playerSlot, int health)
         {
-            attachProcess();
+
 
             int buffer = 0;
             byte[] PointerAddr9 = new byte[4];
@@ -1431,12 +1443,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0x138, setDamageBy, setDamageBy.Length, ref setDamageByWrite);
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0xE2, setPlayerHealth, setPlayerHealth.Length, ref setPlayerHealthWrite);
 
-            gameProcess!.Dispose();
+            
         }
         // Function: WriteMemorySendConsoleCommand
         public static void WriteMemorySendConsoleCommand(string Command)
         {
-            attachProcess();
+
 
             // open cmdConsole
             PostMessage(windowHandle, (ushort)WM_KEYDOWN, cmdConsole, 0);
@@ -1452,7 +1464,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             PostMessage(windowHandle, (ushort)WM_KEYDOWN, VK_ENTER, 0);
             PostMessage(windowHandle, (ushort)WM_KEYUP, VK_ENTER, 0);
 
-            gameProcess!.Dispose();
+            
         }
 
 
@@ -1499,7 +1511,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: ReadMemoryServerStatus
         public static void ReadMemoryServerStatus()
         {
-            attachProcess();
+
 
             var startingPointer = baseAddr + 0x00098334;
             byte[] startingPointerBuffer = new byte[4];
@@ -1514,7 +1526,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             thisInstance.instanceStatus = (InstanceStatus)instanceStatus;
 
-            gameProcess!.Dispose();
+            
         }
         // Function: ReadMemoryGameTimeLeft
         public static void ReadMemoryGameTimeLeft()
@@ -1524,7 +1536,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 thisInstance.gameInfoTimeRemaining = TimeSpan.FromMinutes(thisInstance.gameStartDelay + thisInstance.gameTimeLimit);
             }
 
-            attachProcess();
+
 
             byte[] Ptr = new byte[4];
             int ReadPtr = 0;
@@ -1553,13 +1565,13 @@ namespace BHD_ServerManager.Classes.GameManagement
             stopwatchProcessingTime.Stop();
 
             thisInstance.gameInfoTimeRemaining = TimeRemaining;
-            gameProcess!.Dispose();
+            
 
         }
         // Function: ReadMemoryCurrentMissionName
         public static void ReadMemoryCurrentMissionName()
         {
-            attachProcess();
+
 
             // memory polling
             int bytesRead = 0;
@@ -1568,12 +1580,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             string MissionName = Encoding.Default.GetString(buffer);
             thisInstance.gameInfoMapName = MissionName.Replace("\0", "");
 
-            gameProcess!.Dispose();
+            
         }
         // Fuction: ReadMemoryCurrentGameType
         public static void ReadMemoryCurrentGameType()
         {
-            attachProcess();
+
 
             int bytesRead = 0;
             byte[] buffer = new byte[4];
@@ -1589,7 +1601,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
             }
             
-            gameProcess!.Dispose();
+            
         }
         // FunctionL ReadMemoryCurrentMapIndex
         public static void ReadMemoryCurrentMapIndex()
@@ -1600,7 +1612,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return;
             }
             
-            attachProcess();
+
             
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;
@@ -1611,24 +1623,24 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, MapCycleIndex, mapIndexBytes, mapIndexBytes.Length, ref mapIndexRead);
             thisInstance.gameInfoCurrentMapIndex = BitConverter.ToInt32(mapIndexBytes, 0);
             
-            gameProcess!.Dispose();
+            
         }
         // Function: ReadMemoryWinningTeam
         public static void ReadMemoryWinningTeam()
         {
-            attachProcess();
+
             int bytesRead = 8;
             byte[] buffer = new byte[8];
             ReadProcessMemory((int)processHandle, 0x009F370C, buffer, buffer.Length, ref bytesRead);
             int gameMatchWinner = BitConverter.ToInt32(buffer, 0);
             thisInstance.gameMatchWinner = gameMatchWinner;
 
-            gameProcess!.Dispose();
+            
         }
         // Function: ReadMemoryCurrentNumPlayers
         public static void ReadMemoryCurrentNumPlayers()
         {
-            attachProcess();
+
 
             int bytesRead = 0;
             byte[] buffer = new byte[4];
@@ -1636,7 +1648,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int CurrentPlayers = BitConverter.ToInt32(buffer, 0);
             thisInstance.gameInfoCurrentNumPlayers = CurrentPlayers;
 
-            gameProcess!.Dispose();
+            
         }
         // Function: ReadMemoryGeneratePlayerList
         public static void ReadMemoryGeneratePlayerList()
@@ -1651,7 +1663,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             if (NumPlayers > 0)
             {
-                attachProcess();
+    
 
                 int buffer = 0;
                 var Pointer = baseAddr + 0x005ED600;
@@ -1755,7 +1767,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 }
 
-                gameProcess!.Dispose();
+                
             }
             thisInstance.playerList = currentPlayerList;
             // CoreManager.DebugLog("PlayerList Updated");
@@ -1763,7 +1775,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: ReadMemoryGrabPlayerIPAddress
         public static string ReadMemoryGrabPlayerIPAddress(string playername)
         {
-            attachProcess();
+
 
             const int playerIpAddressPointerOffset = 0x00ACE248;
             const int playernameOffset = 0xBC;
@@ -1794,7 +1806,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             if (failureCounter > thisInstance.gameMaxSlots)
             {
-                gameProcess!.Dispose();
+                
                 return null!;
             }
 
@@ -1808,13 +1820,13 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, PlayerIPLocation, playerIPAddressBytes, playerIPAddressBytes.Length, ref playerIPAddressBuffer);
 
             IPAddress playerIp = new IPAddress(playerIPAddressBytes);
-            gameProcess!.Dispose();
+            
             return playerIp.ToString();
         }
         // Function: ReadMemoryPlayerStats
         public static playerObject ReadMemoryPlayerStats(int reqslot)
         {
-            attachProcess();
+
 
             var baseaddr = 0x400000;
             var startList = baseaddr + 0x005ED600;
@@ -1853,7 +1865,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             // Handle failure if still no player name found
             if (string.IsNullOrEmpty(PlayerName))
             {
-                gameProcess!.Dispose();
+                
                 AppDebug.Log("ServerMemory", "Something went wrong here. We can't find any player names.");
                 return new playerObject();
             }
@@ -1935,7 +1947,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     }
                 }
             }
-            gameProcess!.Dispose();
+            
 
             return new playerObject
             {
@@ -1974,7 +1986,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static string[] ReadMemoryLastChatMessage()
         {
 
-            attachProcess();
+
 
             var starterPtr = baseAddr + 0x00062D10;
             byte[] ChatLogPtr = new byte[4];
@@ -1995,7 +2007,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, msgTypeAddr, msgType, msgType.Length, ref msgTypeRead);
             string msgTypeBytes = BitConverter.ToString(msgType).Replace("-", "");
 
-            gameProcess!.Dispose();
+            
 
             return new string[] { ChatLogAddr.ToString(), LastMessage, msgTypeBytes };
         }
