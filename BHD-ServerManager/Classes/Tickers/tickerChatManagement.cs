@@ -5,64 +5,84 @@ using BHD_ServerManager.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using BHD_ServerManager.Classes.GameManagement;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
-    public class tickerChatManagement()
+    public static class tickerChatManagement
     {
-        private readonly static theInstance thisInstance = CommonCore.theInstance!;
-        private readonly static chatInstance instanceChat = CommonCore.instanceChat!;
+        private static theInstance thisInstance => CommonCore.theInstance!;
+        private static chatInstance instanceChat => CommonCore.instanceChat!;
+        private static ServerManager thisServer => Program.ServerManagerUI!;
 
-        private static readonly object tickerLock = new object();
-        public static void runTicker(ServerManager thisServer)
+        private static readonly object tickerLock = new();
+
+        // For deduplication of chat messages
+        private static string? _lastProcessedPlayerName = null;
+        private static string? _lastProcessedMessageText = null;
+
+        // Helper for UI thread safety
+        private static void SafeInvoke(Control control, Action action)
         {
-            // Ensure UI thread safety
+            if (control.InvokeRequired)
+                control.Invoke(action);
+            else
+                action();
+        }
+
+        public static void runTicker()
+        {
+            // Always ensure UI thread safety for UI-bound operations
             if (thisServer.InvokeRequired)
             {
                 try
                 {
-                    thisServer.Invoke(new Action(() => runTicker(thisServer)));
-                } catch (Exception ex)
+                    thisServer.BeginInvoke(new Action(runTicker));
+                }
+                catch (Exception ex)
                 {
                     AppDebug.Log("tickerChatManagement", $"Error invoking runTicker: {ex.Message}");
                 }
-
                 return;
             }
 
             lock (tickerLock)
             {
-                if (thisInstance.instanceStatus == InstanceStatus.OFFLINE || thisInstance.instanceStatus == InstanceStatus.LOADINGMAP || thisInstance.instanceStatus == InstanceStatus.SCORING)
+                // Only process chat when server is online or in start delay
+                if (thisInstance.instanceStatus != InstanceStatus.ONLINE &&
+                    thisInstance.instanceStatus != InstanceStatus.STARTDELAY)
                 {
                     return;
                 }
 
                 if (ServerMemory.ReadMemoryIsProcessAttached())
                 {
-                    // Process Auto Messages
-                    ProcessAutoMessages();
-                    // Process Latest Chat Message
-                    ProcessChatMessages();
-                    // Update Chat Messages Grid
-                    UpdateChatMessagesGrid(thisServer);
+                    // Process auto messages (non-blocking)
+                    Task.Run(ProcessAutoMessages);
+
+                    // Process latest chat message and update UI (non-blocking)
+                    Task.Run(() =>
+                    {
+                        ProcessChatMessages();
+                        SafeInvoke(thisServer.dataGridView_chatMessages, () =>
+                        {
+                            UpdateChatMessagesGrid(thisServer);
+                        });
+                    });
                 }
                 else
                 {
-                    // If the server process is not attached, we can assume the server is offline.
                     AppDebug.Log("tickerChatManagement", "Server process is not attached. Ticker Skipping.");
                 }
             }
         }
+
         public static void ProcessChatMessages()
         {
             var latestMessage = ServerMemory.ReadMemoryLastChatMessage();
             if (latestMessage == null || latestMessage.Length < 3)
-                return;
-
-            if (!int.TryParse(latestMessage[0], out int chatLogAddr))
                 return;
 
             string lastMessage = latestMessage[1];
@@ -72,8 +92,9 @@ namespace BHD_ServerManager.Classes.Tickers
                 return;
 
             var chatLog = instanceChat.ChatLog;
+            if (chatLog == null)
+                return;
 
-            // Extract player name and message
             int msgStart = lastMessage.IndexOf(':');
             if (msgStart < 0)
                 return;
@@ -81,48 +102,53 @@ namespace BHD_ServerManager.Classes.Tickers
             string playerName = lastMessage.Substring(0, msgStart).Trim();
             string playerMessage = lastMessage.Substring(msgStart + 1).Trim();
 
-            // Prevent duplicate messages
-            if (chatLog.Count > 0)
+            // Prevent duplicate messages based on last processed message
+            if (_lastProcessedPlayerName == playerName && _lastProcessedMessageText == playerMessage)
+                return;
+
+            lock (chatLog)
             {
-                var lastLog = chatLog[^1];
-                if (lastLog.PlayerName == playerName && lastLog.MessageText == playerMessage)
-                    return;
-            }
-
-            // Message type mapping
-            int msgType = msgTypeBytes switch
-            {
-                "00FFFFFF" => 0, // host
-                "FFC0A0FF" => 1, // global
-                "00FF00FF" => 2, // teamchat
-                _ => 3
-            };
-
-            if (msgType == 0)
-                ServerMemory.WriteMemoryChatCountDownKiller(chatLogAddr);
-
-            // Find PlayerTeam number
-            int teamNum = 3;
-
-            foreach (var item in thisInstance.playerList)
-            {
-                if (item.Value.PlayerName == playerName)
+                // Message type mapping
+                int msgType = msgTypeBytes switch
                 {
-                    teamNum = item.Value.PlayerTeam;
-                    break;
-                }
-            }
+                    "00FFFFFF" => 0, // host
+                    "FFC0A0FF" => 1, // global
+                    "00FF00FF" => 2, // teamchat
+                    _ => 3
+                };
 
-            chatLog.Add(new ChatLogObject
-            {
-                PlayerName = playerName,
-                MessageText = playerMessage,
-                MessageType = msgType,
-                MessageType2 = teamNum,
-                MessageTimeStamp = DateTime.Now
-            });
-            AppDebug.Log("tickerChatManagement", $"Chat Message: {playerName} ({teamNum}) - {playerMessage} (Type: {msgType})");
+                // If host message, trigger countdown killer
+                if (msgType == 0 && int.TryParse(latestMessage[0], out int chatLogAddr))
+                    ServerMemory.WriteMemoryChatCountDownKiller(chatLogAddr);
+
+                // Find PlayerTeam number
+                int teamNum = 3;
+                foreach (var player in thisInstance.playerList.Values)
+                {
+                    if (player.PlayerName == playerName)
+                    {
+                        teamNum = player.PlayerTeam;
+                        break;
+                    }
+                }
+
+                chatLog.Add(new ChatLogObject
+                {
+                    PlayerName = playerName,
+                    MessageText = playerMessage,
+                    MessageType = msgType,
+                    MessageType2 = teamNum,
+                    MessageTimeStamp = DateTime.Now
+                });
+
+                // Update last processed message for deduplication
+                _lastProcessedPlayerName = playerName;
+                _lastProcessedMessageText = playerMessage;
+
+                AppDebug.Log("tickerChatManagement", $"Chat Message: {playerName} ({teamNum}) - {playerMessage} (Type: {msgType})");
+            }
         }
+
         public static void ProcessAutoMessages()
         {
             // Do not send auto messages during scoring
@@ -132,53 +158,48 @@ namespace BHD_ServerManager.Classes.Tickers
                 return;
             }
 
-            // Ensure there are messages to send
-            if (instanceChat.AutoMessages == null || instanceChat.AutoMessages.Count == 0)
+            var autoMessages = instanceChat.AutoMessages;
+            if (autoMessages == null || autoMessages.Count == 0)
                 return;
 
-            // Calculate elapsed seconds since map started
-            double elapsedMinutes = (thisInstance.gameTimeLimit) - thisInstance.gameInfoTimeRemaining.TotalMinutes;
+            // Calculate elapsed minutes since map started
+            double elapsedMinutes = Math.Max(0, thisInstance.gameTimeLimit - thisInstance.gameInfoTimeRemaining.TotalMinutes);
 
-            // Send all messages whose trigger time has passed, but only once each
-            while (instanceChat.AutoMessageCounter < instanceChat.AutoMessages.Count)
+            lock (autoMessages)
             {
-                // Calculate the time since the last auto message was sent
-                TimeSpan timeSinceLastMessage = DateTime.Now - instanceChat.lastAutoMessageSent;
+                // Reset counter if out of range (e.g., map restart)
+                if (instanceChat.AutoMessageCounter < 0 || instanceChat.AutoMessageCounter >= autoMessages.Count)
+                    instanceChat.AutoMessageCounter = 0;
 
-                // Wait 10 seconds between messages
-                if (instanceChat.lastAutoMessageSent != DateTime.MinValue &&
-                    timeSinceLastMessage.TotalSeconds < 10)
+                while (instanceChat.AutoMessageCounter < autoMessages.Count)
                 {
-                    // Not enough time has passed since the last message
-                    break;
-                }
+                    var autoMsg = autoMessages[instanceChat.AutoMessageCounter];
 
-                var autoMsg = instanceChat.AutoMessages[instanceChat.AutoMessageCounter];
+                    // Wait 10 seconds between messages
+                    TimeSpan timeSinceLastMessage = DateTime.Now - instanceChat.lastAutoMessageSent;
+                    if (instanceChat.lastAutoMessageSent != DateTime.MinValue &&
+                        timeSinceLastMessage.TotalSeconds < 10)
+                    {
+                        break;
+                    }
 
-                if (elapsedMinutes >= autoMsg.AutoMessageTigger)
-                {
-                    // Send the message (replace with your actual send logic)
-                    ServerMemory.WriteMemorySendChatMessage(1, autoMsg.AutoMessageText);
-
-                    // Move to the next message
-                    instanceChat.AutoMessageCounter++;
-                    instanceChat.lastAutoMessageSent = DateTime.Now;
-                }
-                else
-                {
-                    // The next message's trigger time hasn't been reached yet
-                    break;
+                    if (elapsedMinutes >= autoMsg.AutoMessageTigger)
+                    {
+                        ServerMemory.WriteMemorySendChatMessage(1, autoMsg.AutoMessageText);
+                        instanceChat.AutoMessageCounter++;
+                        instanceChat.lastAutoMessageSent = DateTime.Now;
+                    }
+                    else
+                    {
+                        // The next message's trigger time hasn't been reached yet
+                        break;
+                    }
                 }
             }
         }
+
         private static void UpdateChatMessagesGrid(ServerManager thisServer)
         {
-            if (thisServer.dataGridView_chatMessages.InvokeRequired)
-            {
-                thisServer.dataGridView_chatMessages.Invoke(new Action(() => UpdateChatMessagesGrid(thisServer)));
-                return;
-            }
-
             int lastChatLogIndex = instanceChat.lastChatLogIndex;
             List<ChatLogObject> chatLog = instanceChat.ChatLog;
 
@@ -222,7 +243,5 @@ namespace BHD_ServerManager.Classes.Tickers
                 dgv.FirstDisplayedScrollingRowIndex = dgv.Rows.Count - 1;
             }
         }
-
-
     }
 }

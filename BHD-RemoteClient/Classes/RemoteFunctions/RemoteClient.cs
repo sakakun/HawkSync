@@ -12,7 +12,6 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
 {
     public class RemoteClient
     {
-
         private static theInstance theInstance => CommonCore.theInstance!;
         private static chatInstance instanceChat => CommonCore.instanceChat!;
         private static mapInstance instanceMaps => CommonCore.instanceMaps!;
@@ -42,11 +41,9 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             try
             {
                 Disconnect();
-            } catch (Exception e)
-            {
-                // Do nothing for now.
             }
-            
+            catch { }
+
             try
             {
                 _cts = new CancellationTokenSource();
@@ -66,18 +63,21 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             }
             catch (Exception e)
             {
-                // Do nothing for now.
+                AppDebug.Log("RemoteClient", "Error connecting: " + e.Message);
             }
-
         }
 
         public void Disconnect()
         {
-            _cts?.Cancel();
-            _updateStream?.Dispose();
-            _commStream?.Dispose();
-            _updateClient?.Close();
-            _commClient?.Close();
+            try
+            {
+                _cts?.Cancel();
+                _updateStream?.Dispose();
+                _commStream?.Dispose();
+                _updateClient?.Close();
+                _commClient?.Close();
+            }
+            catch { }
         }
 
         public void SendCommandPacket(SslStream sslStream, CommandPacket packet)
@@ -93,15 +93,15 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             }
             catch (Exception ex)
             {
-                // Log the error, but do not throw an exception to avoid breaking the connection
                 AppDebug.Log("RemoteClient", "Error sending command packet: " + ex.Message);
-                Application.Exit();
             }
         }
+
         public CommandResponse? ReceiveCommandResponse(SslStream sslStream)
         {
             try
             {
+                sslStream.ReadTimeout = 5000; // 5 seconds
                 Span<byte> lengthBytes = stackalloc byte[4];
                 int read = sslStream.Read(lengthBytes);
                 if (read < 4) return null;
@@ -119,25 +119,26 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             }
             catch (Exception ex)
             {
-                // Log the error, but do not throw an exception to avoid breaking the connection
                 AppDebug.Log("RemoteClient", "Error receiving command response: " + ex.Message);
-                Application.Exit();
                 return null;
             }
         }
+
         private void ListenForUpdates(CancellationToken token)
         {
             var stream = _updateStream!;
             bool authenticated = false;
+            var handshakeStart = DateTime.UtcNow;
 
-            // Authentication handshake loop
+            // Authentication handshake loop with timeout
             while (!token.IsCancellationRequested && stream.CanRead && !authenticated)
             {
                 try
                 {
+                    stream.ReadTimeout = 5000; // 5 seconds
                     Span<byte> lengthBytes = stackalloc byte[4];
                     int read = stream.Read(lengthBytes);
-                    if (read < 4) break; // Connection closed
+                    if (read < 4) break;
 
                     int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
                     byte[] buffer = new byte[length];
@@ -145,7 +146,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                     while (offset < length)
                     {
                         int bytesRead = stream.Read(buffer, offset, length - offset);
-                        if (bytesRead == 0) return; // Connection closed
+                        if (bytesRead == 0) return;
                         offset += bytesRead;
                     }
 
@@ -155,8 +156,6 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                     if (root.TryGetProperty("Command", out var commandProp))
                     {
                         var packet = JsonSerializer.Deserialize<CommandPacket>(buffer);
-                        AppDebug.Log("RemoteClient", "Received packet: " + (packet?.Command ?? "null"));
-
                         if (packet != null && packet.Command == "RequestAuthToken")
                         {
                             var authPacket = new CommandPacket
@@ -171,38 +170,36 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                     else if (root.TryGetProperty("Success", out var successProp))
                     {
                         var response = JsonSerializer.Deserialize<CommandResponse>(buffer);
-                        AppDebug.Log("RemoteClient", "Received response: " + (response?.Message ?? "null"));
-
                         if (response != null && response.Success)
                         {
-                            AppDebug.Log("RemoteClient", "Authenticated. Receiving updates...");
                             authenticated = true;
-                            break; // Exit loop after successful authentication
+                            break;
                         }
                         else
                         {
                             AppDebug.Log("RemoteClient", $"Auth failed: {response?.Message}");
                         }
                     }
-                    else
-                    {
-                        AppDebug.Log("RemoteClient", "Unknown packet type received during handshake.");
-                    }
                 }
                 catch (Exception ex)
                 {
                     AppDebug.Log("RemoteClient", "Error during authentication handshake: " + ex.Message);
-                    break; // Exit on error
+                    break;
+                }
+
+                if ((DateTime.UtcNow - handshakeStart).TotalSeconds > 10)
+                {
+                    AppDebug.Log("RemoteClient", "Handshake timeout.");
+                    break;
                 }
             }
-            AppDebug.Log("RemoteClient", "Entering update loop...");
 
             // Update receiving loop
             while (!token.IsCancellationRequested && stream.CanRead && authenticated)
             {
-                AppDebug.Log("RemoteClient", "Inside update loop, waiting for data...");
                 try
                 {
+                    stream.ReadTimeout = 10000; // 10 seconds
                     Span<byte> lengthBytes = stackalloc byte[4];
                     int read = stream.Read(lengthBytes);
                     if (read < 4)
@@ -231,27 +228,18 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                     if (root.TryGetProperty("Command", out var commandProp))
                     {
                         var updatePacket = JsonSerializer.Deserialize<CommandPacket>(buffer);
-                        AppDebug.Log("RemoteClient", "Deserialized update packet: " + (updatePacket?.Command ?? "null"));
                         if (updatePacket != null && updatePacket.Command == "UpdateData")
                         {
-                            //AppDebug.Log("RemoteClient", "Update received: " + JsonSerializer.Serialize(updatePacket?.CommandData));
                             ProcessUpdatePacket(updatePacket!);
                         }
-                    }
-                    else
-                    {
-                        AppDebug.Log("RemoteClient", "Unknown packet type received in update loop.");
                     }
                 }
                 catch (Exception ex)
                 {
                     AppDebug.Log("RemoteClient", "Error in update loop: " + ex.Message);
-                    break; // Exit on error
-
+                    break;
                 }
             }
-
-            AppDebug.Log("RemoteClient", "Exited update loop.");
         }
 
         private static void ProcessUpdatePacket(CommandPacket thePacket)
@@ -260,7 +248,6 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             string json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64));
             InstanceUpdatePacket updateData = JsonSerializer.Deserialize<InstanceUpdatePacket>(json)!;
             CmdUpdateGameClient.ProcessUpdateData(updateData);
-
             Debug.WriteLine("Processing Complete.  Server Status: " + theInstance.instanceStatus);
         }
 

@@ -552,10 +552,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public void InitializeTickers()
         {
             // TODO: Remove the need for the thisServer variable in the ticker methods.
-            CommonCore.Ticker.Start("ServerManager", 1000, () => tickerServerManager.runTicker());
-            CommonCore.Ticker.Start("ChatManager", 1000, () => tickerChatManagement.runTicker(thisServer)); 
-            CommonCore.Ticker.Start("PlayerManager", 1000, () => tickerPlayerManagement.runTicker(thisServer));
-            CommonCore.Ticker.Start("BanManager", 1000, () => tickerBanManagement.runTicker(thisServer));
+            CommonCore.Ticker.Start("ServerManager", 2000, () => tickerServerManager.runTicker());
+            CommonCore.Ticker.Start("ChatManager", 500, () => tickerChatManagement.runTicker()); 
+            CommonCore.Ticker.Start("PlayerManager", 1000, () => tickerPlayerManagement.runTicker());
+            CommonCore.Ticker.Start("BanManager", 1000, () => tickerBanManagement.runTicker());
 
         }
         public void changeTeamGameMode(int currentMapType, int nextMapType)

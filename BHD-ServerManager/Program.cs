@@ -20,8 +20,6 @@ namespace BHD_ServerManager
             // Initialize the Instance of the Application
             CommonCore.InitializeCore();
 
-
-
             // Setup the Instance Managers
             theInstanceManager.Implementation = new serverTheInstanceManager();
             banInstanceManager.Implementation = new serverBanInstanceManager();
