@@ -8,11 +8,16 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
 	<TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion> <!-- This line is crucial -->
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
+    <ApplicationIcon>Icon.ico</ApplicationIcon> <!-- This line is crucial -->
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="DataStores\defaultMapsBHD.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icon.ico" />
   </ItemGroup>
 
   <ItemGroup>

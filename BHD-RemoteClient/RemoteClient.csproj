@@ -8,8 +8,13 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
 	<TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion> <!-- This line is crucial -->
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
+    <ApplicationIcon>Icon.ico</ApplicationIcon> <!-- This line is crucial -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />

@@ -18,6 +18,7 @@ namespace BHD_ServerManager.Classes.Tickers
         private static ServerManager thisServer => Program.ServerManagerUI!;
 
         private static readonly object tickerLock = new();
+        private static bool _autoMessageRecoveryDone = false;
 
         // For deduplication of chat messages
         private static string? _lastProcessedPlayerName = null;
@@ -59,6 +60,9 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 if (ServerMemory.ReadMemoryIsProcessAttached())
                 {
+                    // Recover auto message counter before processing auto messages
+                    RecoverAutoMessageCounter();
+
                     // Process auto messages (non-blocking)
                     Task.Run(ProcessAutoMessages);
 
@@ -196,6 +200,39 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                 }
             }
+        }
+
+        public static void RecoverAutoMessageCounter()
+        {
+            // Only run recovery once per session
+            if (_autoMessageRecoveryDone)
+                return;
+
+            var autoMessages = instanceChat.AutoMessages;
+            if (autoMessages == null || autoMessages.Count == 0)
+                return;
+
+            // Calculate elapsed minutes since map started
+            double elapsedMinutes = Math.Max(0, thisInstance.gameTimeLimit - thisInstance.gameInfoTimeRemaining.TotalMinutes);
+
+            int counter = 0;
+            foreach (var autoMsg in autoMessages)
+            {
+                if (elapsedMinutes >= autoMsg.AutoMessageTigger)
+                    counter++;
+                else
+                    break;
+            }
+            instanceChat.AutoMessageCounter = counter;
+
+            // If at least one message should have been sent, and lastAutoMessageSent is MinValue, set it to now
+            if (counter > 0 && instanceChat.lastAutoMessageSent == DateTime.MinValue)
+            {
+                instanceChat.lastAutoMessageSent = DateTime.Now;
+            }
+
+            // Mark recovery as done
+            _autoMessageRecoveryDone = true;
         }
 
         private static void UpdateChatMessagesGrid(ServerManager thisServer)
