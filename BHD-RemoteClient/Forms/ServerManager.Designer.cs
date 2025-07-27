@@ -606,7 +606,7 @@ namespace BHD_RemoteClient.Forms
             num_respawnTime.Name = "num_respawnTime";
             num_respawnTime.Size = new Size(64, 23);
             num_respawnTime.TabIndex = 4;
-            toolTip.SetToolTip(num_respawnTime, "Time in Minutes");
+            toolTip.SetToolTip(num_respawnTime, "Time in Seconds");
             num_respawnTime.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label_startDelay

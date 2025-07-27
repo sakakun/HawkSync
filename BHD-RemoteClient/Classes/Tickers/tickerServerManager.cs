@@ -42,6 +42,7 @@ namespace BHD_RemoteClient.Classes.Tickers
         {
             // Gather data off the UI thread
             bool isAttached = GameManager.ReadMemoryIsProcessAttached();
+            
             InstanceStatus status = theInstance.instanceStatus;
             int maxSlots = theInstance.gameMaxSlots;
             List<playerObject> players = theInstance.playerList.Values.ToList();
@@ -159,7 +160,6 @@ namespace BHD_RemoteClient.Classes.Tickers
 
                 // Map Differences Refresh Tasks
                 tickerEvent_checkMapDiff();
-
                 tickerEvent_updateLabels();
             });
 

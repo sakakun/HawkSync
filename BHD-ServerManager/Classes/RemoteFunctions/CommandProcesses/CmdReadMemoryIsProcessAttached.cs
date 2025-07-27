@@ -15,7 +15,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
         public static CommandResponse ProcessCommand(object data)
         {
             bool isAttached = ServerMemory.ReadMemoryIsProcessAttached();
-
+            
             return new CommandResponse
             {
                 Success = isAttached,
