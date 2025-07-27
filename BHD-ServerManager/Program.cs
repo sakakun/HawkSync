@@ -17,6 +17,9 @@ namespace BHD_ServerManager
         [STAThread]
         static void Main()
         {
+            // Encoding for legacy code pages
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
             // Initialize the Instance of the Application
             CommonCore.InitializeCore();
 

@@ -171,10 +171,6 @@ namespace BHD_ServerManager.Classes.Tickers
 
             lock (autoMessages)
             {
-                // Reset counter if out of range (e.g., map restart)
-                if (instanceChat.AutoMessageCounter < 0 || instanceChat.AutoMessageCounter >= autoMessages.Count)
-                    instanceChat.AutoMessageCounter = 0;
-
                 while (instanceChat.AutoMessageCounter < autoMessages.Count)
                 {
                     var autoMsg = autoMessages[instanceChat.AutoMessageCounter];

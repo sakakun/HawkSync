@@ -195,6 +195,8 @@ namespace BHD_RemoteClient.Forms
 
                 MessageBox.Show("You have been disconnected from the server.", "Disconnected", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            btn_login.Enabled = true; // <-- Add this line
         }
     }
 

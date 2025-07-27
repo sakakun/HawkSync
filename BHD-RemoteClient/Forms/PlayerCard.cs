@@ -221,10 +221,23 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         // Function: UpdateStatus, updates the PlayerCard with the current player information.
         public void UpdateStatus(playerObject playerInfo)
         {
+            string correctName;
+            try
+            {
+                var encoding1251 = Encoding.GetEncoding("windows-1251");
+                byte[] bytes = Encoding.Default.GetBytes(Player.PlayerName);
+                correctName = encoding1251.GetString(bytes);
+            }
+            catch (ArgumentException)
+            {
+                correctName = Player.PlayerName; // fallback
+            }
+
             Player = playerInfo;
             // Card Updates
             label_dataIPinfo.Text = Player.PlayerIPAddress;
-            label_dataPlayerNameRole.Text = Player.PlayerName;
+            label_dataPlayerNameRole.Text = correctName;
+
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Player.PlayerTeam switch
             {
@@ -236,7 +249,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
             // Conext Updates
             playerContextMenuIcon.Visible = true; // Show context menu icon when player info is updated
-            contextMenu.Items[0].Text = Player.PlayerName; // Update player name in context menu
+            contextMenu.Items[0].Text = correctName; // Update player name in context menu
             contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms"; // Update PlayerPing in context menu
 
             ToolStripMenuItem? WarnMenuUpdate = contextMenu.Items[4] as ToolStripMenuItem;

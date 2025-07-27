@@ -559,33 +559,51 @@ namespace BHD_RemoteClient.Forms
         // Scope: ServerTab, Function: actionClick_startServer, Starts or stops the game server based on the current status.
         private void actionClick_startServer(object sender, EventArgs e)
         {
-            AppDebug.Log("Server Manager", "ValidPath: " + theInstanceManager.ValidateGameServerPath().ToString());
-            AppDebug.Log("Server Manager", "Instance Status: " + InstanceStatus.OFFLINE.ToString());
-
-            if (theInstanceManager.ValidateGameServerPath() && theInstance.instanceStatus == InstanceStatus.OFFLINE)
+            if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
             {
-                // Save the server settings before starting
                 theInstanceManager.SetServerVariables();
 
-                // Start the Game Server
                 if (GameManager.startGame())
                 {
+                    MessageBox.Show("Server start command sent, please wait 10 seconds for the game to start.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                // Poll for server status for up to 10 seconds
+                bool started = false;
+
+                for (int i = 0; i < 20; i++)
+                {
+                    Thread.Sleep(500); // Wait for 0.5 seconds
+                    if (theInstance.instanceStatus != InstanceStatus.OFFLINE)
+                    {
+                        started = true;
+                        break;
+                    }
+                }
+
+                if (started)
+                {
                     MessageBox.Show("Game server started successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
                 }
                 else
                 {
-                    MessageBox.Show("Failed to start the game server. Please check the server path and settings.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    MessageBox.Show("Server start command sent, but server did not come online in time.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                
+
+            }
+            else if (theInstance.instanceStatus != InstanceStatus.OFFLINE)
+            {
+                if (GameManager.stopGame())
+                {
+                    MessageBox.Show("Stop command has been sent.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to stop the game server or it was not running.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            else
-            {
-                // If the server is already running, stop it
-                GameManager.stopGame(); // Stop the game if it is running
-                MessageBox.Show("Stop command has been sent.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
+            // else: do nothing, or optionally log, but don't show a message
         }
         // Scope: MapsTab, Function: actionClick_updateGameServerMaps, Updates the game server maps based on the current map list.
         private void actionClick_updateGameServerMaps(object sender, EventArgs e)

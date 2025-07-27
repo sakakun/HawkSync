@@ -28,6 +28,8 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
         private CancellationTokenSource? _cts;
         public string AuthToken = string.Empty;
 
+        private const int MaxMessageSize = 1024 * 1024; // 1 MB
+
         public RemoteClient(string serverAddress, int commPort, int updatePort)
         {
             _serverAddress = serverAddress;
@@ -80,11 +82,15 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             catch { }
         }
 
-        public void SendCommandPacket(SslStream sslStream, CommandPacket packet)
+        // Generic write method
+        public static void WriteMessage<T>(SslStream sslStream, T message)
         {
             try
             {
-                byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(packet);
+                byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(message!);
+                if (jsonBytes.Length > MaxMessageSize)
+                    throw new InvalidOperationException("Message too large to send.");
+
                 Span<byte> lengthBytes = stackalloc byte[4];
                 BinaryPrimitives.WriteInt32LittleEndian(lengthBytes, jsonBytes.Length);
                 sslStream.Write(lengthBytes);
@@ -93,34 +99,41 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             }
             catch (Exception ex)
             {
-                AppDebug.Log("RemoteClient", "Error sending command packet: " + ex.Message);
+                AppDebug.Log("RemoteClient", $"Error writing message: {ex.Message}");
             }
         }
 
-        public CommandResponse? ReceiveCommandResponse(SslStream sslStream, int timeoutMs = 5000)
+        // Generic read method
+        public static T? ReadMessage<T>(SslStream sslStream, int readTimeout = 5000)
         {
             try
             {
-                sslStream.ReadTimeout = timeoutMs;
+                sslStream.ReadTimeout = readTimeout;
                 Span<byte> lengthBytes = stackalloc byte[4];
                 int read = sslStream.Read(lengthBytes);
-                if (read < 4) return null;
+                if (read < 4) return default;
                 int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
+                if (length <= 0 || length > MaxMessageSize)
+                {
+                    AppDebug.Log("RemoteClient", $"Invalid message length: {length}");
+                    return default;
+                }
 
                 byte[] buffer = new byte[length];
                 int offset = 0;
                 while (offset < length)
                 {
                     int bytesRead = sslStream.Read(buffer, offset, length - offset);
-                    if (bytesRead == 0) return null;
+                    if (bytesRead == 0) return default;
                     offset += bytesRead;
                 }
-                return JsonSerializer.Deserialize<CommandResponse>(buffer);
+
+                return JsonSerializer.Deserialize<T>(buffer);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("RemoteClient", "Error receiving command response: " + ex.Message);
-                return null;
+                AppDebug.Log("RemoteClient", $"Error reading message: {ex.Message}");
+                return default;
             }
         }
 
@@ -130,52 +143,28 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             bool authenticated = false;
             var handshakeStart = DateTime.UtcNow;
 
-            // Allocate buffer once outside the loop
-            byte[] lengthBytes = new byte[4];
-
             // Authentication handshake loop with timeout
             while (!token.IsCancellationRequested && stream.CanRead && !authenticated)
             {
                 try
                 {
-                    stream.ReadTimeout = 5000; // 5 seconds
-                    Array.Clear(lengthBytes, 0, lengthBytes.Length);
-                    int read = stream.Read(lengthBytes, 0, lengthBytes.Length);
-                    if (read < 4) break;
-
-                    int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
-                    byte[] buffer = new byte[length];
-                    int offset = 0;
-                    while (offset < length)
+                    var packet = ReadMessage<CommandPacket>(stream, 5000);
+                    if (packet != null && packet.Command == "RequestAuthToken")
                     {
-                        int bytesRead = stream.Read(buffer, offset, length - offset);
-                        if (bytesRead == 0) return;
-                        offset += bytesRead;
-                    }
-
-                    using var doc = JsonDocument.Parse(buffer);
-                    var root = doc.RootElement;
-
-                    if (root.TryGetProperty("Command", out var commandProp))
-                    {
-                        var packet = JsonSerializer.Deserialize<CommandPacket>(buffer);
-                        if (packet != null && packet.Command == "RequestAuthToken")
+                        var authPacket = new CommandPacket
                         {
-                            var authPacket = new CommandPacket
-                            {
-                                AuthToken = AuthToken,
-                                Command = "AuthToken",
-                                CommandData = AuthToken
-                            };
-                            SendCommandPacket(stream, authPacket);
-                        }
-                    }
-                    else if (root.TryGetProperty("Success", out var successProp))
-                    {
-                        var response = JsonSerializer.Deserialize<CommandResponse>(buffer);
+                            AuthToken = AuthToken,
+                            Command = "AuthToken",
+                            CommandData = AuthToken
+                        };
+                        WriteMessage(stream, authPacket);
+
+                        // Immediately expect a CommandResponse
+                        var response = ReadMessage<CommandResponse>(stream, 5000);
                         if (response != null && response.Success)
                         {
                             authenticated = true;
+                            AppDebug.Log("RemoteClient", "Authenticated for updates.");
                             break;
                         }
                         else
@@ -190,9 +179,9 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                     break;
                 }
 
-                if ((DateTime.UtcNow - handshakeStart).TotalSeconds > 10)
+                if ((DateTime.UtcNow - handshakeStart).TotalSeconds > 60)
                 {
-                    AppDebug.Log("RemoteClient", "Handshake timeout.");
+                    AppDebug.Log("RemoteClient", "Update Token Handshake timeout.");
                     break;
                 }
             }
@@ -202,39 +191,10 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             {
                 try
                 {
-                    stream.ReadTimeout = 10000; // 10 seconds
-                    Array.Clear(lengthBytes, 0, lengthBytes.Length);
-                    int read = stream.Read(lengthBytes, 0, lengthBytes.Length);
-                    if (read < 4)
+                    var updatePacket = ReadMessage<CommandPacket>(stream, 5000);
+                    if (updatePacket != null && updatePacket.Command == "UpdateData")
                     {
-                        AppDebug.Log("RemoteClient", "Stream closed or insufficient data, breaking update loop.");
-                        break;
-                    }
-
-                    int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
-                    byte[] buffer = new byte[length];
-                    int offset = 0;
-                    while (offset < length)
-                    {
-                        int bytesRead = stream.Read(buffer, offset, length - offset);
-                        if (bytesRead == 0)
-                        {
-                            AppDebug.Log("RemoteClient", "No bytes read, returning from update loop.");
-                            return;
-                        }
-                        offset += bytesRead;
-                    }
-
-                    using var doc = JsonDocument.Parse(buffer);
-                    var root = doc.RootElement;
-
-                    if (root.TryGetProperty("Command", out var commandProp))
-                    {
-                        var updatePacket = JsonSerializer.Deserialize<CommandPacket>(buffer);
-                        if (updatePacket != null && updatePacket.Command == "UpdateData")
-                        {
-                            ProcessUpdatePacket(updatePacket!);
-                        }
+                        ProcessUpdatePacket(updatePacket);
                     }
                 }
                 catch (Exception ex)
@@ -243,6 +203,15 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                     break;
                 }
             }
+        }
+
+        public CommandResponse? SendCommandAndGetResponse(CommandPacket packet, int timeoutMs = 5000)
+        {
+            if (_commStream == null)
+                return null;
+
+            WriteMessage(_commStream, packet);
+            return ReadMessage<CommandResponse>(_commStream, timeoutMs);
         }
 
         private static void ProcessUpdatePacket(CommandPacket thePacket)

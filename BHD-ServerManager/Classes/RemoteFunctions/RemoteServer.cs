@@ -24,13 +24,15 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
         private static statInstance instanceStats = CommonCore.instanceStats!;
         private static adminInstance instanceAdmin = CommonCore.instanceAdmin!;
 
-        private static readonly List<AuthorizedClient> _authorizedClients = new List<AuthorizedClient>();
+        private static readonly List<AuthorizedClient> _authorizedClients = new();
         private static TcpListener? _commListener;
         private static TcpListener? _updateListener;
         private static bool _isRunning;
         private static Thread? _serverThread;
         private static X509Certificate? _serverCertificate;
         public static bool IsRunning => _isRunning;
+
+        private const int MaxMessageSize = 1024 * 1024; // 1 MB
 
         public static IReadOnlyList<AuthorizedClient> AuthorizedClients => _authorizedClients.AsReadOnly();
 
@@ -148,19 +150,17 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
         {
             try
             {
-                using (var sslStream = new SslStream(client.GetStream(), false))
+                using var sslStream = new SslStream(client.GetStream(), false);
+                sslStream.AuthenticateAsServer(_serverCertificate!, false, false);
+
+                var processor = new CommandProcessor();
+                while (client.Connected)
                 {
-                    sslStream.AuthenticateAsServer(_serverCertificate!, false, false);
+                    var packet = ReadMessage<CommandPacket>(sslStream);
+                    if (packet == null) break;
 
-                    var processor = new CommandProcessor();
-                    while (client.Connected)
-                    {
-                        CommandPacket? packet = ReadPacket(sslStream);
-                        if (packet == null) break;
-
-                        CommandResponse response = processor.ProcessCommand(packet);
-                        WriteResponse(sslStream, response);
-                    }
+                    var response = processor.ProcessCommand(packet);
+                    WriteMessage(sslStream, response);
                 }
             }
             catch (Exception ex)
@@ -177,87 +177,85 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
         {
             try
             {
-                using (var sslStream = new SslStream(client.GetStream(), false))
+                using var sslStream = new SslStream(client.GetStream(), false);
+                sslStream.AuthenticateAsServer(_serverCertificate!, false, false);
+
+                AuthorizedClient? authorizedClient = null;
+                int attempts = 0;
+                var handshakeStart = DateTime.UtcNow;
+
+                // Auth handshake loop with timeout
+                while (_isRunning && client.Connected && authorizedClient == null && attempts < 10)
                 {
-                    sslStream.AuthenticateAsServer(_serverCertificate!, false, false);
-
-                    AuthorizedClient? authorizedClient = null;
-                    int attempts = 0;
-                    var handshakeStart = DateTime.UtcNow;
-
-                    // Auth handshake loop with timeout
-                    while (_isRunning && client.Connected && authorizedClient == null && attempts < 10)
+                    if ((DateTime.UtcNow - handshakeStart).TotalSeconds > 10)
                     {
-                        if ((DateTime.UtcNow - handshakeStart).TotalSeconds > 10)
-                        {
-                            AppDebug.Log("RemoteServer", "Handshake timeout.");
-                            break;
-                        }
-                        var requestPacket = new CommandPacket
-                        {
-                            Command = "RequestAuthToken",
-                            CommandData = "Please provide your AuthToken."
-                        };
-                        WriteCommandPacket(sslStream, requestPacket);
+                        AppDebug.Log("RemoteServer", "Handshake timeout.");
+                        break;
+                    }
+                    var requestPacket = new CommandPacket
+                    {
+                        Command = "RequestAuthToken",
+                        CommandData = "Please provide your AuthToken."
+                    };
+                    WriteMessage(sslStream, requestPacket);
 
-                        CommandPacket? responsePacket = ReadCommandPacket(sslStream);
-                        if (responsePacket == null || string.IsNullOrWhiteSpace(responsePacket.AuthToken))
+                    var responsePacket = ReadMessage<CommandPacket>(sslStream, 5000);
+                    if (responsePacket == null || string.IsNullOrWhiteSpace(responsePacket.AuthToken))
+                    {
+                        WriteMessage(sslStream, new CommandResponse
                         {
-                            WriteResponse(sslStream, new CommandResponse
-                            {
-                                Success = false,
-                                Message = "No AuthToken provided."
-                            });
-                            attempts++;
-                            Thread.Sleep(500);
-                            continue;
-                        }
+                            Success = false,
+                            Message = "No AuthToken provided."
+                        });
+                        attempts++;
+                        Thread.Sleep(500);
+                        continue;
+                    }
 
-                        lock (_authorizedClients)
-                        {
-                            authorizedClient = _authorizedClients
-                                .Find(c => c.AuthorizationToken.Equals(responsePacket.AuthToken, StringComparison.OrdinalIgnoreCase));
-                        }
-
-                        if (authorizedClient == null)
-                        {
-                            WriteResponse(sslStream, new CommandResponse
-                            {
-                                Success = false,
-                                Message = "Invalid AuthToken."
-                            });
-                            attempts++;
-                            Thread.Sleep(500);
-                        }
+                    lock (_authorizedClients)
+                    {
+                        authorizedClient = _authorizedClients
+                            .Find(c => c.AuthorizationToken.Equals(responsePacket.AuthToken, StringComparison.OrdinalIgnoreCase));
                     }
 
                     if (authorizedClient == null)
                     {
-                        WriteResponse(sslStream, new CommandResponse
+                        WriteMessage(sslStream, new CommandResponse
                         {
                             Success = false,
-                            Message = "Authentication failed. Closing connection."
+                            Message = "Invalid AuthToken."
                         });
-                        return;
+                        attempts++;
+                        Thread.Sleep(500);
                     }
+                }
 
-                    WriteResponse(sslStream, new CommandResponse
+                if (authorizedClient == null)
+                {
+                    WriteMessage(sslStream, new CommandResponse
                     {
-                        Success = true,
-                        Message = "Authenticated. Receiving updates."
+                        Success = false,
+                        Message = "Authentication failed. Closing connection."
                     });
+                    return;
+                }
 
-                    while (_isRunning && client.Connected)
+                WriteMessage(sslStream, new CommandResponse
+                {
+                    Success = true,
+                    Message = "Authenticated. Receiving updates."
+                });
+
+                while (_isRunning && client.Connected)
+                {
+                    var updatePacket = new CommandPacket
                     {
-                        var updatePacket = new CommandPacket
-                        {
-                            AuthToken = authorizedClient.AuthorizationToken,
-                            Command = "UpdateData",
-                            CommandData = GetUpdateDataForClient()
-                        };
-                        WriteCommandPacket(sslStream, updatePacket);
-                        Thread.Sleep(1000);
-                    }
+                        AuthToken = authorizedClient.AuthorizationToken,
+                        Command = "UpdateData",
+                        CommandData = GetUpdateDataForClient()
+                    };
+                    WriteMessage(sslStream, updatePacket);
+                    Thread.Sleep(1000);
                 }
             }
             catch (Exception ex)
@@ -270,11 +268,51 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
             }
         }
 
-        private static void WriteCommandPacket(SslStream sslStream, CommandPacket packet)
+        // Condensed generic read method
+        private static T? ReadMessage<T>(SslStream sslStream, int readTimeout = Timeout.Infinite)
         {
             try
             {
-                byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(packet);
+                if (readTimeout != Timeout.Infinite)
+                    sslStream.ReadTimeout = readTimeout;
+
+                Span<byte> lengthBytes = stackalloc byte[4];
+                int read = sslStream.Read(lengthBytes);
+                if (read < 4) return default;
+                int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
+                if (length <= 0 || length > MaxMessageSize)
+                {
+                    AppDebug.Log("RemoteServer", $"Invalid message length: {length}");
+                    return default;
+                }
+
+                byte[] buffer = new byte[length];
+                int offset = 0;
+                while (offset < length)
+                {
+                    int bytesRead = sslStream.Read(buffer, offset, length - offset);
+                    if (bytesRead == 0) return default;
+                    offset += bytesRead;
+                }
+
+                return JsonSerializer.Deserialize<T>(buffer);
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("RemoteServer", $"Error reading message: {ex.Message}");
+                return default;
+            }
+        }
+
+        // Condensed generic write method
+        private static void WriteMessage<T>(SslStream sslStream, T message)
+        {
+            try
+            {
+                byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(message!);
+                if (jsonBytes.Length > MaxMessageSize)
+                    throw new InvalidOperationException("Message too large to send.");
+
                 Span<byte> lengthBytes = stackalloc byte[4];
                 BinaryPrimitives.WriteInt32LittleEndian(lengthBytes, jsonBytes.Length);
                 sslStream.Write(lengthBytes);
@@ -283,41 +321,13 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
             }
             catch (Exception ex)
             {
-                AppDebug.Log("RemoteServer", "Error writing command packet: " + ex.Message);
-            }
-        }
-
-        private static CommandPacket? ReadCommandPacket(SslStream sslStream)
-        {
-            try
-            {
-                sslStream.ReadTimeout = 5000; // 5 seconds timeout
-                Span<byte> lengthBytes = stackalloc byte[4];
-                int read = sslStream.Read(lengthBytes);
-                if (read < 4) return null;
-                int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
-
-                byte[] buffer = new byte[length];
-                int offset = 0;
-                while (offset < length)
-                {
-                    int bytesRead = sslStream.Read(buffer, offset, length - offset);
-                    if (bytesRead == 0) return null;
-                    offset += bytesRead;
-                }
-
-                return JsonSerializer.Deserialize<CommandPacket>(buffer);
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("RemoteServer", "Error reading command packet: " + ex.Message);
-                return null;
+                AppDebug.Log("RemoteServer", $"Error writing message: {ex.Message}");
             }
         }
 
         private static object GetUpdateDataForClient()
         {
-            InstanceUpdatePacket UpdateData = new InstanceUpdatePacket
+            var updateData = new InstanceUpdatePacket
             {
                 theInstance = theInstance,
                 mapInstance = instanceMaps,
@@ -327,53 +337,8 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 adminInstance = instanceAdmin
             };
 
-            string json = JsonSerializer.Serialize(UpdateData);
-            string dataEncoded = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
-            return dataEncoded;
-        }
-
-        private static CommandPacket? ReadPacket(SslStream sslStream)
-        {
-            try
-            {
-                Span<byte> lengthBytes = stackalloc byte[4];
-                int read = sslStream.Read(lengthBytes);
-                if (read < 4) return null;
-                int length = BinaryPrimitives.ReadInt32LittleEndian(lengthBytes);
-
-                byte[] buffer = new byte[length];
-                int offset = 0;
-                while (offset < length)
-                {
-                    int bytesRead = sslStream.Read(buffer, offset, length - offset);
-                    if (bytesRead == 0) return null;
-                    offset += bytesRead;
-                }
-
-                return JsonSerializer.Deserialize<CommandPacket>(buffer);
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("RemoteServer", "Error reading packet: " + ex.Message);
-                return null;
-            }
-        }
-
-        private static void WriteResponse(SslStream sslStream, CommandResponse response)
-        {
-            try
-            {
-                byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(response);
-                Span<byte> lengthBytes = stackalloc byte[4];
-                BinaryPrimitives.WriteInt32LittleEndian(lengthBytes, jsonBytes.Length);
-                sslStream.Write(lengthBytes);
-                sslStream.Write(jsonBytes);
-                sslStream.Flush();
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("RemoteServer", "Error writing response: " + ex.Message);
-            }
+            string json = JsonSerializer.Serialize(updateData);
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
         }
     }
 

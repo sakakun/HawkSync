@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using BHD_SharedResources.Classes.SupportClasses;
+using System;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
 {
@@ -30,11 +27,8 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 CommandData = authPacket
             };
 
-            // Send the packet
-            theRemoteClient.SendCommandPacket(theRemoteClient._commStream, packet);
-
-            // Receive the response
-            var response = theRemoteClient.ReceiveCommandResponse(theRemoteClient._commStream);
+            // Use the new unified method for command/response
+            var response = theRemoteClient.SendCommandAndGetResponse(packet);
 
             // If successful, extract and store the AuthToken
             if (response != null && response.Success && response.ResponseData != null)
@@ -44,6 +38,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                     using var doc = JsonDocument.Parse(response.ResponseData.ToString()!);
                     if (doc.RootElement.TryGetProperty("Token", out var tokenElement))
                     {
+                        AppDebug.Log("CmdValidateUser", "Received AuthToken: " + tokenElement.GetString());
                         theRemoteClient.AuthToken = tokenElement.GetString() ?? string.Empty;
                         if (!string.IsNullOrEmpty(theRemoteClient.AuthToken))
                         {
@@ -61,6 +56,5 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
             theRemoteClient.AuthToken = string.Empty;
             return false;
         }
-
     }
 }

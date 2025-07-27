@@ -101,6 +101,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 ServerMemory.UpdateGameScores();
                 ServerMemory.ReadMemoryCurrentMapIndex();
                 ServerMemory.UpdatePlayerTeam();
+                ServerMemory.ReadMemoryGeneratePlayerList();
                 tickerEvent_updateLabels(thisServer);
             }
             // 4. Online (game in progress)
