@@ -11,6 +11,7 @@ using Windows.ApplicationModel.Email.DataProvider;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdResetAvailableMaps")]
     public static class CmdResetAvailableMaps
     {
         private static ServerManager thisServer => Program.ServerManagerUI!;

@@ -19,6 +19,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdRearmplayer")]
     public static class CmdRearmplayer
     {
         private static ServerManager thisServer = Program.ServerManagerUI!;

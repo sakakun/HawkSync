@@ -12,6 +12,7 @@ using System.Text.Json;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdValidateUser")]
     public class CmdValidateUser
     {
         private static readonly adminInstance adminInstance = CommonCore.instanceAdmin!;

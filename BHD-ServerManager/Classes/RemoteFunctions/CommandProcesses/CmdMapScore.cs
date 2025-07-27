@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdMapSkip")]
     public static class CmdMapScore
     {
 

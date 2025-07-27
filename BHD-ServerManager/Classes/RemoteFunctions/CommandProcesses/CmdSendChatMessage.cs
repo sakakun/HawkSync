@@ -12,9 +12,9 @@ using System.Windows.Forms;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdSendChatMessage")]
     public static class CmdSendChatMessage
     {
-
         public static CommandResponse ProcessCommand(object data)
         {
             int channel = 0;

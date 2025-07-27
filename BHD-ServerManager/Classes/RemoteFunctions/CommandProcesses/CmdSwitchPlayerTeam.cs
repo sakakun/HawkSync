@@ -15,9 +15,10 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+
+    [CommandHandler("CmdSwitchPlayerTeam")]
     public static class CmdSwitchPlayerTeam
     {
-
         private static theInstance thisInstance = CommonCore.theInstance;
 
         public static CommandResponse ProcessCommand(object data)

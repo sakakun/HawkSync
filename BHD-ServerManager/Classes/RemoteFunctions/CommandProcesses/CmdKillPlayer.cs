@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdKillPlayer")]
     public static class CmdKillPlayer
     {
 

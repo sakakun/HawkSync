@@ -19,6 +19,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdTogglePlayerGodMode")]
     public static class CmdTogglePlayerGodMode
     {
         private static ServerManager thisServer = Program.ServerManagerUI!;

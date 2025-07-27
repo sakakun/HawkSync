@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdRemoveAutoMessage")]
     public static class CmdRemoveAutoMessage
     {
         private static ServerManager thisServer = Program.ServerManagerUI!;

@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdUpdateNextMap")]
     public static class CmdUpdateNextMap
     {
-
         public static CommandResponse ProcessCommand(object data)
         {
             int mapIndex;

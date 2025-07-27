@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdRemoveBannedPlayerAddress")]
     public static class CmdRemoveBannedPlayerAddress
     {
 

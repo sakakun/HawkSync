@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdStartGame")]
     public static class CmdStartGame
     {
-
         public static CommandResponse ProcessCommand(object data)
         {
             bool isStarted = StartServer.startGame();

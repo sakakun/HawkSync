@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdStopGame")]
     public static class CmdStopGame
     {
-
         public static CommandResponse ProcessCommand(object data)
         {
 

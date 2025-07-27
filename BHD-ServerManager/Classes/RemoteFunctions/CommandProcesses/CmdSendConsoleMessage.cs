@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdSendConsoleMessage")]
     public static class CmdSendConsoleMessage
     {
-
         public static CommandResponse ProcessCommand(object data)
         {
             string message = string.Empty;

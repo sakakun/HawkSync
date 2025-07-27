@@ -12,9 +12,10 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+
+    [CommandHandler("CmdRemoveBannedPlayerName")]
     public static class CmdRemoveBannedPlayerName
     {
-
         public static CommandResponse ProcessCommand(object data)
         {
             int recordID;

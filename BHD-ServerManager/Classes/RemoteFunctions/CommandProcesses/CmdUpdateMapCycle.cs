@@ -15,6 +15,7 @@ using Windows.Storage;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdUpdateMapCycle")]
     public static class CmdUpdateMapCycle
     {
         private static theInstance theInstance => CommonCore.theInstance!;

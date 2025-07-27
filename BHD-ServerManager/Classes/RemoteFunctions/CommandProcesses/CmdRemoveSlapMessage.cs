@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdRemoveSlapMessage")]
     public static class CmdRemoveSlapMessage
     {
 

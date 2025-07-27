@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdAddBannedPlayer")]
     public static class CmdAddBannedPlayer
     {
 

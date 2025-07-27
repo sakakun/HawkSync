@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdTestBabstatsConnection")]
     public static class CmdTestBabstatsConnection
     {
-
         public static CommandResponse ProcessCommand(object data)
         {
             string webUrl = string.Empty;

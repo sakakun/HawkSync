@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdReadMemoryIsProcessAttached")]
     public static class CmdReadMemoryIsProcessAttached
     {
 

@@ -13,9 +13,9 @@ using Windows.Storage;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdSetServerVariables")]
     public static class CmdSetServerVariables
     {
-        
         private static theInstance thisInstance => CommonCore.theInstance!;
 
         public static CommandResponse ProcessCommand(object data)

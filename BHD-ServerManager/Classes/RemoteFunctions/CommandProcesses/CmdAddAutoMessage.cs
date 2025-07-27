@@ -15,6 +15,7 @@ using Windows.ApplicationModel.Chat;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdAddAutoMessage")]
     public static class CmdAddAutoMessage
     {
         private static ServerManager thisServer = Program.ServerManagerUI!;

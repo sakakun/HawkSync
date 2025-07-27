@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdPing")]
     public static class CmdPing
     {
 

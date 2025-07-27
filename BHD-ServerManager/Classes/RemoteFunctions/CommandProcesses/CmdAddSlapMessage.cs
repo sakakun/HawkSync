@@ -15,6 +15,7 @@ using Windows.ApplicationModel.Chat;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
+    [CommandHandler("CmdAddSlapMessage")]
     public static class CmdAddSlapMessage
     {
         private static ServerManager thisServer = Program.ServerManagerUI!;

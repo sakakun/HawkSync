@@ -3,10 +3,19 @@ using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.Instances;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.Json;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions
 {
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class CommandHandlerAttribute : Attribute
+    {
+        public string CommandName { get; }
+        public CommandHandlerAttribute(string commandName) => CommandName = commandName;
+    }
+
     public class CommandProcessor
     {
         private static readonly adminInstance adminInstance = CommonCore.instanceAdmin!;
@@ -16,6 +25,24 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
 
         public CommandProcessor()
         {
+            _handlers = new Dictionary<string, (Type, Func<object, CommandResponse>)>(StringComparer.OrdinalIgnoreCase);
+
+            // Register static/manual handlers (if any)
+            RegisterStaticHandlers();
+
+            // Auto-register handlers with CommandHandlerAttribute
+            RegisterAttributedHandlers();
+
+            
+        }
+
+        private void RegisterStaticHandlers()
+        {
+            // If you have legacy handlers or want to keep some manual registrations, do it here.
+            _handlers["Ping"] = (typeof(object), CmdPing.ProcessCommand);
+            _handlers["ValidateUser"] = (typeof(AuthenticationPacket), data => CmdValidateUser.ProcessCommand((AuthenticationPacket)data));
+            // ...add any other static/manual registrations here if needed...
+            /*
             _handlers = new Dictionary<string, (Type, Func<object, CommandResponse>)>(StringComparer.OrdinalIgnoreCase)
             {
                 { "Ping", (typeof(object), CmdPing.ProcessCommand) },
@@ -50,6 +77,46 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 { "CmddeleteAdminAccount", (typeof(object), CmddeleteAdminAccount.ProcessCommand) },
                 { "CmdTestBabstatsConnection", (typeof(object), CmdTestBabstatsConnection.ProcessCommand) },
             };
+            */
+        }
+        private void RegisterAttributedHandlers()
+        {
+            var handlerTypes = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(t => t.GetCustomAttribute<CommandHandlerAttribute>() != null);
+
+            foreach (var type in handlerTypes)
+            {
+                var attr = type.GetCustomAttribute<CommandHandlerAttribute>();
+                // Look for a static method named "ProcessCommand" with correct signature
+                var method = type.GetMethod("ProcessCommand", BindingFlags.Public | BindingFlags.Static);
+                if (method != null && method.ReturnType == typeof(CommandResponse))
+                {
+                    // Determine parameter type for deserialization
+                    var parameters = method.GetParameters();
+                    var paramType = parameters.Length == 1 ? parameters[0].ParameterType : typeof(object);
+
+                    // Create a delegate to invoke the static method
+                    Func<object, CommandResponse> handler = arg =>
+                    {
+                        // If needed, convert arg to the expected parameter type
+                        if (arg != null && paramType != typeof(object) && !paramType.IsInstanceOfType(arg))
+                        {
+                            if (arg is JsonElement jsonElement)
+                            {
+                                arg = JsonSerializer.Deserialize(jsonElement.GetRawText(), paramType)!;
+                            }
+                            else
+                            {
+                                arg = Convert.ChangeType(arg, paramType);
+                            }
+                        }
+                        return (CommandResponse)method.Invoke(null, new[] { arg });
+                    };
+
+                    _handlers[attr.CommandName] = (paramType, handler);
+                }
+            }
         }
 
         public CommandResponse ProcessCommand(CommandPacket packet)
