@@ -58,7 +58,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = "The command to update the maps.",
+                Message = "Map list updated.",
                 ResponseData = true.ToString()
             };
         }

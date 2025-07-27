@@ -21,7 +21,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"The command to start the server was recieve and run.",
+                Message = $"The command toscore the map was recieve and run.",
                 ResponseData = true.ToString()
             };
         }

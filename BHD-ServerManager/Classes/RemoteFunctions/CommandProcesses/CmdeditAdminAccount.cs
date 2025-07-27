@@ -57,9 +57,6 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 
             if (adminInstanceManager.updateAdminAccount(UserID, UserName, UserPass, (AdminRoles)UserRole))
             {
-                thisServer.functionEvent_UpdateAdminList();
-                adminInstanceManager.UpdateAdminLogDialog();
-
                 return new CommandResponse
                 {
                     Success = true,

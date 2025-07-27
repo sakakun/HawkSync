@@ -41,10 +41,26 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 
             banInstanceManager.AddBannedPlayer(encodedPlayerName, playerIPAddress, submask);
 
+            // Decode the player name
+            string decodedPlayerName = string.Empty;
+            if (!string.IsNullOrEmpty(encodedPlayerName))
+            {
+                try
+                {
+                    byte[] nameBytes = Convert.FromBase64String(encodedPlayerName);
+                    decodedPlayerName = Encoding.GetEncoding("windows-1251").GetString(nameBytes);
+                }
+                catch
+                {
+                    decodedPlayerName = encodedPlayerName;
+                }
+            }
+            string logMessage = $"Banned player: '{decodedPlayerName}', IP: {playerIPAddress?.ToString() ?? "N/A"}, Submask: {submask}";
+
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Ban command processed.",
+                Message = logMessage,
                 ResponseData = true.ToString()
             };
         }

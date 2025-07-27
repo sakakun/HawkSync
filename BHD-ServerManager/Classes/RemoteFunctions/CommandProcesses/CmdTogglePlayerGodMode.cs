@@ -51,7 +51,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Command Sent",
+                Message = $"Has toggled god mode for player slot, " + playerSlot.ToString(),
                 ResponseData = true.ToString()
             };
         }

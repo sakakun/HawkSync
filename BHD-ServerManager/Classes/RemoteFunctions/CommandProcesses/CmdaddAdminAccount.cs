@@ -51,13 +51,10 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 
             if (adminInstanceManager.addAdminAccount(UserName, UserPass, (AdminRoles) UserRole))
             {
-                thisServer.functionEvent_UpdateAdminList();
-                adminInstanceManager.UpdateAdminLogDialog();
-
                 return new CommandResponse
                 {
                     Success = true,
-                    Message = $"User Added",
+                    Message = $"User Added, {UserName}.",
                     ResponseData = true.ToString()
                 };
             }

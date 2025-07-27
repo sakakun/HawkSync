@@ -1,5 +1,6 @@
 ﻿using BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses;
 using BHD_SharedResources.Classes.CoreObjects;
+using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,6 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
             // Auto-register handlers with CommandHandlerAttribute
             RegisterAttributedHandlers();
 
-            
         }
 
         private void RegisterStaticHandlers()
@@ -139,6 +139,12 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 .Any(u => !string.IsNullOrEmpty(u.AuthorizationToken) &&
                           u.AuthorizationToken.Equals(packet.AuthToken, StringComparison.OrdinalIgnoreCase));
 
+            int userId = RemoteServer.AuthorizedClients
+                .Where(u => !string.IsNullOrEmpty(u.AuthorizationToken) &&
+                            u.AuthorizationToken.Equals(packet.AuthToken, StringComparison.OrdinalIgnoreCase))
+                .Select(u => u.ClientId)
+                .FirstOrDefault();
+
             if (!isAuthorized && packet.Command != "ValidateUser")
             {
                 return new CommandResponse
@@ -155,7 +161,10 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 {
                     arg = JsonSerializer.Deserialize(jsonElement.GetRawText(), entry.type)!;
                 }
-                return entry.handler(arg);
+
+                var response = entry.handler(arg);
+                adminInstanceManager.AddLogEntry(userId, $"RCE - {packet.Command}: {response.Message}");
+                return response;
             }
 
             return new CommandResponse

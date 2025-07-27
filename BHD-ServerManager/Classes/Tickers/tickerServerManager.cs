@@ -53,7 +53,7 @@ namespace BHD_ServerManager.Classes.Tickers
             SafeInvoke(thisServer, () =>
             {
                 thisServer.functionEvent_swapFieldsStartStop();
-                thisServer.functionEvent_UpdateAdminList();
+                thisServer.functionEvent_UpdateAdminLists();
             });
             adminInstanceManager.UpdateAdminLogDialog();
             SafeInvoke(thisServer, () => theInstanceManager.HighlightDifferences());

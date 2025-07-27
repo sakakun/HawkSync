@@ -62,7 +62,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"The command to start the server was received and run.",
+                Message = $"Updated Next Map to Index of: " + mapIndex.ToString(),
                 ResponseData = true.ToString()
             };
         }

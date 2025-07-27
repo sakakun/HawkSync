@@ -44,9 +44,6 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 
             if (adminInstanceManager.removeAdminAccount(UserID))
             {
-                thisServer.functionEvent_UpdateAdminList();
-                adminInstanceManager.UpdateAdminLogDialog();
-
                 return new CommandResponse
                 {
                     Success = true,

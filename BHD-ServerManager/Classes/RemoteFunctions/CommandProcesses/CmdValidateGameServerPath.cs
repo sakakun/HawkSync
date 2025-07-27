@@ -19,7 +19,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = isValid,
-                Message = $"Valid Game Server Path Response",
+                Message = $"Returned response of '{isValid.ToString()}'",
                 ResponseData = isValid
             };
         }

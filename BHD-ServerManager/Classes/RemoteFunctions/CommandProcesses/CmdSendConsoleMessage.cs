@@ -36,7 +36,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"The command writen to console.",
+                Message = $"The command '{message}' writen to console.",
                 ResponseData = true.ToString()
             };
         }

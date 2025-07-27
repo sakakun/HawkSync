@@ -51,7 +51,7 @@ namespace BHD_ServerManager.Forms
             cb_banSubMask.SelectedIndex = cb_banSubMask.Items.Count - 1;
             functionEvent_UpdateAutoMessages();
             functionEvent_UpdateSlapMessages();
-            functionEvent_UpdateAdminList();
+            functionEvent_UpdateAdminLists();
             ActionClick_AdminNewUser(null!, null!);
         }
 
@@ -684,13 +684,30 @@ namespace BHD_ServerManager.Forms
         }
 
         // --- Admin Tab ---
-        public void functionEvent_UpdateAdminList()
+        public void functionEvent_UpdateAdminLists()
         {
             SafeInvoke(dg_AdminUsers, () =>
             {
                 dg_AdminUsers.Rows.Clear();
                 foreach (var admin in instanceAdmin.Admins)
                     dg_AdminUsers.Rows.Add(admin.UserId, admin.Username, admin.Role.ToString());
+
+                dg_adminLog.Rows.Clear();
+                foreach (AdminLog log in instanceAdmin.Logs.OrderByDescending(l => l.Timestamp))
+                {
+                    // Find the admin account by userId
+                    var admin = instanceAdmin.Admins.FirstOrDefault(a => a.UserId == log.UserId);
+                    string username = admin != null ? admin.Username : $"UserId:{log.UserId}";
+
+                    // Add the row to the DataGridView
+                    dg_adminLog.Rows.Add(
+                        log.Timestamp,   // DateTime or string
+                        username,        // Username resolved from userId
+                        log.Action       // Action/message
+                    );
+                }
+
+
             });
         }
 
@@ -723,7 +740,6 @@ namespace BHD_ServerManager.Forms
             {
                 MessageBox.Show("Admin account has been added successfully.", "Admin Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ActionClick_AdminNewUser(sender, e);
-                functionEvent_UpdateAdminList();
             }
             else
             {
@@ -748,7 +764,6 @@ namespace BHD_ServerManager.Forms
             {
                 MessageBox.Show("Admin account has been updated successfully.", "Admin Updated", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ActionClick_AdminNewUser(sender, e);
-                functionEvent_UpdateAdminList();
             }
             else
             {
@@ -779,7 +794,6 @@ namespace BHD_ServerManager.Forms
                 {
                     MessageBox.Show("Admin account has been deleted successfully.", "Admin Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ActionClick_AdminNewUser(sender, e);
-                    functionEvent_UpdateAdminList();
                 }
                 else
                 {

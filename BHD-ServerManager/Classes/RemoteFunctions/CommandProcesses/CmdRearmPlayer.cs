@@ -46,7 +46,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Disarm Command Sent",
+                Message = $"Disarmed player in slot " + playerSlot.ToString(),
                 ResponseData = true.ToString()
             };
 

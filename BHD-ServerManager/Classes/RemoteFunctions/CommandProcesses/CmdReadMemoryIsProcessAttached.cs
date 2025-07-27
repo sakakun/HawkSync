@@ -14,11 +14,13 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 
         public static CommandResponse ProcessCommand(object data)
         {
+            bool isAttached = ServerMemory.ReadMemoryIsProcessAttached();
+
             return new CommandResponse
             {
-                Success = true,
-                Message = $"Pong",
-                ResponseData = ServerMemory.ReadMemoryIsProcessAttached().ToString()
+                Success = isAttached,
+                Message = $"Game Server Attached? ({isAttached.ToString()})",
+                ResponseData = isAttached.ToString()
             };
         }
 

@@ -67,7 +67,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"The command to start the server was received and run.",
+                Message = $"Removed a slap message.",
                 ResponseData = true.ToString()
             };
         }

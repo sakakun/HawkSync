@@ -35,37 +35,61 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             _serverAddress = serverAddress;
             _commPort = commPort;
             _updatePort = updatePort;
-            Connect();
         }
 
-        public void Connect()
+        public bool Connect(int timeoutMs = 5000)
         {
-            try
-            {
-                Disconnect();
-            }
-            catch { }
+            Disconnect();
 
             try
             {
                 _cts = new CancellationTokenSource();
 
-                // Connect communication channel
-                _commClient = new TcpClient(_serverAddress, _commPort);
+                // Connect communication channel with timeout
+                var commClient = new TcpClient();
+                var commConnectTask = commClient.ConnectAsync(_serverAddress, _commPort);
+                if (!commConnectTask.Wait(timeoutMs))
+                {
+                    AppDebug.Log("RemoteClient", "Timeout connecting to communication channel.");
+                    return false;
+                }
+                _commClient = commClient;
                 _commStream = new SslStream(_commClient.GetStream(), false, ValidateServerCertificate!, null);
-                _commStream.AuthenticateAsClient(_serverAddress);
 
-                // Connect update channel
-                _updateClient = new TcpClient(_serverAddress, _updatePort);
+                var commAuthTask = _commStream.AuthenticateAsClientAsync(_serverAddress);
+                if (!commAuthTask.Wait(timeoutMs))
+                {
+                    AppDebug.Log("RemoteClient", "Timeout during SSL authentication (comm channel).");
+                    return false;
+                }
+
+                // Connect update channel with timeout
+                var updateClient = new TcpClient();
+                var updateConnectTask = updateClient.ConnectAsync(_serverAddress, _updatePort);
+                if (!updateConnectTask.Wait(timeoutMs))
+                {
+                    AppDebug.Log("RemoteClient", "Timeout connecting to update channel.");
+                    return false;
+                }
+                _updateClient = updateClient;
                 _updateStream = new SslStream(_updateClient.GetStream(), false, ValidateServerCertificate!, null);
-                _updateStream.AuthenticateAsClient(_serverAddress);
+
+                var updateAuthTask = _updateStream.AuthenticateAsClientAsync(_serverAddress);
+                if (!updateAuthTask.Wait(timeoutMs))
+                {
+                    AppDebug.Log("RemoteClient", "Timeout during SSL authentication (update channel).");
+                    return false;
+                }
 
                 // Start listening for updates
                 Task.Run(() => ListenForUpdates(_cts.Token));
+
+                return true;
             }
             catch (Exception e)
             {
                 AppDebug.Log("RemoteClient", "Error connecting: " + e.Message);
+                return false;
             }
         }
 
@@ -79,7 +103,9 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                 _updateClient?.Close();
                 _commClient?.Close();
             }
-            catch { }
+            catch (Exception e) {
+                AppDebug.Log("RemoteClient", "Disconnecting Error: " + e.Message);
+            }
         }
 
         // Generic write method

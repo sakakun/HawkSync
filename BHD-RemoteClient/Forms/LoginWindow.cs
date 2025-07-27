@@ -137,6 +137,16 @@ namespace BHD_RemoteClient.Forms
             {
                 Program.theRemoteClient = new RemoteClient(serverAddress, serverPort, serverPort + 1);
 
+                // Use a timeout for the connection (e.g., 5000 ms)
+                bool connected = await Task.Run(() => Program.theRemoteClient.Connect(5000));
+
+                if (!connected)
+                {
+                    MessageBox.Show("Failed to connect to the server (timeout or network error).", "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    btn_login.Enabled = true;
+                    return;
+                }
+
                 bool loginSuccess = await Task.Run(() => CmdValidateUser.Login(username, password));
 
                 if (loginSuccess)

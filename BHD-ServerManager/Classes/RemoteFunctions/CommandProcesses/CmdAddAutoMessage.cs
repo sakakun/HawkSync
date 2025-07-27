@@ -49,7 +49,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"The command to start the server was received and run.",
+                Message = $"Added an auto message.",
                 ResponseData = true.ToString()
             };
         }

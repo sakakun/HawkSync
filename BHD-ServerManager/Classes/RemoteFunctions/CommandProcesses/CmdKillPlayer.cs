@@ -38,7 +38,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Kill Command Sent",
+                Message = $"Player with slot number ({playerSlot.ToString()}) was killed.",
                 ResponseData = true.ToString()
             };
         }

@@ -35,7 +35,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
                 return new CommandResponse
                 {
                     Success = false,
-                    Message = "Invalid username or password."
+                    Message = $"Validation of '{username}', or password used failed."
                 };
             }
 
@@ -54,7 +54,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = "User validated.",
+                Message = $"User '{username}' validated.",
                 ResponseData = new { Token = token }
             };
         }

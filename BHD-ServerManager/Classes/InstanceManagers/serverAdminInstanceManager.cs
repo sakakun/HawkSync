@@ -39,20 +39,49 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     try
                     {
                         string json = File.ReadAllText(adminDBPath);
-                        var admins = JsonSerializer.Deserialize<List<AdminAccount>>(json);
-                        instanceAdmin.Admins = admins ?? new List<AdminAccount>();
+                        var admins = JsonSerializer.Deserialize<List<AdminAccount>>(json) ?? new List<AdminAccount>();
+                        // Ensure console admin exists
+                        if (!admins.Any(a => a.UserId == 0))
+                        {
+                            admins.Insert(0, new AdminAccount
+                            {
+                                UserId = 0,
+                                Username = "Console",
+                                Password = string.Empty,
+                                Role = AdminRoles.Admin
+                            });
+                        }
+                        instanceAdmin.Admins = admins;
                     }
                     catch (Exception ex)
                     {
                         LogError($"Error loading admins: {ex}");
                         BackupFile(adminDBPath);
-                        instanceAdmin.Admins = new List<AdminAccount>();
+                        instanceAdmin.Admins = new List<AdminAccount>
+                        {
+                            new AdminAccount
+                            {
+                                UserId = 0,
+                                Username = "Console",
+                                Password = string.Empty,
+                                Role = AdminRoles.Admin
+                            }
+                        };
                         SaveAdmins();
                     }
                 }
                 else
                 {
-                    instanceAdmin.Admins = new List<AdminAccount>();
+                    instanceAdmin.Admins = new List<AdminAccount>
+                    {
+                        new AdminAccount
+                        {
+                            UserId = 0,
+                            Username = "Console",
+                            Password = string.Empty,
+                            Role = AdminRoles.Admin
+                        }
+                    };
                     SaveAdmins();
                 }
             }
@@ -87,7 +116,19 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         string json = File.ReadAllText(adminLogPath);
                         var logs = JsonSerializer.Deserialize<List<AdminLog>>(json);
-                        instanceAdmin.Logs = logs ?? new List<AdminLog>();
+                        // Decode Action from Base64 after loading
+                        instanceAdmin.Logs = logs?.Select(log =>
+                        {
+                            try
+                            {
+                                log.Action = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(log.Action));
+                            }
+                            catch
+                            {
+                                // If decoding fails, keep the original string
+                            }
+                            return log;
+                        }).ToList() ?? new List<AdminLog>();
                     }
                     catch (Exception ex)
                     {
@@ -113,7 +154,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 try
                 {
                     var options = new JsonSerializerOptions { WriteIndented = true };
-                    string json = JsonSerializer.Serialize(instanceAdmin.Logs, options);
+                    // Encode Action as Base64 before saving
+                    var encodedLogs = instanceAdmin.Logs.Select(log => new AdminLog
+                    {
+                        LogId = log.LogId,
+                        Timestamp = log.Timestamp,
+                        UserId = log.UserId,
+                        Action = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(log.Action))
+                    }).ToList();
+
+                    string json = JsonSerializer.Serialize(encodedLogs, options);
                     File.WriteAllText(adminLogPath, json);
                 }
                 catch (Exception ex)
@@ -201,45 +251,34 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 };
                 instanceAdmin.Admins.Add(newAdmin);
                 SaveAdmins();
-                AddLogEntry(newAdmin.UserId, $"Added admin account: {username}");
                 return true;
             }
         }
 
         public bool removeAdminAccount(int userId)
         {
+            if (userId == 0) return false; // Prevent removal of console admin
             lock (adminLock)
             {
-                // Find the admin account by UserId
                 var admin = instanceAdmin.Admins.FirstOrDefault(a => a.UserId == userId);
-                if (admin == null)
-                {
-                    return false; // Admin account not found
-                }
-                // Remove the admin account
+                if (admin == null) return false;
                 instanceAdmin.Admins.Remove(admin);
                 SaveAdmins();
-                AddLogEntry(userId, $"Removed admin account: {admin.Username}");
                 return true;
             }
         }
 
         public bool updateAdminAccount(int userId, string? username = null, string? password = null, AdminRoles? role = null)
         {
+            if (userId == 0) return false; // Prevent modification of console admin
             lock (adminLock)
             {
-                // Find the admin account by UserId
                 var admin = instanceAdmin.Admins.FirstOrDefault(a => a.UserId == userId);
-                if (admin == null)
-                {
-                    return false; // Admin account not found
-                }
-                // Update the admin account details
+                if (admin == null) return false;
                 if (username != null && username != string.Empty && username != admin.Username) admin.Username = username;
                 if (password != null && password != string.Empty && !ValidatePassword(password, admin.Password!)) admin.Password = EncryptPassword(password);
                 if (role.HasValue) admin.Role = role.Value;
                 SaveAdmins();
-                AddLogEntry(userId, $"Updated admin account: {admin.Username}");
                 return true;
             }
         }
@@ -286,27 +325,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         public void UpdateAdminLogDialog()
         {
-            if (thisServer.dg_adminLog.InvokeRequired)
-            {
-                thisServer.dg_adminLog.Invoke(new Action(() => UpdateAdminLogDialog()));
-                return;
-            }
 
-            thisServer.dg_adminLog.Rows.Clear();
-
-            foreach (AdminLog log in instanceAdmin.Logs.OrderByDescending(l => l.Timestamp))
-            {
-                // Find the admin account by userId
-                var admin = instanceAdmin.Admins.FirstOrDefault(a => a.UserId == log.UserId);
-                string username = admin != null ? admin.Username : $"UserId:{log.UserId}";
-
-                // Add the row to the DataGridView
-                thisServer.dg_adminLog.Rows.Add(
-                    log.Timestamp,   // DateTime or string
-                    username,        // Username resolved from userId
-                    log.Action       // Action/message
-                );
-            }
         }
 
     }
