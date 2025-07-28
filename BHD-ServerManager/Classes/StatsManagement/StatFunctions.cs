@@ -287,7 +287,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
         public static string GenerateUpdateData()
         {
             string updateData = string.Empty;
-            updateData += "ServerID: " + theInstance.WebStatsProfileID + "\n";
+            updateData += "ServerID " + theInstance.WebStatsProfileID + "\n";
             updateData += GenerateGameLine() + "\n";
             foreach (var playerStat in instanceStats.playerStatsList.Values)
             {
@@ -432,7 +432,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 string url = baseUrl + endpoint;
                 string response = await SendBabstatsData(url, data);
 
-                if (response == "No data sent")
+                if (response.IndexOf("no data sent", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     responseGood++;
                     AppDebug.Log("StatsManager", $"Babstats Test: {endpoint} - No data sent.");
