@@ -7,6 +7,8 @@
     <UseWinUI>true</UseWinUI>
     <OutputType>Library</OutputType>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <Platforms>AnyCPU;x64</Platforms>
+    <Configurations>Debug;Release;Release</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />
