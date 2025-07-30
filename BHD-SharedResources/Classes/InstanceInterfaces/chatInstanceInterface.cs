@@ -16,8 +16,8 @@ namespace BHD_SharedResources.Classes.InstanceInterfaces
         void RemoveSlapMessage(int id);
         void AddAutoMessage(string messageText, int tiggerSeconds);
         void RemoveAutoMessage(int id);
-
         IReadOnlyList<SlapMessages> GetSlapMessages();
         IReadOnlyList<AutoMessages> GetAutoMessages();
+        void UpdateChatMessagesGrid();
     }
 }

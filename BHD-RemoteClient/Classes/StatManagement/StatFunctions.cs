@@ -16,8 +16,17 @@ namespace BHD_RemoteClient.Classes.StatManagement
         private static theInstance theInstance => CommonCore.theInstance!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
 
+        // Throttle updates to once every 15 seconds
+        private static DateTime _lastPlayerStatsUpdate = DateTime.MinValue;
+        // Throttle updates to once every 15 seconds
+        private static DateTime _lastWeaponStatsUpdate = DateTime.MinValue;
+
         public static void PopulatePlayerStatsGrid()
         {
+            if ((DateTime.UtcNow - _lastPlayerStatsUpdate).TotalSeconds < 15)
+                return;
+            _lastPlayerStatsUpdate = DateTime.UtcNow;
+
             DataGridView dataGridViewPlayerStats = thisServer.dataGridViewPlayerStats;
 
             if (dataGridViewPlayerStats.InvokeRequired)
@@ -109,6 +118,10 @@ namespace BHD_RemoteClient.Classes.StatManagement
 
         public static void PopulateWeaponStatsGrid()
         {
+            if ((DateTime.UtcNow - _lastWeaponStatsUpdate).TotalSeconds < 15)
+                return;
+            _lastWeaponStatsUpdate = DateTime.UtcNow;
+
             DataGridView dataGridViewWeaponStats = thisServer.dataGridViewWeaponStats;
 
             if (dataGridViewWeaponStats.InvokeRequired)

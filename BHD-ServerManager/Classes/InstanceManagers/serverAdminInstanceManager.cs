@@ -22,6 +22,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // Thread safety locks
         private static readonly object adminLock = new();
         private static readonly object logLock = new();
+        // Static field to track last update time
+        private static DateTime _lastUpdate = DateTime.MinValue;
 
         public void LoadSettings()
         {
@@ -325,7 +327,27 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         public void UpdateAdminLogDialog()
         {
+            // Only update if 15 seconds have passed
+            if ((DateTime.UtcNow - _lastUpdate).TotalSeconds < 15)
+                return;
 
+            _lastUpdate = DateTime.UtcNow;
+
+            thisServer.dg_adminLog.Rows.Clear();
+
+            foreach (AdminLog log in instanceAdmin.Logs
+            .OrderByDescending(l => l.Timestamp)
+            .Take(50))
+            {
+                var admin = instanceAdmin.Admins.FirstOrDefault(a => a.UserId == log.UserId);
+                string username = admin != null ? admin.Username : $"UserId:{log.UserId}";
+
+                thisServer.dg_adminLog.Rows.Add(
+                    log.Timestamp,
+                    username,
+                    log.Action
+                );
+            }
         }
 
     }

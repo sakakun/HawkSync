@@ -1,13 +1,14 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
+﻿using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Forms;
+using BHD_SharedResources.Classes.CoreObjects;
+using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
-using BHD_ServerManager.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BHD_ServerManager.Classes.GameManagement;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -72,7 +73,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         ProcessChatMessages();
                         SafeInvoke(thisServer.dataGridView_chatMessages, () =>
                         {
-                            UpdateChatMessagesGrid(thisServer);
+                            chatInstanceManagers.UpdateChatMessagesGrid();
                         });
                     });
                 }
@@ -231,60 +232,6 @@ namespace BHD_ServerManager.Classes.Tickers
             _autoMessageRecoveryDone = true;
         }
 
-        private static void UpdateChatMessagesGrid(ServerManager thisServer)
-        {
-            var dgv = thisServer.dataGridView_chatMessages;
-
-            // Save scroll position
-            int firstDisplayedRow = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
-            int visibleRows = dgv.DisplayedRowCount(false);
-            bool wasAtBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
-
-            // Clear and repopulate
-            dgv.Rows.Clear();
-            foreach (var entry in CommonCore.instanceChat!.ChatLog)
-            {
-                string teamString = entry.MessageType switch
-                {
-                    0 => "Server",
-                    1 => "Global",
-                    3 => "Other",
-                    2 => entry.MessageType2 switch
-                    {
-                        1 => "Blue",
-                        2 => "Red",
-                        _ => "Other"
-                    },
-                    _ => "Other"
-                };
-
-                entry.PlayerName = Functions.SanitizePlayerName(entry.PlayerName);
-
-                dgv.Rows.Add(
-                    entry.MessageTimeStamp.ToString("HH:mm:ss"),
-                    teamString,
-                    entry.PlayerName,
-                    entry.MessageText
-                );
-            }
-
-            // Restore scroll position safely
-            if (dgv.Rows.Count > 0)
-            {
-                int targetRow;
-                if (wasAtBottom)
-                {
-                    targetRow = dgv.Rows.Count - visibleRows;
-                    if (targetRow < 0) targetRow = 0;
-                }
-                else
-                {
-                    targetRow = firstDisplayedRow;
-                    if (targetRow >= dgv.Rows.Count) targetRow = dgv.Rows.Count - 1;
-                    if (targetRow < 0) targetRow = 0;
-                }
-                dgv.FirstDisplayedScrollingRowIndex = targetRow;
-            }
-        }
+        
     }
 }

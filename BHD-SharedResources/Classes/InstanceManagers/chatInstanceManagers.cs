@@ -19,5 +19,6 @@ namespace BHD_SharedResources.Classes.InstanceManagers
         public static void RemoveAutoMessage(int id) => Implementation.RemoveAutoMessage(id);
         public static IReadOnlyList<SlapMessages> GetSlapMessages() => Implementation.GetSlapMessages();
         public static IReadOnlyList<AutoMessages> GetAutoMessages() => Implementation.GetAutoMessages();
+        public static void UpdateChatMessagesGrid() => Implementation.UpdateChatMessagesGrid();
     }
 }

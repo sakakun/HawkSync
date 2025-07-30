@@ -145,7 +145,7 @@ namespace BHD_RemoteClient.Classes.Tickers
                 // Chat Messages Refresh Tasks
                 thisServer.functionEvent_UpdateSlapMessages();
                 thisServer.functionEvent_UpdateAutoMessages();
-                remoteChatInstanceManager.UpdateChatMessagesGrid();
+                chatInstanceManagers.UpdateChatMessagesGrid();
 
                 // Ban Management Refresh Tasks
                 banInstanceManager.UpdateBannedTables();

@@ -212,9 +212,9 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             ToolStripMenuItem command = new ToolStripMenuItem("Switch Team");
             command.Click += (sender, e) =>
             {
-                CommandResponse response = CmdSwitchPlayerTeam.ProcessCommand(Player.PlayerSlot);
+                CommandResponse response = CmdSwitchPlayerTeam.ProcessCommand(Player.PlayerSlot)!;
 
-                MessageBox.Show(response.Message, "Player Action (Switch Teams) " + (response.Success ? "Success" : "Failed"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(response!.Message, "Player Action (Switch Teams) " + (response.Success ? "Success" : "Failed"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             };
             return command;
         }

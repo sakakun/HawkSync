@@ -18,7 +18,8 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
         private static ServerManager thisServer => Program.ServerManagerUI!;
         private static adminInstance instanceAdmin => CommonCore.instanceAdmin!;
 
-
+        // Static field to track last update time
+        private static DateTime _lastUpdate = DateTime.MinValue;
         public bool addAdminAccount(string username, string password, AdminRoles role) => CmdaddAdminAccount.ProcessCommand(username, password, (int)role);
 
         void adminInstanceInterface.AddLogEntry(int userId, string action)
@@ -81,19 +82,25 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
 
         public void UpdateAdminLogDialog()
         {
+            // Only update if 15 seconds have passed
+            if ((DateTime.UtcNow - _lastUpdate).TotalSeconds < 15)
+                return;
+
+            _lastUpdate = DateTime.UtcNow;
+
             thisServer.dg_adminLog.Rows.Clear();
 
-            foreach (AdminLog log in instanceAdmin.Logs.OrderByDescending(l => l.Timestamp))
+            foreach (AdminLog log in instanceAdmin.Logs
+            .OrderByDescending(l => l.Timestamp)
+            .Take(50))
             {
-                // Find the admin account by userId
                 var admin = instanceAdmin.Admins.FirstOrDefault(a => a.UserId == log.UserId);
                 string username = admin != null ? admin.Username : $"UserId:{log.UserId}";
 
-                // Add the row to the DataGridView
                 thisServer.dg_adminLog.Rows.Add(
-                    log.Timestamp,   // DateTime or string
-                    username,        // Username resolved from userId
-                    log.Action       // Action/message
+                    log.Timestamp,
+                    username,
+                    log.Action
                 );
             }
         }

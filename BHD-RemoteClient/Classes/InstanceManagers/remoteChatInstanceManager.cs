@@ -19,6 +19,7 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
         private static ServerManager thisServer => Program.ServerManagerUI!;
         private static chatInstance chatInstance => CommonCore.instanceChat!;
         private static bool _chatGridFirstLoad = true;
+        private static DateTime _lastGridUpdate = DateTime.MinValue;
 
 
         public void AddAutoMessage(string messageText, int tiggerSeconds) => CmdAddAutoMessage.ProcessCommand(messageText, tiggerSeconds);
@@ -47,8 +48,14 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
             AppDebug.Log("Not Implemented", "Not Implemented");
         }
 
-        public static void UpdateChatMessagesGrid()
+        public void UpdateChatMessagesGrid()
         {
+            // Only allow update if at least 2 seconds have passed
+            if ((DateTime.UtcNow - _lastGridUpdate).TotalSeconds < 2)
+                return;
+
+            _lastGridUpdate = DateTime.UtcNow;
+
             var dgv = thisServer.dataGridView_chatMessages;
 
             if (dgv.InvokeRequired)

@@ -22,6 +22,11 @@ namespace BHD_ServerManager.Classes.StatsManagement
         private static statInstance instanceStats = CommonCore.instanceStats!;
         private static ServerManager thisServer => Program.ServerManagerUI!;
 
+        // Throttle updates to once every 15 seconds
+        private static DateTime _lastPlayerStatsUpdate = DateTime.MinValue;
+        // Throttle updates to once every 15 seconds
+        private static DateTime _lastWeaponStatsUpdate = DateTime.MinValue;
+
         public static void RunPlayerStatsUpdate()
         {
             foreach (var playerRecord in theInstance.playerList)
@@ -496,22 +501,12 @@ namespace BHD_ServerManager.Classes.StatsManagement
             }
         }
 
-        private static void ShowMessageBoxSafe(ServerManager thisServer, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
-        {
-            if (thisServer.InvokeRequired)
-            {
-                thisServer.Invoke(new Action(() =>
-                    MessageBox.Show(text, caption, buttons, icon)
-                ));
-            }
-            else
-            {
-                MessageBox.Show(text, caption, buttons, icon);
-            }
-        }
-
         public static void PopulatePlayerStatsGrid()
         {
+            if ((DateTime.UtcNow - _lastPlayerStatsUpdate).TotalSeconds < 15)
+                return;
+            _lastPlayerStatsUpdate = DateTime.UtcNow;
+
             DataGridView dataGridViewPlayerStats = thisServer.dataGridViewPlayerStats;
 
             if (dataGridViewPlayerStats.InvokeRequired)
@@ -603,6 +598,10 @@ namespace BHD_ServerManager.Classes.StatsManagement
 
         public static void PopulateWeaponStatsGrid()
         {
+            if ((DateTime.UtcNow - _lastWeaponStatsUpdate).TotalSeconds < 15)
+                return;
+            _lastWeaponStatsUpdate = DateTime.UtcNow;
+
             DataGridView dataGridViewWeaponStats = thisServer.dataGridViewWeaponStats;
 
             if (dataGridViewWeaponStats.InvokeRequired)
