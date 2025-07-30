@@ -45,7 +45,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
                 return new CommandResponse
                 {
                     Success = false,
-                    Message = $"Failed to connect to Babstats at {webUrl}.",
+                    Message = string.Empty,
                     ResponseData = null
                 };
             }

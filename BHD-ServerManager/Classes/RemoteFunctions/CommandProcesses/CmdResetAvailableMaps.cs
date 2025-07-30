@@ -23,7 +23,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"The command to refresh maps is complete.",
+                Message = string.Empty,
                 ResponseData = string.Empty
             };
         }

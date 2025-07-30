@@ -44,7 +44,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Sent a chat message. See chat log at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}",
+                Message = string.Empty,
                 ResponseData = true.ToString()
             };
         }

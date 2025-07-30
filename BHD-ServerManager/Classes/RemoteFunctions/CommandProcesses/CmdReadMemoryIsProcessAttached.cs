@@ -19,7 +19,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = isAttached,
-                Message = $"Game Server Attached? ({isAttached.ToString()})",
+                Message = string.Empty,
                 ResponseData = isAttached.ToString()
             };
         }

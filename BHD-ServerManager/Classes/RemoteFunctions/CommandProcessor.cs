@@ -41,43 +41,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
             // If you have legacy handlers or want to keep some manual registrations, do it here.
             _handlers["Ping"] = (typeof(object), CmdPing.ProcessCommand);
             _handlers["ValidateUser"] = (typeof(AuthenticationPacket), data => CmdValidateUser.ProcessCommand((AuthenticationPacket)data));
-            // ...add any other static/manual registrations here if needed...
-            /*
-            _handlers = new Dictionary<string, (Type, Func<object, CommandResponse>)>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "Ping", (typeof(object), CmdPing.ProcessCommand) },
-                { "ValidateUser", (typeof(AuthenticationPacket), data => CmdValidateUser.ProcessCommand((AuthenticationPacket)data)) },
-                { "ReadMemoryIsProcessAttached", (typeof(object), CmdReadMemoryIsProcessAttached.ProcessCommand) },
-                { "startGame", (typeof(object), CmdStartGame.ProcessCommand) },
-                { "stopGame", (typeof(object), CmdStopGame.ProcessCommand) },
-                { "ValidateGameServerPath", (typeof(object), CmdValidateGameServerPath.ProcessCommand) },
-                { "CmdSetServerVariables", (typeof(object), CmdSetServerVariables.ProcessCommand) },
-                { "CmdDisarmplayer", (typeof(object), CmdDisarmplayer.ProcessCommand) },
-                { "CmdRearmplayer", (typeof(object), CmdRearmplayer.ProcessCommand) },
-                { "CmdResetAvailableMaps", (typeof(object), CmdResetAvailableMaps.ProcessCommand) },
-                { "CmdUpdateMapCycle", (typeof(object), CmdUpdateMapCycle.ProcessCommand) },
-                { "CmdUpdateNextMap", (typeof(object), CmdUpdateNextMap.ProcessCommand) },
-                { "CmdMapScore", (typeof(object), CmdMapScore.ProcessCommand) },
-                { "CmdMapSkip", (typeof(object), CmdMapSkip.ProcessCommand) },
-                { "CmdSendChatMessage", (typeof(object), CmdSendChatMessage.ProcessCommand) },
-                { "CmdSendConsoleMessage", (typeof(object), CmdSendConsoleMessage.ProcessCommand) },
-                { "CmdTogglePlayerGodMode", (typeof(object), CmdTogglePlayerGodMode.ProcessCommand) },
-                { "CmdKillPlayer", (typeof(object), CmdKillPlayer.ProcessCommand) },
-                { "CmdSwitchPlayerTeam", (typeof(object), CmdSwitchPlayerTeam.ProcessCommand) },
-                { "CmdAddBannedPlayer", (typeof(object), CmdAddBannedPlayer.ProcessCommand) },
-                { "CmdRemoveBannedPlayerAddress", (typeof(object), CmdRemoveBannedPlayerAddress.ProcessCommand) },
-                { "CmdRemoveBannedPlayerBoth", (typeof(object), CmdRemoveBannedPlayerBoth.ProcessCommand) },
-                { "CmdRemoveBannedPlayerName", (typeof(object), CmdRemoveBannedPlayerName.ProcessCommand) },
-                { "CmdAddAutoMessage", (typeof(object), CmdAddAutoMessage.ProcessCommand) },
-                { "CmdAddSlapMessage", (typeof(object), CmdAddSlapMessage.ProcessCommand) },
-                { "CmdRemoveSlapMessage", (typeof(object), CmdRemoveSlapMessage.ProcessCommand) },
-                { "CmdRemoveAutoMessage", (typeof(object), CmdRemoveAutoMessage.ProcessCommand) },
-                { "CmdaddAdminAccount", (typeof(object), CmdaddAdminAccount.ProcessCommand) },
-                { "CmdeditAdminAccount", (typeof(object), CmdeditAdminAccount.ProcessCommand) },
-                { "CmddeleteAdminAccount", (typeof(object), CmddeleteAdminAccount.ProcessCommand) },
-                { "CmdTestBabstatsConnection", (typeof(object), CmdTestBabstatsConnection.ProcessCommand) },
-            };
-            */
+
         }
         private void RegisterAttributedHandlers()
         {
@@ -111,10 +75,10 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                                 arg = Convert.ChangeType(arg, paramType);
                             }
                         }
-                        return (CommandResponse)method.Invoke(null, new[] { arg });
+                        return (CommandResponse)method.Invoke(null, new[] { arg })!;
                     };
 
-                    _handlers[attr.CommandName] = (paramType, handler);
+                    _handlers[attr!.CommandName] = (paramType, handler);
                 }
             }
         }
@@ -163,6 +127,11 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 }
 
                 var response = entry.handler(arg);
+                if (response.Message == string.Empty)
+                {
+                    // If no message is set, use a default success message no need to log this.
+                    return response;
+                }
                 adminInstanceManager.AddLogEntry(userId, $"RCE - {packet.Command}: {response.Message}");
                 return response;
             }

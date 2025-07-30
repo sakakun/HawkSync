@@ -16,7 +16,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Pong",
+                Message = string.Empty,
                 ResponseData = null
             };
         }

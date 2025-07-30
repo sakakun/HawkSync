@@ -49,7 +49,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Added an auto message.",
+                Message = string.Empty,
                 ResponseData = true.ToString()
             };
         }

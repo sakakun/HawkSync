@@ -66,7 +66,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Removed an auto message.",
+                Message = string.Empty,
                 ResponseData = true.ToString()
             };
         }

@@ -19,7 +19,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = isValid,
-                Message = $"Returned response of '{isValid.ToString()}'",
+                Message = string.Empty,
                 ResponseData = isValid
             };
         }
