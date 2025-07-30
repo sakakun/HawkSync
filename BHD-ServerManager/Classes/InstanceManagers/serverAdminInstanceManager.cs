@@ -333,6 +333,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             _lastUpdate = DateTime.UtcNow;
 
+            // Clear the existing rows
+            thisServer.dg_AdminUsers.Rows.Clear();
+            // Populate the DataGridView with the admin accounts
+            foreach (var admin in instanceAdmin.Admins)
+            {
+                thisServer.dg_AdminUsers.Rows.Add(admin.UserId, admin.Username, admin.Role.ToString());
+            }
+
             thisServer.dg_adminLog.Rows.Clear();
 
             foreach (AdminLog log in instanceAdmin.Logs

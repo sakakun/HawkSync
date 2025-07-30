@@ -3841,7 +3841,6 @@ namespace BHD_RemoteClient.Forms
         private TableLayoutPanel tableAdminPanel;
         public DataGridView dg_adminLog;
         private TableLayoutPanel tableLayoutPanel14;
-        private DataGridView dg_AdminUsers;
         private DataGridViewTextBoxColumn adminLog_datetime;
         private DataGridViewTextBoxColumn adminLog_username;
         private DataGridViewTextBoxColumn adminLog_log;
@@ -3866,5 +3865,6 @@ namespace BHD_RemoteClient.Forms
         private TableLayoutPanel tableLayoutPanel20;
         private Button button1;
         public FontAwesome.Sharp.IconButton ib_resetCurrentMaps;
+        public DataGridView dg_AdminUsers;
     }
 }

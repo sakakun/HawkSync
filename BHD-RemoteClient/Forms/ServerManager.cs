@@ -60,7 +60,7 @@ namespace BHD_RemoteClient.Forms
             functionEvent_UpdateAutoMessages();
             functionEvent_UpdateSlapMessages();
             // Admins Tab
-            functionEvent_UpdateAdminList();
+            adminInstanceManager.UpdateAdminLogDialog();
             ActionClick_AdminNewUser(null!, null!);                     // Initialize the Admins Tab with a new user
 
         }
@@ -898,7 +898,7 @@ namespace BHD_RemoteClient.Forms
                 MessageBox.Show("Admin account has been added successfully.", "Admin Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 // Reset the fields after adding the admin account
                 ActionClick_AdminNewUser(sender, e);
-                functionEvent_UpdateAdminList();
+                adminInstanceManager.UpdateAdminLogDialog();
             }
             else
             {
@@ -923,7 +923,7 @@ namespace BHD_RemoteClient.Forms
             {
                 MessageBox.Show("Admin account has been updated successfully.", "Admin Updated", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ActionClick_AdminNewUser(sender, e);
-                functionEvent_UpdateAdminList();
+                adminInstanceManager.UpdateAdminLogDialog();
             }
             else
             {
@@ -952,7 +952,7 @@ namespace BHD_RemoteClient.Forms
                 {
                     MessageBox.Show("Admin account has been deleted successfully.", "Admin Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ActionClick_AdminNewUser(sender, e); // Reset the fields after deletion
-                    functionEvent_UpdateAdminList();
+                    adminInstanceManager.UpdateAdminLogDialog();
                 }
                 else
                 {
@@ -960,16 +960,6 @@ namespace BHD_RemoteClient.Forms
                 }
             }
 
-        }
-        internal void functionEvent_UpdateAdminList()
-        {
-            // Clear the existing rows
-            dg_AdminUsers.Rows.Clear();
-            // Populate the DataGridView with the admin accounts
-            foreach (var admin in instanceAdmin.Admins)
-            {
-                dg_AdminUsers.Rows.Add(admin.UserId, admin.Username, admin.Role.ToString());
-            }
         }
 
         private void actionClick_ExportSettings(object sender, EventArgs e)

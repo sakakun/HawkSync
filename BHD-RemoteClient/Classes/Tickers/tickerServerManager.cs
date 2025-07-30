@@ -151,7 +151,6 @@ namespace BHD_RemoteClient.Classes.Tickers
                 banInstanceManager.UpdateBannedTables();
 
                 // Admin Refresh Tasks
-                thisServer.functionEvent_UpdateAdminList();
                 adminInstanceManager.UpdateAdminLogDialog();
 
                 // Stats Refresh Tasks

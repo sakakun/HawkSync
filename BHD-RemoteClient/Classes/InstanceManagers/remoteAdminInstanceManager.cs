@@ -90,6 +90,14 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
 
             thisServer.dg_adminLog.Rows.Clear();
 
+            // Clear the existing rows
+            thisServer.dg_AdminUsers.Rows.Clear();
+            // Populate the DataGridView with the admin accounts
+            foreach (var admin in instanceAdmin.Admins)
+            {
+                thisServer.dg_AdminUsers.Rows.Add(admin.UserId, admin.Username, admin.Role.ToString());
+            }
+
             foreach (AdminLog log in instanceAdmin.Logs
             .OrderByDescending(l => l.Timestamp)
             .Take(50))
