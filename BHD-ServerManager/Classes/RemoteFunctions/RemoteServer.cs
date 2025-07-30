@@ -32,7 +32,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
         private static X509Certificate? _serverCertificate;
         public static bool IsRunning => _isRunning;
 
-        private const int MaxMessageSize = 1024 * 1024; // 1 MB
+        private const int MaxMessageSize = 10 * 1024 * 1024; // 1 MB
 
         public static IReadOnlyList<AuthorizedClient> AuthorizedClients => _authorizedClients.AsReadOnly();
 
@@ -129,12 +129,16 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                     if (_commListener.Pending())
                     {
                         var commClient = _commListener.AcceptTcpClient();
+                        AppDebug.Log("RemoteServer", $"Client connected on comm port {((IPEndPoint)commClient.Client.LocalEndPoint!).Port}");
+                        commClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                         Task.Run(() => HandleCommClient(commClient));
                     }
 
                     if (_updateListener.Pending())
                     {
                         var updateClient = _updateListener.AcceptTcpClient();
+                        AppDebug.Log("RemoteServer", $"Client connected on update port {((IPEndPoint)updateClient.Client.LocalEndPoint!).Port}");
+                        updateClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                         Task.Run(() => HandleUpdateClient(updateClient));
                     }
                 }
@@ -338,7 +342,20 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
             };
 
             string json = JsonSerializer.Serialize(updateData);
-            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
+            byte[] jsonBytes = System.Text.Encoding.UTF8.GetBytes(json);
+
+            // Compress the data
+            using var memoryStream = new MemoryStream();
+            using (var gzipStream = new System.IO.Compression.GZipStream(memoryStream, System.IO.Compression.CompressionLevel.Optimal))
+            {
+                gzipStream.Write(jsonBytes, 0, jsonBytes.Length);
+            }
+            byte[] compressedBytes = memoryStream.ToArray();
+
+            string base64 = Convert.ToBase64String(compressedBytes);
+            AppDebug.Log("RemoteServer", $"Compressed message size: {compressedBytes.Length} bytes, Base64 size: {base64.Length} bytes");
+
+            return base64;
         }
     }
 

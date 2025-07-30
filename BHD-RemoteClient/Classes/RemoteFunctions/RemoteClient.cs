@@ -28,7 +28,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
         private CancellationTokenSource? _cts;
         public string AuthToken = string.Empty;
 
-        private const int MaxMessageSize = 1024 * 1024; // 1 MB
+        private const int MaxMessageSize = 10 * 1024 * 1024; // 1 MB
 
         public RemoteClient(string serverAddress, int commPort, int updatePort)
         {
@@ -46,15 +46,19 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                 _cts = new CancellationTokenSource();
 
                 // Connect communication channel with timeout
+                AppDebug.Log("RemoteClient", $"Connecting to comm port {_commPort}...");
                 var commClient = new TcpClient();
                 var commConnectTask = commClient.ConnectAsync(_serverAddress, _commPort);
                 if (!commConnectTask.Wait(timeoutMs))
                 {
-                    AppDebug.Log("RemoteClient", "Timeout connecting to communication channel.");
+                    AppDebug.Log("RemoteClient", $"Timeout connecting to comm port {_commPort}.");
                     return false;
                 }
+                AppDebug.Log("RemoteClient", $"Connected to comm port {_commPort}.");
+
                 _commClient = commClient;
                 _commStream = new SslStream(_commClient.GetStream(), false, ValidateServerCertificate!, null);
+                _commClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
                 var commAuthTask = _commStream.AuthenticateAsClientAsync(_serverAddress);
                 if (!commAuthTask.Wait(timeoutMs))
@@ -62,17 +66,22 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                     AppDebug.Log("RemoteClient", "Timeout during SSL authentication (comm channel).");
                     return false;
                 }
+                AppDebug.Log("RemoteClient", $"SSL authenticated on comm port {_commPort}.");
 
                 // Connect update channel with timeout
+                AppDebug.Log("RemoteClient", $"Connecting to update port {_updatePort}...");
                 var updateClient = new TcpClient();
                 var updateConnectTask = updateClient.ConnectAsync(_serverAddress, _updatePort);
                 if (!updateConnectTask.Wait(timeoutMs))
                 {
-                    AppDebug.Log("RemoteClient", "Timeout connecting to update channel.");
+                    AppDebug.Log("RemoteClient", $"Timeout connecting to update port {_updatePort}.");
                     return false;
                 }
+                AppDebug.Log("RemoteClient", $"Connected to update port {_updatePort}.");
+
                 _updateClient = updateClient;
                 _updateStream = new SslStream(_updateClient.GetStream(), false, ValidateServerCertificate!, null);
+                _updateClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
                 var updateAuthTask = _updateStream.AuthenticateAsClientAsync(_serverAddress);
                 if (!updateAuthTask.Wait(timeoutMs))
@@ -242,11 +251,31 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
 
         private static void ProcessUpdatePacket(CommandPacket thePacket)
         {
-            string base64 = thePacket.CommandData is JsonElement je ? je.GetString()! : (string)thePacket.CommandData;
-            string json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64));
-            InstanceUpdatePacket updateData = JsonSerializer.Deserialize<InstanceUpdatePacket>(json)!;
-            CmdUpdateGameClient.ProcessUpdateData(updateData);
-            Debug.WriteLine("Processing Complete.  Server Status: " + theInstance.instanceStatus);
+            try
+            {
+                // Decode Base64
+                string base64 = thePacket.CommandData is JsonElement je ? je.GetString()! : (string)thePacket.CommandData;
+                byte[] compressedBytes = Convert.FromBase64String(base64);
+
+                // Decompress GZip
+                using var memoryStream = new MemoryStream(compressedBytes);
+                using var gzipStream = new System.IO.Compression.GZipStream(memoryStream, System.IO.Compression.CompressionMode.Decompress);
+                using var decompressedStream = new MemoryStream();
+                gzipStream.CopyTo(decompressedStream);
+
+                // Deserialize the decompressed JSON
+                decompressedStream.Position = 0;
+                string json = System.Text.Encoding.UTF8.GetString(decompressedStream.ToArray());
+                InstanceUpdatePacket updateData = JsonSerializer.Deserialize<InstanceUpdatePacket>(json)!;
+
+                // Process the update data
+                CmdUpdateGameClient.ProcessUpdateData(updateData);
+                Debug.WriteLine("Processing Complete. Server Status: " + theInstance.instanceStatus);
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("RemoteClient", $"Error processing update packet: {ex.Message}");
+            }
         }
 
         private static bool ValidateServerCertificate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, SslPolicyErrors sslPolicyErrors)

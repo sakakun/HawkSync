@@ -40,9 +40,7 @@ namespace BHD_RemoteClient.Classes.Tickers
 
         public static void runTicker()
         {
-            // Gather data off the UI thread
-            bool isAttached = GameManager.ReadMemoryIsProcessAttached();
-            
+           
             InstanceStatus status = theInstance.instanceStatus;
             int maxSlots = theInstance.gameMaxSlots;
             List<playerObject> players = theInstance.playerList.Values.ToList();
@@ -54,6 +52,9 @@ namespace BHD_RemoteClient.Classes.Tickers
             // Now update the UI
             SafeInvoke(thisServer, () =>
             {
+                // Gather data off the UI thread
+                bool isAttached = GameManager.ReadMemoryIsProcessAttached();
+
                 if (isAttached)
                 {
                     // Player Management Tasks
