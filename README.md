@@ -1,22 +1,5 @@
 ## HawkSync
 
-### Features of the Server Manager
-
-
----
-Note:
-The Remote client is a feature that provides all the above Server Manager functionality from a different machine, using secure communication.
-
-### Installation
-Download the latest release from the Releases page.
-- HawkSync-Installer for an all-in-one installer which you can pick which components you want to install. (Requires Run As Admin for Desktop Shortcut, no clue why atm.)
-- Extract the HawkSync-ServerManager.zip to a folder of your choice.
-- Extract the HawkSync-Remote.zip to a folder of your choice.
-
-### Requirements
-- .NET 8.0 Desktop Runtime (or higher).
-- Webview2 Runtime. (Windows 10 & 11 with Edge installed).
-
 ### Roadmap
 
 #### Log Management Improvements
