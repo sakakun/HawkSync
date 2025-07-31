@@ -58,6 +58,7 @@ Download the latest release from the Releases page.
 - Add a "Map Details" view to show more information about each map.
 - Add and Remove Maps from the Game Server directly from the UI.
 - Review Map Bitmap handling to ensure it works correctly.
+- Add Team Sabre Maps
 
 #### Game Server Profile Management
 - Add tab for managing game server profile.
