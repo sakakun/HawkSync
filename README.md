@@ -39,7 +39,7 @@ The Remote client is a feature that provides all the above Server Manager functi
 
 ### Installation
 Download the latest release from the Releases page.
-- HawkSync-Installer for an all-in-one installer which you can pick which components you want to install.
+- HawkSync-Installer for an all-in-one installer which you can pick which components you want to install. (Requires Run As Admin for Desktop Shortcut, no clue why atm.)
 - Extract the HawkSync-ServerManager.zip to a folder of your choice.
 - Extract the HawkSync-Remote.zip to a folder of your choice.
 
