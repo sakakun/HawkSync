@@ -17,24 +17,22 @@
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
     <PackageOutputPath>\bin\$(AssemblyName)</PackageOutputPath>
     <Platforms>AnyCPU</Platforms>
-    <Configurations>Debug;Release;Release</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <GenerateDocumentationFile>False</GenerateDocumentationFile> <!-- This line is crucial -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <IsPublishable>True</IsPublishable>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <DebugType>embedded</DebugType>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <DebugType>portable</DebugType>
     <WarningLevel>8</WarningLevel>
     <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <IsPublishable>True</IsPublishable>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <DebugType>embedded</DebugType>
-    <WarningLevel>8</WarningLevel>
+    <DebugType>none</DebugType>
     <Optimize>False</Optimize>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>

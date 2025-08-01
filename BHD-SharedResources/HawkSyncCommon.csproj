@@ -8,8 +8,16 @@
     <OutputType>Library</OutputType>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <Platforms>AnyCPU</Platforms>
-    <Configurations>Debug;Release;Release</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>True</Optimize>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />

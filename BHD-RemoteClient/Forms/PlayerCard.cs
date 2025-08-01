@@ -215,26 +215,29 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         {
             Player = playerInfo;
 
-            string PlayerName = Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(Player.PlayerNameBase64)).Replace("\0", "");
+            // Decode Base64 and interpret as Windows-1252
+            byte[] decodedBytes = Convert.FromBase64String(Player.PlayerNameBase64);
+            string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
 
-            // Card Updates
+            // Update UI
+            label_dataPlayerNameRole.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+            label_dataPlayerNameRole.UseCompatibleTextRendering = true;
+            label_dataPlayerNameRole.Text = decodedPlayerName;
+
+            // Other updates...
             label_dataIPinfo.Text = Player.PlayerIPAddress;
-            label_dataPlayerNameRole.Text = PlayerName;
-
-            AppDebug.Log("PlayerCard", $"PlayerCard: Updating PlayerCard for {PlayerName} (Slot: {Player.PlayerSlot})");
-
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Player.PlayerTeam switch
             {
                 1 => Color.Blue, // Blue Team
-                2 => Color.Red, // Red Team
+                2 => Color.Red,  // Red Team
                 _ => Color.Black // Default color for unassigned or unknown teams
             };
             player_Tooltip.SetToolTip(this, $"Ping: {Player.PlayerPing} ms");
 
             // Conext Updates
             playerContextMenuIcon.Visible = true; // Show context menu icon when player info is updated
-            contextMenu.Items[0].Text = PlayerName; // Update player name in context menu
+            contextMenu.Items[0].Text = Player.PlayerName; // Update player name in context menu
             contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms"; // Update PlayerPing in context menu
 
             ToolStripMenuItem? WarnMenuUpdate = contextMenu.Items[4] as ToolStripMenuItem;

@@ -13,24 +13,23 @@
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <PackageOutputPath>bin\$(AssemblyName)</PackageOutputPath>
     <Platforms>AnyCPU</Platforms>
-    <Configurations>Debug;Release;Release</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
     <EnableNETAnalyzers>False</EnableNETAnalyzers> <!-- This line is crucial -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <Optimize>True</Optimize>
-    <DebugType>none</DebugType>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <Optimize>False</Optimize>
+    <DebugType>embedded</DebugType>
     <IsPublishable>True</IsPublishable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <Optimize>True</Optimize>
     <DebugType>none</DebugType>
-    <IsPublishable>True</IsPublishable>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
