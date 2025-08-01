@@ -1,15 +1,5 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.InstanceInterfaces;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using BHD_SharedResources.Classes.InstanceInterfaces;
 using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace BHD_SharedResources.Classes.InstanceManagers
 {

@@ -1,20 +1,6 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.RemoteFunctions;
-using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.GameManagement;
+﻿using BHD_ServerManager.Forms;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Text.Json;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
@@ -49,7 +35,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
                     UserPass = pass;
             }
 
-            if (adminInstanceManager.addAdminAccount(UserName, UserPass, (AdminRoles) UserRole))
+            if (adminInstanceManager.addAdminAccount(UserName, UserPass, (AdminRoles)UserRole))
             {
                 return new CommandResponse
                 {

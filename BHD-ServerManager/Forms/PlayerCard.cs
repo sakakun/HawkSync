@@ -3,18 +3,9 @@ using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Forms;
 using UserControl = System.Windows.Forms.UserControl;
 
 namespace BHD_ServerManager.Classes.PlayerManagementClasses
@@ -241,35 +232,31 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         // Function: UpdateStatus, updates the PlayerCard with the current player information.
         public void UpdateStatus(playerObject playerInfo)
         {
-            string correctName;
-            try
-            {
-                var encoding1251 = Encoding.GetEncoding("windows-1251");
-                byte[] bytes = Encoding.Default.GetBytes(Player.PlayerName);
-                correctName = encoding1251.GetString(bytes);
-            }
-            catch (ArgumentException)
-            {
-                correctName = Player.PlayerName; // fallback
-            }
-
             Player = playerInfo;
-            // Card Updates
-            label_dataIPinfo.Text = Player.PlayerIPAddress;
-            label_dataPlayerNameRole.Text = correctName;
 
+            // Decode Base64 and interpret as Windows-1252
+            byte[] decodedBytes = Convert.FromBase64String(Player.PlayerNameBase64);
+            string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
+
+            // Update UI
+            label_dataPlayerNameRole.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+            label_dataPlayerNameRole.UseCompatibleTextRendering = true;
+            label_dataPlayerNameRole.Text = decodedPlayerName;
+
+            // Other updates...
+            label_dataIPinfo.Text = Player.PlayerIPAddress;
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Player.PlayerTeam switch
             {
                 1 => Color.Blue, // Blue Team
-                2 => Color.Red, // Red Team
+                2 => Color.Red,  // Red Team
                 _ => Color.Black // Default color for unassigned or unknown teams
             };
             player_Tooltip.SetToolTip(this, $"Ping: {Player.PlayerPing} ms");
 
             // Conext Updates
             playerContextMenuIcon.Visible = true; // Show context menu icon when player info is updated
-            contextMenu.Items[0].Text = correctName; // Update player name in context menu
+            contextMenu.Items[0].Text = Player.PlayerName; // Update player name in context menu
             contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms"; // Update PlayerPing in context menu
 
             ToolStripMenuItem? WarnMenuUpdate = contextMenu.Items[4] as ToolStripMenuItem;

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BHD_SharedResources.Classes.ObjectClasses
 {
@@ -16,7 +13,7 @@ namespace BHD_SharedResources.Classes.ObjectClasses
         public int PlayerTeam { get; set; } // 0=Self, 1= Blue, 2 Red PlayerTeam
 
         // Player Status Information
-        public int PlayerPing { get; set; } = 0;       
+        public int PlayerPing { get; set; } = 0;
         public int PlayerTimePlayed { get; set; } = 0; // Total time played in seconds
         public DateTime PlayerJoined { get; set; } = DateTime.Now;
         public DateTime PlayerLastSeen { get; set; } = DateTime.Now;
@@ -50,7 +47,7 @@ namespace BHD_SharedResources.Classes.ObjectClasses
         public int stat_TKOTHDefenseKills { get; set; }
         public int stat_TKOTHAttackKills { get; set; }
         public int stat_TotalShotsFired { get; set; }
-        
+
         // Player Weapon Information
         public List<string> PlayerWeapons { get; set; } = new List<string>();
         public int SelectedWeaponID { get; set; }

@@ -24,7 +24,7 @@ namespace BHD_RemoteClient.Forms
         // ServerManager Local Variables
         private bool _updatingWeaponCheckboxes = false; // Prevent recursion
         List<CheckBox> weaponCheckboxes = new List<CheckBox>(); // List to hold all weapon checkboxes
-        
+
         // Admin Selections
         private int adminSelectedId = -1; // Selected Admin ID for actions
 
@@ -589,7 +589,7 @@ namespace BHD_RemoteClient.Forms
                 {
                     MessageBox.Show("Server start command sent, but server did not come online in time.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-                
+
 
             }
             else if (theInstance.instanceStatus != InstanceStatus.OFFLINE)

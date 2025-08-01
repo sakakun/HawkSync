@@ -1,10 +1,4 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.RemoteFunctions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
@@ -15,7 +9,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
         public static CommandResponse ProcessCommand(object data)
         {
             bool isAttached = ServerMemory.ReadMemoryIsProcessAttached();
-            
+
             return new CommandResponse
             {
                 Success = isAttached,

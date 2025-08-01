@@ -1,14 +1,6 @@
 ﻿using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Windows.Storage;
 
 namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
 {
@@ -27,7 +19,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
             try
             {
                 // Ideally there shouldn't be any null values, but let's handle it gracefully
-                
+
                 ProcessingTheInstance(UpdateData.theInstance);
                 ProcessingChatInstance(UpdateData.chatInstance);
                 ProcessingBanInstance(UpdateData.banInstance);

@@ -19,7 +19,7 @@ namespace BHD_SharedResources.Classes.SupportClasses
             }
 
             return;
-
+            /*
             try
             {
                 // Append the log message to the file
@@ -30,6 +30,7 @@ namespace BHD_SharedResources.Classes.SupportClasses
                 // Handle any file I/O errors gracefully
                 Debug.WriteLine($"[ERROR][AppDebug] {DateTime.Now}: Failed to write to log file. {ex.Message}");
             }
+            */
         }
     }
 }

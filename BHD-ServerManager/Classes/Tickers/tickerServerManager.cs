@@ -1,5 +1,4 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.PlayerManagementClasses;
 using BHD_ServerManager.Classes.RemoteFunctions;
 using BHD_ServerManager.Classes.StatsManagement;
 using BHD_ServerManager.Forms;
@@ -7,14 +6,6 @@ using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Drawing;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -142,6 +133,12 @@ namespace BHD_ServerManager.Classes.Tickers
                 tickerEvent_updateLabels(thisServer);
             }
 
+            if (theInstance.instanceStatus != InstanceStatus.SCORING && !theInstance.instanceScoringProcRun)
+            {
+                // If not scoring, reset scoring processing flag
+                theInstance.instanceScoringProcRun = true;
+            }
+
             theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);
             theInstance.instanceLastUpdateTime = currentTime;
         }
@@ -198,6 +195,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 theInstance.instancePreGameProcRun = false;
                 instanceChat.ChatLog?.Clear();
                 theInstance.playerList.Clear();
+                StatFunctions.ResetPlayerStats();
             }
             else if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP && !theInstance.instancePreGameProcRun)
             {
@@ -211,23 +209,17 @@ namespace BHD_ServerManager.Classes.Tickers
         {
             ServerMemory.ReadMemoryWinningTeam();
 
-            if (theInstance.instanceStatus == InstanceStatus.SCORING && theInstance.instanceScoringProcRun)
+            if (theInstance.instanceScoringProcRun)
             {
                 AppDebug.Log("tickerServerManagement", "Scoring Processing...");
                 theInstance.instanceScoringProcRun = false;
-
                 instanceChat.AutoMessageCounter = 0;
-
                 Task.Run(() => StatFunctions.SendImportData(thisServer!));
-                StatFunctions.ResetPlayerStats();
                 ServerMemory.UpdateNextMapGameType();
                 CommonCore.Ticker?.Start("ScoreboardTicker", 500, () => tickerEvent_Scoreboard());
                 AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
             }
-            else if (theInstance.instanceStatus != InstanceStatus.SCORING && !theInstance.instanceScoringProcRun)
-            {
-                theInstance.instanceScoringProcRun = true;
-            }
+
         }
 
         // --- UI Label Updates ---

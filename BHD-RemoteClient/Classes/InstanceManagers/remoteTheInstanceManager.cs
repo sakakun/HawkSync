@@ -6,13 +6,9 @@ using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace BHD_RemoteClient.Classes.InstanceManagers
 {
@@ -275,7 +271,7 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
             {
                 var tempInstance = JsonSerializer.Deserialize<theInstance>(File.ReadAllText(settingsPath));
                 if (tempInstance == null) return;
-                
+
                 theInstanceManager.GetServerVariables(true, tempInstance); // Get the variables from the tempInstance
 
             }

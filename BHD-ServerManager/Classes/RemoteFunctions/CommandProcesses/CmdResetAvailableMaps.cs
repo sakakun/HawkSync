@@ -1,13 +1,4 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.RemoteFunctions;
-using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.InstanceManagers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Email.DataProvider;
+﻿using BHD_ServerManager.Forms;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {

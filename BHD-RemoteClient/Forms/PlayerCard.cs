@@ -5,18 +5,10 @@ using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using BHD_SharedResources.Classes.SupportClasses;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Forms;
 using UserControl = System.Windows.Forms.UserControl;
 
 namespace BHD_ServerManager.Classes.PlayerManagementClasses
@@ -221,22 +213,15 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         // Function: UpdateStatus, updates the PlayerCard with the current player information.
         public void UpdateStatus(playerObject playerInfo)
         {
-            string correctName;
-            try
-            {
-                var encoding1251 = Encoding.GetEncoding("windows-1251");
-                byte[] bytes = Encoding.Default.GetBytes(Player.PlayerName);
-                correctName = encoding1251.GetString(bytes);
-            }
-            catch (ArgumentException)
-            {
-                correctName = Player.PlayerName; // fallback
-            }
-
             Player = playerInfo;
+
+            string PlayerName = Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(Player.PlayerNameBase64)).Replace("\0", "");
+
             // Card Updates
             label_dataIPinfo.Text = Player.PlayerIPAddress;
-            label_dataPlayerNameRole.Text = correctName;
+            label_dataPlayerNameRole.Text = PlayerName;
+
+            AppDebug.Log("PlayerCard", $"PlayerCard: Updating PlayerCard for {PlayerName} (Slot: {Player.PlayerSlot})");
 
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Player.PlayerTeam switch
@@ -249,7 +234,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
             // Conext Updates
             playerContextMenuIcon.Visible = true; // Show context menu icon when player info is updated
-            contextMenu.Items[0].Text = correctName; // Update player name in context menu
+            contextMenu.Items[0].Text = PlayerName; // Update player name in context menu
             contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms"; // Update PlayerPing in context menu
 
             ToolStripMenuItem? WarnMenuUpdate = contextMenu.Items[4] as ToolStripMenuItem;

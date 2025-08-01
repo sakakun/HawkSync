@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace BHD_SharedResources.Classes.ObjectClasses
 {
     public class objectGameTypes
     {
-        public int      DatabaseId      { get; set; }
-        public required string  Name            { get; set; } = string.Empty;
-        public required string  ShortName       { get; set; } = string.Empty;
-        public int      Bitmap          { get; set; }
+        public int DatabaseId { get; set; }
+        public required string Name { get; set; } = string.Empty;
+        public required string ShortName { get; set; } = string.Empty;
+        public int Bitmap { get; set; }
 
         // Static list of all game types
         public static readonly List<objectGameTypes> All = new List<objectGameTypes>

@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 	<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
-    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <BaseOutputPath></BaseOutputPath>
     <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
@@ -17,23 +17,24 @@
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
     <PackageOutputPath>\bin\$(AssemblyName)</PackageOutputPath>
     <Platforms>AnyCPU</Platforms>
-    <Configurations>Debug;Release;Release</Configurations> <!-- This line is crucial -->
+    <Configurations>Debug;Release;Release</Configurations>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile> <!-- This line is crucial -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <IsPublishable>False</IsPublishable>
+    <IsPublishable>True</IsPublishable>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <DebugType>none</DebugType>
+    <DebugType>embedded</DebugType>
     <WarningLevel>8</WarningLevel>
-    <Optimize>True</Optimize>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <IsPublishable>False</IsPublishable>
+    <IsPublishable>True</IsPublishable>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <DebugType>none</DebugType>
+    <DebugType>embedded</DebugType>
     <WarningLevel>8</WarningLevel>
-    <Optimize>True</Optimize>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

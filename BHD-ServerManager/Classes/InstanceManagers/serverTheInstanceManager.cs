@@ -1,21 +1,15 @@
-﻿using BHD_ServerManager.Classes.Tickers;
+﻿using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.Tickers;
+using BHD_ServerManager.Forms;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
 using BHD_SharedResources.Classes.SupportClasses;
-using BHD_ServerManager.Forms;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using System.Web;
-using BHD_ServerManager.Classes.GameManagement;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -72,7 +66,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 var tempInstance = JsonSerializer.Deserialize<theInstance>(File.ReadAllText(settingsPath));
                 if (tempInstance == null) return;
-                
+
                 if (!external)
                 {
                     // Copy all properties from tempInstance to theInstance
@@ -87,10 +81,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.profileServerPath = tempInstance.profileServerPath != null ? Encoding.UTF8.GetString(Convert.FromBase64String(tempInstance.profileServerPath)) : string.Empty;
 
                     theInstanceManager.GetServerVariables();
-                } else
+                }
+                else
                 {
                     theInstanceManager.GetServerVariables(true, tempInstance); // Get the variables from the tempInstance
-                }                    
+                }
             }
             catch (Exception ex)
             {
@@ -553,7 +548,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             // TODO: Remove the need for the thisServer variable in the ticker methods.
             CommonCore.Ticker.Start("ServerManager", 2000, () => tickerServerManager.runTicker());
-            CommonCore.Ticker.Start("ChatManager", 500, () => tickerChatManagement.runTicker()); 
+            CommonCore.Ticker.Start("ChatManager", 500, () => tickerChatManagement.runTicker());
             CommonCore.Ticker.Start("PlayerManager", 1000, () => tickerPlayerManagement.runTicker());
             CommonCore.Ticker.Start("BanManager", 1000, () => tickerBanManagement.runTicker());
 

@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace BHD_SharedResources.Classes.Instances
 {
     public class banInstance
     {
-        public int                          _recordIdCounter        { get; set; } = 1;
-        public List<BannedPlayerNames>      BannedPlayerNames       { get; set; } = new List<BannedPlayerNames>();
-        public List<BannedPlayerAddress>    BannedPlayerAddresses   { get; set; } = new List<BannedPlayerAddress>();
+        public int _recordIdCounter { get; set; } = 1;
+        public List<BannedPlayerNames> BannedPlayerNames { get; set; } = new List<BannedPlayerNames>();
+        public List<BannedPlayerAddress> BannedPlayerAddresses { get; set; } = new List<BannedPlayerAddress>();
     }
 
     public class BanSettingsFile

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace BHD_SharedResources.Classes.SupportClasses

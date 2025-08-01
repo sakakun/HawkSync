@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using static System.Windows.Forms.AxHost;
 
 namespace BHD_SharedResources.Classes.Instances
 {
     public class chatInstance
     {
-        public List<SlapMessages>       SlapMessages    { get; set; } = new List<SlapMessages>();
-        public List<AutoMessages>       AutoMessages    { get; set; } = new List<AutoMessages>();
-        public List<ChatLogObject>      ChatLog         { get; set; } = new List<ChatLogObject>();
+        public List<SlapMessages> SlapMessages { get; set; } = new List<SlapMessages>();
+        public List<AutoMessages> AutoMessages { get; set; } = new List<AutoMessages>();
+        public List<ChatLogObject> ChatLog { get; set; } = new List<ChatLogObject>();
         [JsonIgnore]
-        public int                      AutoMessageCounter  { get; set; } = 0;
+        public int AutoMessageCounter { get; set; } = 0;
         [JsonIgnore]
-        public int                      lastChatLogIndex    { get; set; } = 0;
+        public int lastChatLogIndex { get; set; } = 0;
         [JsonIgnore]
-        public DateTime                 lastAutoMessageSent { get; set; } = DateTime.MinValue;
+        public DateTime lastAutoMessageSent { get; set; } = DateTime.MinValue;
 
     }
 

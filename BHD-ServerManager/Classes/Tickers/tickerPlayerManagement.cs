@@ -6,11 +6,6 @@ using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
 using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BHD_ServerManager.Classes.Tickers
 {

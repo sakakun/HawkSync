@@ -1,21 +1,5 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.RemoteFunctions;
-using BHD_ServerManager.Forms;
+﻿using BHD_ServerManager.Forms;
 using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Windows.ApplicationModel.Background;
-using Windows.ApplicationModel.Chat;
-using Windows.Networking.Proximity;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
@@ -40,9 +24,9 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
                 if (dict.TryGetValue("playerSlot", out var channelObj) && channelObj is int ch)
                     playerSlot = ch;
             }
-            
+
             GameManager.WriteMemoryArmPlayer(playerSlot);
-            
+
             return new CommandResponse
             {
                 Success = true,

@@ -1,17 +1,6 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.GameManagement;
+﻿using BHD_ServerManager.Forms;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Windows.ApplicationModel.Background;
-using Windows.ApplicationModel.Chat;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {

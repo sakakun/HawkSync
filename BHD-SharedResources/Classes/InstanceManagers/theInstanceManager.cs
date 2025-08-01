@@ -1,13 +1,5 @@
 ﻿using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BHD_SharedResources.Classes.InstanceManagers

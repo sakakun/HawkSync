@@ -1,13 +1,6 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.RemoteFunctions;
-using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.InstanceManagers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using BHD_SharedResources.Classes.InstanceManagers;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {

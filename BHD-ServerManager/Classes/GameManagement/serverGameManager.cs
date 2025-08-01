@@ -1,11 +1,5 @@
 ﻿using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.ObjectClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.GameManagement
 {
@@ -16,7 +10,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
         // Game Server Memory Management
-        public int  getGameTypeID(string gameType) => ServerMemory.getGameTypeID(gameType);
+        public int getGameTypeID(string gameType) => ServerMemory.getGameTypeID(gameType);
         public void UpdatePlayerHostName() => ServerMemory.UpdatePlayerHostName();
         public void UpdateMapListCount() => ServerMemory.UpdateMapListCount();
         public void UpdateAllowCustomSkins() => ServerMemory.UpdateAllowCustomSkins();

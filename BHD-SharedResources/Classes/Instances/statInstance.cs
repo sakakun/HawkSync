@@ -1,21 +1,14 @@
-﻿using System;
+﻿using BHD_SharedResources.Classes.ObjectClasses;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using BHD_SharedResources.Classes.ObjectClasses;
 
 namespace BHD_SharedResources.Classes.Instances
 {
     public class statInstance
     {
 
-        public DateTime         lastPlayerStatsUpdate { get; set; } = DateTime.MinValue;
-        public DateTime         lastPlayerStatsReport { get; set; } = DateTime.MinValue;
+        public DateTime lastPlayerStatsUpdate { get; set; } = DateTime.MinValue;
+        public DateTime lastPlayerStatsReport { get; set; } = DateTime.MinValue;
         public Dictionary<string, PlayerStatObject> playerStatsList { get; set; } = new Dictionary<string, PlayerStatObject>();
 
     }

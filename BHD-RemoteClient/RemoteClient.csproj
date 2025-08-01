@@ -23,14 +23,14 @@
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <Optimize>True</Optimize>
     <DebugType>none</DebugType>
-    <IsPublishable>False</IsPublishable>
+    <IsPublishable>True</IsPublishable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <Optimize>True</Optimize>
     <DebugType>none</DebugType>
-    <IsPublishable>False</IsPublishable>
+    <IsPublishable>True</IsPublishable>
   </PropertyGroup>
 
   <ItemGroup>

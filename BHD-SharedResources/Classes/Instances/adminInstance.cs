@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.Json;
-using System.Security.Cryptography;
 
 namespace BHD_SharedResources.Classes.Instances
 {
     public class adminInstance
     {
-        public List<AdminAccount>   Admins  { get; set; } = new List<AdminAccount>();
-        public List<AdminLog>       Logs    { get; set; } = new List<AdminLog>();
+        public List<AdminAccount> Admins { get; set; } = new List<AdminAccount>();
+        public List<AdminLog> Logs { get; set; } = new List<AdminLog>();
     }
 
     public class AdminAccount

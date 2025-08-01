@@ -1,16 +1,12 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
+﻿using BHD_ServerManager.Forms;
+using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
 using BHD_SharedResources.Classes.SupportClasses;
-using BHD_ServerManager.Forms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -26,7 +22,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             instanceMaps.customMaps.Clear();
             mapInstanceManager.LoadDefaultMaps();
 
-            if (!theInstanceManager.ValidateGameServerPath()) return;            
+            if (!theInstanceManager.ValidateGameServerPath()) return;
             mapInstanceManager.LoadCustomMaps();
         }
         public void LoadDefaultMaps()
@@ -70,7 +66,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 instanceMaps.availableMaps.Add(tempMapFile);
             }
         }
-        public void LoadCustomMaps() 
+        public void LoadCustomMaps()
         {
             DirectoryInfo d = new DirectoryInfo(theInstance.profileServerPath!);
             List<int> numbers = new List<int>() { 128, 64, 32, 16, 8, 4, 2, 1 };
@@ -90,7 +86,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     catch (Exception e)
                     {
                         // MessageBox.Show("File Name: " + file.Name + "\n" + "Reason: " + e.Message, "Skipping infoCurrentMapName File");
-                        AppDebug.Log("Skipping infoCurrentMapName File", e.Message );
+                        AppDebug.Log("Skipping infoCurrentMapName File", e.Message);
                         continue;
                     }
 
@@ -202,9 +198,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public List<mapFileInfo> BuildCurrentMapPlaylist()
         {
             DataGridView ogList = thisServer.dataGridView_currentMaps;
-            
+
             var newPlaylist = new List<mapFileInfo>();
-           
+
 
             foreach (DataGridViewRow row in ogList.Rows)
             {

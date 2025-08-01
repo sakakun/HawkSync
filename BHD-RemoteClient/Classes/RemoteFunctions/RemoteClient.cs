@@ -112,7 +112,8 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                 _updateClient?.Close();
                 _commClient?.Close();
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 AppDebug.Log("RemoteClient", "Disconnecting Error: " + e.Message);
             }
         }

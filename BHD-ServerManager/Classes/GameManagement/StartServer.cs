@@ -69,7 +69,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                 try
                 {
                     gamePlayOptions = Functions.CalulateGameOptions(thisInstance.gameOptionAutoBalance, thisInstance.gameOptionFF, thisInstance.gameOptionFriendlyTags, thisInstance.gameOptionFFWarn, thisInstance.gameOptionShowTracers, thisInstance.gameShowTeamClays, thisInstance.gameOptionAutoRange);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     AppDebug.Log("StartServer", "Error calculating game options: " + ex.Message);
                     return false;
@@ -388,7 +389,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                             AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
                             thisInstance.instanceAttachedPID = searchProcess.Id;
                             thisInstance.instanceProcessHandle = searchProcess.Handle;
-                            
+
                             SetProcessWindowTitle(searchProcess, windowTitle);
 
                             ServerMemory.AttachToGameProcess();
@@ -404,7 +405,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
 
                 Debug.WriteLine("No existing game process found, starting a new instance...");
-                
+
                 // Create the AutoRes File
                 createAutoRes();
 
@@ -461,7 +462,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     try
                     {
                         ServerMemory.DetachFromGameProcess();
-                        
+
                         var process = Process.GetProcessById(thisInstance.instanceAttachedPID.Value);
                         if (!process.HasExited)
                         {

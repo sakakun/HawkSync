@@ -1,6 +1,4 @@
-﻿using BHD_RemoteClient.Classes.GameManagement;
-using BHD_RemoteClient.Classes.InstanceManagers;
-using BHD_RemoteClient.Classes.StatManagement;
+﻿using BHD_RemoteClient.Classes.StatManagement;
 using BHD_RemoteClient.Forms;
 using BHD_ServerManager.Classes.PlayerManagementClasses;
 using BHD_SharedResources.Classes.CoreObjects;
@@ -9,12 +7,6 @@ using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
 using BHD_SharedResources.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BHD_RemoteClient.Classes.Tickers
 {
@@ -40,7 +32,7 @@ namespace BHD_RemoteClient.Classes.Tickers
 
         public static void runTicker()
         {
-           
+
             InstanceStatus status = theInstance.instanceStatus;
             int maxSlots = theInstance.gameMaxSlots;
             List<playerObject> players = theInstance.playerList.Values.ToList();
