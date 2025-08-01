@@ -1,6 +1,6 @@
 ## HawkSync
 
-What Is HawkSync?
+### What Is HawkSync?
 
 HawkSync Server Manager, is a tool designed for managing game servers—particularly for Novalogic's Delta Force: Black Hawk Down.
 
@@ -9,6 +9,7 @@ HawkSync Server Manager, is a tool designed for managing game servers—particul
 * Uploads those stats to websites of your choice for public or private viewing.
 * Supports Neo.Chronos Babstats v3.5 Web Stats API.
 
+### How does it look?
 [Snapshots/Images of GUI](https://github.com/sakakun/HawkSync/wiki/HawkSync-GUI)
 
 ### Known Issues
