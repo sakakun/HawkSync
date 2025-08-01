@@ -13,7 +13,7 @@ HawkSync Server Manager, is a tool designed for managing game servers—particul
 [Snapshots/Images of GUI](https://github.com/sakakun/HawkSync/wiki/HawkSync-GUI)
 
 ### Known Issues
-- No issues at this time.
+- 07/31/25: The ServerManager Ticker, processes scoring the map once then never again.  This has been fixed and will publish in 1.0.2.
 
 ### Fixed Issues
  - 07/30/25: The Server Manager may lock up when trying to load a large number of logs.
