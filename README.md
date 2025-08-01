@@ -7,6 +7,7 @@ HawkSync Server Manager, is a tool designed for managing game servers—particular
 * Allows local and remote server management, giving admins control over various server settings and operations.
 * Records detailed player statistics during gameplay on your server.
 * Uploads those stats to websites of your choice for public or private viewing.
+* Supports Neo.Chronos Babstats v3.5 Web Stats API.
 
 ### Known Issues
 - No issues at this time.
