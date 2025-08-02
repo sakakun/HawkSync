@@ -10,6 +10,6 @@ namespace BHD_SharedResources.Classes.InstanceInterfaces
         void LoadCustomMaps();
         void SaveCurrentMapPlaylist(List<mapFileInfo> mapList, bool external);
         List<mapFileInfo> BuildCurrentMapPlaylist();
-        void CalculateGameTypeBits(List<int> numbers, int target, mapFileInfo map);
+        void CalculateGameTypeBits(List<int> numbers, int target, List<int> result);
     }
 }

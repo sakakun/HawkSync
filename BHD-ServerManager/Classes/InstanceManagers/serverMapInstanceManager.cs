@@ -69,7 +69,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public void LoadCustomMaps()
         {
             DirectoryInfo d = new DirectoryInfo(theInstance.profileServerPath!);
-            List<int> numbers = new List<int>() { 128, 64, 32, 16, 8, 4, 2, 1 };
             List<string> badMapsList = new List<string>();
 
             foreach (var file in d.GetFiles("*.bms"))
@@ -77,15 +76,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 using (FileStream fsSourceDDS = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
                 using (BinaryReader binaryReader = new BinaryReader(fsSourceDDS))
                 {
-                    var map = new mapFileInfo();
                     string first_line = string.Empty;
+                    string mapName = string.Empty;
                     try
                     {
                         first_line = File.ReadLines(Path.Combine(theInstance.profileServerPath!, file.Name), Encoding.Default).First().ToString();
                     }
                     catch (Exception e)
                     {
-                        // MessageBox.Show("File Name: " + file.Name + "\n" + "Reason: " + e.Message, "Skipping infoCurrentMapName File");
                         AppDebug.Log("Skipping infoCurrentMapName File", e.Message);
                         continue;
                     }
@@ -101,61 +99,70 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     }
                     try
                     {
-                        map.MapName = first_line_list[1];
+                        mapName = first_line_list[1];
                     }
                     catch
                     {
                         badMapsList.Add(file.Name);
                         continue;
                     }
-                    map.MapFile = file.Name;
+                    string mapFile = file.Name;
 
+                    // Read BitmapBytes sum at 0x8A
                     fsSourceDDS.Seek(0x8A, SeekOrigin.Begin);
-                    var attackdefend = binaryReader.ReadInt16();
+                    var bitmapBytesSum = binaryReader.ReadInt16();
 
-                    if (attackdefend == 128)
-                    {
-                        map.gameTypeBits.Add(0);
-                    }
-                    else
-                    {
-                        fsSourceDDS.Seek(0x8B, SeekOrigin.Begin);
-                        var maptype = binaryReader.ReadInt16();
-                        CalculateGameTypeBits(numbers, Convert.ToInt32(maptype), map);
-                    }
-                    map.CustomMap = true;
-                    instanceMaps.customMaps.Add(map);
-                }
-            }
+                    // Read Bitmap sum at 0x8B
+                    fsSourceDDS.Seek(0x8B, SeekOrigin.Begin);
+                    var bitmapSum = binaryReader.ReadInt16();
 
-            foreach (var item in instanceMaps.customMaps)
-            {
-                List<int> gametypes = new List<int>();
-                foreach (var customMapBits in item.gameTypeBits)
-                {
-                    int gametypeId = -1;
-                    foreach (var gametype in objectGameTypes.All)
+                    // Get all possible BitmapBytes and Bitmap values (excluding 0)
+                    var bitmapBytesNumbers = objectGameTypes.All.Select(gt => gt.BitmapBytes).Where(b => b > 0).OrderByDescending(b => b).ToList();
+                    var bitmapNumbers = objectGameTypes.All.Select(gt => gt.Bitmap).Where(b => b > 0).OrderByDescending(b => b).ToList();
+
+                    // Find all game types for this map
+                    var gameTypeBits = new List<int>();
+                    CalculateGameTypeBits(bitmapBytesNumbers, bitmapBytesSum, gameTypeBits);
+                    if (gameTypeBits.Count == 0)
                     {
-                        if (customMapBits == gametype.Bitmap)
+                        CalculateGameTypeBits(bitmapNumbers, bitmapSum, gameTypeBits);
+                    }
+
+                    // If still nothing, check for special case (Attack and Defend)
+                    if (gameTypeBits.Count == 0 && (bitmapBytesSum == 128 || bitmapSum == 0))
+                    {
+                        gameTypeBits.Add(0); // Attack and Defend
+                    }
+
+                    // Map to game type info and add a separate entry for each supported game type
+                    var gameTypes = new List<int>();
+                    foreach (var bit in gameTypeBits)
+                    {
+                        var match = objectGameTypes.All.FirstOrDefault(gt => gt.Bitmap == bit || gt.BitmapBytes == bit);
+                        if (match != null)
                         {
-                            gametypeId = gametype.DatabaseId;
-                            item.GameType = gametype.ShortName;
-                            break;
+                            gameTypes.Add(match.DatabaseId);
+
+                            var mapEntry = new mapFileInfo
+                            {
+                                MapID = instanceMaps.availableMaps.Count,
+                                MapFile = mapFile,
+                                MapName = mapName,
+                                GameType = match.ShortName ?? string.Empty,
+                                GameTypes = new List<int> { match.DatabaseId },
+                                CustomMap = true,
+                                ProfileServerType = 0, // Set as needed
+                                gameTypeBits = new List<int> { bit }
+                            };
+                            instanceMaps.availableMaps.Add(mapEntry);
+                            instanceMaps.customMaps.Add(mapEntry);
+                        }
+                        else
+                        {
+                            MessageBox.Show("File Name: " + mapFile + "\n" + " with Bitmap/BitmapBytes: " + bit + "\n" + "Reason: Could not find gametype for map.");
                         }
                     }
-                    if (gametypeId == -1)
-                    {
-                        MessageBox.Show("File Name: " + item.MapFile + "\n" + " with Bitmap: " + customMapBits + "\n" + "Reason: Could not find gametype for map.");
-                        continue;
-                    }
-                    else
-                    {
-                        gametypes.Add(gametypeId);
-                    }
                 }
-                item.GameTypes = gametypes;
-                item.MapID = instanceMaps.availableMaps.Count;
-                instanceMaps.availableMaps.Add(item);
             }
 
             if (badMapsList.Count > 0)
@@ -224,14 +231,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             return newPlaylist;
         }
-        public void CalculateGameTypeBits(List<int> numbers, int target, mapFileInfo map)
+        public void CalculateGameTypeBits(List<int> numbers, int target, List<int> result)
         {
             void Recurse(List<int> nums, int tgt, List<int> partial)
             {
                 int sum = partial.Sum();
                 if (sum == tgt)
                 {
-                    map.gameTypeBits = new List<int>(partial);
+                    result.AddRange(partial);
                     return;
                 }
                 if (sum >= tgt)
@@ -242,8 +249,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     var remaining = nums.Skip(i + 1).ToList();
                     var nextPartial = new List<int>(partial) { nums[i] };
                     Recurse(remaining, tgt, nextPartial);
+                    if (result.Count > 0) return; // Only need the first valid combination
                 }
             }
+            result.Clear();
             Recurse(numbers, target, new List<int>());
         }
 

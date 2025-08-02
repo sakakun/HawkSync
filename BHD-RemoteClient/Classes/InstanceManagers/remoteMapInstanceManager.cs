@@ -44,7 +44,7 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
             return newPlaylist;
         }
 
-        void mapInstanceInterface.CalculateGameTypeBits(List<int> numbers, int target, mapFileInfo map)
+        void mapInstanceInterface.CalculateGameTypeBits(List<int> numbers, int target, List<int> result)
         {
             AppDebug.Log("Not Implemented", "Not Implemented");
         }

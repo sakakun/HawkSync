@@ -9,7 +9,7 @@ namespace BHD_SharedResources.Classes.InstanceManagers
         public static mapInstanceInterface Implementation { get; set; }
 
         public static List<mapFileInfo> BuildCurrentMapPlaylist() => Implementation.BuildCurrentMapPlaylist();
-        public static void CalculateGameTypeBits(List<int> numbers, int target, mapFileInfo map) => Implementation.CalculateGameTypeBits(numbers, target, map);
+        public static void CalculateGameTypeBits(List<int> numbers, int target, List<int> result) => Implementation.CalculateGameTypeBits(numbers, target, result);
         public static void LoadCustomMaps() => Implementation.LoadCustomMaps();
         public static void LoadDefaultMaps() => Implementation.LoadDefaultMaps();
         public static void ResetAvailableMaps() => Implementation.ResetAvailableMaps();
