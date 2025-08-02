@@ -1132,13 +1132,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Update the Game Score for the next map
         public static void UpdateGameScores()
         {
-            if (thisInstance.instanceStatus != InstanceStatus.STARTDELAY &&
-                thisInstance.instanceStatus != InstanceStatus.ONLINE)
-            {
-                return;
-            }
-
-
 
             // This changes the score needed to win on the next map played.
             int nextGameScore = 0;
@@ -1172,17 +1165,10 @@ namespace BHD_ServerManager.Classes.GameManagement
             WriteProcessMemory((int)processHandle, startingPtr1, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten1);
             WriteProcessMemory((int)processHandle, startingPtr2, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten2);
 
-
         }
         // Function UpdatePlayerTeam
         public static void UpdatePlayerTeam()
         {
-            if (thisInstance.instanceStatus != InstanceStatus.LOADINGMAP &&
-                thisInstance.instanceStatus != InstanceStatus.SCORING)
-            {
-                return;
-            }
-
             if (thisInstance.playerChangeTeamList.Count == 0)
             {
                 return;

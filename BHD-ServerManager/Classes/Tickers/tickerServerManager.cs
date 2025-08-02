@@ -46,9 +46,12 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.functionEvent_swapFieldsStartStop();
                 adminInstanceManager.UpdateAdminLogDialog();
             });
-            adminInstanceManager.UpdateAdminLogDialog();
-            SafeInvoke(thisServer, () => theInstanceManager.HighlightDifferences());
-            tickerEvent_checkMapDiff();
+
+            // UI Updates Regardless of Server Status
+            adminInstanceManager.UpdateAdminLogDialog();                                        // Admin Log Tab
+            SafeInvoke(thisServer, () => theInstanceManager.HighlightDifferences());            // Instance Settings Differences Check
+            tickerEvent_checkMapDiff();                                                         // Map Playlist Difference Check
+            tickerEvent_updateLabels(thisServer);                                               // Update the Labels on the UI
 
             // Only run the rest if it's time for an update
             DateTime currentTime = DateTime.Now;
@@ -80,57 +83,54 @@ namespace BHD_ServerManager.Classes.Tickers
             // 2. Loading Map
             if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
             {
-                tickerEvent_preGameProcessing();
-                ServerMemory.UpdatePlayerTeam();
-                // UI: update labels
-                tickerEvent_updateLabels(thisServer);
+                tickerEvent_preGameProcessing();                                    // Run pre-game processing
+                ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
+                ServerMemory.UpdateGameScores();                                    // Update game score limits
             }
             // 3. Start Delay
             else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
             {
-                theInstance.instanceCrashCounter = 0;
-                ServerMemory.UpdateGameScores();
-                ServerMemory.ReadMemoryCurrentMapIndex();
-                ServerMemory.UpdatePlayerTeam();
-                ServerMemory.ReadMemoryGeneratePlayerList();
-                tickerEvent_updateLabels(thisServer);
+                theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
+                theInstance.instanceCrashCounter = 0;                               // Reset crash counter
+                ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
+                ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
             }
             // 4. Online (game in progress)
             else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
             {
-                theInstance.instanceCrashCounter = 0;
-                ServerMemory.UpdateGameScores();
-                ServerMemory.ReadMemoryCurrentMapIndex();
-                ServerMemory.UpdatePlayerTeam();
-                ServerMemory.ReadMemoryGeneratePlayerList();
-                tickerEvent_updateLabels(thisServer);
+                ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
+                ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
 
                 // Stats update
-                StatFunctions.RunPlayerStatsUpdate();
+                StatFunctions.RunPlayerStatsUpdate();                               // Collect Player Stats
+                
+                // WebStats Updates and Reports
                 if (theInstance.WebStatsEnabled)
                 {
                     if (DateTime.Now > instanceStats.lastPlayerStatsUpdate.AddSeconds(theInstance.WebStatsUpdateInterval))
                     {
-                        Task.Run(() => StatFunctions.SendUpdateData(thisServer));
                         instanceStats.lastPlayerStatsUpdate = DateTime.Now;
+                        Task.Run(() => StatFunctions.SendUpdateData(thisServer));
+                        
                     }
-                    if (DateTime.Now > instanceStats.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval))
+                    if (DateTime.Now > instanceStats.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval) && theInstance.WebStatsAnnouncements)
                     {
                         Task.Run(async () =>
                         {
+                            instanceStats.lastPlayerStatsReport = DateTime.Now;
                             string ReportResults = await StatFunctions.SendReportData(thisServer);
                             // handle ReportResults if needed
                         });
-                        instanceStats.lastPlayerStatsReport = DateTime.Now;
+                        
                     }
                 }
             }
             // 5. Scoring
             else if (theInstance.instanceStatus == InstanceStatus.SCORING)
             {
-                tickerEvent_scoringGameProcessing();
-                ServerMemory.UpdatePlayerTeam();
-                tickerEvent_updateLabels(thisServer);
+                tickerEvent_scoringGameProcessing();                                // Run scoring processing
+                ServerMemory.UpdateGameScores();                                    // Update game score limits
+                ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable     
             }
 
             if (theInstance.instanceStatus != InstanceStatus.SCORING && !theInstance.instanceScoringProcRun)
@@ -155,6 +155,7 @@ namespace BHD_ServerManager.Classes.Tickers
             {
                 RemoteServer.Start(theInstance.profileRemotePort, theInstance.profileRemotePort + 1);
             }
+
             if (!theInstance.profileEnableRemote && RemoteServer.IsRunning)
             {
                 RemoteServer.Stop();
@@ -197,11 +198,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 theInstance.playerList.Clear();
                 StatFunctions.ResetPlayerStats();
             }
-            else if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP && !theInstance.instancePreGameProcRun)
-            {
-                AppDebug.Log("tickerServerManagement", "Pre-game Processing Reset...");
-                theInstance.instancePreGameProcRun = true;
-            }
+            
         }
 
         // --- Scoring Processing ---
