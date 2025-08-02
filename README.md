@@ -11,3 +11,6 @@ HawkSync Server Manager, is a tool designed for managing game servers—particul
 
 ### How does it look?
 [Snapshots/Images of GUI](https://github.com/sakakun/HawkSync/wiki/HawkSync-GUI)
+
+### Roadmap and Timelines
+[Roadmap](https://github.com/sakakun/HawkSync/wiki/Roadmap)
