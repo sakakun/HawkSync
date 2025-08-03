@@ -230,12 +230,12 @@ namespace BHD_ServerManager.Forms
 
         private void functionEvent_SetupAvailableMapsGrid()
         {
-            SetupDataGridView(dataGridView_availableMaps, new[] { ("MapName", "Name", 120), ("GameType", "Type", 50) });
+            SetupDataGridView(dataGridView_availableMaps, new[] { ("MapName", "Name", 120), ("MapType", "Type", 50) });
         }
 
         private void functionEvent_SetupCurrentMapsGrid()
         {
-            SetupDataGridView(dataGridView_currentMaps, new[] { ("MapNum", "#", 30), ("MapName", "Name", 120), ("GameType", "Type", 50) });
+            SetupDataGridView(dataGridView_currentMaps, new[] { ("MapNum", "#", 30), ("MapName", "Name", 120), ("MapType", "Type", 50) });
         }
 
         // Helper for DataGridView setup (could be moved to a static class)
@@ -248,7 +248,7 @@ namespace BHD_ServerManager.Forms
                 dgv.Columns.Add(name, header);
                 dgv.Columns[name].Width = width;
                 dgv.Columns[name].AutoSizeMode = name == "MapName" ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
-                if (name == "GameType")
+                if (name == "MapType")
                 {
                     dgv.Columns[name].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                     dgv.Columns[name].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
@@ -270,9 +270,9 @@ namespace BHD_ServerManager.Forms
                 foreach (var map in maps)
                 {
                     if (includeRowNum)
-                        dgv.Rows.Add(rowNum++, map.MapName, map.GameType);
+                        dgv.Rows.Add(rowNum++, map.MapName, map.MapType);
                     else
-                        dgv.Rows.Add(map.MapName, map.GameType);
+                        dgv.Rows.Add(map.MapName, map.MapType);
                 }
             });
         }
@@ -305,7 +305,7 @@ namespace BHD_ServerManager.Forms
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 var parts = line.Split(',');
                 if (parts.Length < 3) continue;
-                yield return new mapFileInfo { MapFile = parts[0], MapName = parts[1], GameType = parts[2] };
+                yield return new mapFileInfo { MapFile = parts[0], MapName = parts[1], MapType = parts[2] };
             }
         }
 
@@ -416,7 +416,7 @@ namespace BHD_ServerManager.Forms
                 foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
                 {
                     row.Visible = combo_gameTypes.SelectedIndex == 9 ||
-                        row.Cells["GameType"].Value?.ToString() == selectedGameType;
+                        row.Cells["MapType"].Value?.ToString() == selectedGameType;
                 }
             }
         }

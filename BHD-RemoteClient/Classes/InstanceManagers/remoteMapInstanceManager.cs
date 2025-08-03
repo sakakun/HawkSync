@@ -26,14 +26,14 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
                 if (row.IsNewRow) continue;
 
                 string? mapName = row.Cells["MapName"].Value?.ToString();
-                string? gameType = row.Cells["GameType"].Value?.ToString();
+                string? gameType = row.Cells["MapType"].Value?.ToString();
 
                 if (string.IsNullOrWhiteSpace(mapName) || string.IsNullOrWhiteSpace(gameType))
                     continue;
 
                 var map = instanceMaps.availableMaps
                     .FirstOrDefault(m => string.Equals(m.MapName, mapName, StringComparison.OrdinalIgnoreCase)
-                                      && string.Equals(m.GameType, gameType, StringComparison.OrdinalIgnoreCase));
+                                      && string.Equals(m.MapType, gameType, StringComparison.OrdinalIgnoreCase));
 
                 if (map == null)
                     continue;
@@ -83,7 +83,7 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
                 var sb = new StringBuilder();
                 foreach (var map in mapList)
                 {
-                    sb.AppendLine($"{map.MapFile},{map.MapName},{map.GameType}");
+                    sb.AppendLine($"{map.MapFile},{map.MapName},{map.MapType}");
                 }
                 File.WriteAllText(savePath, sb.ToString(), Encoding.UTF8);
             }

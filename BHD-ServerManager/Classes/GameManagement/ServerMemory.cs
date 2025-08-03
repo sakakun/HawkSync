@@ -75,7 +75,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             windowHandle = nint.Zero;
             processHandle = nint.Zero;
         }
-        // Function: GetGameTypeID, Converts the GameType ShortName to and INT value.
+        // Function: GetGameTypeID, Converts the MapType ShortName to and INT value.
         public static int getGameTypeID(string gameType)
         {
             switch (gameType)
@@ -1107,15 +1107,15 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
 
                 int currentMapType = getGameTypeID(thisInstance.gameInfoGameType!);
-                int nextMapType = getGameTypeID(mapInstance.currentMapPlaylist[currentMapIndex].GameType!);
+                int nextMapType = getGameTypeID(mapInstance.currentMapPlaylist[currentMapIndex].MapType!);
 
                 AppDebug.Log("ServerMemory", "Current Map Type: " + thisInstance.gameInfoMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
-                AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].GameType + " - " + nextMapType);
+                AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].MapType + " - " + nextMapType);
 
                 // Deal with the Players
                 theInstanceManager.changeTeamGameMode(currentMapType, nextMapType);
 
-                // Change the GameType for the next map
+                // Change the MapType for the next map
                 var CurrentGameTypeAddr = baseAddr + 0x5F21A4;
                 byte[] nextMaptypeBytes = BitConverter.GetBytes(nextMapType);
                 int nextMaptypeBytesWrite = 0;

@@ -102,7 +102,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps > 0 ? 1 : 0);
 
                 byte[] gameTypeBytes = BitConverter.GetBytes(
-                    objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == mapInstance.currentMapPlaylist[0].GameType)?.DatabaseId ?? 0);
+                    objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == mapInstance.currentMapPlaylist[0].MapType)?.DatabaseId ?? 0);
                 byte[] timeLimitBytes = BitConverter.GetBytes(thisInstance.gameTimeLimit);
                 byte[] respawnTimeBytes = BitConverter.GetBytes(thisInstance.gameRespawnTime);
                 byte[] allowCustomSkinsBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameCustomSkins));

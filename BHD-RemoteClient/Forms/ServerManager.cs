@@ -234,12 +234,12 @@ namespace BHD_RemoteClient.Forms
             dgv.Rows.Clear();
             dgv.Columns.Clear();
             dgv.Columns.Add("MapName", "Name");
-            dgv.Columns.Add("GameType", "Type");
+            dgv.Columns.Add("MapType", "Type");
             dgv.Columns["MapName"].Width = 120;
-            dgv.Columns["GameType"].Width = 50;
+            dgv.Columns["MapType"].Width = 50;
             dgv.Columns["MapName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgv.Columns["GameType"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dgv.Columns["GameType"].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgv.Columns["MapType"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgv.Columns["MapType"].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
         }
         // Scope: MapTab, Function: functionEvent_SetupCurrentMapsGrid, Sets up the current maps DataGridView with columns and styles.
         private void functionEvent_SetupCurrentMapsGrid()
@@ -250,16 +250,16 @@ namespace BHD_RemoteClient.Forms
             dgv.Columns.Clear();
             dgv.Columns.Add("MapNum", "#");
             dgv.Columns.Add("MapName", "Name");
-            dgv.Columns.Add("GameType", "Type");
+            dgv.Columns.Add("MapType", "Type");
             dgv.Columns["MapNum"].Width = 30;
             dgv.Columns["MapName"].Width = 120;
-            dgv.Columns["GameType"].Width = 50;
-            dgv.Columns["GameType"].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgv.Columns["MapType"].Width = 50;
+            dgv.Columns["MapType"].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgv.Columns["MapNum"].SortMode = DataGridViewColumnSortMode.NotSortable;
             dgv.Columns["MapNum"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dgv.Columns["GameType"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgv.Columns["MapType"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgv.Columns["MapName"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            dgv.Columns["GameType"].SortMode = DataGridViewColumnSortMode.NotSortable;
+            dgv.Columns["MapType"].SortMode = DataGridViewColumnSortMode.NotSortable;
             dgv.Columns["MapName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
         }
         // Scope: MapTab, Function: functionEvent_PopulateMapDataGrid, Populates the given DataGridView with map data.
@@ -270,9 +270,9 @@ namespace BHD_RemoteClient.Forms
             foreach (var map in maps)
             {
                 if (includeRowNum)
-                    dgv.Rows.Add(rowNum++, map.MapName, map.GameType);
+                    dgv.Rows.Add(rowNum++, map.MapName, map.MapType);
                 else
-                    dgv.Rows.Add(map.MapName, map.GameType);
+                    dgv.Rows.Add(map.MapName, map.MapType);
             }
         }
         // Scope: MapTab, Function: functionEvent_UpdateMapRowNumbers, Updates the row numbers in the current maps DataGridView.
@@ -308,7 +308,7 @@ namespace BHD_RemoteClient.Forms
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 var parts = line.Split(',');
                 if (parts.Length < 3) continue;
-                yield return new mapFileInfo { MapFile = parts[0], MapName = parts[1], GameType = parts[2] };
+                yield return new mapFileInfo { MapFile = parts[0], MapName = parts[1], MapType = parts[2] };
             }
         }
         // Scope: MapTab, Function: functionEvent_ImportMapPlaylistToCurrentDataGrid, Imports a map playlist from a file to the current maps DataGridView.
@@ -427,7 +427,7 @@ namespace BHD_RemoteClient.Forms
         private void actionClick_refreshMaps(object sender, EventArgs e)
         {
             functionEvent_RefreshAvailableMaps();
-            combo_gameTypes.SelectedIndex = 9; // Reset the GameType filter to "All"
+            combo_gameTypes.SelectedIndex = 9; // Reset the MapType filter to "All"
         }
         // Scope: MapsTab, Function: actionClick_clearCurrentMapPlaylist, Clears the current map playlist.
         private void actionClick_clearCurrentMapPlaylist(object sender, EventArgs e)
@@ -496,8 +496,8 @@ namespace BHD_RemoteClient.Forms
         // Scope: MapsTab, Function: actionChange_mapFilterGameType, Filters the available maps based on the selected game type.
         private void actionChange_mapFilterGameType(object sender, EventArgs e)
         {
-            // GameTypes.All, the index of the selected item in the ComboBox is the DatabaseId of the GameType
-            // Take the ShortName of the selected GameType and filter the available maps accordingly, the column is named "GameType"
+            // MapTypes.All, the index of the selected item in the ComboBox is the DatabaseId of the MapType
+            // Take the ShortName of the selected MapType and filter the available maps accordingly, the column is named "MapType"
             // If the selected index is 9, remove filtering and show all items.
             if (combo_gameTypes.SelectedIndex >= 0)
             {
@@ -520,7 +520,7 @@ namespace BHD_RemoteClient.Forms
                     // Filter maps by the selected game type
                     foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
                     {
-                        if (row.Cells["GameType"].Value?.ToString() != selectedGameType)
+                        if (row.Cells["MapType"].Value?.ToString() != selectedGameType)
                         {
                             // Hide the row if it doesn't match the selected game type
                             row.Visible = false;

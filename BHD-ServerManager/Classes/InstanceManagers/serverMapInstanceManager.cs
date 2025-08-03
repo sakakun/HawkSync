@@ -52,15 +52,15 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     MapID = int.Parse(parts[0]),
                     MapName = parts[1],
                     MapFile = parts[2],
-                    ProfileServerType = int.Parse(parts[3]),
-                    GameType = parts[4],
-                    GameTypes = new List<int>()
+                    GameModType = int.Parse(parts[3]),
+                    MapType = parts[4],
+                    MapTypes = new List<int>()
                 };
                 foreach (var gameType in objectGameTypes.All)
                 {
-                    if (gameType.ShortName!.Equals(tempMapFile.GameType, StringComparison.OrdinalIgnoreCase))
+                    if (gameType.ShortName!.Equals(tempMapFile.MapType, StringComparison.OrdinalIgnoreCase))
                     {
-                        tempMapFile.GameTypes.Add(gameType.Bitmap);
+                        tempMapFile.MapTypes.Add(gameType.Bitmap);
                     }
                 }
                 instanceMaps.availableMaps.Add(tempMapFile);
@@ -148,11 +148,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 MapID = instanceMaps.availableMaps.Count,
                                 MapFile = mapFile,
                                 MapName = mapName,
-                                GameType = match.ShortName ?? string.Empty,
-                                GameTypes = new List<int> { match.DatabaseId },
+                                MapType = match.ShortName ?? string.Empty,
+                                MapTypes = new List<int> { match.DatabaseId },
                                 CustomMap = true,
-                                ProfileServerType = 0, // Set as needed
-                                gameTypeBits = new List<int> { bit }
+                                GameModType = 0, // Set as needed
+                                MapTypeBits = new List<int> { bit }
                             };
                             instanceMaps.availableMaps.Add(mapEntry);
                             instanceMaps.customMaps.Add(mapEntry);
@@ -193,7 +193,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var sb = new StringBuilder();
                 foreach (var map in mapList)
                 {
-                    sb.AppendLine($"{map.MapFile},{map.MapName},{map.GameType}");
+                    sb.AppendLine($"{map.MapFile},{map.MapName},{map.MapType}");
                 }
                 File.WriteAllText(savePath, sb.ToString(), Encoding.UTF8);
             }
@@ -214,14 +214,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (row.IsNewRow) continue;
 
                 string? mapName = row.Cells["MapName"].Value?.ToString();
-                string? gameType = row.Cells["GameType"].Value?.ToString();
+                string? gameType = row.Cells["MapType"].Value?.ToString();
 
                 if (string.IsNullOrWhiteSpace(mapName) || string.IsNullOrWhiteSpace(gameType))
                     continue;
 
                 var map = instanceMaps.availableMaps
                     .FirstOrDefault(m => string.Equals(m.MapName, mapName, StringComparison.OrdinalIgnoreCase)
-                                      && string.Equals(m.GameType, gameType, StringComparison.OrdinalIgnoreCase));
+                                      && string.Equals(m.MapType, gameType, StringComparison.OrdinalIgnoreCase));
 
                 if (map == null)
                     continue;

@@ -21,13 +21,37 @@ namespace BHD_SharedResources.Classes.Instances
 
     public class mapFileInfo
     {
-        public int MapID { get; set; }
-        public string MapFile { get; set; } = string.Empty;
-        public string MapName { get; set; } = string.Empty;
-        public string GameType { get; set; } = string.Empty;
-        public bool CustomMap { get; set; }
-        public List<int> GameTypes { get; set; } = new List<int>();
-        public int ProfileServerType { get; set; }
-        public List<int> gameTypeBits { get; set; } = new List<int>();
+        /// <summary>
+        /// Map Identifier (ID)
+        /// </summary>
+        public int          MapID { get; set; }
+        /// <summary>
+        /// Map File Name
+        /// </summary>
+        public string       MapFile { get; set; } = string.Empty;
+        /// <summary>
+        /// Map Name
+        /// </summary>
+        public string       MapName { get; set; } = string.Empty;
+        /// <summary>
+        /// Map Type (e.g., "Deathmatch", "Team Deathmatch") - Seen in the UI, multiple types can be associated with a map.
+        /// </summary>
+        public string       MapType { get; set; } = string.Empty;
+        /// <summary>
+        /// Custom Map Flag - Indicates if the map is a custom map.
+        /// </summary>
+        public bool         CustomMap { get; set; }
+        /// <summary>
+        /// List of Map Types - Used for filtering or categorization.
+        /// </summary>
+        public List<int>    MapTypes { get; set; } = new List<int>();
+        /// <summary>
+        /// Mod Type - DF BHD/DF BHD Team Sabre, etc. 0 for BHD, 1 for BHD Team Sabre, etc.
+        /// </summary>
+        public int          GameModType { get; set; }
+        /// <summary>
+        /// Map Type Bits - Used for bitwise operations to determine map types.
+        /// </summary>
+        public List<int>    MapTypeBits { get; set; } = new List<int>();
     }
 }

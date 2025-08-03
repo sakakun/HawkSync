@@ -32,11 +32,11 @@ namespace BHD_ServerManager.Forms
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle13 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle14 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle15 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             toolStrip = new ToolStrip();
             btn_UpdatePath = new FontAwesome.Sharp.IconToolStripButton();
             toolStripStatus = new ToolStripLabel();
@@ -2424,13 +2424,13 @@ namespace BHD_ServerManager.Forms
             dataGridView_chatMessages.AllowUserToDeleteRows = false;
             dataGridView_chatMessages.AllowUserToResizeColumns = false;
             dataGridView_chatMessages.AllowUserToResizeRows = false;
-            dataGridViewCellStyle11.BackColor = SystemColors.Control;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Segoe UI", 9F);
-            dataGridViewCellStyle11.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle11.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = DataGridViewTriState.True;
-            dataGridView_chatMessages.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dataGridView_chatMessages.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dataGridView_chatMessages.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_chatMessages.Columns.AddRange(new DataGridViewColumn[] { dateTime, Team, Player, Message });
             dataGridView_chatMessages.Dock = DockStyle.Fill;
@@ -2443,8 +2443,8 @@ namespace BHD_ServerManager.Forms
             // 
             // dateTime
             // 
-            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dateTime.DefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dateTime.DefaultCellStyle = dataGridViewCellStyle2;
             dateTime.HeaderText = "Timestamp";
             dateTime.MaxInputLength = 12;
             dateTime.Name = "dateTime";
@@ -2452,8 +2452,8 @@ namespace BHD_ServerManager.Forms
             // 
             // Team
             // 
-            dataGridViewCellStyle13.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            Team.DefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            Team.DefaultCellStyle = dataGridViewCellStyle3;
             Team.HeaderText = "Team";
             Team.MaxInputLength = 24;
             Team.Name = "Team";
@@ -2461,8 +2461,8 @@ namespace BHD_ServerManager.Forms
             // 
             // Player
             // 
-            dataGridViewCellStyle14.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            Player.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            Player.DefaultCellStyle = dataGridViewCellStyle4;
             Player.HeaderText = "Player";
             Player.MaxInputLength = 32;
             Player.Name = "Player";
@@ -2470,8 +2470,8 @@ namespace BHD_ServerManager.Forms
             // Message
             // 
             Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle15.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            Message.DefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            Message.DefaultCellStyle = dataGridViewCellStyle5;
             Message.HeaderText = "Message";
             Message.MaxInputLength = 90;
             Message.Name = "Message";
