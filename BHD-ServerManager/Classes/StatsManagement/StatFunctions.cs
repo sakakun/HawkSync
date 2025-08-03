@@ -336,7 +336,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             Dictionary<string, string> DATA = new Dictionary<string, string>
             {
                 ["serverid"] = theInstance.WebStatsProfileID,
-                ["data"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(GenerateImportData())),
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateImportData())),
                 ["BMT"] = "1"
             };
 
@@ -362,7 +362,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             Dictionary<string, string> DATA = new Dictionary<string, string>
             {
                 ["serverid"] = theInstance.WebStatsProfileID,
-                ["data"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(GenerateUpdateData())),
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateUpdateData())),
                 ["BMT"] = "1"
             };
 
@@ -388,7 +388,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             Dictionary<string, string> DATA = new Dictionary<string, string>
             {
                 ["serverid"] = theInstance.WebStatsProfileID,
-                ["data"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(GenerateReportData())),
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateReportData())),
                 ["BMT"] = "1"
             };
 
