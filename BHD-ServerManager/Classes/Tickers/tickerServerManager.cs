@@ -240,10 +240,10 @@ namespace BHD_ServerManager.Classes.Tickers
         // --- Scoreboard Ticker ---
         private static void tickerEvent_Scoreboard()
         {
-            Thread.Sleep(theInstance.gameScoreBoardDelay * 1000);
-            ServerMemory.UpdateScoreBoardTimer();
-            AppDebug.Log("tickerServerManagement", "Scoreboard Timer Complete");
-            CommonCore.Ticker?.Stop("ScoreboardTicker");
+            Thread.Sleep(theInstance.gameScoreBoardDelay * 1000);                   // Wait for the specified delay
+            ServerMemory.UpdateScoreBoardTimer();                                   // Set the scoreboard timer to 1 second.
+            AppDebug.Log("tickerServerManagement", "Scoreboard Timer Complete");    // Log the completion of the scoreboard timer
+            CommonCore.Ticker?.Stop("ScoreboardTicker");                            // Stop the scoreboard ticker
         }
     }
 }
