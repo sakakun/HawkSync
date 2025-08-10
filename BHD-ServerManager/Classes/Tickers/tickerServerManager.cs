@@ -83,7 +83,8 @@ namespace BHD_ServerManager.Classes.Tickers
             ServerMemory.ReadMemoryCurrentGameType();
             ServerMemory.ReadMemoryCurrentNumPlayers();
             ServerMemory.UpdateGlobalGameType();
-            ServerMemory.UpdateGameScores();                                        // Update game score limits
+            ServerMemory.UpdateNextMapGameType();
+            ServerMemory.UpdateGameScores();
             ServerMemory.UpdateMapCycleCounter();
 
             // 2. Loading Map
@@ -138,7 +139,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable     
             }
 
-            if (theInstance.instanceStatus != InstanceStatus.SCORING && !theInstance.instanceScoringProcRun)
+            if (theInstance.instanceStatus != InstanceStatus.SCORING)
             {
                 // If not scoring, reset scoring processing flag
                 theInstance.instanceScoringProcRun = true;
@@ -198,10 +199,11 @@ namespace BHD_ServerManager.Classes.Tickers
             if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP && theInstance.instancePreGameProcRun)
             {
                 AppDebug.Log("tickerServerManagement", "Pre-game Processing...");
-                theInstance.instancePreGameProcRun = false;
+                theInstance.instancePreGameProcRun = false;               
                 instanceChat.ChatLog?.Clear();
                 theInstance.playerList.Clear();
                 StatFunctions.ResetPlayerStats();
+                
             }
             
         }
@@ -217,7 +219,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 theInstance.instanceScoringProcRun = false;
                 instanceChat.AutoMessageCounter = 0;
                 Task.Run(() => StatFunctions.SendImportData(thisServer!));
-                ServerMemory.UpdateNextMapGameType();
                 CommonCore.Ticker?.Start("ScoreboardTicker", 500, () => tickerEvent_Scoreboard());
                 AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
             }
@@ -236,7 +237,7 @@ namespace BHD_ServerManager.Classes.Tickers
             {
                 thisServer.label_dataCurrentMap.Text = theInstance.gameInfoMapName;
                 thisServer.label_dataNextMap.Text = instanceMaps.currentMapPlaylist.Count > 0
-                    ? instanceMaps.currentMapPlaylist[nextMapIndex].MapName
+                    ? instanceMaps.currentMapPlaylist[nextMapIndex].MapName + "[" + theInstance.gameInfoNextMapGameType + "]"
                     : string.Empty;
                 thisServer.label_dataTimeLeft.Text = theInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss");
             });

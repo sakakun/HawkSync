@@ -1013,8 +1013,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: UpdateGlobalGameType
         public static void UpdateGlobalGameType()
         {
-
-
             // this function is responsible for adjusting the Pinger Queries to the current game type
             var startingPtr = baseAddr + 0xACE0E8; // pinger query
             byte[] read_pingergametype = new byte[4];
@@ -1079,7 +1077,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static void UpdateNextMapGameType()
         {
 
-
             // This will grab the current map index.
             var startingPtr = baseAddr + 0x005ED5F8;
 
@@ -1114,6 +1111,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 // Deal with the Players
                 theInstanceManager.changeTeamGameMode(currentMapType, nextMapType);
+                thisInstance.gameInfoNextMapGameType = nextMapType;
 
                 // Change the MapType for the next map
                 var CurrentGameTypeAddr = baseAddr + 0x5F21A4;
@@ -1133,40 +1131,40 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static void UpdateGameScores()
         {
 
-            if (thisInstance.instanceStatus == InstanceStatus.SCORING || thisInstance.instanceStatus == InstanceStatus.LOADINGMAP)
+            // This changes the score needed to win on the next map played.
+            int nextGameScore = 0;
+            var startingPtr1 = 0;
+            var startingPtr2 = 0;
+
+            switch (thisInstance.gameInfoNextMapGameType)
             {
-                // This changes the score needed to win on the next map played.
-                int nextGameScore = 0;
-                var startingPtr1 = 0;
-                var startingPtr2 = 0;
-                switch (thisInstance.gameInfoNextMapGameType)
-                {
-                    // KOTH/TKOTH
-                    case 3:
-                    case 4:
-                        startingPtr1 = baseAddr + 0x5F21B8;
-                        startingPtr2 = baseAddr + 0x6344B4;
-                        nextGameScore = thisInstance.gameScoreZoneTime;
-                        break;
-                    // flag ball
-                    case 8:
-                        startingPtr1 = baseAddr + 0x5F21AC;
-                        startingPtr2 = baseAddr + 0x6034B8;
-                        nextGameScore = thisInstance.gameScoreFlags;
-                        break;
-                    // all other game types...
-                    default:
-                        startingPtr1 = baseAddr + 0x5F21AC;
-                        startingPtr2 = baseAddr + 0x6034B8;
-                        nextGameScore = thisInstance.gameScoreKills;
-                        break;
-                }
-                byte[] nextGameScoreBytes = BitConverter.GetBytes(nextGameScore);
-                int nextGameScoreWritten1 = 0;
-                int nextGameScoreWritten2 = 0;
-                WriteProcessMemory((int)processHandle, startingPtr1, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten1);
-                WriteProcessMemory((int)processHandle, startingPtr2, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten2);
+                // KOTH/TKOTH
+                case 3:
+                case 4:
+                    startingPtr1 = baseAddr + 0x5F21B8;
+                    startingPtr2 = baseAddr + 0x6344B4;
+                    nextGameScore = thisInstance.gameScoreZoneTime;
+                    break;
+                // flag ball
+                case 8:
+                    startingPtr1 = baseAddr + 0x5F21AC;
+                    startingPtr2 = baseAddr + 0x6034B8;
+                    nextGameScore = thisInstance.gameScoreFlags;
+                    break;
+                // all other game types...
+                default:
+                    startingPtr1 = baseAddr + 0x5F21AC;
+                    startingPtr2 = baseAddr + 0x6034B8;
+                    nextGameScore = thisInstance.gameScoreKills;
+                    break;
             }
+            byte[] nextGameScoreBytes = BitConverter.GetBytes(nextGameScore);
+            int nextGameScoreWritten1 = 0;
+            int nextGameScoreWritten2 = 0;
+            WriteProcessMemory((int)processHandle, startingPtr1, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten1);
+            WriteProcessMemory((int)processHandle, startingPtr2, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten2);
+
+            AppDebug.Log("UpdateGameScores", "Game Score Updated: " + nextGameScore);
 
         }
         // Function UpdatePlayerTeam
