@@ -823,5 +823,38 @@ namespace BHD_ServerManager.Forms
             theInstanceManager.SaveSettings();
             base.OnFormClosing(e);
         }
+
+        private void actionClick_importBans(object sender, EventArgs e)
+        {
+            // Ask if the user wants to clear existing bans
+            // If yes, clear the bans first
+            // If no, just import the new bans
+            var result = MessageBox.Show(
+                "Do you want to clear existing bans before importing new ones?",
+                "Clear Existing Bans",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                instanceBans.BannedPlayerAddresses.Clear();
+                instanceBans.BannedPlayerNames.Clear();
+                banInstanceManager.UpdateBannedTables();
+                banInstanceManager.ImportSettings();
+            }
+            else if (result == DialogResult.No)
+            {
+                banInstanceManager.ImportSettings();
+            }
+            else
+            {
+                // User cancelled the import
+                return;
+            }
+        }
+
+        private void actionClick_exportBanSettings(object sender, EventArgs e)
+        {
+            banInstanceManager.ExportSettings();
+        }
     }
 }

@@ -217,15 +217,17 @@ namespace BHD_RemoteClient.Forms
             dg_IPAddresses = new DataGridView();
             ipRecordID = new DataGridViewTextBoxColumn();
             address = new DataGridViewTextBoxColumn();
+            panel8 = new Panel();
+            groupBox10 = new GroupBox();
             tableLayoutPanel6 = new TableLayoutPanel();
+            btn_banExport = new Button();
+            btn_banImport = new Button();
             groupBox9 = new GroupBox();
             tableLayoutPanel7 = new TableLayoutPanel();
             tb_bansPlayerName = new TextBox();
             tb_bansIPAddress = new TextBox();
             cb_banSubMask = new ComboBox();
             btn_addBan = new Button();
-            tableLayoutPanel8 = new TableLayoutPanel();
-            label13 = new Label();
             tabMessages = new TabPage();
             tabMessagesControl = new TabControl();
             tabAuto = new TabPage();
@@ -367,10 +369,11 @@ namespace BHD_RemoteClient.Forms
             ((System.ComponentModel.ISupportInitialize)dg_playerNames).BeginInit();
             groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dg_IPAddresses).BeginInit();
+            panel8.SuspendLayout();
+            groupBox10.SuspendLayout();
             tableLayoutPanel6.SuspendLayout();
             groupBox9.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
-            tableLayoutPanel8.SuspendLayout();
             tabMessages.SuspendLayout();
             tabMessagesControl.SuspendLayout();
             tabAuto.SuspendLayout();
@@ -2498,7 +2501,7 @@ namespace BHD_RemoteClient.Forms
             tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle());
             tableLayoutPanel5.Controls.Add(groupBox3, 1, 0);
             tableLayoutPanel5.Controls.Add(groupBox8, 3, 0);
-            tableLayoutPanel5.Controls.Add(tableLayoutPanel6, 5, 0);
+            tableLayoutPanel5.Controls.Add(panel8, 5, 0);
             tableLayoutPanel5.Dock = DockStyle.Fill;
             tableLayoutPanel5.Location = new Point(3, 3);
             tableLayoutPanel5.Margin = new Padding(0);
@@ -2586,27 +2589,76 @@ namespace BHD_RemoteClient.Forms
             address.HeaderText = "IP Address";
             address.Name = "address";
             // 
+            // panel8
+            // 
+            panel8.Controls.Add(groupBox10);
+            panel8.Controls.Add(groupBox9);
+            panel8.Dock = DockStyle.Fill;
+            panel8.Location = new Point(360, 0);
+            panel8.Margin = new Padding(0);
+            panel8.Name = "panel8";
+            panel8.Size = new Size(536, 356);
+            panel8.TabIndex = 2;
+            // 
+            // groupBox10
+            // 
+            groupBox10.Controls.Add(tableLayoutPanel6);
+            groupBox10.Dock = DockStyle.Top;
+            groupBox10.Location = new Point(0, 50);
+            groupBox10.Name = "groupBox10";
+            groupBox10.Padding = new Padding(3, 3, 3, 6);
+            groupBox10.Size = new Size(536, 53);
+            groupBox10.TabIndex = 2;
+            groupBox10.TabStop = false;
+            groupBox10.Text = "Misc";
+            // 
             // tableLayoutPanel6
             // 
-            tableLayoutPanel6.ColumnCount = 1;
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel6.Controls.Add(groupBox9, 0, 0);
-            tableLayoutPanel6.Controls.Add(tableLayoutPanel8, 0, 1);
+            tableLayoutPanel6.ColumnCount = 5;
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.Controls.Add(btn_banExport, 4, 0);
+            tableLayoutPanel6.Controls.Add(btn_banImport, 3, 0);
             tableLayoutPanel6.Dock = DockStyle.Fill;
-            tableLayoutPanel6.Location = new Point(360, 0);
-            tableLayoutPanel6.Margin = new Padding(0);
+            tableLayoutPanel6.Location = new Point(3, 19);
             tableLayoutPanel6.Name = "tableLayoutPanel6";
-            tableLayoutPanel6.RowCount = 2;
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2441864F));
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 85.75581F));
-            tableLayoutPanel6.Size = new Size(536, 356);
-            tableLayoutPanel6.TabIndex = 2;
+            tableLayoutPanel6.RowCount = 1;
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel6.Size = new Size(530, 28);
+            tableLayoutPanel6.TabIndex = 0;
+            // 
+            // btn_banExport
+            // 
+            btn_banExport.Dock = DockStyle.Fill;
+            btn_banExport.Location = new Point(424, 0);
+            btn_banExport.Margin = new Padding(0);
+            btn_banExport.Name = "btn_banExport";
+            btn_banExport.Size = new Size(106, 28);
+            btn_banExport.TabIndex = 0;
+            btn_banExport.Text = "Export";
+            btn_banExport.UseVisualStyleBackColor = true;
+            btn_banExport.Click += actionClick_exportBanSettings;
+            // 
+            // btn_banImport
+            // 
+            btn_banImport.Dock = DockStyle.Fill;
+            btn_banImport.Location = new Point(318, 0);
+            btn_banImport.Margin = new Padding(0);
+            btn_banImport.Name = "btn_banImport";
+            btn_banImport.Size = new Size(106, 28);
+            btn_banImport.TabIndex = 1;
+            btn_banImport.Text = "Import";
+            toolTip.SetToolTip(btn_banImport, "HawkSync or BMT v3.5 Ban Files Accepted");
+            btn_banImport.UseVisualStyleBackColor = true;
+            btn_banImport.Click += actionClick_importBanSettings;
             // 
             // groupBox9
             // 
             groupBox9.Controls.Add(tableLayoutPanel7);
-            groupBox9.Dock = DockStyle.Fill;
+            groupBox9.Dock = DockStyle.Top;
             groupBox9.Location = new Point(0, 0);
             groupBox9.Margin = new Padding(0);
             groupBox9.Name = "groupBox9";
@@ -2675,34 +2727,6 @@ namespace BHD_RemoteClient.Forms
             btn_addBan.Text = "ADD";
             btn_addBan.UseVisualStyleBackColor = true;
             btn_addBan.Click += actionClick_addBanInformation;
-            // 
-            // tableLayoutPanel8
-            // 
-            tableLayoutPanel8.ColumnCount = 1;
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel8.Controls.Add(label13, 0, 0);
-            tableLayoutPanel8.Dock = DockStyle.Fill;
-            tableLayoutPanel8.Location = new Point(3, 53);
-            tableLayoutPanel8.Name = "tableLayoutPanel8";
-            tableLayoutPanel8.RowCount = 2;
-            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 8.135593F));
-            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 91.86441F));
-            tableLayoutPanel8.Size = new Size(530, 300);
-            tableLayoutPanel8.TabIndex = 1;
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.Dock = DockStyle.Fill;
-            label13.Location = new Point(0, 0);
-            label13.Margin = new Padding(0);
-            label13.Name = "label13";
-            label13.Padding = new Padding(0, 3, 0, 0);
-            label13.Size = new Size(530, 24);
-            label13.TabIndex = 0;
-            label13.Text = "You may add a record with or without both pieces of information.";
-            label13.TextAlign = ContentAlignment.TopCenter;
             // 
             // tabMessages
             // 
@@ -3561,12 +3585,12 @@ namespace BHD_RemoteClient.Forms
             ((System.ComponentModel.ISupportInitialize)dg_playerNames).EndInit();
             groupBox8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dg_IPAddresses).EndInit();
+            panel8.ResumeLayout(false);
+            groupBox10.ResumeLayout(false);
             tableLayoutPanel6.ResumeLayout(false);
             groupBox9.ResumeLayout(false);
             tableLayoutPanel7.ResumeLayout(false);
             tableLayoutPanel7.PerformLayout();
-            tableLayoutPanel8.ResumeLayout(false);
-            tableLayoutPanel8.PerformLayout();
             tabMessages.ResumeLayout(false);
             tabMessagesControl.ResumeLayout(false);
             tabAuto.ResumeLayout(false);
@@ -3783,13 +3807,10 @@ namespace BHD_RemoteClient.Forms
         private DataGridViewTextBoxColumn playerName;
         private DataGridViewTextBoxColumn ipRecordID;
         private DataGridViewTextBoxColumn address;
-        private TableLayoutPanel tableLayoutPanel6;
         private GroupBox groupBox9;
         private TableLayoutPanel tableLayoutPanel7;
         private ComboBox cb_banSubMask;
         private Button btn_addBan;
-        private TableLayoutPanel tableLayoutPanel8;
-        private Label label13;
         internal TabControl tabControl;
         internal DataGridView dg_playerNames;
         internal DataGridView dg_IPAddresses;
@@ -3866,5 +3887,10 @@ namespace BHD_RemoteClient.Forms
         private Button button1;
         public FontAwesome.Sharp.IconButton ib_resetCurrentMaps;
         public DataGridView dg_AdminUsers;
+        private Panel panel8;
+        private GroupBox groupBox10;
+        private TableLayoutPanel tableLayoutPanel6;
+        private Button btn_banExport;
+        private Button btn_banImport;
     }
 }

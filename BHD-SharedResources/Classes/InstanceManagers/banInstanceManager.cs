@@ -14,6 +14,8 @@ namespace BHD_SharedResources.Classes.InstanceManagers
         public static bool RemoveBannedPlayerAddress(int recordId) => Implementation.RemoveBannedPlayerAddress(recordId);
         public static bool RemoveBannedPlayerBoth(int recordId) => Implementation.RemoveBannedPlayerBoth(recordId);
         public static void UpdateBannedTables() => Implementation.UpdateBannedTables();
-
+        public static void ExportSettings() => Implementation.ExportSettings();
+        public static void ImportSettings() => Implementation.ImportSettings();
+        public static void ImportSettingsFromBase64(string encodedData, string fileType) => Implementation.ImportSettingsFromBase64(encodedData, fileType);
     }
 }

@@ -966,6 +966,35 @@ namespace BHD_RemoteClient.Forms
         {
             theInstanceManager.ExportSettings();
         }
+
+        private void actionClick_exportBanSettings(object sender, EventArgs e)
+        {
+            banInstanceManager.ExportSettings();
+        }
+
+        private void actionClick_importBanSettings(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                "Do you want to clear existing bans before importing new ones?",
+                "Clear Existing Bans",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                CmdImportBanSettings.ImportSettings(true);
+            }
+            else if (result == DialogResult.No)
+            {
+                CmdImportBanSettings.ImportSettings();
+            }
+            else
+            {
+                // User cancelled the import
+                return;
+            }
+
+            
+        }
     }
 }
 

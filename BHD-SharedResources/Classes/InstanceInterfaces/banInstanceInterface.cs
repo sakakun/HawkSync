@@ -11,6 +11,9 @@ namespace BHD_SharedResources.Classes.InstanceInterfaces
         bool RemoveBannedPlayerAddress(int recordId);
         bool RemoveBannedPlayerBoth(int recordId);
         void UpdateBannedTables();
+        void ExportSettings();
+        void ImportSettings();
+        void ImportSettingsFromBase64(string encodedData, string fileType);
 
     }
 }
