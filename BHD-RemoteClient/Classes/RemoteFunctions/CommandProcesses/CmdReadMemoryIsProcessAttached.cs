@@ -16,11 +16,17 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 CommandData = string.Empty
             };
 
-            var response = theRemoteClient.SendCommandAndGetResponse(packet);
-
-            AppDebug.Log("CmdReadMemoryIsProcessAttached", JsonSerializer.Serialize(response));
-
-            return response!.Success;
+            try
+            {
+                var response = theRemoteClient.SendCommandAndGetResponse(packet);
+                AppDebug.Log("CmdReadMemoryIsProcessAttached", JsonSerializer.Serialize(response));
+                return response?.Success == true ? true : false;
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("CmdReadMemoryIsProcessAttached", ex.Message);
+                return false;
+            }
         }
     }
 }

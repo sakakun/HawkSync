@@ -135,6 +135,10 @@ namespace BHD_SharedResources.Classes.Instances
         public int gameInfoCurrentMapIndex { get; set; } = 0;             /* Current Map Index, used for the Info Panel */
         public int gameInfoNextMapGameType { get; set; } = 0;             /* Next Map Game Type, used for the Info Panel */
 
+        // Instance Update Statements
+        public bool banInstanceUpdated { get; set; } = false;
+
+
         // Player Team Information
         public Dictionary<int, playerObject> playerList { get; set; } = new();
         public List<playerTeamObject> playerChangeTeamList { get; set; } = new();
