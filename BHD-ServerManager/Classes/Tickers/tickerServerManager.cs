@@ -6,6 +6,8 @@ using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -61,11 +63,14 @@ namespace BHD_ServerManager.Classes.Tickers
             // If server process is not attached, set status to offline and update UI
             if (!ServerMemory.ReadMemoryIsProcessAttached())
             {
-                theInstance.instanceStatus = InstanceStatus.OFFLINE;
-                SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());
-                theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);
-                theInstance.instanceLastUpdateTime = currentTime;
-                return;
+                if (!StartServer.CheckForExistingProcess())
+                {
+                    theInstance.instanceStatus = InstanceStatus.OFFLINE;
+                    SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());
+                    theInstance.instanceNextUpdateTime = currentTime.AddSeconds(20);
+                    theInstance.instanceLastUpdateTime = currentTime;
+                    return;
+                }
             }
 
             // --- Server is online: run status-specific logic in order ---
@@ -78,6 +83,7 @@ namespace BHD_ServerManager.Classes.Tickers
             ServerMemory.ReadMemoryCurrentGameType();
             ServerMemory.ReadMemoryCurrentNumPlayers();
             ServerMemory.UpdateGlobalGameType();
+            ServerMemory.UpdateGameScores();                                        // Update game score limits
             ServerMemory.UpdateMapCycleCounter();
 
             // 2. Loading Map
@@ -85,7 +91,6 @@ namespace BHD_ServerManager.Classes.Tickers
             {
                 tickerEvent_preGameProcessing();                                    // Run pre-game processing
                 ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
-                ServerMemory.UpdateGameScores();                                    // Update game score limits
             }
             // 3. Start Delay
             else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
@@ -129,7 +134,7 @@ namespace BHD_ServerManager.Classes.Tickers
             else if (theInstance.instanceStatus == InstanceStatus.SCORING)
             {
                 tickerEvent_scoringGameProcessing();                                // Run scoring processing
-                ServerMemory.UpdateGameScores();                                    // Update game score limits
+
                 ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable     
             }
 
@@ -245,5 +250,6 @@ namespace BHD_ServerManager.Classes.Tickers
             AppDebug.Log("tickerServerManagement", "Scoreboard Timer Complete");    // Log the completion of the scoreboard timer
             CommonCore.Ticker?.Stop("ScoreboardTicker");                            // Stop the scoreboard ticker
         }
+
     }
 }

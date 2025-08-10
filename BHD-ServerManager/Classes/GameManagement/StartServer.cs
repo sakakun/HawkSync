@@ -370,6 +370,42 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
 
         }
+
+        // Function: CheckForExistingProcess
+        public static bool CheckForExistingProcess()
+        {
+            string file_name = "dfbhd.exe";
+            string FullFileName = Path.Combine(thisInstance.profileServerPath!, file_name);
+            string windowTitle = $"BHD Server - {thisInstance.gameServerName}";
+
+            // Is there an instance already running? Locate by the profileServerPath
+            foreach (var searchProcess in Process.GetProcesses())
+            {
+                try
+                {
+                    if (string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
+                        thisInstance.instanceAttachedPID = searchProcess.Id;
+                        thisInstance.instanceProcessHandle = searchProcess.Handle;
+
+                        SetProcessWindowTitle(searchProcess, windowTitle);
+
+                        ServerMemory.AttachToGameProcess();
+
+                        return true;
+                    }
+                }
+                catch (Win32Exception)
+                {
+                    // Skip processes we can't access
+                    continue;
+                }
+            }
+            
+            return false;
+        }
+
         // Function: CmdStartGame
         public static bool startGame()
         {
@@ -379,30 +415,8 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             try
             {
-                // Is there an instance already running? Locate by the profileServerPath
-                foreach (var searchProcess in Process.GetProcesses())
-                {
-                    try
-                    {
-                        if (string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
-                            thisInstance.instanceAttachedPID = searchProcess.Id;
-                            thisInstance.instanceProcessHandle = searchProcess.Handle;
-
-                            SetProcessWindowTitle(searchProcess, windowTitle);
-
-                            ServerMemory.AttachToGameProcess();
-
-                            return true;
-                        }
-                    }
-                    catch (Win32Exception)
-                    {
-                        // Skip processes we can't access
-                        continue;
-                    }
-                }
+                
+                if (CheckForExistingProcess()) { return true; }
 
                 Debug.WriteLine("No existing game process found, starting a new instance...");
 
