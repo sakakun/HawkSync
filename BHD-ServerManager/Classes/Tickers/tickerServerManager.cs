@@ -75,17 +75,17 @@ namespace BHD_ServerManager.Classes.Tickers
 
             // --- Server is online: run status-specific logic in order ---
             // 1. Always update status and basic info
-            ServerMemory.ReadMemoryServerStatus();
-            SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());
-            ServerMemory.UpdateNovaID();
-            ServerMemory.ReadMemoryGameTimeLeft();
-            ServerMemory.ReadMemoryCurrentMissionName();
-            ServerMemory.ReadMemoryCurrentGameType();
-            ServerMemory.ReadMemoryCurrentNumPlayers();
-            ServerMemory.UpdateGlobalGameType();
-            ServerMemory.UpdateNextMapGameType();
-            ServerMemory.UpdateGameScores();
-            ServerMemory.UpdateMapCycleCounter();
+            ServerMemory.ReadMemoryServerStatus();                                  // Server Status
+            SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());  // Update Server Status
+            ServerMemory.UpdateNovaID();                                            // Nova ID Update
+            ServerMemory.ReadMemoryGameTimeLeft();                                  // Time Left in the Current Game
+            ServerMemory.ReadMemoryCurrentMissionName();                            // Get Current Mission Name
+            ServerMemory.ReadMemoryCurrentGameType();                               // Get Current Game Type
+            ServerMemory.ReadMemoryCurrentNumPlayers();                             // Get Current Number of Players
+            ServerMemory.UpdateGlobalGameType();                                    // Pinger Game Type Update
+            ServerMemory.UpdateNextMapGameType();                                   // Grab the Current Map Type and the Next Map Type
+            ServerMemory.UpdateGameScores();                                        // Update the Scores Required to Win the Game
+            ServerMemory.UpdateMapCycleCounter();                                   // Map Cycle Counter (How Maps Have Been Played)
 
             // 2. Loading Map
             if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)

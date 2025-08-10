@@ -1046,7 +1046,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static void UpdateMapCycleCounter()
         {
 
-
             byte[] currentMapCycleCountBytes = new byte[4];
             int currentMapCycleCountRead = 0;
 
