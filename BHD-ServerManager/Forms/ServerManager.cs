@@ -1,4 +1,5 @@
 using BHD_ServerManager.Classes.RemoteFunctions;
+using BHD_ServerManager.Forms.Panels;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
@@ -21,6 +22,9 @@ namespace BHD_ServerManager.Forms
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static adminInstance instanceAdmin => CommonCore.instanceAdmin!;
 
+        // Server Manager Tabs
+        public tabProfile ProfileTab = null!;                   // The Profile Tab User Control
+
         // ServerManager Local Variables
         private bool _updatingWeaponCheckboxes = false; // Prevent recursion
         private List<CheckBox> weaponCheckboxes = new();
@@ -33,6 +37,8 @@ namespace BHD_ServerManager.Forms
 
         private void PostServerManagerInitalization(object? sender, EventArgs e)
         {
+            functionEvent_loadPanels();                                         // Load the User Control Tabs
+
             functionEvent_InitializeWeaponCheckboxes();
 
             theInstanceManager.CheckSettings();
@@ -53,6 +59,12 @@ namespace BHD_ServerManager.Forms
             functionEvent_UpdateSlapMessages();
             adminInstanceManager.UpdateAdminLogDialog();
             ActionClick_AdminNewUser(null!, null!);
+        }
+
+        private void functionEvent_loadPanels()
+        {
+            // Load the User Controls into the TabPages
+            tabProfile.Controls.Add(ProfileTab = new tabProfile());
         }
 
         // --- UI Thread Helper ---

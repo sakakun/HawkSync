@@ -295,6 +295,7 @@ namespace BHD_ServerManager.Forms
             tb_adminPass = new TextBox();
             openFileDialog = new OpenFileDialog();
             toolTip = new ToolTip(components);
+            tabProfile = new TabPage();
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
@@ -451,6 +452,7 @@ namespace BHD_ServerManager.Forms
             // 
             // tabControl
             // 
+            tabControl.Controls.Add(tabProfile);
             tabControl.Controls.Add(tabServer);
             tabControl.Controls.Add(tabMaps);
             tabControl.Controls.Add(tabPlayers);
@@ -475,7 +477,7 @@ namespace BHD_ServerManager.Forms
             tabServer.Padding = new Padding(3);
             tabServer.Size = new Size(902, 362);
             tabServer.TabIndex = 0;
-            tabServer.Text = "Server";
+            tabServer.Text = "Game Server";
             tabServer.UseVisualStyleBackColor = true;
             // 
             // splitContainer
@@ -3485,6 +3487,15 @@ namespace BHD_ServerManager.Forms
             // 
             openFileDialog.FileName = "openFileDialog";
             // 
+            // tabProfile
+            // 
+            tabProfile.Location = new Point(4, 24);
+            tabProfile.Name = "tabProfile";
+            tabProfile.Size = new Size(902, 362);
+            tabProfile.TabIndex = 8;
+            tabProfile.Text = "Game Profile";
+            tabProfile.UseVisualStyleBackColor = true;
+            // 
             // ServerManager
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3892,5 +3903,6 @@ namespace BHD_ServerManager.Forms
         private TableLayoutPanel tableLayoutPanel6;
         private Button btn_banExport;
         private Button btn_banImport;
+        private TabPage tabProfile;
     }
 }
