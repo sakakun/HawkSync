@@ -31,24 +31,24 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             profileFileManagers = new TabControl();
             tabProfilePage1 = new TabPage();
+            label_NotInUse1 = new Label();
             tabProfilePage2 = new TabPage();
+            label2 = new Label();
             tableLayoutPanel2 = new TableLayoutPanel();
             gp_profileSettings = new GroupBox();
+            cb_profileModifierList2 = new CheckedListBox();
+            cb_profileModifierList1 = new CheckedListBox();
+            btn_profileBrowse2 = new Button();
+            tb_modFile = new TextBox();
+            label1 = new Label();
+            btn_profileBrowse1 = new Button();
+            label_profileServerPath = new Label();
+            tb_profileServerPath = new TextBox();
             panel1 = new Panel();
             btn_resetProfile = new Button();
             btn_saveProfile = new Button();
-            tb_profileServerPath = new TextBox();
-            label_profileServerPath = new Label();
-            btn_profileBrowse1 = new Button();
-            label1 = new Label();
-            tb_modFile = new TextBox();
-            btn_profileBrowse2 = new Button();
-            cb_profileModifierList1 = new CheckedListBox();
             folderProfileBrowserDialog = new FolderBrowserDialog();
             openFileDialog1 = new OpenFileDialog();
-            cb_profileModifierList2 = new CheckedListBox();
-            label_NotInUse1 = new Label();
-            label2 = new Label();
             tableLayoutPanel1.SuspendLayout();
             profileFileManagers.SuspendLayout();
             tabProfilePage1.SuspendLayout();
@@ -95,6 +95,15 @@
             tabProfilePage1.Text = "HawkSync";
             tabProfilePage1.UseVisualStyleBackColor = true;
             // 
+            // label_NotInUse1
+            // 
+            label_NotInUse1.AutoSize = true;
+            label_NotInUse1.Location = new Point(164, 181);
+            label_NotInUse1.Name = "label_NotInUse1";
+            label_NotInUse1.Size = new Size(214, 15);
+            label_NotInUse1.TabIndex = 0;
+            label_NotInUse1.Text = "File Manager Feature Not Implemented";
+            // 
             // tabProfilePage2
             // 
             tabProfilePage2.Controls.Add(label2);
@@ -105,6 +114,15 @@
             tabProfilePage2.TabIndex = 1;
             tabProfilePage2.Text = "Game Server";
             tabProfilePage2.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(164, 181);
+            label2.Name = "label2";
+            label2.Size = new Size(214, 15);
+            label2.TabIndex = 1;
+            label2.Text = "File Manager Feature Not Implemented";
             // 
             // tableLayoutPanel2
             // 
@@ -139,6 +157,80 @@
             gp_profileSettings.TabStop = false;
             gp_profileSettings.Text = "Profile Settings";
             // 
+            // cb_profileModifierList2
+            // 
+            cb_profileModifierList2.FormattingEnabled = true;
+            cb_profileModifierList2.Items.AddRange(new object[] { "/shadowmap", "/s", "/NOSTAT", "/NETLOG", "/NETFLOW", "/SYSDUMP", "/NOSYSDUMP", "/STACKTRACE", "/NOSTACKTRACE", "/LOADBAR", "/DUMP" });
+            cb_profileModifierList2.Location = new Point(177, 103);
+            cb_profileModifierList2.Name = "cb_profileModifierList2";
+            cb_profileModifierList2.Size = new Size(165, 202);
+            cb_profileModifierList2.TabIndex = 7;
+            // 
+            // cb_profileModifierList1
+            // 
+            cb_profileModifierList1.FormattingEnabled = true;
+            cb_profileModifierList1.Items.AddRange(new object[] { "/D", "/WDM", "/FRISK", "/mod", "/betamp", "/noreload", "/w", "/autorestart", "/L", "/BADPACKETS", "/PUNT.TXT" });
+            cb_profileModifierList1.Location = new Point(6, 103);
+            cb_profileModifierList1.Name = "cb_profileModifierList1";
+            cb_profileModifierList1.Size = new Size(165, 202);
+            cb_profileModifierList1.TabIndex = 6;
+            // 
+            // btn_profileBrowse2
+            // 
+            btn_profileBrowse2.Enabled = false;
+            btn_profileBrowse2.FlatStyle = FlatStyle.Flat;
+            btn_profileBrowse2.Location = new Point(267, 74);
+            btn_profileBrowse2.Name = "btn_profileBrowse2";
+            btn_profileBrowse2.Size = new Size(75, 23);
+            btn_profileBrowse2.TabIndex = 5;
+            btn_profileBrowse2.Text = "Browse";
+            btn_profileBrowse2.UseVisualStyleBackColor = true;
+            btn_profileBrowse2.Click += actionClick_profileOpenFileDialog;
+            // 
+            // tb_modFile
+            // 
+            tb_modFile.Enabled = false;
+            tb_modFile.Location = new Point(6, 74);
+            tb_modFile.Name = "tb_modFile";
+            tb_modFile.Size = new Size(255, 23);
+            tb_modFile.TabIndex = 4;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(208, 56);
+            label1.Name = "label1";
+            label1.Size = new Size(53, 15);
+            label1.TabIndex = 3;
+            label1.Text = "Mod File";
+            // 
+            // btn_profileBrowse1
+            // 
+            btn_profileBrowse1.FlatStyle = FlatStyle.Flat;
+            btn_profileBrowse1.Location = new Point(267, 20);
+            btn_profileBrowse1.Name = "btn_profileBrowse1";
+            btn_profileBrowse1.Size = new Size(75, 23);
+            btn_profileBrowse1.TabIndex = 2;
+            btn_profileBrowse1.Text = "Browse";
+            btn_profileBrowse1.UseVisualStyleBackColor = true;
+            btn_profileBrowse1.Click += actionClick_profileOpenFolderDialog;
+            // 
+            // label_profileServerPath
+            // 
+            label_profileServerPath.AutoSize = true;
+            label_profileServerPath.Location = new Point(6, 46);
+            label_profileServerPath.Name = "label_profileServerPath";
+            label_profileServerPath.Size = new Size(100, 15);
+            label_profileServerPath.TabIndex = 1;
+            label_profileServerPath.Text = "Game Server Path";
+            // 
+            // tb_profileServerPath
+            // 
+            tb_profileServerPath.Location = new Point(6, 20);
+            tb_profileServerPath.Name = "tb_profileServerPath";
+            tb_profileServerPath.Size = new Size(255, 23);
+            tb_profileServerPath.TabIndex = 0;
+            // 
             // panel1
             // 
             panel1.Controls.Add(btn_resetProfile);
@@ -157,6 +249,7 @@
             btn_resetProfile.TabIndex = 1;
             btn_resetProfile.Text = "Reset";
             btn_resetProfile.UseVisualStyleBackColor = true;
+            btn_resetProfile.Click += actionClick_ResetProfile;
             // 
             // btn_saveProfile
             // 
@@ -168,97 +261,9 @@
             btn_saveProfile.UseVisualStyleBackColor = true;
             btn_saveProfile.Click += actionClick_SaveProfile;
             // 
-            // tb_profileServerPath
-            // 
-            tb_profileServerPath.Location = new Point(6, 20);
-            tb_profileServerPath.Name = "tb_profileServerPath";
-            tb_profileServerPath.Size = new Size(255, 23);
-            tb_profileServerPath.TabIndex = 0;
-            // 
-            // label_profileServerPath
-            // 
-            label_profileServerPath.AutoSize = true;
-            label_profileServerPath.Location = new Point(6, 46);
-            label_profileServerPath.Name = "label_profileServerPath";
-            label_profileServerPath.Size = new Size(100, 15);
-            label_profileServerPath.TabIndex = 1;
-            label_profileServerPath.Text = "Game Server Path";
-            // 
-            // btn_profileBrowse1
-            // 
-            btn_profileBrowse1.FlatStyle = FlatStyle.Flat;
-            btn_profileBrowse1.Location = new Point(267, 20);
-            btn_profileBrowse1.Name = "btn_profileBrowse1";
-            btn_profileBrowse1.Size = new Size(75, 23);
-            btn_profileBrowse1.TabIndex = 2;
-            btn_profileBrowse1.Text = "Browse";
-            btn_profileBrowse1.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(208, 56);
-            label1.Name = "label1";
-            label1.Size = new Size(53, 15);
-            label1.TabIndex = 3;
-            label1.Text = "Mod File";
-            // 
-            // tb_modFile
-            // 
-            tb_modFile.Location = new Point(6, 74);
-            tb_modFile.Name = "tb_modFile";
-            tb_modFile.Size = new Size(255, 23);
-            tb_modFile.TabIndex = 4;
-            // 
-            // btn_profileBrowse2
-            // 
-            btn_profileBrowse2.FlatStyle = FlatStyle.Flat;
-            btn_profileBrowse2.Location = new Point(267, 74);
-            btn_profileBrowse2.Name = "btn_profileBrowse2";
-            btn_profileBrowse2.Size = new Size(75, 23);
-            btn_profileBrowse2.TabIndex = 5;
-            btn_profileBrowse2.Text = "Browse";
-            btn_profileBrowse2.UseVisualStyleBackColor = true;
-            // 
-            // cb_profileModifierList1
-            // 
-            cb_profileModifierList1.FormattingEnabled = true;
-            cb_profileModifierList1.Items.AddRange(new object[] { "/D", "/WDM", "/FRISK", "/mod", "/betamp", "/noreload", "/w", "/autorestart", "/L", "/BADPACKETS", "/PUNT.TXT" });
-            cb_profileModifierList1.Location = new Point(6, 103);
-            cb_profileModifierList1.Name = "cb_profileModifierList1";
-            cb_profileModifierList1.Size = new Size(165, 202);
-            cb_profileModifierList1.TabIndex = 6;
-            // 
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openModFileDialog";
-            // 
-            // cb_profileModifierList2
-            // 
-            cb_profileModifierList2.FormattingEnabled = true;
-            cb_profileModifierList2.Items.AddRange(new object[] { "/shadowmap", "/s", "/NOSTAT", "/NETLOG", "/NETFLOW", "/SYSDUMP", "/NOSYSDUMP", "/STACKTRACE", "/NOSTACKTRACE", "/LOADBAR", "/DUMP" });
-            cb_profileModifierList2.Location = new Point(177, 103);
-            cb_profileModifierList2.Name = "cb_profileModifierList2";
-            cb_profileModifierList2.Size = new Size(165, 202);
-            cb_profileModifierList2.TabIndex = 7;
-            // 
-            // label_NotInUse1
-            // 
-            label_NotInUse1.AutoSize = true;
-            label_NotInUse1.Location = new Point(164, 181);
-            label_NotInUse1.Name = "label_NotInUse1";
-            label_NotInUse1.Size = new Size(214, 15);
-            label_NotInUse1.TabIndex = 0;
-            label_NotInUse1.Text = "File Manager Feature Not Implemented";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(164, 181);
-            label2.Name = "label2";
-            label2.Size = new Size(214, 15);
-            label2.TabIndex = 1;
-            label2.Text = "File Manager Feature Not Implemented";
             // 
             // tabProfile
             // 

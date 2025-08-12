@@ -42,23 +42,26 @@ namespace BHD_ServerManager.Classes.Tickers
             // Functions that run all the time, even offline
             HandleRemoteServer();
 
-            // UI updates that should always run
-            SafeInvoke(thisServer, () =>
-            {
-                thisServer.functionEvent_swapFieldsStartStop();
-                adminInstanceManager.UpdateAdminLogDialog();
-            });
-
-            // UI Updates Regardless of Server Status
-            adminInstanceManager.UpdateAdminLogDialog();                                        // Admin Log Tab
-            SafeInvoke(thisServer, () => theInstanceManager.HighlightDifferences());            // Instance Settings Differences Check
-            tickerEvent_checkMapDiff();                                                         // Map Playlist Difference Check
-            tickerEvent_updateLabels(thisServer);                                               // Update the Labels on the UI
-
             // Only run the rest if it's time for an update
             DateTime currentTime = DateTime.Now;
             if (DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) >= 0)
                 return;
+
+            // UI updates that should always run
+            SafeInvoke(thisServer, () =>
+            {
+                // --- UI Update Hooks ---
+                thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
+
+                thisServer.functionEvent_swapFieldsStartStop();                                 // Swap Start/Stop Fields
+                adminInstanceManager.UpdateAdminLogDialog();                                    // Update Admin Log Dialog
+                theInstanceManager.HighlightDifferences();                                      // Highlight differences in the UI (Settings)
+                tickerEvent_checkMapDiff();                                                     // Map Playlist Difference Check
+                tickerEvent_updateLabels(thisServer);                                           // Update the Labels on the UI
+            });
+
+
+            
 
             // If server process is not attached, set status to offline and update UI
             if (!ServerMemory.ReadMemoryIsProcessAttached())

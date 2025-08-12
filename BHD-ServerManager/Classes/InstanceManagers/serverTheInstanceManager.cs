@@ -156,10 +156,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 AppDebug.Log("InstanceManager", "Profile server path is invalid or does not exist.");
                 MessageBox.Show("The profile server path is invalid or does not exist.  Please 'set' your server path and refresh your map list before starting the server.", "Invalid Profile Server Path", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                thisServer.btn_UpdatePath.Visible = true; // Enable the button to allow user to set the path
+                // thisServer.btn_UpdatePath.Visible = true; // Enable the button to allow user to set the path
                 return false;
             }
-            thisServer.btn_UpdatePath.Visible = false;
+            // thisServer.btn_UpdatePath.Visible = false;
             return true;
         }
         public void GetServerVariables(bool import = false, theInstance updatedInstance = null!)

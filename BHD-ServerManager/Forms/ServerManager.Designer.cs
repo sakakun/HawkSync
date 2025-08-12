@@ -38,10 +38,10 @@ namespace BHD_ServerManager.Forms
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             toolStrip = new ToolStrip();
-            btn_UpdatePath = new FontAwesome.Sharp.IconToolStripButton();
             toolStripStatus = new ToolStripLabel();
             mainPanel = new Panel();
             tabControl = new TabControl();
+            tabProfile = new TabPage();
             tabServer = new TabPage();
             splitContainer = new SplitContainer();
             panelLeft = new Panel();
@@ -295,7 +295,6 @@ namespace BHD_ServerManager.Forms
             tb_adminPass = new TextBox();
             openFileDialog = new OpenFileDialog();
             toolTip = new ToolTip(components);
-            tabProfile = new TabPage();
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
@@ -413,26 +412,12 @@ namespace BHD_ServerManager.Forms
             // toolStrip
             // 
             toolStrip.Dock = DockStyle.Bottom;
-            toolStrip.Items.AddRange(new ToolStripItem[] { btn_UpdatePath, toolStripStatus });
+            toolStrip.Items.AddRange(new ToolStripItem[] { toolStripStatus });
             toolStrip.Location = new Point(0, 400);
             toolStrip.Name = "toolStrip";
             toolStrip.Size = new Size(920, 25);
             toolStrip.TabIndex = 1;
             toolStrip.Text = "toolStrip";
-            // 
-            // btn_UpdatePath
-            // 
-            btn_UpdatePath.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            btn_UpdatePath.IconChar = FontAwesome.Sharp.IconChar.CircleExclamation;
-            btn_UpdatePath.IconColor = Color.Red;
-            btn_UpdatePath.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btn_UpdatePath.ImageTransparentColor = Color.Magenta;
-            btn_UpdatePath.Name = "btn_UpdatePath";
-            btn_UpdatePath.Size = new Size(23, 22);
-            btn_UpdatePath.Text = "Fix Game Server Path!";
-            btn_UpdatePath.ToolTipText = "Click here to fix Game Server Path";
-            btn_UpdatePath.Visible = false;
-            btn_UpdatePath.Click += actionClick_SetServerPath;
             // 
             // toolStripStatus
             // 
@@ -468,6 +453,15 @@ namespace BHD_ServerManager.Forms
             tabControl.SelectedIndex = 0;
             tabControl.Size = new Size(910, 390);
             tabControl.TabIndex = 0;
+            // 
+            // tabProfile
+            // 
+            tabProfile.Location = new Point(4, 24);
+            tabProfile.Name = "tabProfile";
+            tabProfile.Size = new Size(902, 362);
+            tabProfile.TabIndex = 8;
+            tabProfile.Text = "Game Profile";
+            tabProfile.UseVisualStyleBackColor = true;
             // 
             // tabServer
             // 
@@ -3487,15 +3481,6 @@ namespace BHD_ServerManager.Forms
             // 
             openFileDialog.FileName = "openFileDialog";
             // 
-            // tabProfile
-            // 
-            tabProfile.Location = new Point(4, 24);
-            tabProfile.Name = "tabProfile";
-            tabProfile.Size = new Size(902, 362);
-            tabProfile.TabIndex = 8;
-            tabProfile.Text = "Game Profile";
-            tabProfile.UseVisualStyleBackColor = true;
-            // 
             // ServerManager
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3885,7 +3870,6 @@ namespace BHD_ServerManager.Forms
         private TextBox tb_adminPass;
         internal CheckBox cb_enableRemote;
         internal NumericUpDown num_remotePort;
-        public FontAwesome.Sharp.IconToolStripButton btn_UpdatePath;
         public DataGridView dg_playerNames;
         public DataGridView dg_IPAddresses;
         private TableLayoutPanel tableLayoutPanel20;

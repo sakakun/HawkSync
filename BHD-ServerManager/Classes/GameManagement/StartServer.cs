@@ -378,8 +378,8 @@ namespace BHD_ServerManager.Classes.GameManagement
             string FullFileName = Path.Combine(thisInstance.profileServerPath!, file_name);
             string windowTitle = $"BHD Server - {thisInstance.gameServerName}";
 
-            // Is there an instance already running? Locate by the profileServerPath
-            foreach (var searchProcess in Process.GetProcesses())
+            // Filter by process name first (much faster)
+            foreach (var searchProcess in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file_name)))
             {
                 try
                 {
@@ -402,7 +402,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     continue;
                 }
             }
-            
+
             return false;
         }
 
