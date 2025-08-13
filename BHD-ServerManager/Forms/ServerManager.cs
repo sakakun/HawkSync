@@ -24,10 +24,9 @@ namespace BHD_ServerManager.Forms
 
         // Server Manager Tabs
         public tabProfile ProfileTab = null!;                   // The Profile Tab User Control
+        public tabServer  ServerTab  = null!;                   // The Server Tab User Control
 
-        // ServerManager Local Variables
-        private bool _updatingWeaponCheckboxes = false; // Prevent recursion
-        private List<CheckBox> weaponCheckboxes = new();
+
 
         public ServerManager()
         {
@@ -38,8 +37,6 @@ namespace BHD_ServerManager.Forms
         private void PostServerManagerInitalization(object? sender, EventArgs e)
         {
             functionEvent_loadPanels();                                         // Load the User Control Tabs
-
-            functionEvent_InitializeWeaponCheckboxes();
 
             theInstanceManager.CheckSettings();
             banInstanceManager.LoadSettings();
@@ -65,6 +62,7 @@ namespace BHD_ServerManager.Forms
         {
             // Load the User Controls into the TabPages
             tabProfile.Controls.Add(ProfileTab = new tabProfile());
+            tabServer.Controls.Add(ServerTab = new tabServer());
         }
 
         // --- UI Thread Helper ---
@@ -74,42 +72,6 @@ namespace BHD_ServerManager.Forms
                 control.Invoke(action);
             else
                 action();
-        }
-
-        // --- Weapon Checkbox Logic ---
-        private void functionEvent_InitializeWeaponCheckboxes()
-        {
-            weaponCheckboxes = new()
-            {
-                cb_weapColt45, cb_weapM9Bereatta, cb_weapCAR15, cb_weapCAR15203, cb_weapM16, cb_weapM16203,
-                cb_weapG3, cb_weapG36, cb_weapM60, cb_weapM240, cb_weapMP5, cb_weapSaw, cb_weap300Tact,
-                cb_weapM21, cb_weapM24, cb_weapBarret, cb_weapPSG1, cb_weapShotgun, cb_weapFragGrenade,
-                cb_weapSmokeGrenade, cb_weapSatchel, cb_weapAT4, cb_weapFlashBang, cb_weapClay
-            };
-        }
-
-        private void actionClick_WeaponCheckedChanged(object sender, EventArgs e)
-        {
-            if (_updatingWeaponCheckboxes) return;
-            _updatingWeaponCheckboxes = true;
-
-            if (sender == checkBox_selectAll && checkBox_selectAll.Checked)
-            {
-                weaponCheckboxes.ForEach(cb => cb.Checked = true);
-                checkBox_selectNone.Checked = false;
-            }
-            else if (sender == checkBox_selectNone && checkBox_selectNone.Checked)
-            {
-                weaponCheckboxes.ForEach(cb => cb.Checked = false);
-                checkBox_selectAll.Checked = false;
-            }
-            else if (weaponCheckboxes.Contains(sender))
-            {
-                checkBox_selectAll.Checked = weaponCheckboxes.All(cb => cb.Checked);
-                checkBox_selectNone.Checked = weaponCheckboxes.All(cb => !cb.Checked);
-            }
-
-            _updatingWeaponCheckboxes = false;
         }
 
         // --- Server Status and Controls ---
@@ -136,11 +98,11 @@ namespace BHD_ServerManager.Forms
 
             bool isOffline = thisInstance.instanceStatus == InstanceStatus.OFFLINE;
 
-            btn_startStop.Text = isOffline ? "Start Server" : "Stop Server";
+            ServerTab.btn_serverControl.Text = isOffline ? "START" : "STOP";
 
             SetControlsEnabled(new Control[]
             {
-                cb_serverIP, num_serverPort, cb_serverDedicated, tb_serverPassword, cb_enableRemote, num_remotePort
+                ServerTab.cb_serverIP, ServerTab.num_serverPort, ServerTab.cb_serverDedicated, ServerTab.tb_serverPassword, ServerTab.cb_enableRemote, ServerTab.num_remotePort
             }, isOffline);
 
             SetControlsEnabled(new Control[]
@@ -153,35 +115,6 @@ namespace BHD_ServerManager.Forms
         {
             foreach (var control in controls)
                 control.Enabled = enabled;
-        }
-
-        private void actionClick_resetServerChanges(object sender, EventArgs e) => theInstanceManager.GetServerVariables();
-
-        private void actionClick_SetServerPath(object sender, EventArgs e)
-        {
-            using OpenFileDialog openFileDialog = new()
-            {
-                InitialDirectory = @"C:\",
-                Filter = "dfbhd.exe|dfbhd.exe",
-                Title = "Select dfbhd.exe"
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                thisInstance.profileServerPath = Path.GetDirectoryName(openFileDialog.FileName) ?? string.Empty;
-                if (!string.IsNullOrEmpty(thisInstance.profileServerPath))
-                {
-                    MessageBox.Show($"Server Path set to: {thisInstance.profileServerPath}", "Server Path Set", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    theInstanceManager.ValidateGameServerType(thisInstance.profileServerPath);
-                    theInstanceManager.SetServerVariables();
-                    theInstanceManager.SaveSettings();
-                    MessageBox.Show("Server path has been set successfully. Settings updated and saved.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Failed to set server path. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
         }
 
         private void actionClick_saveUpdateSettings(object sender, EventArgs e)
@@ -213,10 +146,10 @@ namespace BHD_ServerManager.Forms
             }
         }
 
-        private void actionClick_enableFFkills(object sender, EventArgs e) => num_maxFFKills.Enabled = cb_enableFFkills.Checked;
-        private void actionClick_enableMinCheck(object sender, EventArgs e) => num_minPing.Enabled = cb_enableMinCheck.Checked;
-        private void actionClick_enableMaxPing(object sender, EventArgs e) => num_maxPing.Enabled = cb_enableMaxCheck.Checked;
-        private void ActionClick_ToggleRemoteAccess(object sender, EventArgs e) => num_remotePort.Enabled = cb_enableRemote.Checked;
+        private void actionClick_enableFFkills(object sender, EventArgs e) => ServerTab.num_maxFFKills.Enabled = ServerTab.cb_enableFFkills.Checked;
+        private void actionClick_enableMinCheck(object sender, EventArgs e) => ServerTab.num_minPing.Enabled = ServerTab.cb_enableMinCheck.Checked;
+        private void actionClick_enableMaxPing(object sender, EventArgs e) => ServerTab.num_maxPing.Enabled = ServerTab.cb_enableMaxCheck.Checked;
+        private void ActionClick_ToggleRemoteAccess(object sender, EventArgs e) => ServerTab.num_remotePort.Enabled = ServerTab.cb_enableRemote.Checked;
 
         private void actionClick_importServerSettings(object sender, EventArgs e) => theInstanceManager.ImportSettings();
         private void actionClick_ExportSettings(object sender, EventArgs e) => theInstanceManager.ExportSettings();

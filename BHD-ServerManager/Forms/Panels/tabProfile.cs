@@ -23,14 +23,15 @@ namespace BHD_ServerManager.Forms.Panels
         private ServerManager theServer => Program.ServerManagerUI!;
         // --- Class Variables ---
         private new string Name = "ProfileTab";                     // Name of the tab for logging purposes.
-        private bool _firstLoadComplete = false;                            // First load flag to prevent certain actions on initial load.
+        private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
+        
         public tabProfile()
         {
             InitializeComponent();
         }
         // --- Form Functions ---
         // --- Get Profile --- Allow to be triggered externally
-        private void getProfile(object? sender, EventArgs e)
+        public void getProfile(object? sender, EventArgs e)
         {
             // Get the data from "theInterface" object and set it to the form.
             tb_profileServerPath.Text = theInstance.profileServerPath;
@@ -38,14 +39,14 @@ namespace BHD_ServerManager.Forms.Panels
             // Set checked items for cb_profileModifierList1
             for (int i = 0; i < cb_profileModifierList1.Items.Count; i++)
             {
-                string item = cb_profileModifierList1.Items[i].ToString();
+                string item = cb_profileModifierList1.Items[i].ToString()!;
                 cb_profileModifierList1.SetItemChecked(i, theInstance.profileModifierList1 != null && theInstance.profileModifierList1.Contains(item));
             }
 
             // Set checked items for cb_profileModifierList2
             for (int i = 0; i < cb_profileModifierList2.Items.Count; i++)
             {
-                string item = cb_profileModifierList2.Items[i].ToString();
+                string item = cb_profileModifierList2.Items[i].ToString()!;
                 cb_profileModifierList2.SetItemChecked(i, theInstance.profileModifierList2 != null && theInstance.profileModifierList2.Contains(item));
             }
             // if sender type is a button, open a message box to confirm the profile data has been loaded.
@@ -77,8 +78,7 @@ namespace BHD_ServerManager.Forms.Panels
             // Show a message box to confirm the save.
             MessageBox.Show("Profile settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-        // --- Toggle Profile Lock --- Allow to be triggered externally
+        // --- Ticker Profile Hook --- Allow to be triggered externally by the Server Manager Ticker
         public void tickerProfileTabHook()
         {
             if (!_firstLoadComplete)

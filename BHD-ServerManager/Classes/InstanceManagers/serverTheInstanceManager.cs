@@ -156,189 +156,20 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 AppDebug.Log("InstanceManager", "Profile server path is invalid or does not exist.");
                 MessageBox.Show("The profile server path is invalid or does not exist.  Please 'set' your server path and refresh your map list before starting the server.", "Invalid Profile Server Path", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                // thisServer.btn_UpdatePath.Visible = true; // Enable the button to allow user to set the path
+                // thisServer.ServerTab.btn_UpdatePath.Visible = true; // Enable the button to allow user to set the path
                 return false;
             }
-            // thisServer.btn_UpdatePath.Visible = false;
+            // thisServer.ServerTab.btn_UpdatePath.Visible = false;
             return true;
         }
         public void GetServerVariables(bool import = false, theInstance updatedInstance = null!)
         {
 
             var newInstance = import && updatedInstance != null ? updatedInstance : theInstance;
-
-            // Set the variables from the newInstance of the ServerManager to the variables located in tabServer
-            // Host Information (4 fields)
-            {
-
-                thisServer.tb_serverID.Text = newInstance.WebStatsProfileID;
-                thisServer.tb_serverName.Text = newInstance.gameServerName;
-                thisServer.tb_hostName.Text = newInstance.gameHostName;
-                thisServer.tb_serverMessage.Text = newInstance.gameMOTD;
-            }
-            // Server Details (6 fields)
-            {
-                if (!string.IsNullOrEmpty(newInstance.profileBindIP) &&
-                    thisServer.cb_serverIP.Items.Contains(newInstance.profileBindIP))
-                {
-                    thisServer.cb_serverIP.SelectedItem = newInstance.profileBindIP; // Select the item in cb_serverIP that matches the value of newInstance.profileBindIP,
-                }
-                else
-                {
-                    thisServer.cb_serverIP.SelectedIndex = 0; // or default to the first item (assumed "0.0.0.0") if not found
-                }
-                thisServer.num_serverPort.Value = newInstance.profileBindPort;
-                thisServer.tb_serverPassword.Text = newInstance.gamePasswordLobby;
-                thisServer.cb_serverDedicated.Checked = newInstance.gameDedicated;
-                thisServer.cb_novaRequired.Checked = newInstance.gameRequireNova;
-                thisServer.cb_sessionType.SelectedIndex = newInstance.gameSessionType;
-            }
-            // Server Options (4 fields)
-            {
-                thisServer.num_gameTimeLimit.Value = newInstance.gameTimeLimit;
-                thisServer.cb_replayMaps.SelectedIndex = newInstance.gameLoopMaps;
-                thisServer.num_gameStartDelay.Value = newInstance.gameStartDelay;
-                thisServer.num_respawnTime.Value = newInstance.gameRespawnTime;
-                thisServer.num_scoreBoardDelay.Value = newInstance.gameScoreBoardDelay;
-                thisServer.num_maxPlayers.Value = newInstance.gameMaxSlots;
-            }
-            // Scoring Options (3 fields)
-            {
-                thisServer.num_scoresKOTH.Value = newInstance.gameScoreZoneTime;
-                thisServer.num_scoresDM.Value = newInstance.gameScoreKills;
-                thisServer.num_scoresFB.Value = newInstance.gameScoreFlags;
-            }
-            // Team Options (3 fields)
-            {
-                thisServer.cb_autoBalance.Checked = newInstance.gameOptionAutoBalance;
-                thisServer.tb_bluePassword.Text = newInstance.gamePasswordBlue;
-                thisServer.tb_redPassword.Text = newInstance.gamePasswordRed;
-            }
-            // Game Play Settings (6 fields)
-            {
-                thisServer.cb_showTracers.Checked = newInstance.gameOptionShowTracers;
-                thisServer.cb_showClays.Checked = newInstance.gameShowTeamClays;
-                thisServer.cb_autoRange.Checked = newInstance.gameOptionAutoRange;
-                thisServer.num_pspTakeoverTimer.Value = newInstance.gamePSPTOTimer;
-                thisServer.num_flagReturnTime.Value = newInstance.gameFlagReturnTime;
-                thisServer.num_maxTeamLives.Value = newInstance.gameMaxTeamLives;
-            }
-            // Friendly Fire (4 fields)
-            {
-                thisServer.cb_enableFFkills.Checked = newInstance.gameOptionFF;
-                thisServer.num_maxFFKills.Enabled = newInstance.gameOptionFF ? true : false;
-                thisServer.num_maxFFKills.Value = newInstance.gameFriendlyFireKills;
-                thisServer.cb_warnFFkils.Checked = newInstance.gameOptionFFWarn;
-                thisServer.cb_showTeamTags.Checked = newInstance.gameOptionFriendlyTags;
-            }
-            // Ping Checking (4 fields)
-            {
-                thisServer.cb_enableMinCheck.Checked = newInstance.gameMinPing;
-                thisServer.cb_enableMaxCheck.Checked = newInstance.gameMaxPing;
-                thisServer.num_minPing.Value = newInstance.gameMinPingValue;
-                thisServer.num_maxPing.Value = newInstance.gameMaxPingValue;
-                thisServer.num_minPing.Enabled = newInstance.gameMinPing ? true : false;
-                thisServer.num_maxPing.Enabled = newInstance.gameMaxPing ? true : false;
-            }
-            // Misc (4 fields)
-            {
-                thisServer.cb_customSkins.Checked = newInstance.gameCustomSkins;
-                thisServer.cb_enableDistroyBuildings.Checked = newInstance.gameDestroyBuildings;
-                thisServer.cb_enableFatBullets.Checked = newInstance.gameFatBullets;
-                thisServer.cb_enableOneShotKills.Checked = newInstance.gameOneShotKills;
-                thisServer.cb_enableLeftLean.Checked = newInstance.gameAllowLeftLeaning;
-            }
-
-            // Restrictions Weapons (Many Fields)
-
-            {
-                thisServer.cb_weapColt45.Checked = newInstance.weaponColt45;
-                thisServer.cb_weapM9Bereatta.Checked = newInstance.weaponM9Beretta;
-                thisServer.cb_weapCAR15.Checked = newInstance.weaponCar15;
-                thisServer.cb_weapCAR15203.Checked = newInstance.weaponCar15203;
-                thisServer.cb_weapM16.Checked = newInstance.weaponM16;
-                thisServer.cb_weapM16203.Checked = newInstance.weaponM16203;
-                thisServer.cb_weapG3.Checked = newInstance.weaponG3;
-                thisServer.cb_weapG36.Checked = newInstance.weaponG36;
-                thisServer.cb_weapM60.Checked = newInstance.weaponM60;
-                thisServer.cb_weapM240.Checked = newInstance.weaponM240;
-                thisServer.cb_weapMP5.Checked = newInstance.weaponMP5;
-                thisServer.cb_weapSaw.Checked = newInstance.weaponSAW;
-                thisServer.cb_weap300Tact.Checked = newInstance.weaponMCRT300;
-                thisServer.cb_weapM21.Checked = newInstance.weaponM21;
-                thisServer.cb_weapM24.Checked = newInstance.weaponM24;
-                thisServer.cb_weapBarret.Checked = newInstance.weaponBarrett;
-                thisServer.cb_weapPSG1.Checked = newInstance.weaponPSG1;
-                thisServer.cb_weapShotgun.Checked = newInstance.weaponShotgun;
-                thisServer.cb_weapFragGrenade.Checked = newInstance.weaponFragGrenade;
-                thisServer.cb_weapSmokeGrenade.Checked = newInstance.weaponSmokeGrenade;
-                thisServer.cb_weapSatchel.Checked = newInstance.weaponSatchelCharges;
-                thisServer.cb_weapAT4.Checked = newInstance.weaponAT4;
-                thisServer.cb_weapFlashBang.Checked = newInstance.weaponFlashGrenade;
-                thisServer.cb_weapClay.Checked = newInstance.weaponClaymore;
-
-                // If the above weap are all checked, then checkBox_selectAll should be checked.
-                thisServer.checkBox_selectAll.Checked =
-                    thisServer.cb_weapColt45.Checked &&
-                    thisServer.cb_weapM9Bereatta.Checked &&
-                    thisServer.cb_weapCAR15.Checked &&
-                    thisServer.cb_weapCAR15203.Checked &&
-                    thisServer.cb_weapM16.Checked &&
-                    thisServer.cb_weapM16203.Checked &&
-                    thisServer.cb_weapG3.Checked &&
-                    thisServer.cb_weapG36.Checked &&
-                    thisServer.cb_weapM60.Checked &&
-                    thisServer.cb_weapM240.Checked &&
-                    thisServer.cb_weapMP5.Checked &&
-                    thisServer.cb_weapSaw.Checked &&
-                    thisServer.cb_weap300Tact.Checked &&
-                    thisServer.cb_weapM21.Checked &&
-                    thisServer.cb_weapM24.Checked &&
-                    thisServer.cb_weapBarret.Checked &&
-                    thisServer.cb_weapPSG1.Checked &&
-                    thisServer.cb_weapShotgun.Checked &&
-                    thisServer.cb_weapFragGrenade.Checked &&
-                    thisServer.cb_weapSmokeGrenade.Checked &&
-                    thisServer.cb_weapSatchel.Checked &&
-                    thisServer.cb_weapAT4.Checked &&
-                    thisServer.cb_weapFlashBang.Checked &&
-                    thisServer.cb_weapClay.Checked;
-
-                // If the above weap are all unchecked, then checkBox_selectNone should be checked.
-                thisServer.checkBox_selectNone.Checked =
-                    !thisServer.cb_weapColt45.Checked &&
-                    !thisServer.cb_weapM9Bereatta.Checked &&
-                    !thisServer.cb_weapCAR15.Checked &&
-                    !thisServer.cb_weapCAR15203.Checked &&
-                    !thisServer.cb_weapM16.Checked &&
-                    !thisServer.cb_weapM16203.Checked &&
-                    !thisServer.cb_weapG3.Checked &&
-                    !thisServer.cb_weapG36.Checked &&
-                    !thisServer.cb_weapM60.Checked &&
-                    !thisServer.cb_weapM240.Checked &&
-                    !thisServer.cb_weapMP5.Checked &&
-                    !thisServer.cb_weapSaw.Checked &&
-                    !thisServer.cb_weap300Tact.Checked &&
-                    !thisServer.cb_weapM21.Checked &&
-                    !thisServer.cb_weapM24.Checked &&
-                    !thisServer.cb_weapBarret.Checked &&
-                    !thisServer.cb_weapPSG1.Checked &&
-                    !thisServer.cb_weapShotgun.Checked &&
-                    !thisServer.cb_weapFragGrenade.Checked &&
-                    !thisServer.cb_weapSmokeGrenade.Checked &&
-                    !thisServer.cb_weapSatchel.Checked &&
-                    !thisServer.cb_weapAT4.Checked &&
-                    !thisServer.cb_weapFlashBang.Checked &&
-                    !thisServer.cb_weapClay.Checked;
-            }
-
-            // Role Restrictions (4 fields
-            {
-                thisServer.cb_roleCQB.Checked = newInstance.roleCQB;
-                thisServer.cb_roleGunner.Checked = newInstance.roleGunner;
-                thisServer.cb_roleSniper.Checked = newInstance.roleSniper;
-                thisServer.cb_roleMedic.Checked = newInstance.roleMedic;
-            }
+            
+            // Trigger "Gets" for the Tabs
+            thisServer.ProfileTab.getProfile(null, null);
+            thisServer.ServerTab.functionEvent_GetServerSettings((updatedInstance != null ? updatedInstance : null));
 
             // Stats Settings
             thisServer.cb_enableWebStats.Checked = newInstance.WebStatsEnabled;
@@ -355,105 +186,100 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             thisServer.num_WebStatsReport.Enabled = announcementsEnabled;
             thisServer.num_WebStatsUpdates.Enabled = statsEnabled;
 
-            // Remote Settings
-            thisServer.cb_enableRemote.Checked = newInstance.profileEnableRemote;
-            thisServer.num_remotePort.Value = (int)newInstance.profileRemotePort;
-            thisServer.num_remotePort.Enabled = newInstance.profileEnableRemote;
-
         }
         public void SetServerVariables()
         {
 
             // Host Information
-            thisInstance.WebStatsProfileID = thisServer.tb_serverID.Text;
-            thisInstance.gameServerName = thisServer.tb_serverName.Text;
-            thisInstance.gameHostName = thisServer.tb_hostName.Text;
-            thisInstance.gameMOTD = thisServer.tb_serverMessage.Text;
+            thisInstance.WebStatsProfileID = thisServer.ServerTab.tb_serverID.Text;
+            thisInstance.gameServerName = thisServer.ServerTab.tb_serverName.Text;
+            thisInstance.gameHostName = thisServer.ServerTab.tb_hostName.Text;
+            thisInstance.gameMOTD = thisServer.ServerTab.tb_serverMessage.Text;
 
             // Server Details
-            thisInstance.profileBindIP = thisServer.cb_serverIP.SelectedItem?.ToString() ?? "";
-            thisInstance.profileBindPort = (int)thisServer.num_serverPort.Value;
-            thisInstance.gamePasswordLobby = thisServer.tb_serverPassword.Text;
-            thisInstance.gameDedicated = thisServer.cb_serverDedicated.Checked;
-            thisInstance.gameRequireNova = thisServer.cb_novaRequired.Checked;
-            thisInstance.gameSessionType = thisServer.cb_sessionType.SelectedIndex;
+            thisInstance.profileBindIP = thisServer.ServerTab.cb_serverIP.SelectedItem?.ToString() ?? "";
+            thisInstance.profileBindPort = (int)thisServer.ServerTab.num_serverPort.Value;
+            thisInstance.gamePasswordLobby = thisServer.ServerTab.tb_serverPassword.Text;
+            thisInstance.gameDedicated = thisServer.ServerTab.cb_serverDedicated.Checked;
+            thisInstance.gameRequireNova = thisServer.ServerTab.cb_novaRequired.Checked;
+            thisInstance.gameSessionType = thisServer.ServerTab.cb_sessionType.SelectedIndex;
 
             // Server Options
-            thisInstance.gameTimeLimit = (int)thisServer.num_gameTimeLimit.Value;
-            thisInstance.gameLoopMaps = thisServer.cb_replayMaps.SelectedIndex;
-            thisInstance.gameStartDelay = (int)thisServer.num_gameStartDelay.Value;
-            thisInstance.gameRespawnTime = (int)thisServer.num_respawnTime.Value;
-            thisInstance.gameScoreBoardDelay = (int)thisServer.num_scoreBoardDelay.Value;
-            thisInstance.gameMaxSlots = (int)thisServer.num_maxPlayers.Value;
+            thisInstance.gameTimeLimit = (int)thisServer.ServerTab.num_gameTimeLimit.Value;
+            thisInstance.gameLoopMaps = thisServer.ServerTab.cb_replayMaps.SelectedIndex;
+            thisInstance.gameStartDelay = (int)thisServer.ServerTab.num_gameStartDelay.Value;
+            thisInstance.gameRespawnTime = (int)thisServer.ServerTab.num_respawnTime.Value;
+            thisInstance.gameScoreBoardDelay = (int)thisServer.ServerTab.num_scoreBoardDelay.Value;
+            thisInstance.gameMaxSlots = (int)thisServer.ServerTab.num_maxPlayers.Value;
 
             // Scoring Options
-            thisInstance.gameScoreZoneTime = (int)thisServer.num_scoresKOTH.Value;
-            thisInstance.gameScoreKills = (int)thisServer.num_scoresDM.Value;
-            thisInstance.gameScoreFlags = (int)thisServer.num_scoresFB.Value;
+            thisInstance.gameScoreZoneTime = (int)thisServer.ServerTab.num_scoresKOTH.Value;
+            thisInstance.gameScoreKills = (int)thisServer.ServerTab.num_scoresDM.Value;
+            thisInstance.gameScoreFlags = (int)thisServer.ServerTab.num_scoresFB.Value;
 
             // Team Options
-            thisInstance.gameOptionAutoBalance = thisServer.cb_autoBalance.Checked;
-            thisInstance.gamePasswordBlue = thisServer.tb_bluePassword.Text;
-            thisInstance.gamePasswordRed = thisServer.tb_redPassword.Text;
+            thisInstance.gameOptionAutoBalance = thisServer.ServerTab.cb_autoBalance.Checked;
+            thisInstance.gamePasswordBlue = thisServer.ServerTab.tb_bluePassword.Text;
+            thisInstance.gamePasswordRed = thisServer.ServerTab.tb_redPassword.Text;
 
             // Game Play Settings
-            thisInstance.gameOptionShowTracers = thisServer.cb_showTracers.Checked;
-            thisInstance.gameShowTeamClays = thisServer.cb_showClays.Checked;
-            thisInstance.gameOptionAutoRange = thisServer.cb_autoRange.Checked;
-            thisInstance.gamePSPTOTimer = (int)thisServer.num_pspTakeoverTimer.Value;
-            thisInstance.gameFlagReturnTime = (int)thisServer.num_flagReturnTime.Value;
-            thisInstance.gameMaxTeamLives = (int)thisServer.num_maxTeamLives.Value;
+            thisInstance.gameOptionShowTracers = thisServer.ServerTab.cb_showTracers.Checked;
+            thisInstance.gameShowTeamClays = thisServer.ServerTab.cb_showClays.Checked;
+            thisInstance.gameOptionAutoRange = thisServer.ServerTab.cb_autoRange.Checked;
+            thisInstance.gamePSPTOTimer = (int)thisServer.ServerTab.num_pspTakeoverTimer.Value;
+            thisInstance.gameFlagReturnTime = (int)thisServer.ServerTab.num_flagReturnTime.Value;
+            thisInstance.gameMaxTeamLives = (int)thisServer.ServerTab.num_maxTeamLives.Value;
 
             // Friendly Fire
-            thisInstance.gameOptionFF = thisServer.cb_enableFFkills.Checked;
-            thisInstance.gameFriendlyFireKills = (int)thisServer.num_maxFFKills.Value;
-            thisInstance.gameOptionFFWarn = thisServer.cb_warnFFkils.Checked;
-            thisInstance.gameOptionFriendlyTags = thisServer.cb_showTeamTags.Checked;
+            thisInstance.gameOptionFF = thisServer.ServerTab.cb_enableFFkills.Checked;
+            thisInstance.gameFriendlyFireKills = (int)thisServer.ServerTab.num_maxFFKills.Value;
+            thisInstance.gameOptionFFWarn = thisServer.ServerTab.cb_warnFFkils.Checked;
+            thisInstance.gameOptionFriendlyTags = thisServer.ServerTab.cb_showTeamTags.Checked;
 
             // Ping Checking
-            thisInstance.gameMinPing = thisServer.cb_enableMinCheck.Checked;
-            thisInstance.gameMaxPing = thisServer.cb_enableMaxCheck.Checked;
-            thisInstance.gameMinPingValue = (int)thisServer.num_minPing.Value;
-            thisInstance.gameMaxPingValue = (int)thisServer.num_maxPing.Value;
+            thisInstance.gameMinPing = thisServer.ServerTab.cb_enableMinCheck.Checked;
+            thisInstance.gameMaxPing = thisServer.ServerTab.cb_enableMaxCheck.Checked;
+            thisInstance.gameMinPingValue = (int)thisServer.ServerTab.num_minPing.Value;
+            thisInstance.gameMaxPingValue = (int)thisServer.ServerTab.num_maxPing.Value;
 
             // Misc
-            thisInstance.gameCustomSkins = thisServer.cb_customSkins.Checked;
-            thisInstance.gameDestroyBuildings = thisServer.cb_enableDistroyBuildings.Checked;
-            thisInstance.gameFatBullets = thisServer.cb_enableFatBullets.Checked;
-            thisInstance.gameOneShotKills = thisServer.cb_enableOneShotKills.Checked;
-            thisInstance.gameAllowLeftLeaning = thisServer.cb_enableLeftLean.Checked;
+            thisInstance.gameCustomSkins = thisServer.ServerTab.cb_customSkins.Checked;
+            thisInstance.gameDestroyBuildings = thisServer.ServerTab.cb_enableDistroyBuildings.Checked;
+            thisInstance.gameFatBullets = thisServer.ServerTab.cb_enableFatBullets.Checked;
+            thisInstance.gameOneShotKills = thisServer.ServerTab.cb_enableOneShotKills.Checked;
+            thisInstance.gameAllowLeftLeaning = thisServer.ServerTab.cb_enableLeftLean.Checked;
 
             // Restrictions Weapons
-            thisInstance.weaponColt45 = thisServer.cb_weapColt45.Checked;
-            thisInstance.weaponM9Beretta = thisServer.cb_weapM9Bereatta.Checked;
-            thisInstance.weaponCar15 = thisServer.cb_weapCAR15.Checked;
-            thisInstance.weaponCar15203 = thisServer.cb_weapCAR15203.Checked;
-            thisInstance.weaponM16 = thisServer.cb_weapM16.Checked;
-            thisInstance.weaponM16203 = thisServer.cb_weapM16203.Checked;
-            thisInstance.weaponG3 = thisServer.cb_weapG3.Checked;
-            thisInstance.weaponG36 = thisServer.cb_weapG36.Checked;
-            thisInstance.weaponM60 = thisServer.cb_weapM60.Checked;
-            thisInstance.weaponM240 = thisServer.cb_weapM240.Checked;
-            thisInstance.weaponMP5 = thisServer.cb_weapMP5.Checked;
-            thisInstance.weaponSAW = thisServer.cb_weapSaw.Checked;
-            thisInstance.weaponMCRT300 = thisServer.cb_weap300Tact.Checked;
-            thisInstance.weaponM21 = thisServer.cb_weapM21.Checked;
-            thisInstance.weaponM24 = thisServer.cb_weapM24.Checked;
-            thisInstance.weaponBarrett = thisServer.cb_weapBarret.Checked;
-            thisInstance.weaponPSG1 = thisServer.cb_weapPSG1.Checked;
-            thisInstance.weaponShotgun = thisServer.cb_weapShotgun.Checked;
-            thisInstance.weaponFragGrenade = thisServer.cb_weapFragGrenade.Checked;
-            thisInstance.weaponSmokeGrenade = thisServer.cb_weapSmokeGrenade.Checked;
-            thisInstance.weaponSatchelCharges = thisServer.cb_weapSatchel.Checked;
-            thisInstance.weaponAT4 = thisServer.cb_weapAT4.Checked;
-            thisInstance.weaponFlashGrenade = thisServer.cb_weapFlashBang.Checked;
-            thisInstance.weaponClaymore = thisServer.cb_weapClay.Checked;
+            thisInstance.weaponColt45 = thisServer.ServerTab.cb_weapColt45.Checked;
+            thisInstance.weaponM9Beretta = thisServer.ServerTab.cb_weapM9Bereatta.Checked;
+            thisInstance.weaponCar15 = thisServer.ServerTab.cb_weapCAR15.Checked;
+            thisInstance.weaponCar15203 = thisServer.ServerTab.cb_weapCAR15203.Checked;
+            thisInstance.weaponM16 = thisServer.ServerTab.cb_weapM16.Checked;
+            thisInstance.weaponM16203 = thisServer.ServerTab.cb_weapM16203.Checked;
+            thisInstance.weaponG3 = thisServer.ServerTab.cb_weapG3.Checked;
+            thisInstance.weaponG36 = thisServer.ServerTab.cb_weapG36.Checked;
+            thisInstance.weaponM60 = thisServer.ServerTab.cb_weapM60.Checked;
+            thisInstance.weaponM240 = thisServer.ServerTab.cb_weapM240.Checked;
+            thisInstance.weaponMP5 = thisServer.ServerTab.cb_weapMP5.Checked;
+            thisInstance.weaponSAW = thisServer.ServerTab.cb_weapSaw.Checked;
+            thisInstance.weaponMCRT300 = thisServer.ServerTab.cb_weap300Tact.Checked;
+            thisInstance.weaponM21 = thisServer.ServerTab.cb_weapM21.Checked;
+            thisInstance.weaponM24 = thisServer.ServerTab.cb_weapM24.Checked;
+            thisInstance.weaponBarrett = thisServer.ServerTab.cb_weapBarret.Checked;
+            thisInstance.weaponPSG1 = thisServer.ServerTab.cb_weapPSG1.Checked;
+            thisInstance.weaponShotgun = thisServer.ServerTab.cb_weapShotgun.Checked;
+            thisInstance.weaponFragGrenade = thisServer.ServerTab.cb_weapFragGrenade.Checked;
+            thisInstance.weaponSmokeGrenade = thisServer.ServerTab.cb_weapSmokeGrenade.Checked;
+            thisInstance.weaponSatchelCharges = thisServer.ServerTab.cb_weapSatchel.Checked;
+            thisInstance.weaponAT4 = thisServer.ServerTab.cb_weapAT4.Checked;
+            thisInstance.weaponFlashGrenade = thisServer.ServerTab.cb_weapFlashBang.Checked;
+            thisInstance.weaponClaymore = thisServer.ServerTab.cb_weapClay.Checked;
 
             // Role Restrictions
-            thisInstance.roleCQB = thisServer.cb_roleCQB.Checked;
-            thisInstance.roleGunner = thisServer.cb_roleGunner.Checked;
-            thisInstance.roleSniper = thisServer.cb_roleSniper.Checked;
-            thisInstance.roleMedic = thisServer.cb_roleMedic.Checked;
+            thisInstance.roleCQB = thisServer.ServerTab.cb_roleCQB.Checked;
+            thisInstance.roleGunner = thisServer.ServerTab.cb_roleGunner.Checked;
+            thisInstance.roleSniper = thisServer.ServerTab.cb_roleSniper.Checked;
+            thisInstance.roleMedic = thisServer.ServerTab.cb_roleMedic.Checked;
 
             // Stats Settings
             thisInstance.WebStatsEnabled = thisServer.cb_enableWebStats.Checked;
@@ -463,8 +289,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             thisInstance.WebStatsUpdateInterval = (int)thisServer.num_WebStatsUpdates.Value;
 
             // Remote Settings
-            thisInstance.profileEnableRemote = thisServer.cb_enableRemote.Checked;
-            thisInstance.profileRemotePort = (int)thisServer.num_remotePort.Value;
+            thisInstance.profileEnableRemote = thisServer.ServerTab.cb_enableRemote.Checked;
+            thisInstance.profileRemotePort = (int)thisServer.ServerTab.num_remotePort.Value;
 
         }
         public void ValidateGameServerType(string serverPath)
@@ -528,10 +354,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             ServerMemory.UpdateWeaponRestrictions();
 
             // Role Restrictions
-            //thisInstance.roleCQB = thisServer.cb_roleCQB.Checked;
-            //thisInstance.roleGunner = thisServer.cb_roleGunner.Checked;
-            //thisInstance.roleSniper = thisServer.cb_roleSniper.Checked;
-            //thisInstance.roleMedic = thisServer.cb_roleMedic.Checked;
+            //thisInstance.roleCQB = thisServer.ServerTab.cb_roleCQB.Checked;
+            //thisInstance.roleGunner = thisServer.ServerTab.cb_roleGunner.Checked;
+            //thisInstance.roleSniper = thisServer.ServerTab.cb_roleSniper.Checked;
+            //thisInstance.roleMedic = thisServer.ServerTab.cb_roleMedic.Checked;
 
             // Update Game Scores for the next game.
             ServerMemory.UpdateGameScores();
@@ -541,7 +367,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             //
 
             // Player State Check
-            //thisInstance.gameAllowLeftLeaning = thisServer.cb_enableLeftLean.Checked;
+            //thisInstance.gameAllowLeftLeaning = thisServer.ServerTab.cb_enableLeftLean.Checked;
 
         }
         public void InitializeTickers()
@@ -692,63 +518,63 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public void HighlightDifferences()
         {
             // Host Information
-            HighlightTextBox(thisServer.tb_serverID, theInstance.WebStatsProfileID);
-            HighlightTextBox(thisServer.tb_serverName, theInstance.gameServerName);
-            HighlightTextBox(thisServer.tb_hostName, theInstance.gameHostName);
-            HighlightTextBox(thisServer.tb_serverMessage, theInstance.gameMOTD);
+            HighlightTextBox(thisServer.ServerTab.tb_serverID, theInstance.WebStatsProfileID);
+            HighlightTextBox(thisServer.ServerTab.tb_serverName, theInstance.gameServerName);
+            HighlightTextBox(thisServer.ServerTab.tb_hostName, theInstance.gameHostName);
+            HighlightTextBox(thisServer.ServerTab.tb_serverMessage, theInstance.gameMOTD);
 
             // Server Details
-            HighlightComboBox(thisServer.cb_serverIP, theInstance.profileBindIP);
-            HighlightNumericUpDown(thisServer.num_serverPort, theInstance.profileBindPort);
-            HighlightTextBox(thisServer.tb_serverPassword, theInstance.gamePasswordLobby);
-            HighlightCheckBox(thisServer.cb_serverDedicated, theInstance.gameDedicated);
-            HighlightCheckBox(thisServer.cb_novaRequired, theInstance.gameRequireNova);
-            HighlightComboBoxIndex(thisServer.cb_sessionType, theInstance.gameSessionType);
+            HighlightComboBox(thisServer.ServerTab.cb_serverIP, theInstance.profileBindIP);
+            HighlightNumericUpDown(thisServer.ServerTab.num_serverPort, theInstance.profileBindPort);
+            HighlightTextBox(thisServer.ServerTab.tb_serverPassword, theInstance.gamePasswordLobby);
+            HighlightCheckBox(thisServer.ServerTab.cb_serverDedicated, theInstance.gameDedicated);
+            HighlightCheckBox(thisServer.ServerTab.cb_novaRequired, theInstance.gameRequireNova);
+            HighlightComboBoxIndex(thisServer.ServerTab.cb_sessionType, theInstance.gameSessionType);
 
             // Server Options
-            HighlightNumericUpDown(thisServer.num_gameTimeLimit, theInstance.gameTimeLimit);
-            HighlightComboBoxIndex(thisServer.cb_replayMaps, theInstance.gameLoopMaps);
-            HighlightNumericUpDown(thisServer.num_gameStartDelay, theInstance.gameStartDelay);
-            HighlightNumericUpDown(thisServer.num_respawnTime, theInstance.gameRespawnTime);
-            HighlightNumericUpDown(thisServer.num_scoreBoardDelay, theInstance.gameScoreBoardDelay);
-            HighlightNumericUpDown(thisServer.num_maxPlayers, theInstance.gameMaxSlots);
+            HighlightNumericUpDown(thisServer.ServerTab.num_gameTimeLimit, theInstance.gameTimeLimit);
+            HighlightComboBoxIndex(thisServer.ServerTab.cb_replayMaps, theInstance.gameLoopMaps);
+            HighlightNumericUpDown(thisServer.ServerTab.num_gameStartDelay, theInstance.gameStartDelay);
+            HighlightNumericUpDown(thisServer.ServerTab.num_respawnTime, theInstance.gameRespawnTime);
+            HighlightNumericUpDown(thisServer.ServerTab.num_scoreBoardDelay, theInstance.gameScoreBoardDelay);
+            HighlightNumericUpDown(thisServer.ServerTab.num_maxPlayers, theInstance.gameMaxSlots);
 
             // Scoring Options
-            HighlightNumericUpDown(thisServer.num_scoresKOTH, theInstance.gameScoreZoneTime);
-            HighlightNumericUpDown(thisServer.num_scoresDM, theInstance.gameScoreKills);
-            HighlightNumericUpDown(thisServer.num_scoresFB, theInstance.gameScoreFlags);
+            HighlightNumericUpDown(thisServer.ServerTab.num_scoresKOTH, theInstance.gameScoreZoneTime);
+            HighlightNumericUpDown(thisServer.ServerTab.num_scoresDM, theInstance.gameScoreKills);
+            HighlightNumericUpDown(thisServer.ServerTab.num_scoresFB, theInstance.gameScoreFlags);
 
             // Team Options
-            HighlightCheckBox(thisServer.cb_autoBalance, theInstance.gameOptionAutoBalance);
-            HighlightTextBox(thisServer.tb_bluePassword, theInstance.gamePasswordBlue);
-            HighlightTextBox(thisServer.tb_redPassword, theInstance.gamePasswordRed);
+            HighlightCheckBox(thisServer.ServerTab.cb_autoBalance, theInstance.gameOptionAutoBalance);
+            HighlightTextBox(thisServer.ServerTab.tb_bluePassword, theInstance.gamePasswordBlue);
+            HighlightTextBox(thisServer.ServerTab.tb_redPassword, theInstance.gamePasswordRed);
 
             // Game Play Settings
-            HighlightCheckBox(thisServer.cb_showTracers, theInstance.gameOptionShowTracers);
-            HighlightCheckBox(thisServer.cb_showClays, theInstance.gameShowTeamClays);
-            HighlightCheckBox(thisServer.cb_autoRange, theInstance.gameOptionAutoRange);
-            HighlightNumericUpDown(thisServer.num_pspTakeoverTimer, theInstance.gamePSPTOTimer);
-            HighlightNumericUpDown(thisServer.num_flagReturnTime, theInstance.gameFlagReturnTime);
-            HighlightNumericUpDown(thisServer.num_maxTeamLives, theInstance.gameMaxTeamLives);
+            HighlightCheckBox(thisServer.ServerTab.cb_showTracers, theInstance.gameOptionShowTracers);
+            HighlightCheckBox(thisServer.ServerTab.cb_showClays, theInstance.gameShowTeamClays);
+            HighlightCheckBox(thisServer.ServerTab.cb_autoRange, theInstance.gameOptionAutoRange);
+            HighlightNumericUpDown(thisServer.ServerTab.num_pspTakeoverTimer, theInstance.gamePSPTOTimer);
+            HighlightNumericUpDown(thisServer.ServerTab.num_flagReturnTime, theInstance.gameFlagReturnTime);
+            HighlightNumericUpDown(thisServer.ServerTab.num_maxTeamLives, theInstance.gameMaxTeamLives);
 
             // Friendly Fire
-            HighlightCheckBox(thisServer.cb_enableFFkills, theInstance.gameOptionFF);
-            HighlightNumericUpDown(thisServer.num_maxFFKills, theInstance.gameFriendlyFireKills);
-            HighlightCheckBox(thisServer.cb_warnFFkils, theInstance.gameOptionFFWarn);
-            HighlightCheckBox(thisServer.cb_showTeamTags, theInstance.gameOptionFriendlyTags);
+            HighlightCheckBox(thisServer.ServerTab.cb_enableFFkills, theInstance.gameOptionFF);
+            HighlightNumericUpDown(thisServer.ServerTab.num_maxFFKills, theInstance.gameFriendlyFireKills);
+            HighlightCheckBox(thisServer.ServerTab.cb_warnFFkils, theInstance.gameOptionFFWarn);
+            HighlightCheckBox(thisServer.ServerTab.cb_showTeamTags, theInstance.gameOptionFriendlyTags);
 
             // Ping Checking
-            HighlightCheckBox(thisServer.cb_enableMinCheck, theInstance.gameMinPing);
-            HighlightCheckBox(thisServer.cb_enableMaxCheck, theInstance.gameMaxPing);
-            HighlightNumericUpDown(thisServer.num_minPing, theInstance.gameMinPingValue);
-            HighlightNumericUpDown(thisServer.num_maxPing, theInstance.gameMaxPingValue);
+            HighlightCheckBox(thisServer.ServerTab.cb_enableMinCheck, theInstance.gameMinPing);
+            HighlightCheckBox(thisServer.ServerTab.cb_enableMaxCheck, theInstance.gameMaxPing);
+            HighlightNumericUpDown(thisServer.ServerTab.num_minPing, theInstance.gameMinPingValue);
+            HighlightNumericUpDown(thisServer.ServerTab.num_maxPing, theInstance.gameMaxPingValue);
 
             // Misc
-            HighlightCheckBox(thisServer.cb_customSkins, theInstance.gameCustomSkins);
-            HighlightCheckBox(thisServer.cb_enableDistroyBuildings, theInstance.gameDestroyBuildings);
-            HighlightCheckBox(thisServer.cb_enableFatBullets, theInstance.gameFatBullets);
-            HighlightCheckBox(thisServer.cb_enableOneShotKills, theInstance.gameOneShotKills);
-            HighlightCheckBox(thisServer.cb_enableLeftLean, theInstance.gameAllowLeftLeaning);
+            HighlightCheckBox(thisServer.ServerTab.cb_customSkins, theInstance.gameCustomSkins);
+            HighlightCheckBox(thisServer.ServerTab.cb_enableDistroyBuildings, theInstance.gameDestroyBuildings);
+            HighlightCheckBox(thisServer.ServerTab.cb_enableFatBullets, theInstance.gameFatBullets);
+            HighlightCheckBox(thisServer.ServerTab.cb_enableOneShotKills, theInstance.gameOneShotKills);
+            HighlightCheckBox(thisServer.ServerTab.cb_enableLeftLean, theInstance.gameAllowLeftLeaning);
 
             // Add more fields as needed...
         }
