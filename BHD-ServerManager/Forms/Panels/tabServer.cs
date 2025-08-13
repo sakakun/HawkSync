@@ -1,4 +1,6 @@
 ﻿using BHD_SharedResources.Classes.CoreObjects;
+using BHD_SharedResources.Classes.GameManagement;
+using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
 using System;
@@ -316,6 +318,9 @@ namespace BHD_ServerManager.Forms.Panels
             theInstance.profileEnableRemote = cb_enableRemote.Checked;
             theInstance.profileRemotePort = (int)num_remotePort.Value;
 
+            // Temp OG Set Settings - Until Remaining Tabs are Implemented
+            theInstanceManager.SetServerVariables();                            // Set the server variables based on the current instance settings 
+
             AppDebug.Log(this.Name, "Server settings saved.");
         }
         // --- Weapon Checkbox Logic ---
@@ -329,6 +334,32 @@ namespace BHD_ServerManager.Forms.Panels
                 cb_weapSmokeGrenade, cb_weapSatchel, cb_weapAT4, cb_weapFlashBang, cb_weapClay
             };
         }
+        private void functionEvent_UpdateServerControls()
+        {
+            bool isOffline = theInstance.instanceStatus == InstanceStatus.OFFLINE;
+            // Server Running? Update Text
+            btn_serverControl.Text = isOffline ? "START" : "STOP";
+            // Lock Down Settings that shouldn't be changed while the server is running
+            functionEvent_SetControlsEnabled(new Control[]
+            {
+                cb_serverIP,                                // Server IP ComboBox
+                num_serverPort,                             // Server Port
+                cb_serverDedicated,                         // Dedicated Server Checkbox
+                tb_serverPassword,                          // Server Lobby Password
+                cb_enableRemote,                            // Enable Remote Access
+                num_remotePort,                             // Remote Access Port
+                cb_novaRequired                             // Nova Required Checkbox
+            }, isOffline);
+            
+            // Update Visibility of Controls
+            btn_ServerUpdate.Visible = !isOffline;          // Show the update button only when the server is running
+            btn_LockLobby.Visible = !isOffline;             // Show the lock lobby button only when the server is running
+        }
+        private void functionEvent_SetControlsEnabled(Control[] controls, bool enabled)
+        {
+            foreach (var control in controls)
+                control.Enabled = enabled;
+        }
         // --- Ticker Server Hook --- Allow to be triggered externally by the Server Manager Ticker
         public void tickerServerHook()
         {
@@ -341,6 +372,7 @@ namespace BHD_ServerManager.Forms.Panels
                 functionEvent_GetServerSettings();
             }
             // Do stuff here that needs to be done every tick
+            functionEvent_UpdateServerControls();                              // Update the Server Control Button State
         }
         //  --- Action Click Events ---
         //  --- Weapon Checkbox Changed ---
@@ -382,10 +414,51 @@ namespace BHD_ServerManager.Forms.Panels
         {
             functionEvent_SaveServerSettings();
         }
-
+        // --- Reset Server Settings Button Clicked ---
         private void actionClick_ResetSettings(object sender, EventArgs e)
         {
             functionEvent_GetServerSettings();
+        }
+        // --- Enable/Disable Checkboxes Based on Other Checkbox States ---
+        private void actionClick_EnableFFkills(object sender, EventArgs e) => num_maxFFKills.Enabled = cb_enableFFkills.Checked;
+        private void actionClick_EnableMinCheck(object sender, EventArgs e) => num_minPing.Enabled = cb_enableMinCheck.Checked;
+        private void actionClick_EnableMaxPing(object sender, EventArgs e) => num_maxPing.Enabled = cb_enableMaxCheck.Checked;
+        private void actionClick_ToggleRemoteAccess(object sender, EventArgs e) => num_remotePort.Enabled = cb_enableRemote.Checked;
+        // --- Import/Export Server Settings ---
+        private void actionClick_ImportServerSettings(object sender, EventArgs e) => theInstanceManager.ImportSettings();
+        private void actionClick_ExportServerSettings(object sender, EventArgs e) => theInstanceManager.ExportSettings();
+        // --- Server Control Button Clicked ---
+        private void actionClick_serverControl(object sender, EventArgs e)
+        {
+            if (theInstanceManager.ValidateGameServerPath() && theInstance.instanceStatus == InstanceStatus.OFFLINE)
+            {
+                theInstanceManager.SetServerVariables();
+                if (GameManager.startGame())
+                {
+                    GameManager.ReadMemoryServerStatus();
+                    functionEvent_UpdateServerControls();
+                }
+            }
+            else
+            {
+                GameManager.stopGame();
+                functionEvent_UpdateServerControls();
+            }
+            
+        }
+        // --- Update Game Server Settings ---
+        private void actionClick_GameServerUpdate(object sender, EventArgs e)
+        {
+            if (GameManager.ReadMemoryIsProcessAttached())
+            {
+                theInstanceManager.UpdateGameServer();
+                MessageBox.Show("Saved settings have been applied to the game server.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        // --- Server Lock Lobby ----
+        private void actionClick_ServerLockLobby(object sender, EventArgs e)
+        {
+            GameManager.WriteMemorySendConsoleCommand("lockgame");
         }
     }
 }

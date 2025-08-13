@@ -26,8 +26,6 @@ namespace BHD_ServerManager.Forms
         public tabProfile ProfileTab = null!;                   // The Profile Tab User Control
         public tabServer  ServerTab  = null!;                   // The Server Tab User Control
 
-
-
         public ServerManager()
         {
             InitializeComponent();
@@ -87,72 +85,6 @@ namespace BHD_ServerManager.Forms
                 _ => toolStripStatus.Text
             };
         }
-
-        public void functionEvent_swapFieldsStartStop()
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(functionEvent_swapFieldsStartStop));
-                return;
-            }
-
-            bool isOffline = thisInstance.instanceStatus == InstanceStatus.OFFLINE;
-
-            ServerTab.btn_serverControl.Text = isOffline ? "START" : "STOP";
-
-            SetControlsEnabled(new Control[]
-            {
-                ServerTab.cb_serverIP, ServerTab.num_serverPort, ServerTab.cb_serverDedicated, ServerTab.tb_serverPassword, ServerTab.cb_enableRemote, ServerTab.num_remotePort
-            }, isOffline);
-
-            SetControlsEnabled(new Control[]
-            {
-                btn_mapsPlayNext, btn_mapsScore, btn_mapsSkip
-            }, !isOffline);
-        }
-
-        private static void SetControlsEnabled(Control[] controls, bool enabled)
-        {
-            foreach (var control in controls)
-                control.Enabled = enabled;
-        }
-
-        private void actionClick_saveUpdateSettings(object sender, EventArgs e)
-        {
-            theInstanceManager.SetServerVariables();
-            theInstanceManager.SaveSettings();
-
-            if (GameManager.ReadMemoryIsProcessAttached())
-            {
-                theInstanceManager.UpdateGameServer();
-                MessageBox.Show("Settings have been saved and game server updated.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void actionClick_startServer(object sender, EventArgs e)
-        {
-            if (theInstanceManager.ValidateGameServerPath() && thisInstance.instanceStatus == InstanceStatus.OFFLINE)
-            {
-                theInstanceManager.SetServerVariables();
-                if (GameManager.startGame())
-                {
-                    GameManager.ReadMemoryServerStatus();
-                    functionEvent_swapFieldsStartStop();
-                }
-            }
-            else
-            {
-                GameManager.stopGame();
-            }
-        }
-
-        private void actionClick_enableFFkills(object sender, EventArgs e) => ServerTab.num_maxFFKills.Enabled = ServerTab.cb_enableFFkills.Checked;
-        private void actionClick_enableMinCheck(object sender, EventArgs e) => ServerTab.num_minPing.Enabled = ServerTab.cb_enableMinCheck.Checked;
-        private void actionClick_enableMaxPing(object sender, EventArgs e) => ServerTab.num_maxPing.Enabled = ServerTab.cb_enableMaxCheck.Checked;
-        private void ActionClick_ToggleRemoteAccess(object sender, EventArgs e) => ServerTab.num_remotePort.Enabled = ServerTab.cb_enableRemote.Checked;
-
-        private void actionClick_importServerSettings(object sender, EventArgs e) => theInstanceManager.ImportSettings();
-        private void actionClick_ExportSettings(object sender, EventArgs e) => theInstanceManager.ExportSettings();
 
         // --- Map Tab ---
         private void functionEvent_UpdateMapGameTypes()

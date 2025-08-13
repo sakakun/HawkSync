@@ -32,7 +32,7 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel2 = new TableLayoutPanel();
             btn_serverControl = new Button();
-            btn_lock = new Button();
+            btn_LockLobby = new Button();
             btn_LoadSettings = new Button();
             btn_ExportSettings = new Button();
             btn_ResetSettings = new Button();
@@ -208,7 +208,7 @@
             tableLayoutPanel2.ColumnCount = 1;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle());
             tableLayoutPanel2.Controls.Add(btn_serverControl, 0, 0);
-            tableLayoutPanel2.Controls.Add(btn_lock, 0, 1);
+            tableLayoutPanel2.Controls.Add(btn_LockLobby, 0, 1);
             tableLayoutPanel2.Controls.Add(btn_LoadSettings, 0, 2);
             tableLayoutPanel2.Controls.Add(btn_ExportSettings, 0, 3);
             tableLayoutPanel2.Controls.Add(btn_ResetSettings, 0, 4);
@@ -239,19 +239,21 @@
             btn_serverControl.Text = "START";
             toolTip1.SetToolTip(btn_serverControl, "Start/Stop Server");
             btn_serverControl.UseVisualStyleBackColor = true;
+            btn_serverControl.Click += actionClick_serverControl;
             // 
-            // btn_lock
+            // btn_LockLobby
             // 
-            btn_lock.Dock = DockStyle.Fill;
-            btn_lock.Font = new Font("Segoe UI", 12F);
-            btn_lock.Location = new Point(3, 53);
-            btn_lock.Name = "btn_lock";
-            btn_lock.Size = new Size(89, 44);
-            btn_lock.TabIndex = 1;
-            btn_lock.Text = "LOCK";
-            toolTip1.SetToolTip(btn_lock, "Lock Server from Entry");
-            btn_lock.UseVisualStyleBackColor = true;
-            btn_lock.Visible = false;
+            btn_LockLobby.Dock = DockStyle.Fill;
+            btn_LockLobby.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btn_LockLobby.Location = new Point(3, 53);
+            btn_LockLobby.Name = "btn_LockLobby";
+            btn_LockLobby.Size = new Size(89, 44);
+            btn_LockLobby.TabIndex = 1;
+            btn_LockLobby.Text = "UN/LOCK LOBBY";
+            toolTip1.SetToolTip(btn_LockLobby, "Lock Server from Entry");
+            btn_LockLobby.UseVisualStyleBackColor = true;
+            btn_LockLobby.Visible = false;
+            btn_LockLobby.Click += actionClick_ServerLockLobby;
             // 
             // btn_LoadSettings
             // 
@@ -264,6 +266,7 @@
             btn_LoadSettings.Text = "LOAD";
             toolTip1.SetToolTip(btn_LoadSettings, "Load Settings from File");
             btn_LoadSettings.UseVisualStyleBackColor = true;
+            btn_LoadSettings.Click += actionClick_ImportServerSettings;
             // 
             // btn_ExportSettings
             // 
@@ -276,6 +279,7 @@
             btn_ExportSettings.Text = "EXPORT";
             toolTip1.SetToolTip(btn_ExportSettings, "Export Settings to File");
             btn_ExportSettings.UseVisualStyleBackColor = true;
+            btn_ExportSettings.Click += actionClick_ExportServerSettings;
             // 
             // btn_ResetSettings
             // 
@@ -315,6 +319,7 @@
             toolTip1.SetToolTip(btn_ServerUpdate, "Update Game Server using Saved Settings");
             btn_ServerUpdate.UseVisualStyleBackColor = true;
             btn_ServerUpdate.Visible = false;
+            btn_ServerUpdate.Click += actionClick_GameServerUpdate;
             // 
             // panel1
             // 
@@ -607,6 +612,7 @@
             cb_enableRemote.TabIndex = 5;
             cb_enableRemote.Text = "Enable Remote Access";
             cb_enableRemote.UseVisualStyleBackColor = true;
+            cb_enableRemote.Click += actionClick_ToggleRemoteAccess;
             // 
             // num_remotePort
             // 
@@ -899,7 +905,7 @@
             // 
             // num_maxFFKills
             // 
-            num_maxFFKills.Location = new Point(110, 84);
+            num_maxFFKills.Location = new Point(110, 86);
             num_maxFFKills.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             num_maxFFKills.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             num_maxFFKills.Name = "num_maxFFKills";
@@ -911,17 +917,18 @@
             // cb_enableFFkills
             // 
             cb_enableFFkills.AutoSize = true;
-            cb_enableFFkills.Location = new Point(45, 21);
+            cb_enableFFkills.Location = new Point(45, 23);
             cb_enableFFkills.Name = "cb_enableFFkills";
             cb_enableFFkills.Size = new Size(100, 19);
             cb_enableFFkills.TabIndex = 4;
             cb_enableFFkills.Text = "Enable FF Kills";
             cb_enableFFkills.UseVisualStyleBackColor = true;
+            cb_enableFFkills.Click += actionClick_EnableFFkills;
             // 
             // label_maxFFkills
             // 
             label_maxFFkills.AutoSize = true;
-            label_maxFFkills.Location = new Point(34, 88);
+            label_maxFFkills.Location = new Point(34, 90);
             label_maxFFkills.Name = "label_maxFFkills";
             label_maxFFkills.Size = new Size(68, 15);
             label_maxFFkills.TabIndex = 7;
@@ -930,7 +937,7 @@
             // cb_warnFFkils
             // 
             cb_warnFFkils.AutoSize = true;
-            cb_warnFFkils.Location = new Point(45, 41);
+            cb_warnFFkils.Location = new Point(45, 43);
             cb_warnFFkils.Name = "cb_warnFFkils";
             cb_warnFFkils.Size = new Size(93, 19);
             cb_warnFFkils.TabIndex = 6;
@@ -940,7 +947,7 @@
             // cb_showTeamTags
             // 
             cb_showTeamTags.AutoSize = true;
-            cb_showTeamTags.Location = new Point(45, 61);
+            cb_showTeamTags.Location = new Point(45, 63);
             cb_showTeamTags.Name = "cb_showTeamTags";
             cb_showTeamTags.Size = new Size(97, 19);
             cb_showTeamTags.TabIndex = 5;
@@ -1093,6 +1100,7 @@
             cb_enableMaxCheck.TabIndex = 1;
             cb_enableMaxCheck.Text = "Enable Max Check";
             cb_enableMaxCheck.UseVisualStyleBackColor = true;
+            cb_enableMaxCheck.Click += actionClick_EnableMaxPing;
             // 
             // cb_enableMinCheck
             // 
@@ -1103,6 +1111,7 @@
             cb_enableMinCheck.TabIndex = 0;
             cb_enableMinCheck.Text = "Enable Min Check";
             cb_enableMinCheck.UseVisualStyleBackColor = true;
+            cb_enableMinCheck.Click += actionClick_EnableMinCheck;
             // 
             // groupBox7
             // 
@@ -1611,7 +1620,7 @@
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableLayoutPanel2;
         public Button btn_serverControl;
-        public Button btn_lock;
+        public Button btn_LockLobby;
         public Button btn_LoadSettings;
         public Button btn_ExportSettings;
         public Button btn_ResetSettings;

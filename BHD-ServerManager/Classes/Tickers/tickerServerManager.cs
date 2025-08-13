@@ -52,8 +52,8 @@ namespace BHD_ServerManager.Classes.Tickers
             {
                 // --- UI Update Hooks ---
                 thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
+                thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
 
-                thisServer.functionEvent_swapFieldsStartStop();                                 // Swap Start/Stop Fields
                 adminInstanceManager.UpdateAdminLogDialog();                                    // Update Admin Log Dialog
                 theInstanceManager.HighlightDifferences();                                      // Highlight differences in the UI (Settings)
                 tickerEvent_checkMapDiff();                                                     // Map Playlist Difference Check

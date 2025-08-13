@@ -1553,7 +1553,6 @@ namespace BHD_ServerManager.Forms
             btn_SaveSettings.TabIndex = 9;
             btn_SaveSettings.Text = "Save";
             btn_SaveSettings.UseVisualStyleBackColor = true;
-            btn_SaveSettings.Click += actionClick_saveUpdateSettings;
             // 
             // labelReportInterval
             // 
