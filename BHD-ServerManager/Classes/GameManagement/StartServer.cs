@@ -428,7 +428,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 {
                     FileName = FullFileName,
                     WorkingDirectory = thisInstance.profileServerPath,
-                    Arguments = "/w /LOADBAR /NOSYSDUMP /serveonly /autorestart",
+                    Arguments = (thisInstance.profileModifierList1.Count > 0 || thisInstance.profileModifierList2.Count > 0)
+                                ? string.Join(" ", thisInstance.profileModifierList1.Concat(thisInstance.profileModifierList2))
+                                : string.Empty,
                     // WindowStyle = ProcessWindowStyle.Minimized
                 };
                 Process? process = Process.Start(startInfo);
