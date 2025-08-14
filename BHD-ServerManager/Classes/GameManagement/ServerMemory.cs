@@ -943,7 +943,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static void UpdateSecondaryMapList()
         {
 
-
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;
             ReadProcessMemory((int)processHandle, baseAddr + 0x005ED5F8, ServerMapCyclePtr, ServerMapCyclePtr.Length, ref Pointer2Read);
@@ -982,8 +981,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 WriteProcessMemory((int)processHandle, mapFileIndexLocation, customMapFlag, customMapFlag.Length, ref customMapFlagWritten);
                 mapCycleList += 0x24;
             }
-
-
 
         }
         // Function: UpdateNovaID
