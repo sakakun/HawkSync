@@ -169,7 +169,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             var newInstance = import && updatedInstance != null ? updatedInstance : theInstance;
             
             // Trigger "Gets" for the Tabs
-            thisServer.ProfileTab.functionEvent_GetProfileSettings(null, null);
+            thisServer.ProfileTab.functionEvent_GetProfileSettings(null, null!);
             thisServer.ServerTab.functionEvent_GetServerSettings((updatedInstance != null ? updatedInstance : null!));
 
             // Stats Settings

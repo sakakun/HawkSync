@@ -108,7 +108,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             if (!_firstLoadComplete)
             {
-                functionEvent_GetProfileSettings(null, null); // Initial load of profile data.
+                functionEvent_GetProfileSettings(null, null!); // Initial load of profile data.
                 _firstLoadComplete = true;
             }
 
