@@ -994,8 +994,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return; // since we are requiring nova login, just return.
             }
 
-
-
             byte[] CurrentAppIDBytes = new byte[4];
             int currentAppIDRead = 0;
             ReadProcessMemory((int)processHandle, 0x009DDA44, CurrentAppIDBytes, CurrentAppIDBytes.Length, ref currentAppIDRead);
@@ -1043,7 +1041,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
         }
         // Function: UpdateMapCycleCounter
-        public static void UpdateMapCycleCounter()
+        public static void ReadMapCycleCounter()
         {
 
             byte[] currentMapCycleCountBytes = new byte[4];
@@ -1073,7 +1071,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
         }
         // Function: UpdateNextMapGameType
-        public static void UpdateNextMapGameType()
+        public static void GetNextMapType()
         {
 
             // This will grab the current map index.
@@ -1098,32 +1096,34 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 currentMapIndex++;
             }
+
             AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.currentMapPlaylist.Count + " Current Map Index: " + currentMapIndex);
+            int currentMapType = getGameTypeID(thisInstance.gameInfoGameType!);
+            int nextMapType = getGameTypeID(mapInstance.currentMapPlaylist[currentMapIndex].MapType!);
+
+            AppDebug.Log("ServerMemory", "Current Map Type: " + thisInstance.gameInfoMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
+            AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].MapType + " - " + nextMapType);
+
+            thisInstance.gameInfoNextMapGameType = nextMapType;
+
+        }
+        public static void SetNextMapType()
+        {
             try
             {
-
-                int currentMapType = getGameTypeID(thisInstance.gameInfoGameType!);
-                int nextMapType = getGameTypeID(mapInstance.currentMapPlaylist[currentMapIndex].MapType!);
-
-                AppDebug.Log("ServerMemory", "Current Map Type: " + thisInstance.gameInfoMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
-                AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].MapType + " - " + nextMapType);
-
                 // Deal with the Players
-                theInstanceManager.changeTeamGameMode(currentMapType, nextMapType);
-                thisInstance.gameInfoNextMapGameType = nextMapType;
+                theInstanceManager.changeTeamGameMode(getGameTypeID(thisInstance.gameInfoGameType!), thisInstance.gameInfoNextMapGameType);
 
                 // Change the MapType for the next map
                 var CurrentGameTypeAddr = baseAddr + 0x5F21A4;
-                byte[] nextMaptypeBytes = BitConverter.GetBytes(nextMapType);
+                byte[] nextMaptypeBytes = BitConverter.GetBytes(thisInstance.gameInfoNextMapGameType);
                 int nextMaptypeBytesWrite = 0;
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
 
             }
             catch (Exception ex)
             {
-
                 AppDebug.Log("ServerMemory", "Something went wrong with ScoringProcessHandler: " + ex);
-                throw new Exception("Something went wrong with ScoringProcessHandler: " + ex);
             }
         }
         // Update the Game Score for the next map

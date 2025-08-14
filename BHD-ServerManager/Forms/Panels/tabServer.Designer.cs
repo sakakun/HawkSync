@@ -66,7 +66,6 @@
             num_remotePort = new NumericUpDown();
             cb_sessionType = new ComboBox();
             tb_serverPassword = new TextBox();
-            cb_novaRequired = new CheckBox();
             num_serverPort = new NumericUpDown();
             cb_serverDedicated = new CheckBox();
             cb_serverIP = new ComboBox();
@@ -579,7 +578,6 @@
             groupBox4.Controls.Add(num_remotePort);
             groupBox4.Controls.Add(cb_sessionType);
             groupBox4.Controls.Add(tb_serverPassword);
-            groupBox4.Controls.Add(cb_novaRequired);
             groupBox4.Controls.Add(num_serverPort);
             groupBox4.Controls.Add(cb_serverDedicated);
             groupBox4.Controls.Add(cb_serverIP);
@@ -645,18 +643,6 @@
             tb_serverPassword.Size = new Size(154, 23);
             tb_serverPassword.TabIndex = 2;
             tb_serverPassword.TextAlign = HorizontalAlignment.Center;
-            // 
-            // cb_novaRequired
-            // 
-            cb_novaRequired.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            cb_novaRequired.AutoSize = true;
-            cb_novaRequired.CheckAlign = ContentAlignment.MiddleRight;
-            cb_novaRequired.Location = new Point(440, 73);
-            cb_novaRequired.Name = "cb_novaRequired";
-            cb_novaRequired.Size = new Size(169, 19);
-            cb_novaRequired.TabIndex = 1;
-            cb_novaRequired.Text = "NovaWorld Login Required";
-            cb_novaRequired.UseVisualStyleBackColor = true;
             // 
             // num_serverPort
             // 

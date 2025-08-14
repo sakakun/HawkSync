@@ -10,6 +10,7 @@ using BHD_SharedResources.Classes.SupportClasses;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Windows.Storage;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -168,7 +169,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             var newInstance = import && updatedInstance != null ? updatedInstance : theInstance;
             
             // Trigger "Gets" for the Tabs
-            thisServer.ProfileTab.getProfile(null, null);
+            thisServer.ProfileTab.functionEvent_GetProfileSettings(null, null);
             thisServer.ServerTab.functionEvent_GetServerSettings((updatedInstance != null ? updatedInstance : null!));
 
             // Stats Settings
@@ -278,7 +279,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public void InitializeTickers()
         {
             // TODO: Remove the need for the thisServer variable in the ticker methods.
-            CommonCore.Ticker.Start("ServerManager", 2000, () => tickerServerManager.runTicker());
+            CommonCore.Ticker.Start("ServerManager", 500, () => tickerServerManager.runTicker());
             CommonCore.Ticker.Start("ChatManager", 500, () => tickerChatManagement.runTicker());
             CommonCore.Ticker.Start("PlayerManager", 1000, () => tickerPlayerManagement.runTicker());
             CommonCore.Ticker.Start("BanManager", 1000, () => tickerBanManagement.runTicker());
@@ -422,66 +423,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         public void HighlightDifferences()
         {
-            // Host Information
-            HighlightTextBox(thisServer.ServerTab.tb_serverID, theInstance.WebStatsProfileID);
-            HighlightTextBox(thisServer.ServerTab.tb_serverName, theInstance.gameServerName);
-            HighlightTextBox(thisServer.ServerTab.tb_hostName, theInstance.gameHostName);
-            HighlightTextBox(thisServer.ServerTab.tb_serverMessage, theInstance.gameMOTD);
-
-            // Server Details
-            HighlightComboBox(thisServer.ServerTab.cb_serverIP, theInstance.profileBindIP);
-            HighlightNumericUpDown(thisServer.ServerTab.num_serverPort, theInstance.profileBindPort);
-            HighlightTextBox(thisServer.ServerTab.tb_serverPassword, theInstance.gamePasswordLobby);
-            HighlightCheckBox(thisServer.ServerTab.cb_serverDedicated, theInstance.gameDedicated);
-            HighlightCheckBox(thisServer.ServerTab.cb_novaRequired, theInstance.gameRequireNova);
-            HighlightComboBoxIndex(thisServer.ServerTab.cb_sessionType, theInstance.gameSessionType);
-
-            // Server Options
-            HighlightNumericUpDown(thisServer.ServerTab.num_gameTimeLimit, theInstance.gameTimeLimit);
-            HighlightComboBoxIndex(thisServer.ServerTab.cb_replayMaps, theInstance.gameLoopMaps);
-            HighlightNumericUpDown(thisServer.ServerTab.num_gameStartDelay, theInstance.gameStartDelay);
-            HighlightNumericUpDown(thisServer.ServerTab.num_respawnTime, theInstance.gameRespawnTime);
-            HighlightNumericUpDown(thisServer.ServerTab.num_scoreBoardDelay, theInstance.gameScoreBoardDelay);
-            HighlightNumericUpDown(thisServer.ServerTab.num_maxPlayers, theInstance.gameMaxSlots);
-
-            // Scoring Options
-            HighlightNumericUpDown(thisServer.ServerTab.num_scoresKOTH, theInstance.gameScoreZoneTime);
-            HighlightNumericUpDown(thisServer.ServerTab.num_scoresDM, theInstance.gameScoreKills);
-            HighlightNumericUpDown(thisServer.ServerTab.num_scoresFB, theInstance.gameScoreFlags);
-
-            // Team Options
-            HighlightCheckBox(thisServer.ServerTab.cb_autoBalance, theInstance.gameOptionAutoBalance);
-            HighlightTextBox(thisServer.ServerTab.tb_bluePassword, theInstance.gamePasswordBlue);
-            HighlightTextBox(thisServer.ServerTab.tb_redPassword, theInstance.gamePasswordRed);
-
-            // Game Play Settings
-            HighlightCheckBox(thisServer.ServerTab.cb_showTracers, theInstance.gameOptionShowTracers);
-            HighlightCheckBox(thisServer.ServerTab.cb_showClays, theInstance.gameShowTeamClays);
-            HighlightCheckBox(thisServer.ServerTab.cb_autoRange, theInstance.gameOptionAutoRange);
-            HighlightNumericUpDown(thisServer.ServerTab.num_pspTakeoverTimer, theInstance.gamePSPTOTimer);
-            HighlightNumericUpDown(thisServer.ServerTab.num_flagReturnTime, theInstance.gameFlagReturnTime);
-            HighlightNumericUpDown(thisServer.ServerTab.num_maxTeamLives, theInstance.gameMaxTeamLives);
-
-            // Friendly Fire
-            HighlightCheckBox(thisServer.ServerTab.cb_enableFFkills, theInstance.gameOptionFF);
-            HighlightNumericUpDown(thisServer.ServerTab.num_maxFFKills, theInstance.gameFriendlyFireKills);
-            HighlightCheckBox(thisServer.ServerTab.cb_warnFFkils, theInstance.gameOptionFFWarn);
-            HighlightCheckBox(thisServer.ServerTab.cb_showTeamTags, theInstance.gameOptionFriendlyTags);
-
-            // Ping Checking
-            HighlightCheckBox(thisServer.ServerTab.cb_enableMinCheck, theInstance.gameMinPing);
-            HighlightCheckBox(thisServer.ServerTab.cb_enableMaxCheck, theInstance.gameMaxPing);
-            HighlightNumericUpDown(thisServer.ServerTab.num_minPing, theInstance.gameMinPingValue);
-            HighlightNumericUpDown(thisServer.ServerTab.num_maxPing, theInstance.gameMaxPingValue);
-
-            // Misc
-            HighlightCheckBox(thisServer.ServerTab.cb_customSkins, theInstance.gameCustomSkins);
-            HighlightCheckBox(thisServer.ServerTab.cb_enableDistroyBuildings, theInstance.gameDestroyBuildings);
-            HighlightCheckBox(thisServer.ServerTab.cb_enableFatBullets, theInstance.gameFatBullets);
-            HighlightCheckBox(thisServer.ServerTab.cb_enableOneShotKills, theInstance.gameOneShotKills);
-            HighlightCheckBox(thisServer.ServerTab.cb_enableLeftLean, theInstance.gameAllowLeftLeaning);
-
-            // Add more fields as needed...
+            // TO DO: Remove the need for HighlightDifferences in theInstanceManager.
         }
 
         // Helper methods for highlighting

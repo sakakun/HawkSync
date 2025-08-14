@@ -31,7 +31,7 @@ namespace BHD_ServerManager.Forms.Panels
         }
         // --- Form Functions ---
         // --- Get Profile --- Allow to be triggered externally
-        public void getProfile(object? sender, EventArgs e)
+        public void functionEvent_GetProfileSettings(object? sender, EventArgs e)
         {
             // Get the data from "theInterface" object and set it to the form.
             tb_profileServerPath.Text = theInstance.profileServerPath;
@@ -56,7 +56,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
         // --- Save Profile --- Allow to be triggered externally
-        public void saveProfile()
+        public void funtionEvent_SetProfileSettings()
         {
             // Set the data from the form to the "theInterface" object.
             // Trigger the save function in "theInstanceManager".
@@ -78,12 +78,37 @@ namespace BHD_ServerManager.Forms.Panels
             // Show a message box to confirm the save.
             MessageBox.Show("Profile settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+        // --- Highlight Differences --- Allow to be triggered
+        private void functionEvent_HighlightDiffFields()
+        {
+            // Profile Server Path
+            tb_profileServerPath.BackColor = tb_profileServerPath.Text != theInstance.profileServerPath
+                ? Color.LightYellow : SystemColors.Window;
+
+            // Mod File Name
+            tb_modFile.BackColor = tb_modFile.Text != theInstance.profileModFileName
+                ? Color.LightYellow : SystemColors.Window;
+
+            // Modifier List 1
+            var checkedItems1 = cb_profileModifierList1.CheckedItems.Cast<string>().ToList();
+            bool list1Diff = !(theInstance.profileModifierList1?.Count == checkedItems1.Count &&
+                               theInstance.profileModifierList1.All(checkedItems1.Contains) &&
+                               checkedItems1.All(theInstance.profileModifierList1.Contains));
+            cb_profileModifierList1.BackColor = list1Diff ? Color.LightYellow : SystemColors.Window;
+
+            // Modifier List 2
+            var checkedItems2 = cb_profileModifierList2.CheckedItems.Cast<string>().ToList();
+            bool list2Diff = !(theInstance.profileModifierList2?.Count == checkedItems2.Count &&
+                               theInstance.profileModifierList2.All(checkedItems2.Contains) &&
+                               checkedItems2.All(theInstance.profileModifierList2.Contains));
+            cb_profileModifierList2.BackColor = list2Diff ? Color.LightYellow : SystemColors.Window;
+        }
         // --- Ticker Profile Hook --- Allow to be triggered externally by the Server Manager Ticker
         public void tickerProfileTabHook()
         {
             if (!_firstLoadComplete)
             {
-                getProfile(null, null); // Initial load of profile data.
+                functionEvent_GetProfileSettings(null, null); // Initial load of profile data.
                 _firstLoadComplete = true;
             }
 
@@ -101,18 +126,21 @@ namespace BHD_ServerManager.Forms.Panels
             // Enable/disable mod fields based on /mod checked and OFFLINE status
             tb_modFile.Enabled = currentState && isModChecked;
             btn_profileBrowse2.Enabled = currentState && isModChecked;
+            
+            // Highlight differences
+            functionEvent_HighlightDiffFields();
         }
 
         // --- Action Click Events ---
         // --- Save Profile Button Clicked ---
         private void actionClick_SaveProfile(object sender, EventArgs e)
         {
-            saveProfile();
+            funtionEvent_SetProfileSettings();
         }
         // --- Reset Profile Button Clicked ---
         private void actionClick_ResetProfile(object sender, EventArgs e)
         {
-            getProfile(sender, e); // Re-fetch the profile data to reset the form.
+            functionEvent_GetProfileSettings(sender, e); // Re-fetch the profile data to reset the form.
         }
         // --- Open Profile Folder Button Clicked ---
         private void actionClick_profileOpenFolderDialog(object sender, EventArgs e)
