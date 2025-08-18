@@ -1461,7 +1461,9 @@ namespace BHD_ServerManager.Classes.GameManagement
         {
             // Check if PID and process handle are set
             if (thisInstance.instanceAttachedPID == null || thisInstance.instanceAttachedPID == 0 || processHandle == nint.Zero)
+            {
                 return false;
+            }
 
             try
             {
@@ -1480,6 +1482,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                         return false;
                     }
                 }
+
                 // If we got here, process is running and matches
                 return true;
             }
@@ -1488,13 +1491,13 @@ namespace BHD_ServerManager.Classes.GameManagement
                 // Process does not exist or access denied
                 thisInstance.instanceAttachedPID = null;
                 processHandle = nint.Zero; // Replace 'null' with 'IntPtr.Zero' for nint type
+                AppDebug.Log("ServerMemory", "Process not found or access denied.");
                 return false;
             }
         }
         // Function: ReadMemoryServerStatus
         public static void ReadMemoryServerStatus()
         {
-
 
             var startingPointer = baseAddr + 0x00098334;
             byte[] startingPointerBuffer = new byte[4];

@@ -51,7 +51,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             }
 
             chatInstanceManagers.RemoveSlapMessage(messageIndex);
-            thisServer.functionEvent_UpdateSlapMessages();
+            thisServer.ChatTab.fuctionEvent_UpdateSlapMessages();
 
             return new CommandResponse
             {

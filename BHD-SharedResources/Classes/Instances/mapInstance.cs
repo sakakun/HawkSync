@@ -35,7 +35,8 @@ namespace BHD_SharedResources.Classes.Instances
         public string       MapName { get; set; } = string.Empty;
         /// <summary>
         /// Map Type (e.g., "Deathmatch", "Team Deathmatch") - Seen in the UI, multiple types can be associated with a map.
-        /// </summary>
+        /// </summary>\
+        /// 
         public string       MapType { get; set; } = string.Empty;
         /// <summary>
         /// Custom Map Flag - Indicates if the map is a custom map.

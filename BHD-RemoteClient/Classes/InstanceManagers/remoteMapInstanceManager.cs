@@ -92,5 +92,15 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
                 MessageBox.Show("Failed to save map playlist:\n" + ex.Message, "Save Error");
             }
         }
+
+        List<mapFileInfo> mapInstanceInterface.LoadCustomMapPlaylist(bool external)
+        {
+            throw new NotImplementedException();
+        }
+
+        string[]? mapInstanceInterface.GetFileLinesFromDialog(bool saveDialog, string filter, string title, string initialDirectory, string defaultFileName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

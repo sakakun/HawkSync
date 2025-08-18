@@ -47,18 +47,6 @@ namespace BHD_ServerManager.Classes.Tickers
             if (DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) >= 0)
                 return;
 
-            // UI updates that should always run
-            SafeInvoke(thisServer, () =>
-            {
-                // --- UI Update Hooks ---
-                thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
-                thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
-
-                adminInstanceManager.UpdateAdminLogDialog();                                    // Update Admin Log Dialog
-                tickerEvent_checkMapDiff();                                                     // Map Playlist Difference Check
-                tickerEvent_updateLabels(thisServer);                                           // Update the Labels on the UI
-            });
-
             // If server process is not attached, set status to offline and update UI
             if (!ServerMemory.ReadMemoryIsProcessAttached())
             {
@@ -66,10 +54,26 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     theInstance.instanceStatus = InstanceStatus.OFFLINE;
                     SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());
-                    theInstance.instanceNextUpdateTime = currentTime.AddSeconds(5);
-                    theInstance.instanceLastUpdateTime = currentTime;
-                    return;
                 }
+            }
+
+            // UI updates that should always run
+            SafeInvoke(thisServer, () =>
+            {
+                // --- UI Update Hooks ---
+                thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
+                thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
+                thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
+
+                adminInstanceManager.UpdateAdminLogDialog();                                    // Update Admin Log Dialog
+            });
+
+            if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
+            {
+                // If the server is offline, we can skip the rest of the processing
+                theInstance.instanceNextUpdateTime = currentTime.AddSeconds(5);
+                theInstance.instanceLastUpdateTime = currentTime;
+                return;
             }
 
             // --- Server is online: run status-specific logic in order ---
@@ -166,31 +170,6 @@ namespace BHD_ServerManager.Classes.Tickers
             }
         }
 
-        // --- Map Playlist Difference Check ---
-        private static void tickerEvent_checkMapDiff()
-        {
-            if (thisServer == null) return;
-
-            SafeInvoke(thisServer, () =>
-            {
-                if (instanceMaps.currentMapPlaylist.Count != thisServer.dataGridView_currentMaps.Rows.Count)
-                {
-                    thisServer.ib_resetCurrentMaps.BackColor = Color.Red;
-                    return;
-                }
-                for (int i = 0; i < instanceMaps.currentMapPlaylist.Count; i++)
-                {
-                    if (instanceMaps.currentMapPlaylist[i].MapName != thisServer.dataGridView_currentMaps.Rows[i].Cells["MapName"].Value?.ToString())
-                    {
-                        AppDebug.Log("tickerServerManagement", "Map Playlist Name Mismatch Detected at index " + i);
-                        thisServer.ib_resetCurrentMaps.BackColor = Color.Red;
-                        return;
-                    }
-                }
-                thisServer.ib_resetCurrentMaps.BackColor = Color.Transparent;
-            });
-        }
-
         // --- Pre-Game Processing (Loading Map) ---
         private static void tickerEvent_preGameProcessing()
         {
@@ -229,24 +208,6 @@ namespace BHD_ServerManager.Classes.Tickers
             CommonCore.Ticker?.Start("ScoreboardTicker", 1000, () => tickerEvent_Scoreboard());
             AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
 
-        }
-
-        // --- UI Label Updates ---
-        private static void tickerEvent_updateLabels(ServerManager thisServer)
-        {
-            int nextMapIndex = theInstance.gameInfoCurrentMapIndex >= instanceMaps.currentMapPlaylist.Count - 1
-                                || theInstance.gameInfoCurrentMapIndex < 0
-                                ? 0
-                                : theInstance.gameInfoCurrentMapIndex + 1;
-
-            SafeInvoke(thisServer, () =>
-            {
-                thisServer.label_dataCurrentMap.Text = theInstance.gameInfoMapName;
-                thisServer.label_dataNextMap.Text = instanceMaps.currentMapPlaylist.Count > 0
-                    ? instanceMaps.currentMapPlaylist[nextMapIndex].MapName + "[" + theInstance.gameInfoNextMapGameType + "]"
-                    : string.Empty;
-                thisServer.label_dataTimeLeft.Text = theInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss");
-            });
         }
 
         // --- Scoreboard Ticker ---

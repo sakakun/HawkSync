@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Windows.Storage;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -460,7 +461,9 @@ namespace BHD_ServerManager.Forms.Panels
         }
         private void functionEvent_UpdateServerControls()
         {
-            bool isOffline = theInstance.instanceStatus == InstanceStatus.OFFLINE;
+            // Is the Server Running?
+            bool isOffline = (theInstance.instanceStatus == InstanceStatus.OFFLINE);
+
             // Server Running? Update Text
             btn_serverControl.Text = isOffline ? "START" : "STOP";
             // Lock Down Settings that shouldn't be changed while the server is running

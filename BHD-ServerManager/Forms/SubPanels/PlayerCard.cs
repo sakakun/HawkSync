@@ -276,8 +276,12 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             label_dataPlayerNameRole.Text = $"{Player.PlayerName}";
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Color.Black; // Reset to default color
-            playerContextMenuIcon.Visible = false; // Hide context menu icon by default
+            playerContextMenuIcon.Visible = false;  // Hide context menu icon by default
         }
-
+        public void ToggleSlot(int slotNum, bool visible = true)
+        {
+            this.ResetStatus(slotNum);
+            this.Visible = visible;
+        }
     }
 }

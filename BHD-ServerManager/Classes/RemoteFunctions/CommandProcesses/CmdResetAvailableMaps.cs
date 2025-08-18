@@ -9,7 +9,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
         public static CommandResponse ProcessCommand(object data)
         {
 
-            thisServer.functionEvent_RefreshAvailableMaps();
+            thisServer.MapsTab.functionEvent_ResetAvailableMaps();
 
             return new CommandResponse
             {

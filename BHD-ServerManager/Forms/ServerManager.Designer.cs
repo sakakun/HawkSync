@@ -32,63 +32,20 @@ namespace BHD_ServerManager.Forms
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             toolStrip = new ToolStrip();
             toolStripStatus = new ToolStripLabel();
+            label_TimeLeft = new ToolStripLabel();
+            label_WinCondition = new ToolStripLabel();
+            label_RedScore = new ToolStripLabel();
+            label_BlueScore = new ToolStripLabel();
+            label_PlayersOnline = new ToolStripLabel();
             mainPanel = new Panel();
             tabControl = new TabControl();
             tabProfile = new TabPage();
             tabServer = new TabPage();
             tabMaps = new TabPage();
-            mapsTable = new TableLayoutPanel();
-            mapPanel1 = new Panel();
-            mapsPanel1_table = new TableLayoutPanel();
-            combo_gameTypes = new ComboBox();
-            dataGridView_availableMaps = new DataGridView();
-            mapsPanel2 = new Panel();
-            mapsPanel2_table = new TableLayoutPanel();
-            dataGridView_currentMaps = new DataGridView();
-            tableMapControls = new TableLayoutPanel();
-            ib_resetCurrentMaps = new FontAwesome.Sharp.IconButton();
-            ib_exportMapList = new FontAwesome.Sharp.IconButton();
-            ib_importMapList = new FontAwesome.Sharp.IconButton();
-            ib_mapRefresh = new FontAwesome.Sharp.IconButton();
-            ib_clearMapList = new FontAwesome.Sharp.IconButton();
-            panel1 = new Panel();
-            tableLayoutPanel2 = new TableLayoutPanel();
-            btn_mapsUpdate = new Button();
-            btn_mapsPlayNext = new Button();
-            btn_mapsScore = new Button();
-            btn_mapsSkip = new Button();
-            panel4 = new Panel();
-            tableLayoutPanel3 = new TableLayoutPanel();
-            label6 = new Label();
-            label_dataCurrentMap = new Label();
-            label7 = new Label();
-            label_dataNextMap = new Label();
-            label8 = new Label();
-            label_dataTimeLeft = new Label();
-            label9 = new Label();
-            label10 = new Label();
-            label11 = new Label();
-            label12 = new Label();
             tabPlayers = new TabPage();
-            panel6 = new Panel();
-            player_LayoutPanel = new FlowLayoutPanel();
             tabChat = new TabPage();
-            tableLayoutPanel4 = new TableLayoutPanel();
-            tb_chatMessage = new TextBox();
-            btn_sendChat = new Button();
-            panel5 = new Panel();
-            dataGridView_chatMessages = new DataGridView();
-            dateTime = new DataGridViewTextBoxColumn();
-            Team = new DataGridViewTextBoxColumn();
-            Player = new DataGridViewTextBoxColumn();
-            Message = new DataGridViewTextBoxColumn();
             tabBans = new TabPage();
             tableLayoutPanel5 = new TableLayoutPanel();
             groupBox3 = new GroupBox();
@@ -110,26 +67,6 @@ namespace BHD_ServerManager.Forms
             tb_bansIPAddress = new TextBox();
             cb_banSubMask = new ComboBox();
             btn_addBan = new Button();
-            tabMessages = new TabPage();
-            tabMessagesControl = new TabControl();
-            tabAuto = new TabPage();
-            tableLayoutPanel9 = new TableLayoutPanel();
-            dg_autoMessages = new DataGridView();
-            autoMessageID = new DataGridViewTextBoxColumn();
-            autoTrigger = new DataGridViewTextBoxColumn();
-            autoMessageText = new DataGridViewTextBoxColumn();
-            tableLayoutPanel12 = new TableLayoutPanel();
-            tb_autoMessage = new TextBox();
-            btn_addAutoMessage = new Button();
-            num_AutoMessageTrigger = new NumericUpDown();
-            tabSlaps = new TabPage();
-            tableLayoutPanel10 = new TableLayoutPanel();
-            dg_slapMessages = new DataGridView();
-            slapMessageID = new DataGridViewTextBoxColumn();
-            slapMessages = new DataGridViewTextBoxColumn();
-            tableLayoutPanel11 = new TableLayoutPanel();
-            tb_slapMessage = new TextBox();
-            btn_addSlap = new Button();
             tabStats = new TabPage();
             tabStatsControl = new TabControl();
             tabPlayerStats = new TabPage();
@@ -180,24 +117,6 @@ namespace BHD_ServerManager.Forms
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
-            tabMaps.SuspendLayout();
-            mapsTable.SuspendLayout();
-            mapPanel1.SuspendLayout();
-            mapsPanel1_table.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView_availableMaps).BeginInit();
-            mapsPanel2.SuspendLayout();
-            mapsPanel2_table.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView_currentMaps).BeginInit();
-            tableMapControls.SuspendLayout();
-            panel1.SuspendLayout();
-            tableLayoutPanel2.SuspendLayout();
-            panel4.SuspendLayout();
-            tableLayoutPanel3.SuspendLayout();
-            tabPlayers.SuspendLayout();
-            tabChat.SuspendLayout();
-            tableLayoutPanel4.SuspendLayout();
-            panel5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView_chatMessages).BeginInit();
             tabBans.SuspendLayout();
             tableLayoutPanel5.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -209,17 +128,6 @@ namespace BHD_ServerManager.Forms
             tableLayoutPanel6.SuspendLayout();
             groupBox9.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
-            tabMessages.SuspendLayout();
-            tabMessagesControl.SuspendLayout();
-            tabAuto.SuspendLayout();
-            tableLayoutPanel9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dg_autoMessages).BeginInit();
-            tableLayoutPanel12.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)num_AutoMessageTrigger).BeginInit();
-            tabSlaps.SuspendLayout();
-            tableLayoutPanel10.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dg_slapMessages).BeginInit();
-            tableLayoutPanel11.SuspendLayout();
             tabStats.SuspendLayout();
             tabStatsControl.SuspendLayout();
             tabPlayerStats.SuspendLayout();
@@ -247,7 +155,7 @@ namespace BHD_ServerManager.Forms
             // toolStrip
             // 
             toolStrip.Dock = DockStyle.Bottom;
-            toolStrip.Items.AddRange(new ToolStripItem[] { toolStripStatus });
+            toolStrip.Items.AddRange(new ToolStripItem[] { toolStripStatus, label_TimeLeft, label_WinCondition, label_RedScore, label_BlueScore, label_PlayersOnline });
             toolStrip.Location = new Point(0, 400);
             toolStrip.Name = "toolStrip";
             toolStrip.Size = new Size(920, 25);
@@ -259,6 +167,46 @@ namespace BHD_ServerManager.Forms
             toolStripStatus.Name = "toolStripStatus";
             toolStripStatus.Size = new Size(117, 22);
             toolStripStatus.Text = "Current Server Status";
+            // 
+            // label_TimeLeft
+            // 
+            label_TimeLeft.Alignment = ToolStripItemAlignment.Right;
+            label_TimeLeft.Name = "label_TimeLeft";
+            label_TimeLeft.Size = new Size(65, 22);
+            label_TimeLeft.Text = "[Time Left]";
+            label_TimeLeft.ToolTipText = "Future Feature";
+            // 
+            // label_WinCondition
+            // 
+            label_WinCondition.Alignment = ToolStripItemAlignment.Right;
+            label_WinCondition.Name = "label_WinCondition";
+            label_WinCondition.Size = new Size(92, 22);
+            label_WinCondition.Text = "[Win Condition]";
+            label_WinCondition.ToolTipText = "Future Feature";
+            // 
+            // label_RedScore
+            // 
+            label_RedScore.Alignment = ToolStripItemAlignment.Right;
+            label_RedScore.Name = "label_RedScore";
+            label_RedScore.Size = new Size(67, 22);
+            label_RedScore.Text = "[Red Score]";
+            label_RedScore.ToolTipText = "Future Feature";
+            // 
+            // label_BlueScore
+            // 
+            label_BlueScore.Alignment = ToolStripItemAlignment.Right;
+            label_BlueScore.Name = "label_BlueScore";
+            label_BlueScore.Size = new Size(70, 22);
+            label_BlueScore.Text = "[Blue Score]";
+            label_BlueScore.ToolTipText = "Future Feature";
+            // 
+            // label_PlayersOnline
+            // 
+            label_PlayersOnline.Alignment = ToolStripItemAlignment.Right;
+            label_PlayersOnline.Name = "label_PlayersOnline";
+            label_PlayersOnline.Size = new Size(90, 22);
+            label_PlayersOnline.Text = "[Players Online]";
+            label_PlayersOnline.ToolTipText = "Future Feature";
             // 
             // mainPanel
             // 
@@ -278,7 +226,6 @@ namespace BHD_ServerManager.Forms
             tabControl.Controls.Add(tabPlayers);
             tabControl.Controls.Add(tabChat);
             tabControl.Controls.Add(tabBans);
-            tabControl.Controls.Add(tabMessages);
             tabControl.Controls.Add(tabStats);
             tabControl.Controls.Add(tabAdmin);
             tabControl.Dock = DockStyle.Fill;
@@ -310,7 +257,6 @@ namespace BHD_ServerManager.Forms
             // 
             // tabMaps
             // 
-            tabMaps.Controls.Add(mapsTable);
             tabMaps.Location = new Point(4, 24);
             tabMaps.Name = "tabMaps";
             tabMaps.Padding = new Padding(3);
@@ -319,478 +265,8 @@ namespace BHD_ServerManager.Forms
             tabMaps.Text = "Maps";
             tabMaps.UseVisualStyleBackColor = true;
             // 
-            // mapsTable
-            // 
-            mapsTable.ColumnCount = 4;
-            mapsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 250F));
-            mapsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
-            mapsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 250F));
-            mapsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            mapsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            mapsTable.Controls.Add(mapPanel1, 0, 0);
-            mapsTable.Controls.Add(mapsPanel2, 2, 0);
-            mapsTable.Controls.Add(panel1, 1, 0);
-            mapsTable.Controls.Add(panel4, 3, 0);
-            mapsTable.Dock = DockStyle.Fill;
-            mapsTable.Location = new Point(3, 3);
-            mapsTable.Name = "mapsTable";
-            mapsTable.RowCount = 1;
-            mapsTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            mapsTable.Size = new Size(896, 356);
-            mapsTable.TabIndex = 0;
-            // 
-            // mapPanel1
-            // 
-            mapPanel1.Controls.Add(mapsPanel1_table);
-            mapPanel1.Dock = DockStyle.Fill;
-            mapPanel1.Location = new Point(3, 3);
-            mapPanel1.Name = "mapPanel1";
-            mapPanel1.Size = new Size(244, 350);
-            mapPanel1.TabIndex = 0;
-            // 
-            // mapsPanel1_table
-            // 
-            mapsPanel1_table.ColumnCount = 1;
-            mapsPanel1_table.ColumnStyles.Add(new ColumnStyle());
-            mapsPanel1_table.Controls.Add(combo_gameTypes, 0, 0);
-            mapsPanel1_table.Controls.Add(dataGridView_availableMaps, 0, 1);
-            mapsPanel1_table.Dock = DockStyle.Fill;
-            mapsPanel1_table.Location = new Point(0, 0);
-            mapsPanel1_table.Name = "mapsPanel1_table";
-            mapsPanel1_table.RowCount = 2;
-            mapsPanel1_table.RowStyles.Add(new RowStyle(SizeType.Percent, 8.46947F));
-            mapsPanel1_table.RowStyles.Add(new RowStyle(SizeType.Percent, 91.53053F));
-            mapsPanel1_table.Size = new Size(244, 350);
-            mapsPanel1_table.TabIndex = 0;
-            // 
-            // combo_gameTypes
-            // 
-            combo_gameTypes.Dock = DockStyle.Fill;
-            combo_gameTypes.FormattingEnabled = true;
-            combo_gameTypes.Items.AddRange(new object[] { "All Game Modes" });
-            combo_gameTypes.Location = new Point(3, 3);
-            combo_gameTypes.Name = "combo_gameTypes";
-            combo_gameTypes.Size = new Size(238, 23);
-            combo_gameTypes.TabIndex = 0;
-            combo_gameTypes.SelectedIndexChanged += actionChange_mapFilterGameType;
-            // 
-            // dataGridView_availableMaps
-            // 
-            dataGridView_availableMaps.AllowUserToAddRows = false;
-            dataGridView_availableMaps.AllowUserToDeleteRows = false;
-            dataGridView_availableMaps.AllowUserToResizeColumns = false;
-            dataGridView_availableMaps.AllowUserToResizeRows = false;
-            dataGridView_availableMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_availableMaps.Dock = DockStyle.Fill;
-            dataGridView_availableMaps.Location = new Point(3, 32);
-            dataGridView_availableMaps.MultiSelect = false;
-            dataGridView_availableMaps.Name = "dataGridView_availableMaps";
-            dataGridView_availableMaps.ReadOnly = true;
-            dataGridView_availableMaps.RowHeadersVisible = false;
-            dataGridView_availableMaps.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridView_availableMaps.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_availableMaps.ShowEditingIcon = false;
-            dataGridView_availableMaps.Size = new Size(238, 315);
-            dataGridView_availableMaps.TabIndex = 1;
-            dataGridView_availableMaps.CellDoubleClick += actionClick_addMap2Current;
-            // 
-            // mapsPanel2
-            // 
-            mapsPanel2.Controls.Add(mapsPanel2_table);
-            mapsPanel2.Dock = DockStyle.Fill;
-            mapsPanel2.Location = new Point(353, 3);
-            mapsPanel2.Name = "mapsPanel2";
-            mapsPanel2.Size = new Size(244, 350);
-            mapsPanel2.TabIndex = 2;
-            // 
-            // mapsPanel2_table
-            // 
-            mapsPanel2_table.ColumnCount = 1;
-            mapsPanel2_table.ColumnStyles.Add(new ColumnStyle());
-            mapsPanel2_table.Controls.Add(dataGridView_currentMaps, 0, 1);
-            mapsPanel2_table.Controls.Add(tableMapControls, 0, 0);
-            mapsPanel2_table.Dock = DockStyle.Fill;
-            mapsPanel2_table.Location = new Point(0, 0);
-            mapsPanel2_table.Name = "mapsPanel2_table";
-            mapsPanel2_table.RowCount = 2;
-            mapsPanel2_table.RowStyles.Add(new RowStyle(SizeType.Percent, 8.519183F));
-            mapsPanel2_table.RowStyles.Add(new RowStyle(SizeType.Percent, 91.48081F));
-            mapsPanel2_table.Size = new Size(244, 350);
-            mapsPanel2_table.TabIndex = 1;
-            // 
-            // dataGridView_currentMaps
-            // 
-            dataGridView_currentMaps.AllowUserToAddRows = false;
-            dataGridView_currentMaps.AllowUserToResizeColumns = false;
-            dataGridView_currentMaps.AllowUserToResizeRows = false;
-            dataGridView_currentMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_currentMaps.Dock = DockStyle.Fill;
-            dataGridView_currentMaps.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dataGridView_currentMaps.Location = new Point(3, 32);
-            dataGridView_currentMaps.MultiSelect = false;
-            dataGridView_currentMaps.Name = "dataGridView_currentMaps";
-            dataGridView_currentMaps.RowHeadersVisible = false;
-            dataGridView_currentMaps.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridView_currentMaps.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView_currentMaps.ShowEditingIcon = false;
-            dataGridView_currentMaps.Size = new Size(238, 315);
-            dataGridView_currentMaps.TabIndex = 0;
-            dataGridView_currentMaps.CellDoubleClick += actionClick_delRowFromCurrent;
-            dataGridView_currentMaps.KeyPress += actionKeyEvent_moveMap;
-            // 
-            // tableMapControls
-            // 
-            tableMapControls.ColumnCount = 6;
-            tableMapControls.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16F));
-            tableMapControls.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16F));
-            tableMapControls.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17F));
-            tableMapControls.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17F));
-            tableMapControls.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17F));
-            tableMapControls.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17F));
-            tableMapControls.Controls.Add(ib_resetCurrentMaps, 5, 0);
-            tableMapControls.Controls.Add(ib_exportMapList, 4, 0);
-            tableMapControls.Controls.Add(ib_importMapList, 3, 0);
-            tableMapControls.Controls.Add(ib_mapRefresh, 0, 0);
-            tableMapControls.Controls.Add(ib_clearMapList, 2, 0);
-            tableMapControls.Dock = DockStyle.Fill;
-            tableMapControls.Location = new Point(3, 3);
-            tableMapControls.Name = "tableMapControls";
-            tableMapControls.RowCount = 1;
-            tableMapControls.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableMapControls.Size = new Size(238, 23);
-            tableMapControls.TabIndex = 1;
-            // 
-            // ib_resetCurrentMaps
-            // 
-            ib_resetCurrentMaps.Dock = DockStyle.Fill;
-            ib_resetCurrentMaps.FlatStyle = FlatStyle.Flat;
-            ib_resetCurrentMaps.IconChar = FontAwesome.Sharp.IconChar.Reply;
-            ib_resetCurrentMaps.IconColor = Color.Black;
-            ib_resetCurrentMaps.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_resetCurrentMaps.IconSize = 24;
-            ib_resetCurrentMaps.Location = new Point(196, 0);
-            ib_resetCurrentMaps.Margin = new Padding(0);
-            ib_resetCurrentMaps.Name = "ib_resetCurrentMaps";
-            ib_resetCurrentMaps.Padding = new Padding(0, 2, 0, 0);
-            ib_resetCurrentMaps.Size = new Size(42, 23);
-            ib_resetCurrentMaps.TabIndex = 5;
-            toolTip.SetToolTip(ib_resetCurrentMaps, "Reset Current Lists");
-            ib_resetCurrentMaps.UseVisualStyleBackColor = true;
-            ib_resetCurrentMaps.Click += actionClick_resetCurrentMapList;
-            // 
-            // ib_exportMapList
-            // 
-            ib_exportMapList.Dock = DockStyle.Fill;
-            ib_exportMapList.FlatStyle = FlatStyle.Flat;
-            ib_exportMapList.IconChar = FontAwesome.Sharp.IconChar.BoxesPacking;
-            ib_exportMapList.IconColor = Color.Black;
-            ib_exportMapList.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_exportMapList.IconSize = 24;
-            ib_exportMapList.Location = new Point(156, 0);
-            ib_exportMapList.Margin = new Padding(0);
-            ib_exportMapList.Name = "ib_exportMapList";
-            ib_exportMapList.Padding = new Padding(0, 2, 0, 0);
-            ib_exportMapList.Size = new Size(40, 23);
-            ib_exportMapList.TabIndex = 4;
-            toolTip.SetToolTip(ib_exportMapList, "Export Map List");
-            ib_exportMapList.UseVisualStyleBackColor = true;
-            ib_exportMapList.Click += actionClick_exportCurrentPlaylist;
-            // 
-            // ib_importMapList
-            // 
-            ib_importMapList.Dock = DockStyle.Fill;
-            ib_importMapList.FlatStyle = FlatStyle.Flat;
-            ib_importMapList.IconChar = FontAwesome.Sharp.IconChar.BoxOpen;
-            ib_importMapList.IconColor = Color.Black;
-            ib_importMapList.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_importMapList.IconSize = 24;
-            ib_importMapList.Location = new Point(116, 0);
-            ib_importMapList.Margin = new Padding(0);
-            ib_importMapList.Name = "ib_importMapList";
-            ib_importMapList.Padding = new Padding(0, 2, 0, 0);
-            ib_importMapList.Size = new Size(40, 23);
-            ib_importMapList.TabIndex = 3;
-            toolTip.SetToolTip(ib_importMapList, "Import Map List");
-            ib_importMapList.UseVisualStyleBackColor = true;
-            ib_importMapList.Click += actionClick_importMapPlaylist;
-            // 
-            // ib_mapRefresh
-            // 
-            ib_mapRefresh.Dock = DockStyle.Fill;
-            ib_mapRefresh.FlatStyle = FlatStyle.Flat;
-            ib_mapRefresh.IconChar = FontAwesome.Sharp.IconChar.Refresh;
-            ib_mapRefresh.IconColor = Color.Black;
-            ib_mapRefresh.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_mapRefresh.IconSize = 24;
-            ib_mapRefresh.Location = new Point(0, 0);
-            ib_mapRefresh.Margin = new Padding(0);
-            ib_mapRefresh.Name = "ib_mapRefresh";
-            ib_mapRefresh.Padding = new Padding(0, 2, 0, 0);
-            ib_mapRefresh.Size = new Size(38, 23);
-            ib_mapRefresh.TabIndex = 0;
-            toolTip.SetToolTip(ib_mapRefresh, "Refresh Available Maps");
-            ib_mapRefresh.UseVisualStyleBackColor = true;
-            ib_mapRefresh.Click += actionClick_refreshMaps;
-            // 
-            // ib_clearMapList
-            // 
-            ib_clearMapList.Dock = DockStyle.Fill;
-            ib_clearMapList.FlatStyle = FlatStyle.Flat;
-            ib_clearMapList.IconChar = FontAwesome.Sharp.IconChar.Eraser;
-            ib_clearMapList.IconColor = Color.Black;
-            ib_clearMapList.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_clearMapList.IconSize = 24;
-            ib_clearMapList.Location = new Point(76, 0);
-            ib_clearMapList.Margin = new Padding(0);
-            ib_clearMapList.Name = "ib_clearMapList";
-            ib_clearMapList.Padding = new Padding(0, 2, 0, 0);
-            ib_clearMapList.Size = new Size(40, 23);
-            ib_clearMapList.TabIndex = 2;
-            toolTip.SetToolTip(ib_clearMapList, "Clear Current Map List");
-            ib_clearMapList.UseVisualStyleBackColor = true;
-            ib_clearMapList.Click += actionClick_clearCurrentMapPlaylist;
-            // 
-            // panel1
-            // 
-            panel1.Controls.Add(tableLayoutPanel2);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(253, 3);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(94, 350);
-            panel1.TabIndex = 3;
-            // 
-            // tableLayoutPanel2
-            // 
-            tableLayoutPanel2.ColumnCount = 1;
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle());
-            tableLayoutPanel2.Controls.Add(btn_mapsUpdate, 0, 1);
-            tableLayoutPanel2.Controls.Add(btn_mapsPlayNext, 0, 2);
-            tableLayoutPanel2.Controls.Add(btn_mapsScore, 0, 3);
-            tableLayoutPanel2.Controls.Add(btn_mapsSkip, 0, 4);
-            tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(0, 0);
-            tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 6;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel2.Size = new Size(94, 350);
-            tableLayoutPanel2.TabIndex = 0;
-            // 
-            // btn_mapsUpdate
-            // 
-            btn_mapsUpdate.Dock = DockStyle.Fill;
-            btn_mapsUpdate.Location = new Point(3, 78);
-            btn_mapsUpdate.Name = "btn_mapsUpdate";
-            btn_mapsUpdate.Size = new Size(88, 44);
-            btn_mapsUpdate.TabIndex = 0;
-            btn_mapsUpdate.Text = "Update && Save Maps";
-            btn_mapsUpdate.UseVisualStyleBackColor = true;
-            btn_mapsUpdate.Click += actionClick_updateGameServerMaps;
-            // 
-            // btn_mapsPlayNext
-            // 
-            btn_mapsPlayNext.Dock = DockStyle.Fill;
-            btn_mapsPlayNext.Location = new Point(3, 128);
-            btn_mapsPlayNext.Name = "btn_mapsPlayNext";
-            btn_mapsPlayNext.Size = new Size(88, 44);
-            btn_mapsPlayNext.TabIndex = 1;
-            btn_mapsPlayNext.Text = "Play Next";
-            btn_mapsPlayNext.UseVisualStyleBackColor = true;
-            btn_mapsPlayNext.Click += actionClick_mapPlayNext;
-            // 
-            // btn_mapsScore
-            // 
-            btn_mapsScore.Dock = DockStyle.Fill;
-            btn_mapsScore.Location = new Point(3, 178);
-            btn_mapsScore.Name = "btn_mapsScore";
-            btn_mapsScore.Size = new Size(88, 44);
-            btn_mapsScore.TabIndex = 2;
-            btn_mapsScore.Text = "Score Map";
-            btn_mapsScore.UseVisualStyleBackColor = true;
-            btn_mapsScore.Click += actionClick_mapScore;
-            // 
-            // btn_mapsSkip
-            // 
-            btn_mapsSkip.Dock = DockStyle.Fill;
-            btn_mapsSkip.Location = new Point(3, 228);
-            btn_mapsSkip.Name = "btn_mapsSkip";
-            btn_mapsSkip.Size = new Size(88, 44);
-            btn_mapsSkip.TabIndex = 3;
-            btn_mapsSkip.Text = "Skip Map";
-            btn_mapsSkip.UseVisualStyleBackColor = true;
-            btn_mapsSkip.Click += actionClick_mapSkip;
-            // 
-            // panel4
-            // 
-            panel4.Controls.Add(tableLayoutPanel3);
-            panel4.Dock = DockStyle.Fill;
-            panel4.Location = new Point(603, 3);
-            panel4.Name = "panel4";
-            panel4.Size = new Size(290, 350);
-            panel4.TabIndex = 4;
-            // 
-            // tableLayoutPanel3
-            // 
-            tableLayoutPanel3.ColumnCount = 2;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40.6896553F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 59.3103447F));
-            tableLayoutPanel3.Controls.Add(label6, 0, 1);
-            tableLayoutPanel3.Controls.Add(label_dataCurrentMap, 1, 1);
-            tableLayoutPanel3.Controls.Add(label7, 0, 2);
-            tableLayoutPanel3.Controls.Add(label_dataNextMap, 1, 2);
-            tableLayoutPanel3.Controls.Add(label8, 0, 4);
-            tableLayoutPanel3.Controls.Add(label_dataTimeLeft, 1, 4);
-            tableLayoutPanel3.Controls.Add(label9, 0, 14);
-            tableLayoutPanel3.Controls.Add(label10, 0, 15);
-            tableLayoutPanel3.Controls.Add(label11, 1, 14);
-            tableLayoutPanel3.Controls.Add(label12, 1, 15);
-            tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(0, 0);
-            tableLayoutPanel3.Name = "tableLayoutPanel3";
-            tableLayoutPanel3.RowCount = 16;
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel3.Size = new Size(290, 350);
-            tableLayoutPanel3.TabIndex = 0;
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Dock = DockStyle.Fill;
-            label6.Location = new Point(3, 24);
-            label6.Name = "label6";
-            label6.Size = new Size(112, 24);
-            label6.TabIndex = 2;
-            label6.Text = "[Current Map]";
-            label6.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label_dataCurrentMap
-            // 
-            label_dataCurrentMap.AutoSize = true;
-            label_dataCurrentMap.Dock = DockStyle.Fill;
-            label_dataCurrentMap.Location = new Point(121, 24);
-            label_dataCurrentMap.Name = "label_dataCurrentMap";
-            label_dataCurrentMap.Size = new Size(166, 24);
-            label_dataCurrentMap.TabIndex = 1;
-            label_dataCurrentMap.Text = "No Map Data...";
-            label_dataCurrentMap.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Dock = DockStyle.Fill;
-            label7.Location = new Point(3, 48);
-            label7.Name = "label7";
-            label7.Size = new Size(112, 24);
-            label7.TabIndex = 3;
-            label7.Text = "[Next Map]";
-            label7.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label_dataNextMap
-            // 
-            label_dataNextMap.AutoSize = true;
-            label_dataNextMap.Dock = DockStyle.Fill;
-            label_dataNextMap.Location = new Point(121, 48);
-            label_dataNextMap.Name = "label_dataNextMap";
-            label_dataNextMap.Size = new Size(166, 24);
-            label_dataNextMap.TabIndex = 4;
-            label_dataNextMap.Text = "No Map Data...";
-            label_dataNextMap.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // label8
-            // 
-            label8.AutoSize = true;
-            label8.Dock = DockStyle.Fill;
-            label8.Location = new Point(3, 96);
-            label8.Name = "label8";
-            label8.Size = new Size(112, 24);
-            label8.TabIndex = 5;
-            label8.Text = "[Time Left]";
-            label8.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label_dataTimeLeft
-            // 
-            label_dataTimeLeft.AutoSize = true;
-            label_dataTimeLeft.Dock = DockStyle.Fill;
-            label_dataTimeLeft.Location = new Point(121, 96);
-            label_dataTimeLeft.Name = "label_dataTimeLeft";
-            label_dataTimeLeft.Size = new Size(166, 24);
-            label_dataTimeLeft.TabIndex = 6;
-            label_dataTimeLeft.Text = "No Map Data...";
-            label_dataTimeLeft.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Dock = DockStyle.Fill;
-            label9.Location = new Point(3, 304);
-            label9.Name = "label9";
-            label9.Size = new Size(112, 20);
-            label9.TabIndex = 7;
-            label9.Text = "[Move Map Up]";
-            label9.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Dock = DockStyle.Fill;
-            label10.Location = new Point(3, 324);
-            label10.Name = "label10";
-            label10.Size = new Size(112, 26);
-            label10.TabIndex = 8;
-            label10.Text = "[Move Map Down]";
-            label10.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Dock = DockStyle.Fill;
-            label11.Location = new Point(121, 304);
-            label11.Name = "label11";
-            label11.Size = new Size(166, 20);
-            label11.TabIndex = 9;
-            label11.Text = "Shift + W";
-            label11.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.Dock = DockStyle.Fill;
-            label12.Location = new Point(121, 324);
-            label12.Name = "label12";
-            label12.Size = new Size(166, 26);
-            label12.TabIndex = 10;
-            label12.Text = "Shift + S";
-            label12.TextAlign = ContentAlignment.MiddleLeft;
-            // 
             // tabPlayers
             // 
-            tabPlayers.Controls.Add(panel6);
-            tabPlayers.Controls.Add(player_LayoutPanel);
             tabPlayers.Location = new Point(4, 24);
             tabPlayers.Name = "tabPlayers";
             tabPlayers.Size = new Size(902, 362);
@@ -798,138 +274,15 @@ namespace BHD_ServerManager.Forms
             tabPlayers.Text = "Players";
             tabPlayers.UseVisualStyleBackColor = true;
             // 
-            // panel6
-            // 
-            panel6.Dock = DockStyle.Bottom;
-            panel6.Location = new Point(0, 328);
-            panel6.Name = "panel6";
-            panel6.Size = new Size(902, 34);
-            panel6.TabIndex = 1;
-            // 
-            // player_LayoutPanel
-            // 
-            player_LayoutPanel.Dock = DockStyle.Fill;
-            player_LayoutPanel.Location = new Point(0, 0);
-            player_LayoutPanel.Name = "player_LayoutPanel";
-            player_LayoutPanel.Size = new Size(902, 362);
-            player_LayoutPanel.TabIndex = 0;
-            // 
             // tabChat
             // 
-            tabChat.Controls.Add(tableLayoutPanel4);
-            tabChat.Controls.Add(panel5);
             tabChat.Location = new Point(4, 24);
             tabChat.Name = "tabChat";
+            tabChat.Padding = new Padding(3);
             tabChat.Size = new Size(902, 362);
-            tabChat.TabIndex = 3;
+            tabChat.TabIndex = 9;
             tabChat.Text = "Chat";
             tabChat.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel4
-            // 
-            tableLayoutPanel4.ColumnCount = 2;
-            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 85F));
-            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
-            tableLayoutPanel4.Controls.Add(tb_chatMessage, 0, 0);
-            tableLayoutPanel4.Controls.Add(btn_sendChat, 1, 0);
-            tableLayoutPanel4.Dock = DockStyle.Bottom;
-            tableLayoutPanel4.Location = new Point(0, 336);
-            tableLayoutPanel4.Name = "tableLayoutPanel4";
-            tableLayoutPanel4.RowCount = 1;
-            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel4.Size = new Size(902, 26);
-            tableLayoutPanel4.TabIndex = 0;
-            // 
-            // tb_chatMessage
-            // 
-            tb_chatMessage.AcceptsReturn = true;
-            tb_chatMessage.Dock = DockStyle.Fill;
-            tb_chatMessage.Location = new Point(3, 3);
-            tb_chatMessage.Name = "tb_chatMessage";
-            tb_chatMessage.Size = new Size(760, 23);
-            tb_chatMessage.TabIndex = 0;
-            tb_chatMessage.KeyPress += actionKeyEvent_submitEnterMessage;
-            // 
-            // btn_sendChat
-            // 
-            btn_sendChat.Dock = DockStyle.Fill;
-            btn_sendChat.FlatStyle = FlatStyle.Flat;
-            btn_sendChat.Location = new Point(766, 0);
-            btn_sendChat.Margin = new Padding(0);
-            btn_sendChat.Name = "btn_sendChat";
-            btn_sendChat.Size = new Size(136, 26);
-            btn_sendChat.TabIndex = 1;
-            btn_sendChat.Text = "Send";
-            btn_sendChat.UseVisualStyleBackColor = true;
-            btn_sendChat.Click += actionKeyEvent_submitMessage;
-            // 
-            // panel5
-            // 
-            panel5.Controls.Add(dataGridView_chatMessages);
-            panel5.Dock = DockStyle.Fill;
-            panel5.Location = new Point(0, 0);
-            panel5.Name = "panel5";
-            panel5.Padding = new Padding(0, 0, 0, 27);
-            panel5.Size = new Size(902, 362);
-            panel5.TabIndex = 1;
-            // 
-            // dataGridView_chatMessages
-            // 
-            dataGridView_chatMessages.AllowUserToAddRows = false;
-            dataGridView_chatMessages.AllowUserToDeleteRows = false;
-            dataGridView_chatMessages.AllowUserToResizeColumns = false;
-            dataGridView_chatMessages.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dataGridView_chatMessages.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            dataGridView_chatMessages.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_chatMessages.Columns.AddRange(new DataGridViewColumn[] { dateTime, Team, Player, Message });
-            dataGridView_chatMessages.Dock = DockStyle.Fill;
-            dataGridView_chatMessages.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dataGridView_chatMessages.Location = new Point(0, 0);
-            dataGridView_chatMessages.Name = "dataGridView_chatMessages";
-            dataGridView_chatMessages.RowHeadersVisible = false;
-            dataGridView_chatMessages.Size = new Size(902, 335);
-            dataGridView_chatMessages.TabIndex = 0;
-            // 
-            // dateTime
-            // 
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dateTime.DefaultCellStyle = dataGridViewCellStyle2;
-            dateTime.HeaderText = "Timestamp";
-            dateTime.MaxInputLength = 12;
-            dateTime.Name = "dateTime";
-            dateTime.Width = 75;
-            // 
-            // Team
-            // 
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            Team.DefaultCellStyle = dataGridViewCellStyle3;
-            Team.HeaderText = "Team";
-            Team.MaxInputLength = 24;
-            Team.Name = "Team";
-            Team.Width = 75;
-            // 
-            // Player
-            // 
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            Player.DefaultCellStyle = dataGridViewCellStyle4;
-            Player.HeaderText = "Player";
-            Player.MaxInputLength = 32;
-            Player.Name = "Player";
-            // 
-            // Message
-            // 
-            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            Message.DefaultCellStyle = dataGridViewCellStyle5;
-            Message.HeaderText = "Message";
-            Message.MaxInputLength = 90;
-            Message.Name = "Message";
             // 
             // tabBans
             // 
@@ -1179,228 +532,6 @@ namespace BHD_ServerManager.Forms
             btn_addBan.Text = "ADD";
             btn_addBan.UseVisualStyleBackColor = true;
             btn_addBan.Click += actionClick_addBanInformation;
-            // 
-            // tabMessages
-            // 
-            tabMessages.Controls.Add(tabMessagesControl);
-            tabMessages.Location = new Point(4, 24);
-            tabMessages.Name = "tabMessages";
-            tabMessages.Size = new Size(902, 362);
-            tabMessages.TabIndex = 5;
-            tabMessages.Text = "Messages";
-            tabMessages.UseVisualStyleBackColor = true;
-            // 
-            // tabMessagesControl
-            // 
-            tabMessagesControl.Controls.Add(tabAuto);
-            tabMessagesControl.Controls.Add(tabSlaps);
-            tabMessagesControl.Dock = DockStyle.Fill;
-            tabMessagesControl.Location = new Point(0, 0);
-            tabMessagesControl.Name = "tabMessagesControl";
-            tabMessagesControl.SelectedIndex = 0;
-            tabMessagesControl.Size = new Size(902, 362);
-            tabMessagesControl.TabIndex = 0;
-            // 
-            // tabAuto
-            // 
-            tabAuto.Controls.Add(tableLayoutPanel9);
-            tabAuto.Location = new Point(4, 24);
-            tabAuto.Name = "tabAuto";
-            tabAuto.Padding = new Padding(3);
-            tabAuto.Size = new Size(894, 334);
-            tabAuto.TabIndex = 0;
-            tabAuto.Text = "Auto Messages";
-            tabAuto.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel9
-            // 
-            tableLayoutPanel9.ColumnCount = 1;
-            tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel9.Controls.Add(dg_autoMessages, 0, 0);
-            tableLayoutPanel9.Controls.Add(tableLayoutPanel12, 0, 1);
-            tableLayoutPanel9.Dock = DockStyle.Fill;
-            tableLayoutPanel9.Location = new Point(3, 3);
-            tableLayoutPanel9.Name = "tableLayoutPanel9";
-            tableLayoutPanel9.RowCount = 2;
-            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel9.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
-            tableLayoutPanel9.Size = new Size(888, 328);
-            tableLayoutPanel9.TabIndex = 0;
-            // 
-            // dg_autoMessages
-            // 
-            dg_autoMessages.AllowUserToAddRows = false;
-            dg_autoMessages.AllowUserToDeleteRows = false;
-            dg_autoMessages.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dg_autoMessages.Columns.AddRange(new DataGridViewColumn[] { autoMessageID, autoTrigger, autoMessageText });
-            dg_autoMessages.Dock = DockStyle.Fill;
-            dg_autoMessages.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dg_autoMessages.Location = new Point(3, 3);
-            dg_autoMessages.Name = "dg_autoMessages";
-            dg_autoMessages.ReadOnly = true;
-            dg_autoMessages.RowHeadersVisible = false;
-            dg_autoMessages.Size = new Size(882, 292);
-            dg_autoMessages.TabIndex = 0;
-            dg_autoMessages.CellDoubleClick += actionDbClick_RemoveAutoMessage;
-            // 
-            // autoMessageID
-            // 
-            autoMessageID.HeaderText = "autoMessageID";
-            autoMessageID.Name = "autoMessageID";
-            autoMessageID.ReadOnly = true;
-            autoMessageID.Visible = false;
-            // 
-            // autoTrigger
-            // 
-            autoTrigger.HeaderText = "Trigger (Min)";
-            autoTrigger.Name = "autoTrigger";
-            autoTrigger.ReadOnly = true;
-            // 
-            // autoMessageText
-            // 
-            autoMessageText.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            autoMessageText.HeaderText = "Message";
-            autoMessageText.Name = "autoMessageText";
-            autoMessageText.ReadOnly = true;
-            // 
-            // tableLayoutPanel12
-            // 
-            tableLayoutPanel12.ColumnCount = 3;
-            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 75F));
-            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
-            tableLayoutPanel12.Controls.Add(tb_autoMessage, 1, 0);
-            tableLayoutPanel12.Controls.Add(btn_addAutoMessage, 2, 0);
-            tableLayoutPanel12.Controls.Add(num_AutoMessageTrigger, 0, 0);
-            tableLayoutPanel12.Dock = DockStyle.Fill;
-            tableLayoutPanel12.Location = new Point(0, 298);
-            tableLayoutPanel12.Margin = new Padding(0);
-            tableLayoutPanel12.Name = "tableLayoutPanel12";
-            tableLayoutPanel12.RowCount = 1;
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel12.Size = new Size(888, 30);
-            tableLayoutPanel12.TabIndex = 1;
-            // 
-            // tb_autoMessage
-            // 
-            tb_autoMessage.Dock = DockStyle.Fill;
-            tb_autoMessage.Location = new Point(78, 3);
-            tb_autoMessage.Name = "tb_autoMessage";
-            tb_autoMessage.Size = new Size(707, 23);
-            tb_autoMessage.TabIndex = 0;
-            // 
-            // btn_addAutoMessage
-            // 
-            btn_addAutoMessage.Dock = DockStyle.Fill;
-            btn_addAutoMessage.Location = new Point(791, 3);
-            btn_addAutoMessage.Name = "btn_addAutoMessage";
-            btn_addAutoMessage.Size = new Size(94, 24);
-            btn_addAutoMessage.TabIndex = 1;
-            btn_addAutoMessage.Text = "Add Message";
-            btn_addAutoMessage.UseVisualStyleBackColor = true;
-            btn_addAutoMessage.Click += actionClick_addAutoMessages;
-            // 
-            // num_AutoMessageTrigger
-            // 
-            num_AutoMessageTrigger.Dock = DockStyle.Fill;
-            num_AutoMessageTrigger.Location = new Point(3, 3);
-            num_AutoMessageTrigger.Maximum = new decimal(new int[] { 1440, 0, 0, 0 });
-            num_AutoMessageTrigger.Name = "num_AutoMessageTrigger";
-            num_AutoMessageTrigger.Size = new Size(69, 23);
-            num_AutoMessageTrigger.TabIndex = 2;
-            num_AutoMessageTrigger.TextAlign = HorizontalAlignment.Right;
-            toolTip.SetToolTip(num_AutoMessageTrigger, "Trigger in Minutes from Start of Map\r\n0 = Get Triggered During Start Delay\r\n");
-            // 
-            // tabSlaps
-            // 
-            tabSlaps.Controls.Add(tableLayoutPanel10);
-            tabSlaps.Location = new Point(4, 24);
-            tabSlaps.Name = "tabSlaps";
-            tabSlaps.Padding = new Padding(3);
-            tabSlaps.Size = new Size(894, 334);
-            tabSlaps.TabIndex = 1;
-            tabSlaps.Text = "Slap Messages";
-            tabSlaps.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel10
-            // 
-            tableLayoutPanel10.ColumnCount = 1;
-            tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel10.Controls.Add(dg_slapMessages, 0, 0);
-            tableLayoutPanel10.Controls.Add(tableLayoutPanel11, 0, 1);
-            tableLayoutPanel10.Dock = DockStyle.Fill;
-            tableLayoutPanel10.Location = new Point(3, 3);
-            tableLayoutPanel10.Name = "tableLayoutPanel10";
-            tableLayoutPanel10.RowCount = 2;
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
-            tableLayoutPanel10.Size = new Size(888, 328);
-            tableLayoutPanel10.TabIndex = 1;
-            // 
-            // dg_slapMessages
-            // 
-            dg_slapMessages.AllowUserToAddRows = false;
-            dg_slapMessages.AllowUserToDeleteRows = false;
-            dg_slapMessages.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dg_slapMessages.Columns.AddRange(new DataGridViewColumn[] { slapMessageID, slapMessages });
-            dg_slapMessages.Dock = DockStyle.Fill;
-            dg_slapMessages.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dg_slapMessages.Location = new Point(3, 3);
-            dg_slapMessages.Name = "dg_slapMessages";
-            dg_slapMessages.ReadOnly = true;
-            dg_slapMessages.RowHeadersVisible = false;
-            dg_slapMessages.Size = new Size(882, 292);
-            dg_slapMessages.TabIndex = 0;
-            dg_slapMessages.CellDoubleClick += actionDbClick_RemoveSlapMessage;
-            // 
-            // slapMessageID
-            // 
-            slapMessageID.HeaderText = "slapMessageID";
-            slapMessageID.Name = "slapMessageID";
-            slapMessageID.ReadOnly = true;
-            slapMessageID.Visible = false;
-            // 
-            // slapMessages
-            // 
-            slapMessages.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            slapMessages.HeaderText = "Message";
-            slapMessages.Name = "slapMessages";
-            slapMessages.ReadOnly = true;
-            // 
-            // tableLayoutPanel11
-            // 
-            tableLayoutPanel11.ColumnCount = 2;
-            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
-            tableLayoutPanel11.Controls.Add(tb_slapMessage, 0, 0);
-            tableLayoutPanel11.Controls.Add(btn_addSlap, 1, 0);
-            tableLayoutPanel11.Dock = DockStyle.Fill;
-            tableLayoutPanel11.Location = new Point(0, 298);
-            tableLayoutPanel11.Margin = new Padding(0);
-            tableLayoutPanel11.Name = "tableLayoutPanel11";
-            tableLayoutPanel11.RowCount = 1;
-            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel11.Size = new Size(888, 30);
-            tableLayoutPanel11.TabIndex = 1;
-            // 
-            // tb_slapMessage
-            // 
-            tb_slapMessage.Dock = DockStyle.Fill;
-            tb_slapMessage.Location = new Point(3, 3);
-            tb_slapMessage.Name = "tb_slapMessage";
-            tb_slapMessage.Size = new Size(782, 23);
-            tb_slapMessage.TabIndex = 0;
-            // 
-            // btn_addSlap
-            // 
-            btn_addSlap.Dock = DockStyle.Fill;
-            btn_addSlap.Location = new Point(791, 3);
-            btn_addSlap.Name = "btn_addSlap";
-            btn_addSlap.Size = new Size(94, 24);
-            btn_addSlap.TabIndex = 1;
-            btn_addSlap.Text = "Add Message";
-            btn_addSlap.UseVisualStyleBackColor = true;
-            btn_addSlap.Click += actionClick_addSlapMessage;
             // 
             // tabStats
             // 
@@ -1952,26 +1083,6 @@ namespace BHD_ServerManager.Forms
             toolStrip.PerformLayout();
             mainPanel.ResumeLayout(false);
             tabControl.ResumeLayout(false);
-            tabMaps.ResumeLayout(false);
-            mapsTable.ResumeLayout(false);
-            mapPanel1.ResumeLayout(false);
-            mapsPanel1_table.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView_availableMaps).EndInit();
-            mapsPanel2.ResumeLayout(false);
-            mapsPanel2_table.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView_currentMaps).EndInit();
-            tableMapControls.ResumeLayout(false);
-            panel1.ResumeLayout(false);
-            tableLayoutPanel2.ResumeLayout(false);
-            panel4.ResumeLayout(false);
-            tableLayoutPanel3.ResumeLayout(false);
-            tableLayoutPanel3.PerformLayout();
-            tabPlayers.ResumeLayout(false);
-            tabChat.ResumeLayout(false);
-            tableLayoutPanel4.ResumeLayout(false);
-            tableLayoutPanel4.PerformLayout();
-            panel5.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView_chatMessages).EndInit();
             tabBans.ResumeLayout(false);
             tableLayoutPanel5.ResumeLayout(false);
             groupBox3.ResumeLayout(false);
@@ -1984,19 +1095,6 @@ namespace BHD_ServerManager.Forms
             groupBox9.ResumeLayout(false);
             tableLayoutPanel7.ResumeLayout(false);
             tableLayoutPanel7.PerformLayout();
-            tabMessages.ResumeLayout(false);
-            tabMessagesControl.ResumeLayout(false);
-            tabAuto.ResumeLayout(false);
-            tableLayoutPanel9.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dg_autoMessages).EndInit();
-            tableLayoutPanel12.ResumeLayout(false);
-            tableLayoutPanel12.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)num_AutoMessageTrigger).EndInit();
-            tabSlaps.ResumeLayout(false);
-            tableLayoutPanel10.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dg_slapMessages).EndInit();
-            tableLayoutPanel11.ResumeLayout(false);
-            tableLayoutPanel11.PerformLayout();
             tabStats.ResumeLayout(false);
             tabStatsControl.ResumeLayout(false);
             tabPlayerStats.ResumeLayout(false);
@@ -2029,55 +1127,12 @@ namespace BHD_ServerManager.Forms
         #endregion
         private ToolStrip toolStrip;
         private Panel mainPanel;
-        private TabPage tabChat;
         private TabPage tabServer;
         private TabPage tabMaps;
         private TabPage tabPlayers;
         private OpenFileDialog openFileDialog;
-        private TableLayoutPanel mapsTable;
-        private Panel mapPanel1;
-        private TableLayoutPanel mapsPanel1_table;
-        internal ComboBox combo_gameTypes;
-        internal DataGridView dataGridView_availableMaps;
         private ToolTip toolTip;
-        private Panel mapsPanel2;
-        private TableLayoutPanel mapsPanel2_table;
-        internal DataGridView dataGridView_currentMaps;
-        private TableLayoutPanel tableMapControls;
-        private FontAwesome.Sharp.IconButton ib_exportMapList;
-        private FontAwesome.Sharp.IconButton ib_importMapList;
-        private FontAwesome.Sharp.IconButton ib_mapRefresh;
-        private FontAwesome.Sharp.IconButton ib_clearMapList;
-        private Panel panel1;
-        private TableLayoutPanel tableLayoutPanel2;
-        private Button btn_mapsScore;
-        private Button btn_mapsSkip;
-        private Button btn_mapsUpdate;
-        private Button btn_mapsPlayNext;
         internal ToolStripLabel toolStripStatus;
-        private Panel panel4;
-        private TableLayoutPanel tableLayoutPanel3;
-        private Label label6;
-        private Label label7;
-        internal Label label_dataCurrentMap;
-        internal Label label_dataNextMap;
-        private Label label8;
-        internal Label label_dataTimeLeft;
-        private Label label9;
-        private Label label10;
-        private Label label11;
-        private Label label12;
-        private TableLayoutPanel tableLayoutPanel4;
-        private TextBox tb_chatMessage;
-        private Button btn_sendChat;
-        private Panel panel5;
-        internal DataGridView dataGridView_chatMessages;
-        private DataGridViewTextBoxColumn dateTime;
-        private DataGridViewTextBoxColumn Team;
-        private DataGridViewTextBoxColumn Player;
-        private DataGridViewTextBoxColumn Message;
-        public FlowLayoutPanel player_LayoutPanel;
-        private Panel panel6;
         private TabPage tabBans;
         private TableLayoutPanel tableLayoutPanel5;
         private GroupBox groupBox3;
@@ -2087,26 +1142,6 @@ namespace BHD_ServerManager.Forms
         private DataGridViewTextBoxColumn ipRecordID;
         private DataGridViewTextBoxColumn address;
         internal TabControl tabControl;
-        private TabPage tabMessages;
-        private TabControl tabMessagesControl;
-        private TabPage tabAuto;
-        private TableLayoutPanel tableLayoutPanel9;
-        private TabPage tabSlaps;
-        private TableLayoutPanel tableLayoutPanel10;
-        private DataGridViewTextBoxColumn slapMessageID;
-        private DataGridViewTextBoxColumn slapMessages;
-        internal DataGridView dg_autoMessages;
-        internal DataGridView dg_slapMessages;
-        private TableLayoutPanel tableLayoutPanel11;
-        private TextBox tb_slapMessage;
-        private Button btn_addSlap;
-        private TableLayoutPanel tableLayoutPanel12;
-        private TextBox tb_autoMessage;
-        private Button btn_addAutoMessage;
-        private NumericUpDown num_AutoMessageTrigger;
-        private DataGridViewTextBoxColumn autoMessageID;
-        private DataGridViewTextBoxColumn autoTrigger;
-        private DataGridViewTextBoxColumn autoMessageText;
         private TabPage tabStats;
         private TabControl tabStatsControl;
         private TabPage tabPlayerStats;
@@ -2153,7 +1188,6 @@ namespace BHD_ServerManager.Forms
         private TextBox tb_adminPass;
         public DataGridView dg_playerNames;
         public DataGridView dg_IPAddresses;
-        public FontAwesome.Sharp.IconButton ib_resetCurrentMaps;
         public DataGridView dg_AdminUsers;
         private GroupBox groupBox9;
         private TableLayoutPanel tableLayoutPanel7;
@@ -2167,5 +1201,11 @@ namespace BHD_ServerManager.Forms
         private Button btn_banExport;
         private Button btn_banImport;
         private TabPage tabProfile;
+        private ToolStripLabel label_TimeLeft;
+        private ToolStripLabel label_WinCondition;
+        private ToolStripLabel label_RedScore;
+        private ToolStripLabel label_BlueScore;
+        private ToolStripLabel label_PlayersOnline;
+        private TabPage tabChat;
     }
 }
