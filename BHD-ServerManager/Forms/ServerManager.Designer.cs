@@ -1075,6 +1075,7 @@ namespace BHD_ServerManager.Forms
             Controls.Add(mainPanel);
             Controls.Add(toolStrip);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
             Name = "ServerManager";
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
