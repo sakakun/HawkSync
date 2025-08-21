@@ -38,4 +38,5 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
         }
+    }
 }
