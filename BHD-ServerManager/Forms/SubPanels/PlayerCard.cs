@@ -14,24 +14,31 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
     {
         private static theInstance thisInstance = CommonCore.theInstance!;
         private static chatInstance chatInstance = CommonCore.instanceChat!;
-        public playerObject Player { get; set; } = new playerObject();
-        private ContextMenuStrip contextMenu = new ContextMenuStrip();
+        private playerObject Player { get; set; } = new playerObject();
+        // Change the visibility of the 'contextMenu' field from 'private' to 'public' to match the containing type's visibility.
+        // This resolves CS9032 by ensuring the required member is not less visible than the containing type.
+        private ContextMenuStrip contextMenu;
 
         private bool isArmed = true;
         private bool isGod = false;
 
-        // Constructor: Initializes the PlayerCard control and builds the context menu.
         public PlayerCard()
         {
             InitializeComponent();
+
+            contextMenu = new ContextMenuStrip();
+            playerContextMenuIcon.ContextMenuStrip = contextMenu;
+            playerContextMenuIcon.Click -= PlayerContextMenuIcon_Click;
+            playerContextMenuIcon.Click += PlayerContextMenuIcon_Click;
+
             BuildContextMenu();
         }
 
-        // Function: BuildContextMenu, constructs the context menu for the PlayerCard control.
         private void BuildContextMenu()
         {
-            ToolStripMenuItem playerName = new ToolStripMenuItem();
-            ToolStripMenuItem playerPing = new ToolStripMenuItem();
+
+            ToolStripMenuItem playerName = new ToolStripMenuItem(Player.PlayerName ?? "Unknown");
+            ToolStripMenuItem playerPing = new ToolStripMenuItem($"Ping: {Player.PlayerPing} ms");
             ToolStripMenuItem command_ArmDisarm = command_ArmDisarm_Click();
             ToolStripMenuItem command_Warning = command_Warning_Click();
             ToolStripMenuItem command_Kick = command_Kick_Click();
@@ -51,22 +58,19 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             contextMenu.Items.Add(command_GodMode_Click());
             contextMenu.Items.Add(command_SwitchTeam_Click());
 
-            playerContextMenuIcon.ContextMenuStrip = contextMenu;
-            playerContextMenuIcon.Click += (sender, e) =>
-            {
-                contextMenu.Show(this, new Point(playerContextMenuIcon.Location.X, playerContextMenuIcon.Location.Y));
-            };
         }
-        // Function: command_ArmDisarm_Click, creates a menu item for arming or disarming the player.
+
+        private void PlayerContextMenuIcon_Click(object? sender, EventArgs e)
+        {
+            contextMenu.Show(this, new Point(playerContextMenuIcon.Location.X, playerContextMenuIcon.Location.Y));
+        }
+
         private ToolStripMenuItem command_ArmDisarm_Click()
         {
-
             ToolStripMenuItem command = new ToolStripMenuItem(isArmed ? "Disarm Player" : "Arm Player");
             command.Click += (sender, e) =>
             {
-                // Armed = True/Disarmed False
                 command.Text = isArmed ? "Disarm Player" : "Arm Player";
-                // Placeholder for actual command logic
                 if (isArmed)
                 {
                     GameManager.WriteMemoryDisarmPlayer(Player.PlayerSlot);
@@ -81,47 +85,43 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             };
             return command;
         }
-        // Function: command_Warning_Click, creates a menu item for warning the player with slap messages.
+
         private ToolStripMenuItem command_Warning_Click()
         {
             ToolStripMenuItem command = new ToolStripMenuItem("Warn Player");
             command = AddSlaps2WarningSubMenu(command);
             return command;
         }
-        // Function: AddSlaps2WarningSubMenu, adds slap messages to the warning command's sub-menu.
+
         private ToolStripMenuItem AddSlaps2WarningSubMenu(ToolStripMenuItem thisCommand)
         {
-            // Clear existing items to avoid duplicates
             thisCommand.DropDownItems.Clear();
             foreach (var slapMessage in chatInstance.SlapMessages)
             {
                 ToolStripMenuItem slapItem = new ToolStripMenuItem(slapMessage.SlapMessageText);
                 slapItem.Click += (sender, e) =>
                 {
-                    // Placeholder for actual slap logic
                     GameManager.WriteMemorySendChatMessage(1, Player.PlayerName + ", " + slapMessage.SlapMessageText);
                     MessageBox.Show($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Debug.WriteLine($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}");
                 };
                 thisCommand.DropDownItems.Add(slapItem);
             }
-
-            return thisCommand; // Placeholder for actual slap logic, if needed
+            return thisCommand;
         }
-        // Function: command_Kick_Click, creates a menu item for kicking the player from the server.
+
         private ToolStripMenuItem command_Kick_Click()
         {
             ToolStripMenuItem command = new ToolStripMenuItem("Kick Player");
             command.Click += (sender, e) =>
             {
-                // Placeholder for actual command logic
                 GameManager.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been kicked from the server.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} has been kicked from the server.");
             };
             return command;
         }
-        // Function: command_GodMode_Click, creates a menu item for toggling God Mode for the player.
+
         private ToolStripMenuItem command_GodMode_Click()
         {
             ToolStripMenuItem command = new ToolStripMenuItem(isGod ? "Disable God Mode" : "Enable God Mode");
@@ -129,11 +129,11 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             {
                 if (!isGod)
                 {
-                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, 9999); // Enable God Mode
+                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, 9999);
                 }
                 else
                 {
-                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, 100); // Disable God Mode
+                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, 100);
                 }
                 isGod = !isGod;
                 command.Text = isGod ? "Disable God Mode" : "Enable God Mode";
@@ -142,21 +142,19 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             };
             return command;
         }
-        // Function: command_Kill_Click, creates a menu item for killing the player.
+
         private ToolStripMenuItem command_Kill_Click()
         {
             ToolStripMenuItem command = new ToolStripMenuItem("Kill Player");
             command.Click += (sender, e) =>
             {
-                // Placeholder for actual command logic
                 GameManager.WriteMemoryKillPlayer(Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been killed.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} has been killed.");
-            }
-            ;
+            };
             return command;
         }
-        // Function: command_Ban_Click, creates a menu item for banning the player with options for name, IP, or both.
+
         private ToolStripMenuItem command_Ban_Click()
         {
             ToolStripMenuItem command = new ToolStripMenuItem("Ban Player");
@@ -164,50 +162,44 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             ToolStripMenuItem banByIP = new ToolStripMenuItem("Ban IP Address");
             ToolStripMenuItem banByNameAndIP = new ToolStripMenuItem("Ban Both");
 
-            // Add sub-menu items for banning
             command.DropDownItems.Add(banByName);
             command.DropDownItems.Add(banByIP);
             command.DropDownItems.Add(banByNameAndIP);
 
             banByName.Click += (sender, e) =>
             {
-                // Ban by name logic
                 banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!);
                 MessageBox.Show($"Player {Player.PlayerName} has been banned by name.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Ban by name command clicked for player {Player.PlayerName}.");
             };
             banByIP.Click += (sender, e) =>
             {
-                // Ban by name logic
                 IPAddress iPAddress = IPAddress.Parse(Player.PlayerIPAddress!);
                 banInstanceManager.AddBannedPlayer(null!, iPAddress, 32);
-                MessageBox.Show($"Player {Player.PlayerName} has been banned by name.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Ban by name command clicked for player {Player.PlayerName}.");
+                MessageBox.Show($"Player {Player.PlayerName} has been banned by IP.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Debug.WriteLine($"Ban by IP command clicked for player {Player.PlayerName}.");
             };
             banByNameAndIP.Click += (sender, e) =>
             {
-                // Ban Both
                 IPAddress playerAddress = IPAddress.Parse(Player.PlayerIPAddress!);
                 banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!, playerAddress, 32);
                 MessageBox.Show($"Player {Player.PlayerName} has been banned.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Ban command clicked for player {Player.PlayerName}, but functionality is not implemented.");
+                Debug.WriteLine($"Ban command clicked for player {Player.PlayerName}.");
             };
 
             return command;
         }
-        // Function: command_SwitchTeam_Click, creates a menu item for switching the player's team.
+
         private ToolStripMenuItem command_SwitchTeam_Click()
         {
             ToolStripMenuItem command = new ToolStripMenuItem("Switch Team");
             command.Click += (sender, e) =>
             {
-                // Check if player is already in the change PlayerTeam list
                 var existing = thisInstance.playerChangeTeamList
                     .FirstOrDefault(p => p.slotNum == Player.PlayerSlot);
 
                 if (existing != null)
                 {
-                    // Undo: remove from list
                     thisInstance.playerChangeTeamList.Remove(existing);
                     MessageBox.Show($"Team switch for {Player.PlayerName} has been undone.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Debug.WriteLine($"Team switch for {Player.PlayerName} (PlayerSlot {Player.PlayerSlot}) has been undone.");
@@ -229,41 +221,34 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             };
             return command;
         }
-        // Function: UpdateStatus, updates the PlayerCard with the current player information.
+
         public void UpdateStatus(playerObject playerInfo)
         {
             Player = playerInfo;
 
             // Decode Base64 and interpret as Windows-1252
-            byte[] decodedBytes = Convert.FromBase64String(Player.PlayerNameBase64);
+            byte[] decodedBytes = Convert.FromBase64String(Player.PlayerNameBase64 ?? "");
             string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
 
-            // Update UI
             label_dataPlayerNameRole.Font = new Font("Segoe UI", 10, FontStyle.Regular);
             label_dataPlayerNameRole.UseCompatibleTextRendering = true;
             label_dataPlayerNameRole.Text = decodedPlayerName;
 
-            // Other updates...
             label_dataIPinfo.Text = Player.PlayerIPAddress;
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Player.PlayerTeam switch
             {
-                1 => Color.Blue, // Blue Team
-                2 => Color.Red,  // Red Team
-                _ => Color.Black // Default color for unassigned or unknown teams
+                1 => Color.Blue,
+                2 => Color.Red,
+                _ => Color.Black
             };
+            this.contextMenu.Items[0].Text = decodedPlayerName;
+            this.contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms";
+
             player_Tooltip.SetToolTip(this, $"Ping: {Player.PlayerPing} ms");
-
-            // Conext Updates
-            playerContextMenuIcon.Visible = true; // Show context menu icon when player info is updated
-            contextMenu.Items[0].Text = Player.PlayerName; // Update player name in context menu
-            contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms"; // Update PlayerPing in context menu
-
-            ToolStripMenuItem? WarnMenuUpdate = contextMenu.Items[4] as ToolStripMenuItem;
-            AddSlaps2WarningSubMenu(WarnMenuUpdate!);
-
+            playerContextMenuIcon.Visible = true;
         }
-        // Function: ResetStatus, resets the PlayerCard to default values for an empty slot.
+
         public void ResetStatus(int slotNum)
         {
             Player = new playerObject
@@ -275,11 +260,19 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             label_dataIPinfo.Text = Player.PlayerIPAddress;
             label_dataPlayerNameRole.Text = $"{Player.PlayerName}";
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
-            playerTeamIcon.IconColor = Color.Black; // Reset to default color
-            playerContextMenuIcon.Visible = false;  // Hide context menu icon by default
+            playerTeamIcon.IconColor = Color.Black;
+            playerContextMenuIcon.Visible = false;
+
         }
+
         public void ToggleSlot(int slotNum, bool visible = true)
         {
+            if (this.Visible == visible)
+            {
+                // If the visibility is already set, do nothing.
+                return;
+            }
+
             this.ResetStatus(slotNum);
             this.Visible = visible;
         }

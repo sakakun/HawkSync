@@ -11,10 +11,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     public class serverChatInterfaceManager : chatInstanceInterface
     {
 
-        private static ServerManager thisServer => Program.ServerManagerUI!;
         private static chatInstance instanceChat = CommonCore.instanceChat!;
 
-        private static bool _chatGridFirstLoad = true;
         private static DateTime _lastGridUpdate = DateTime.MinValue;
 
         // Function: loadChatSettings, loads the chat settings from a JSON file. If it does not exist, it initializes empty lists and saves them.

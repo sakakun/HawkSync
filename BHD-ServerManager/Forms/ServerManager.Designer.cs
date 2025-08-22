@@ -47,26 +47,6 @@ namespace BHD_ServerManager.Forms
             tabPlayers = new TabPage();
             tabChat = new TabPage();
             tabBans = new TabPage();
-            tableLayoutPanel5 = new TableLayoutPanel();
-            groupBox3 = new GroupBox();
-            dg_playerNames = new DataGridView();
-            playerRecordID = new DataGridViewTextBoxColumn();
-            playerName = new DataGridViewTextBoxColumn();
-            groupBox8 = new GroupBox();
-            dg_IPAddresses = new DataGridView();
-            ipRecordID = new DataGridViewTextBoxColumn();
-            address = new DataGridViewTextBoxColumn();
-            panel8 = new Panel();
-            groupBox10 = new GroupBox();
-            tableLayoutPanel6 = new TableLayoutPanel();
-            btn_banExport = new Button();
-            btn_banImport = new Button();
-            groupBox9 = new GroupBox();
-            tableLayoutPanel7 = new TableLayoutPanel();
-            tb_bansPlayerName = new TextBox();
-            tb_bansIPAddress = new TextBox();
-            cb_banSubMask = new ComboBox();
-            btn_addBan = new Button();
             tabStats = new TabPage();
             tabStatsControl = new TabControl();
             tabPlayerStats = new TabPage();
@@ -74,21 +54,6 @@ namespace BHD_ServerManager.Forms
             tabWeaponStats = new TabPage();
             dataGridViewWeaponStats = new DataGridView();
             tabBabstats = new TabPage();
-            tableLayoutPanel13 = new TableLayoutPanel();
-            dg_statsLog = new DataGridView();
-            statsLog_DateTime = new DataGridViewTextBoxColumn();
-            statLog_Message = new DataGridViewTextBoxColumn();
-            panel7 = new Panel();
-            btn_SaveSettings = new Button();
-            labelReportInterval = new Label();
-            labelUpatedInterval = new Label();
-            num_WebStatsReport = new NumericUpDown();
-            num_WebStatsUpdates = new NumericUpDown();
-            cb_enableAnnouncements = new CheckBox();
-            btn_validate = new Button();
-            label_webServerPath = new Label();
-            tb_webStatsServerPath = new TextBox();
-            cb_enableWebStats = new CheckBox();
             tabAdmin = new TabPage();
             tableAdminPanel = new TableLayoutPanel();
             dg_adminLog = new DataGridView();
@@ -117,29 +82,12 @@ namespace BHD_ServerManager.Forms
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
-            tabBans.SuspendLayout();
-            tableLayoutPanel5.SuspendLayout();
-            groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dg_playerNames).BeginInit();
-            groupBox8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dg_IPAddresses).BeginInit();
-            panel8.SuspendLayout();
-            groupBox10.SuspendLayout();
-            tableLayoutPanel6.SuspendLayout();
-            groupBox9.SuspendLayout();
-            tableLayoutPanel7.SuspendLayout();
             tabStats.SuspendLayout();
             tabStatsControl.SuspendLayout();
             tabPlayerStats.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).BeginInit();
             tabWeaponStats.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).BeginInit();
-            tabBabstats.SuspendLayout();
-            tableLayoutPanel13.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dg_statsLog).BeginInit();
-            panel7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsReport).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).BeginInit();
             tabAdmin.SuspendLayout();
             tableAdminPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dg_adminLog).BeginInit();
@@ -286,7 +234,6 @@ namespace BHD_ServerManager.Forms
             // 
             // tabBans
             // 
-            tabBans.Controls.Add(tableLayoutPanel5);
             tabBans.Location = new Point(4, 24);
             tabBans.Name = "tabBans";
             tabBans.Padding = new Padding(3);
@@ -294,244 +241,6 @@ namespace BHD_ServerManager.Forms
             tabBans.TabIndex = 4;
             tabBans.Text = "Bans";
             tabBans.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel5
-            // 
-            tableLayoutPanel5.ColumnCount = 6;
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle());
-            tableLayoutPanel5.Controls.Add(groupBox3, 1, 0);
-            tableLayoutPanel5.Controls.Add(groupBox8, 3, 0);
-            tableLayoutPanel5.Controls.Add(panel8, 5, 0);
-            tableLayoutPanel5.Dock = DockStyle.Fill;
-            tableLayoutPanel5.Location = new Point(3, 3);
-            tableLayoutPanel5.Margin = new Padding(0);
-            tableLayoutPanel5.Name = "tableLayoutPanel5";
-            tableLayoutPanel5.RowCount = 1;
-            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 350F));
-            tableLayoutPanel5.Size = new Size(896, 356);
-            tableLayoutPanel5.TabIndex = 0;
-            // 
-            // groupBox3
-            // 
-            groupBox3.Controls.Add(dg_playerNames);
-            groupBox3.Dock = DockStyle.Fill;
-            groupBox3.Location = new Point(20, 0);
-            groupBox3.Margin = new Padding(0);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(150, 356);
-            groupBox3.TabIndex = 0;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "Player Names";
-            // 
-            // dg_playerNames
-            // 
-            dg_playerNames.AllowUserToAddRows = false;
-            dg_playerNames.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dg_playerNames.ColumnHeadersVisible = false;
-            dg_playerNames.Columns.AddRange(new DataGridViewColumn[] { playerRecordID, playerName });
-            dg_playerNames.Dock = DockStyle.Fill;
-            dg_playerNames.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dg_playerNames.Location = new Point(3, 19);
-            dg_playerNames.Name = "dg_playerNames";
-            dg_playerNames.RowHeadersVisible = false;
-            dg_playerNames.Size = new Size(144, 334);
-            dg_playerNames.TabIndex = 0;
-            dg_playerNames.CellDoubleClick += actionDbClick_RemoveRecord;
-            // 
-            // playerRecordID
-            // 
-            playerRecordID.HeaderText = "ID";
-            playerRecordID.Name = "playerRecordID";
-            playerRecordID.Visible = false;
-            // 
-            // playerName
-            // 
-            playerName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            playerName.HeaderText = "Player Name";
-            playerName.Name = "playerName";
-            // 
-            // groupBox8
-            // 
-            groupBox8.Controls.Add(dg_IPAddresses);
-            groupBox8.Dock = DockStyle.Fill;
-            groupBox8.Location = new Point(190, 0);
-            groupBox8.Margin = new Padding(0);
-            groupBox8.Name = "groupBox8";
-            groupBox8.Size = new Size(150, 356);
-            groupBox8.TabIndex = 1;
-            groupBox8.TabStop = false;
-            groupBox8.Text = "IP Addresses";
-            // 
-            // dg_IPAddresses
-            // 
-            dg_IPAddresses.AllowUserToAddRows = false;
-            dg_IPAddresses.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dg_IPAddresses.ColumnHeadersVisible = false;
-            dg_IPAddresses.Columns.AddRange(new DataGridViewColumn[] { ipRecordID, address });
-            dg_IPAddresses.Dock = DockStyle.Fill;
-            dg_IPAddresses.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dg_IPAddresses.Location = new Point(3, 19);
-            dg_IPAddresses.Name = "dg_IPAddresses";
-            dg_IPAddresses.RowHeadersVisible = false;
-            dg_IPAddresses.Size = new Size(144, 334);
-            dg_IPAddresses.TabIndex = 0;
-            dg_IPAddresses.CellDoubleClick += actionDbClick_RemoveRecord2;
-            // 
-            // ipRecordID
-            // 
-            ipRecordID.HeaderText = "ID";
-            ipRecordID.Name = "ipRecordID";
-            ipRecordID.Visible = false;
-            // 
-            // address
-            // 
-            address.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            address.HeaderText = "IP Address";
-            address.Name = "address";
-            // 
-            // panel8
-            // 
-            panel8.Controls.Add(groupBox10);
-            panel8.Controls.Add(groupBox9);
-            panel8.Dock = DockStyle.Fill;
-            panel8.Location = new Point(360, 0);
-            panel8.Margin = new Padding(0);
-            panel8.Name = "panel8";
-            panel8.Size = new Size(536, 356);
-            panel8.TabIndex = 2;
-            // 
-            // groupBox10
-            // 
-            groupBox10.Controls.Add(tableLayoutPanel6);
-            groupBox10.Dock = DockStyle.Top;
-            groupBox10.Location = new Point(0, 50);
-            groupBox10.Name = "groupBox10";
-            groupBox10.Padding = new Padding(3, 3, 3, 6);
-            groupBox10.Size = new Size(536, 53);
-            groupBox10.TabIndex = 1;
-            groupBox10.TabStop = false;
-            groupBox10.Text = "Misc";
-            // 
-            // tableLayoutPanel6
-            // 
-            tableLayoutPanel6.ColumnCount = 5;
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel6.Controls.Add(btn_banExport, 4, 0);
-            tableLayoutPanel6.Controls.Add(btn_banImport, 3, 0);
-            tableLayoutPanel6.Dock = DockStyle.Fill;
-            tableLayoutPanel6.Location = new Point(3, 19);
-            tableLayoutPanel6.Name = "tableLayoutPanel6";
-            tableLayoutPanel6.RowCount = 1;
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel6.Size = new Size(530, 28);
-            tableLayoutPanel6.TabIndex = 0;
-            // 
-            // btn_banExport
-            // 
-            btn_banExport.Dock = DockStyle.Fill;
-            btn_banExport.Location = new Point(424, 0);
-            btn_banExport.Margin = new Padding(0);
-            btn_banExport.Name = "btn_banExport";
-            btn_banExport.Size = new Size(106, 28);
-            btn_banExport.TabIndex = 0;
-            btn_banExport.Text = "Export";
-            btn_banExport.UseVisualStyleBackColor = true;
-            btn_banExport.Click += actionClick_exportBanSettings;
-            // 
-            // btn_banImport
-            // 
-            btn_banImport.Dock = DockStyle.Fill;
-            btn_banImport.Location = new Point(318, 0);
-            btn_banImport.Margin = new Padding(0);
-            btn_banImport.Name = "btn_banImport";
-            btn_banImport.Size = new Size(106, 28);
-            btn_banImport.TabIndex = 1;
-            btn_banImport.Text = "Import";
-            toolTip.SetToolTip(btn_banImport, "HawkSync or BMT v3.5 Ban Files Accepted");
-            btn_banImport.UseVisualStyleBackColor = true;
-            btn_banImport.Click += actionClick_importBans;
-            // 
-            // groupBox9
-            // 
-            groupBox9.Controls.Add(tableLayoutPanel7);
-            groupBox9.Dock = DockStyle.Top;
-            groupBox9.Location = new Point(0, 0);
-            groupBox9.Margin = new Padding(0);
-            groupBox9.Name = "groupBox9";
-            groupBox9.Size = new Size(536, 50);
-            groupBox9.TabIndex = 0;
-            groupBox9.TabStop = false;
-            groupBox9.Text = "Add Record";
-            // 
-            // tableLayoutPanel7
-            // 
-            tableLayoutPanel7.ColumnCount = 4;
-            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 75F));
-            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
-            tableLayoutPanel7.Controls.Add(tb_bansPlayerName, 0, 0);
-            tableLayoutPanel7.Controls.Add(tb_bansIPAddress, 1, 0);
-            tableLayoutPanel7.Controls.Add(cb_banSubMask, 2, 0);
-            tableLayoutPanel7.Controls.Add(btn_addBan, 3, 0);
-            tableLayoutPanel7.Dock = DockStyle.Fill;
-            tableLayoutPanel7.Location = new Point(3, 19);
-            tableLayoutPanel7.Name = "tableLayoutPanel7";
-            tableLayoutPanel7.RowCount = 1;
-            tableLayoutPanel7.RowStyles.Add(new RowStyle());
-            tableLayoutPanel7.Size = new Size(530, 28);
-            tableLayoutPanel7.TabIndex = 0;
-            // 
-            // tb_bansPlayerName
-            // 
-            tb_bansPlayerName.Dock = DockStyle.Fill;
-            tb_bansPlayerName.Location = new Point(3, 3);
-            tb_bansPlayerName.Name = "tb_bansPlayerName";
-            tb_bansPlayerName.PlaceholderText = "Player Name";
-            tb_bansPlayerName.Size = new Size(171, 23);
-            tb_bansPlayerName.TabIndex = 0;
-            tb_bansPlayerName.TextAlign = HorizontalAlignment.Center;
-            // 
-            // tb_bansIPAddress
-            // 
-            tb_bansIPAddress.Dock = DockStyle.Fill;
-            tb_bansIPAddress.Location = new Point(180, 3);
-            tb_bansIPAddress.Name = "tb_bansIPAddress";
-            tb_bansIPAddress.PlaceholderText = "000.000.000.000";
-            tb_bansIPAddress.Size = new Size(171, 23);
-            tb_bansIPAddress.TabIndex = 1;
-            tb_bansIPAddress.TextAlign = HorizontalAlignment.Center;
-            // 
-            // cb_banSubMask
-            // 
-            cb_banSubMask.Dock = DockStyle.Fill;
-            cb_banSubMask.FormattingEnabled = true;
-            cb_banSubMask.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32" });
-            cb_banSubMask.Location = new Point(357, 3);
-            cb_banSubMask.Name = "cb_banSubMask";
-            cb_banSubMask.Size = new Size(69, 23);
-            cb_banSubMask.TabIndex = 2;
-            toolTip.SetToolTip(cb_banSubMask, "These are examples of the type of masks you can do,  that said you'll likely just want 32 for a single IP.\r\n\r\n8 = 10.0.0.0\r\n16 = 172.16.0.0 \r\n24 = 192.16.1.0\r\n32 = 1.1.1.1 ");
-            // 
-            // btn_addBan
-            // 
-            btn_addBan.Dock = DockStyle.Fill;
-            btn_addBan.Location = new Point(432, 3);
-            btn_addBan.Name = "btn_addBan";
-            btn_addBan.Size = new Size(95, 23);
-            btn_addBan.TabIndex = 3;
-            btn_addBan.Text = "ADD";
-            btn_addBan.UseVisualStyleBackColor = true;
-            btn_addBan.Click += actionClick_addBanInformation;
             // 
             // tabStats
             // 
@@ -607,177 +316,12 @@ namespace BHD_ServerManager.Forms
             // 
             // tabBabstats
             // 
-            tabBabstats.Controls.Add(tableLayoutPanel13);
             tabBabstats.Location = new Point(4, 24);
             tabBabstats.Name = "tabBabstats";
             tabBabstats.Size = new Size(888, 328);
             tabBabstats.TabIndex = 2;
             tabBabstats.Text = "Babstats";
             tabBabstats.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel13
-            // 
-            tableLayoutPanel13.ColumnCount = 2;
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 645F));
-            tableLayoutPanel13.Controls.Add(dg_statsLog, 1, 0);
-            tableLayoutPanel13.Controls.Add(panel7, 0, 0);
-            tableLayoutPanel13.Dock = DockStyle.Fill;
-            tableLayoutPanel13.Location = new Point(0, 0);
-            tableLayoutPanel13.Name = "tableLayoutPanel13";
-            tableLayoutPanel13.RowCount = 1;
-            tableLayoutPanel13.RowStyles.Add(new RowStyle());
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel13.Size = new Size(888, 328);
-            tableLayoutPanel13.TabIndex = 0;
-            // 
-            // dg_statsLog
-            // 
-            dg_statsLog.AllowUserToAddRows = false;
-            dg_statsLog.AllowUserToDeleteRows = false;
-            dg_statsLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dg_statsLog.Columns.AddRange(new DataGridViewColumn[] { statsLog_DateTime, statLog_Message });
-            dg_statsLog.Dock = DockStyle.Fill;
-            dg_statsLog.Location = new Point(246, 3);
-            dg_statsLog.Name = "dg_statsLog";
-            dg_statsLog.ReadOnly = true;
-            dg_statsLog.RowHeadersVisible = false;
-            dg_statsLog.Size = new Size(639, 322);
-            dg_statsLog.TabIndex = 0;
-            // 
-            // statsLog_DateTime
-            // 
-            statsLog_DateTime.HeaderText = "Time Stamp";
-            statsLog_DateTime.Name = "statsLog_DateTime";
-            statsLog_DateTime.ReadOnly = true;
-            // 
-            // statLog_Message
-            // 
-            statLog_Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            statLog_Message.HeaderText = "Log Message";
-            statLog_Message.Name = "statLog_Message";
-            statLog_Message.ReadOnly = true;
-            // 
-            // panel7
-            // 
-            panel7.Controls.Add(btn_SaveSettings);
-            panel7.Controls.Add(labelReportInterval);
-            panel7.Controls.Add(labelUpatedInterval);
-            panel7.Controls.Add(num_WebStatsReport);
-            panel7.Controls.Add(num_WebStatsUpdates);
-            panel7.Controls.Add(cb_enableAnnouncements);
-            panel7.Controls.Add(btn_validate);
-            panel7.Controls.Add(label_webServerPath);
-            panel7.Controls.Add(tb_webStatsServerPath);
-            panel7.Controls.Add(cb_enableWebStats);
-            panel7.Dock = DockStyle.Fill;
-            panel7.Location = new Point(3, 3);
-            panel7.Name = "panel7";
-            panel7.Size = new Size(237, 322);
-            panel7.TabIndex = 1;
-            // 
-            // btn_SaveSettings
-            // 
-            btn_SaveSettings.Location = new Point(84, 197);
-            btn_SaveSettings.Name = "btn_SaveSettings";
-            btn_SaveSettings.Size = new Size(75, 23);
-            btn_SaveSettings.TabIndex = 9;
-            btn_SaveSettings.Text = "Save";
-            btn_SaveSettings.UseVisualStyleBackColor = true;
-            // 
-            // labelReportInterval
-            // 
-            labelReportInterval.AutoSize = true;
-            labelReportInterval.Location = new Point(13, 136);
-            labelReportInterval.Name = "labelReportInterval";
-            labelReportInterval.Size = new Size(112, 15);
-            labelReportInterval.TabIndex = 8;
-            labelReportInterval.Text = "Stats Report Interval";
-            labelReportInterval.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // labelUpatedInterval
-            // 
-            labelUpatedInterval.AutoSize = true;
-            labelUpatedInterval.Location = new Point(13, 165);
-            labelUpatedInterval.Name = "labelUpatedInterval";
-            labelUpatedInterval.Size = new Size(115, 15);
-            labelUpatedInterval.TabIndex = 7;
-            labelUpatedInterval.Text = "Stats Update Interval";
-            labelUpatedInterval.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // num_WebStatsReport
-            // 
-            num_WebStatsReport.Location = new Point(134, 132);
-            num_WebStatsReport.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
-            num_WebStatsReport.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
-            num_WebStatsReport.Name = "num_WebStatsReport";
-            num_WebStatsReport.Size = new Size(55, 23);
-            num_WebStatsReport.TabIndex = 6;
-            num_WebStatsReport.TextAlign = HorizontalAlignment.Center;
-            num_WebStatsReport.Value = new decimal(new int[] { 60, 0, 0, 0 });
-            // 
-            // num_WebStatsUpdates
-            // 
-            num_WebStatsUpdates.Location = new Point(134, 161);
-            num_WebStatsUpdates.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
-            num_WebStatsUpdates.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
-            num_WebStatsUpdates.Name = "num_WebStatsUpdates";
-            num_WebStatsUpdates.Size = new Size(55, 23);
-            num_WebStatsUpdates.TabIndex = 5;
-            num_WebStatsUpdates.TextAlign = HorizontalAlignment.Center;
-            num_WebStatsUpdates.Value = new decimal(new int[] { 60, 0, 0, 0 });
-            // 
-            // cb_enableAnnouncements
-            // 
-            cb_enableAnnouncements.AutoSize = true;
-            cb_enableAnnouncements.CheckAlign = ContentAlignment.MiddleRight;
-            cb_enableAnnouncements.Location = new Point(13, 107);
-            cb_enableAnnouncements.Name = "cb_enableAnnouncements";
-            cb_enableAnnouncements.Size = new Size(152, 19);
-            cb_enableAnnouncements.TabIndex = 4;
-            cb_enableAnnouncements.Text = "Enable Announcements";
-            cb_enableAnnouncements.UseVisualStyleBackColor = true;
-            cb_enableAnnouncements.CheckedChanged += ActionEvent_EnableAnnouncements;
-            // 
-            // btn_validate
-            // 
-            btn_validate.Location = new Point(151, 75);
-            btn_validate.Name = "btn_validate";
-            btn_validate.Size = new Size(75, 23);
-            btn_validate.TabIndex = 3;
-            btn_validate.Text = "Validate";
-            btn_validate.UseVisualStyleBackColor = true;
-            btn_validate.Click += ActionEvent_TestBabstatConnection;
-            // 
-            // label_webServerPath
-            // 
-            label_webServerPath.AutoSize = true;
-            label_webServerPath.Font = new System.Drawing.Font("Segoe UI", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label_webServerPath.Location = new Point(13, 72);
-            label_webServerPath.Name = "label_webServerPath";
-            label_webServerPath.Size = new Size(113, 13);
-            label_webServerPath.TabIndex = 2;
-            label_webServerPath.Text = "Babstats Server Path";
-            // 
-            // tb_webStatsServerPath
-            // 
-            tb_webStatsServerPath.Location = new Point(3, 46);
-            tb_webStatsServerPath.Name = "tb_webStatsServerPath";
-            tb_webStatsServerPath.PlaceholderText = "http(s)://youdomain.com/babstats_root/";
-            tb_webStatsServerPath.Size = new Size(231, 23);
-            tb_webStatsServerPath.TabIndex = 1;
-            tb_webStatsServerPath.TextAlign = HorizontalAlignment.Center;
-            // 
-            // cb_enableWebStats
-            // 
-            cb_enableWebStats.AutoSize = true;
-            cb_enableWebStats.Location = new Point(13, 16);
-            cb_enableWebStats.Name = "cb_enableWebStats";
-            cb_enableWebStats.Size = new Size(163, 19);
-            cb_enableWebStats.TabIndex = 0;
-            cb_enableWebStats.Text = "Enable Babstats Reporting";
-            cb_enableWebStats.UseVisualStyleBackColor = true;
-            cb_enableWebStats.CheckedChanged += ActionEvent_EnableBabStats;
             // 
             // tabAdmin
             // 
@@ -1084,31 +628,12 @@ namespace BHD_ServerManager.Forms
             toolStrip.PerformLayout();
             mainPanel.ResumeLayout(false);
             tabControl.ResumeLayout(false);
-            tabBans.ResumeLayout(false);
-            tableLayoutPanel5.ResumeLayout(false);
-            groupBox3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dg_playerNames).EndInit();
-            groupBox8.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dg_IPAddresses).EndInit();
-            panel8.ResumeLayout(false);
-            groupBox10.ResumeLayout(false);
-            tableLayoutPanel6.ResumeLayout(false);
-            groupBox9.ResumeLayout(false);
-            tableLayoutPanel7.ResumeLayout(false);
-            tableLayoutPanel7.PerformLayout();
             tabStats.ResumeLayout(false);
             tabStatsControl.ResumeLayout(false);
             tabPlayerStats.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).EndInit();
             tabWeaponStats.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).EndInit();
-            tabBabstats.ResumeLayout(false);
-            tableLayoutPanel13.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dg_statsLog).EndInit();
-            panel7.ResumeLayout(false);
-            panel7.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsReport).EndInit();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).EndInit();
             tabAdmin.ResumeLayout(false);
             tableAdminPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dg_adminLog).EndInit();
@@ -1135,13 +660,6 @@ namespace BHD_ServerManager.Forms
         private ToolTip toolTip;
         internal ToolStripLabel toolStripStatus;
         private TabPage tabBans;
-        private TableLayoutPanel tableLayoutPanel5;
-        private GroupBox groupBox3;
-        private GroupBox groupBox8;
-        private DataGridViewTextBoxColumn playerRecordID;
-        private DataGridViewTextBoxColumn playerName;
-        private DataGridViewTextBoxColumn ipRecordID;
-        private DataGridViewTextBoxColumn address;
         internal TabControl tabControl;
         private TabPage tabStats;
         private TabControl tabStatsControl;
@@ -1150,21 +668,6 @@ namespace BHD_ServerManager.Forms
         private TabPage tabBabstats;
         internal DataGridView dataGridViewPlayerStats;
         internal DataGridView dataGridViewWeaponStats;
-        private TableLayoutPanel tableLayoutPanel13;
-        private DataGridViewTextBoxColumn statsLog_DateTime;
-        private DataGridViewTextBoxColumn statLog_Message;
-        private Panel panel7;
-        private Label label_webServerPath;
-        private Label labelReportInterval;
-        private Label labelUpatedInterval;
-        public DataGridView dg_statsLog;
-        public CheckBox cb_enableWebStats;
-        public TextBox tb_webStatsServerPath;
-        public CheckBox cb_enableAnnouncements;
-        public Button btn_validate;
-        public NumericUpDown num_WebStatsReport;
-        public NumericUpDown num_WebStatsUpdates;
-        private Button btn_SaveSettings;
         private TabPage tabAdmin;
         private TableLayoutPanel tableAdminPanel;
         public DataGridView dg_adminLog;
@@ -1187,20 +690,7 @@ namespace BHD_ServerManager.Forms
         private ComboBox cb_adminRole;
         private TextBox tb_adminUser;
         private TextBox tb_adminPass;
-        public DataGridView dg_playerNames;
-        public DataGridView dg_IPAddresses;
         public DataGridView dg_AdminUsers;
-        private GroupBox groupBox9;
-        private TableLayoutPanel tableLayoutPanel7;
-        internal TextBox tb_bansPlayerName;
-        internal TextBox tb_bansIPAddress;
-        private ComboBox cb_banSubMask;
-        private Button btn_addBan;
-        private Panel panel8;
-        private GroupBox groupBox10;
-        private TableLayoutPanel tableLayoutPanel6;
-        private Button btn_banExport;
-        private Button btn_banImport;
         private TabPage tabProfile;
         private ToolStripLabel label_TimeLeft;
         private ToolStripLabel label_WinCondition;

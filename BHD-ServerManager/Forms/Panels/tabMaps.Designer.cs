@@ -188,7 +188,7 @@
             tableLayoutPanel3.Margin = new Padding(0);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 2;
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 34F));
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel3.Size = new Size(300, 362);
             tableLayoutPanel3.TabIndex = 2;
@@ -196,14 +196,14 @@
             // combo_gameTypes
             // 
             combo_gameTypes.Dock = DockStyle.Fill;
-            combo_gameTypes.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            combo_gameTypes.Font = new Font("Segoe UI", 10F);
             combo_gameTypes.FormattingEnabled = true;
-            combo_gameTypes.ItemHeight = 21;
+            combo_gameTypes.ItemHeight = 17;
             combo_gameTypes.Items.AddRange(new object[] { "Deathmatch", "Team Deathmatch", "Cooperative", "Team King of the Hill", "King of the Hill", "Search and Destroy", "Attack and Defend", "Capture the Flag", "Flagball", "All Game Modes" });
             combo_gameTypes.Location = new Point(0, 0);
             combo_gameTypes.Margin = new Padding(0);
             combo_gameTypes.Name = "combo_gameTypes";
-            combo_gameTypes.Size = new Size(300, 29);
+            combo_gameTypes.Size = new Size(300, 25);
             combo_gameTypes.TabIndex = 1;
             combo_gameTypes.Text = "All Game Modes";
             combo_gameTypes.SelectedIndexChanged += actionClick_filterChanged;
@@ -227,12 +227,12 @@
             dataGridView_availableMaps.Columns.AddRange(new DataGridViewColumn[] { avail_MapID, avail_MapName, avail_MapFileName, avail_MapType, avail_MapDelete });
             dataGridView_availableMaps.Dock = DockStyle.Fill;
             dataGridView_availableMaps.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dataGridView_availableMaps.Location = new Point(3, 37);
+            dataGridView_availableMaps.Location = new Point(3, 29);
             dataGridView_availableMaps.Name = "dataGridView_availableMaps";
             dataGridView_availableMaps.ReadOnly = true;
             dataGridView_availableMaps.RowHeadersVisible = false;
             dataGridView_availableMaps.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridView_availableMaps.Size = new Size(294, 322);
+            dataGridView_availableMaps.Size = new Size(294, 330);
             dataGridView_availableMaps.TabIndex = 2;
             dataGridView_availableMaps.CellDoubleClick += actionClick_CurrentPlaylistAddMap;
             // 
@@ -291,7 +291,7 @@
             tableLayoutPanel4.Margin = new Padding(0);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
             tableLayoutPanel4.RowCount = 2;
-            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Absolute, 34F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel4.Size = new Size(300, 362);
             tableLayoutPanel4.TabIndex = 3;
@@ -317,21 +317,22 @@
             tableLayoutPanel5.Name = "tableLayoutPanel5";
             tableLayoutPanel5.RowCount = 1;
             tableLayoutPanel5.RowStyles.Add(new RowStyle());
-            tableLayoutPanel5.Size = new Size(300, 34);
+            tableLayoutPanel5.Size = new Size(300, 26);
             tableLayoutPanel5.TabIndex = 0;
             // 
             // ib_SaveMapList
             // 
             ib_SaveMapList.Dock = DockStyle.Fill;
             ib_SaveMapList.FlatStyle = FlatStyle.Flat;
+            ib_SaveMapList.Font = new Font("Segoe UI", 8.25F);
             ib_SaveMapList.IconChar = FontAwesome.Sharp.IconChar.Save;
             ib_SaveMapList.IconColor = Color.Black;
             ib_SaveMapList.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_SaveMapList.IconSize = 32;
+            ib_SaveMapList.IconSize = 24;
             ib_SaveMapList.Location = new Point(50, 0);
             ib_SaveMapList.Margin = new Padding(0);
             ib_SaveMapList.Name = "ib_SaveMapList";
-            ib_SaveMapList.Size = new Size(50, 34);
+            ib_SaveMapList.Size = new Size(50, 26);
             ib_SaveMapList.TabIndex = 1;
             toolTip1.SetToolTip(ib_SaveMapList, "Refresh Available Maps");
             ib_SaveMapList.UseVisualStyleBackColor = true;
@@ -341,14 +342,15 @@
             // 
             ib_mapRefresh.Dock = DockStyle.Fill;
             ib_mapRefresh.FlatStyle = FlatStyle.Flat;
+            ib_mapRefresh.Font = new Font("Segoe UI", 8.25F);
             ib_mapRefresh.IconChar = FontAwesome.Sharp.IconChar.Refresh;
             ib_mapRefresh.IconColor = Color.Black;
             ib_mapRefresh.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_mapRefresh.IconSize = 32;
+            ib_mapRefresh.IconSize = 24;
             ib_mapRefresh.Location = new Point(0, 0);
             ib_mapRefresh.Margin = new Padding(0);
             ib_mapRefresh.Name = "ib_mapRefresh";
-            ib_mapRefresh.Size = new Size(50, 34);
+            ib_mapRefresh.Size = new Size(50, 26);
             ib_mapRefresh.TabIndex = 0;
             toolTip1.SetToolTip(ib_mapRefresh, "Refresh Available Maps");
             ib_mapRefresh.UseVisualStyleBackColor = true;
@@ -358,14 +360,15 @@
             // 
             ib_resetCurrentMaps.Dock = DockStyle.Fill;
             ib_resetCurrentMaps.FlatStyle = FlatStyle.Flat;
+            ib_resetCurrentMaps.Font = new Font("Segoe UI", 8.25F);
             ib_resetCurrentMaps.IconChar = FontAwesome.Sharp.IconChar.Reply;
             ib_resetCurrentMaps.IconColor = Color.Black;
             ib_resetCurrentMaps.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_resetCurrentMaps.IconSize = 32;
+            ib_resetCurrentMaps.IconSize = 24;
             ib_resetCurrentMaps.Location = new Point(250, 0);
             ib_resetCurrentMaps.Margin = new Padding(0);
             ib_resetCurrentMaps.Name = "ib_resetCurrentMaps";
-            ib_resetCurrentMaps.Size = new Size(50, 34);
+            ib_resetCurrentMaps.Size = new Size(50, 26);
             ib_resetCurrentMaps.TabIndex = 4;
             toolTip1.SetToolTip(ib_resetCurrentMaps, "Reset Playlist Back to Live");
             ib_resetCurrentMaps.UseVisualStyleBackColor = true;
@@ -375,14 +378,15 @@
             // 
             ib_exportMapList.Dock = DockStyle.Fill;
             ib_exportMapList.FlatStyle = FlatStyle.Flat;
+            ib_exportMapList.Font = new Font("Segoe UI", 8.25F);
             ib_exportMapList.IconChar = FontAwesome.Sharp.IconChar.BoxesPacking;
             ib_exportMapList.IconColor = Color.Black;
             ib_exportMapList.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_exportMapList.IconSize = 32;
+            ib_exportMapList.IconSize = 24;
             ib_exportMapList.Location = new Point(200, 0);
             ib_exportMapList.Margin = new Padding(0);
             ib_exportMapList.Name = "ib_exportMapList";
-            ib_exportMapList.Size = new Size(50, 34);
+            ib_exportMapList.Size = new Size(50, 26);
             ib_exportMapList.TabIndex = 3;
             toolTip1.SetToolTip(ib_exportMapList, "Export Maplist");
             ib_exportMapList.UseVisualStyleBackColor = true;
@@ -392,14 +396,15 @@
             // 
             ib_importMapList.Dock = DockStyle.Fill;
             ib_importMapList.FlatStyle = FlatStyle.Flat;
+            ib_importMapList.Font = new Font("Segoe UI", 8.25F);
             ib_importMapList.IconChar = FontAwesome.Sharp.IconChar.BoxOpen;
             ib_importMapList.IconColor = Color.Black;
             ib_importMapList.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_importMapList.IconSize = 32;
+            ib_importMapList.IconSize = 24;
             ib_importMapList.Location = new Point(150, 0);
             ib_importMapList.Margin = new Padding(0);
             ib_importMapList.Name = "ib_importMapList";
-            ib_importMapList.Size = new Size(50, 34);
+            ib_importMapList.Size = new Size(50, 26);
             ib_importMapList.TabIndex = 2;
             toolTip1.SetToolTip(ib_importMapList, "Import Maplist");
             ib_importMapList.UseVisualStyleBackColor = true;
@@ -409,14 +414,15 @@
             // 
             ib_clearMapList.Dock = DockStyle.Fill;
             ib_clearMapList.FlatStyle = FlatStyle.Flat;
+            ib_clearMapList.Font = new Font("Segoe UI", 8.25F);
             ib_clearMapList.IconChar = FontAwesome.Sharp.IconChar.Eraser;
             ib_clearMapList.IconColor = Color.Black;
             ib_clearMapList.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            ib_clearMapList.IconSize = 32;
+            ib_clearMapList.IconSize = 24;
             ib_clearMapList.Location = new Point(100, 0);
             ib_clearMapList.Margin = new Padding(0);
             ib_clearMapList.Name = "ib_clearMapList";
-            ib_clearMapList.Size = new Size(50, 34);
+            ib_clearMapList.Size = new Size(50, 26);
             ib_clearMapList.TabIndex = 1;
             toolTip1.SetToolTip(ib_clearMapList, "Clear Playlist");
             ib_clearMapList.UseVisualStyleBackColor = true;
@@ -440,12 +446,12 @@
             dataGridView_currentMaps.Columns.AddRange(new DataGridViewColumn[] { current_MapID, current_MapName, current_MapFileName, current_MapType });
             dataGridView_currentMaps.Dock = DockStyle.Fill;
             dataGridView_currentMaps.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dataGridView_currentMaps.Location = new Point(3, 37);
+            dataGridView_currentMaps.Location = new Point(3, 29);
             dataGridView_currentMaps.Name = "dataGridView_currentMaps";
             dataGridView_currentMaps.ReadOnly = true;
             dataGridView_currentMaps.RowHeadersVisible = false;
             dataGridView_currentMaps.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridView_currentMaps.Size = new Size(294, 322);
+            dataGridView_currentMaps.Size = new Size(294, 330);
             dataGridView_currentMaps.TabIndex = 1;
             dataGridView_currentMaps.CellDoubleClick += actionClick_DeleteSelectedMap;
             dataGridView_currentMaps.KeyPress += actionKey_MoveMap;

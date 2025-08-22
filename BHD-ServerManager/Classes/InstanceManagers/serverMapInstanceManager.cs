@@ -31,7 +31,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             var resourceName = "BHD_ServerManager.DataStores.defaultMapsBHD.csv";
 
             using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
-            using StreamReader reader = new(stream, Encoding.UTF8);
+            using StreamReader reader = new(stream, Encoding.Default);
 
             bool isFirstLine = true;
             while (!reader.EndOfStream)
@@ -80,7 +80,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     string mapName = string.Empty;
                     try
                     {
-                        first_line = File.ReadLines(Path.Combine(theInstance.profileServerPath!, file.Name), Encoding.GetEncoding("Windows-1252")).First().ToString();
+                        first_line = File.ReadLines(Path.Combine(theInstance.profileServerPath!, file.Name), Encoding.Default).First().ToString();
                     }
                     catch (Exception e)
                     {
@@ -194,11 +194,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 foreach (var map in mapList)
                 {
                     // Convert MapFile, MapName to Base64\
-                    string encodedMapFile = Convert.ToBase64String(Encoding.UTF8.GetBytes(map.MapFile));
+                    string encodedMapFile = Convert.ToBase64String(Encoding.Default.GetBytes(map.MapFile));
                     string encodedMapName = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(map.MapName));
                     sb.AppendLine($"{encodedMapFile},{encodedMapName},{map.MapType}");
                 }
-                File.WriteAllText(savePath, sb.ToString(), Encoding.UTF8);
+                File.WriteAllText(savePath, sb.ToString(), Encoding.Default);
             }
             catch (Exception ex)
             {
@@ -210,7 +210,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             string? filePath = Functions.ShowFileDialog(saveDialog, filter, title, initialDirectory, defaultFileName);
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                 return null;
-            return File.ReadAllLines(filePath, Encoding.UTF8);
+            return File.ReadAllLines(filePath, Encoding.Default);
         }
         public List<mapFileInfo> LoadCustomMapPlaylist(bool external = false)
         {
@@ -243,19 +243,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (parts.Length < 3) continue;
 
                 // Decode from Base64
-                string decodedMapFile = Encoding.UTF8.GetString(Convert.FromBase64String(parts[0]));
+                string decodedMapFile = Encoding.Default.GetString(Convert.FromBase64String(parts[0]));
                 string decodedMapName = Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(parts[1]));
 
-                if (instanceMaps.availableMaps.Any(m => string.Equals(m.MapFile, decodedMapFile, StringComparison.OrdinalIgnoreCase) 
-                            && string.Equals(m.MapName, decodedMapName, StringComparison.OrdinalIgnoreCase) 
-                            && string.Equals(m.MapType, parts[2], StringComparison.OrdinalIgnoreCase)))
+                var mapItem = instanceMaps.availableMaps
+                    .FirstOrDefault(m => string.Equals(m.MapFile, decodedMapFile, StringComparison.OrdinalIgnoreCase)
+                                      && string.Equals(m.MapName, decodedMapName, StringComparison.OrdinalIgnoreCase)
+                                      && string.Equals(m.MapType, parts[2], StringComparison.OrdinalIgnoreCase));
+
+                if (mapItem != null)
                 {
-                    mapFileInfo mapItem = new mapFileInfo
-                    {
-                        MapFile = decodedMapFile,
-                        MapName = decodedMapName,
-                        MapType = parts[2]
-                    };
                     newMapPlaylist.Add(mapItem);
                 }
                 else

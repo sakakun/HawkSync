@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace BHD_ServerManager.Forms.Panels
             // Ensure the TableLayoutPanel has 5 columns and 10 rows
             PlayerCards.ColumnCount = 5;
             PlayerCards.RowCount = 10;
+            PlayerCards.Padding = new Padding(0,3,0,0);
 
             for (int i = 0; i < 50; i++)
             {
@@ -42,6 +44,8 @@ namespace BHD_ServerManager.Forms.Panels
                 PlayerCard card = new PlayerCard();
                 card.Name = $"PlayerCard_{slotNum}";
                 card.Dock = DockStyle.Fill;
+                card.Margin = new Padding(0);
+                card.Padding = new Padding(0);
                 card.ToggleSlot(slotNum, (i) < theInstance.gameMaxSlots ? true : false);
                 playerCards[slotNum] = card;
 

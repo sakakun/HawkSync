@@ -28,6 +28,7 @@ namespace BHD_ServerManager.Forms
         public tabMaps    MapsTab    = null!;                   // The Maps Tab User Control
         public tabPlayers PlayersTab = null!;                   // The Players Tab User Control
         public tabChat    ChatTab    = null!;                   // The Chat Tab User Control
+        public tabBans    BanTab     = null!;                   // The Bans Tab User Control
 
         public ServerManager()
         {
@@ -47,7 +48,6 @@ namespace BHD_ServerManager.Forms
             theInstanceManager.InitializeTickers();
             theInstanceManager.GetServerVariables();
 
-            cb_banSubMask.SelectedIndex = cb_banSubMask.Items.Count - 1;
             adminInstanceManager.UpdateAdminLogDialog();
             ActionClick_AdminNewUser(null!, null!);
         }
@@ -60,6 +60,7 @@ namespace BHD_ServerManager.Forms
             tabMaps.Controls.Add(MapsTab = new tabMaps());
             tabPlayers.Controls.Add(PlayersTab = new tabPlayers());
             tabChat.Controls.Add(ChatTab = new tabChat());
+            tabBans.Controls.Add(BanTab = new tabBans());
         }
 
         // --- UI Thread Helper ---
@@ -83,80 +84,6 @@ namespace BHD_ServerManager.Forms
                 InstanceStatus.STARTDELAY => "Server is running. Game ready, waiting for start.",
                 _ => toolStripStatus.Text
             };
-        }
-
-        // --- Ban Tab ---
-        private void functionEvent_RemoveBannedPlayer(int recordId)
-        {
-            bool foundInNames = instanceBans.BannedPlayerNames.Any(b => b.recordId == recordId);
-            bool foundInAddresses = instanceBans.BannedPlayerAddresses.Any(b => b.recordId == recordId);
-
-            if (!foundInNames && !foundInAddresses)
-            {
-                MessageBox.Show($"No ban record found with ID {recordId}.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            if (foundInNames && foundInAddresses)
-            {
-                var result = MessageBox.Show(
-                    "This record ID exists in both player name and IP bans.\n\n" +
-                    "Click Yes to remove both.\n" +
-                    "Click No to remove only the player name ban.\n" +
-                    "Click Cancel to remove only the IP ban.",
-                    "Remove Ban Record",
-                    MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
-                    banInstanceManager.RemoveBannedPlayerBoth(recordId);
-                else if (result == DialogResult.No)
-                    banInstanceManager.RemoveBannedPlayerName(recordId);
-                else if (result == DialogResult.Cancel)
-                    banInstanceManager.RemoveBannedPlayerAddress(recordId);
-            }
-            else if (foundInNames)
-                banInstanceManager.RemoveBannedPlayerName(recordId);
-            else if (foundInAddresses)
-                banInstanceManager.RemoveBannedPlayerAddress(recordId);
-        }
-
-        private void actionClick_addBanInformation(object sender, EventArgs e)
-        {
-            string playerName = tb_bansPlayerName.Text.Trim();
-            string playerIP = tb_bansIPAddress.Text.Trim();
-            int submask = cb_banSubMask.SelectedIndex + 1;
-
-            string EncodedPlayerName = string.Empty;
-            IPAddress ipAddress = null!;
-
-            if (!string.IsNullOrEmpty(playerName))
-                EncodedPlayerName = Convert.ToBase64String(Encoding.UTF8.GetBytes(playerName));
-            if (!string.IsNullOrEmpty(playerIP))
-                ipAddress = IPAddress.Parse(playerIP);
-
-            banInstanceManager.AddBannedPlayer(EncodedPlayerName, ipAddress!, submask);
-
-            MessageBox.Show("Ban information has been added successfully.", "Ban Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            banInstanceManager.UpdateBannedTables();
-
-            tb_bansPlayerName.Text = string.Empty;
-            tb_bansIPAddress.Text = string.Empty;
-            cb_banSubMask.SelectedIndex = cb_banSubMask.Items.Count - 1;
-        }
-
-        private void actionDbClick_RemoveRecord2(object sender, DataGridViewCellEventArgs e)
-        {
-            int recordId = Convert.ToInt32(dg_IPAddresses.Rows[e.RowIndex].Cells[0].Value);
-            functionEvent_RemoveBannedPlayer(recordId);
-            banInstanceManager.UpdateBannedTables();
-        }
-
-        private void actionDbClick_RemoveRecord(object sender, DataGridViewCellEventArgs e)
-        {
-            int recordId = Convert.ToInt32(dg_playerNames.Rows[e.RowIndex].Cells[0].Value);
-            functionEvent_RemoveBannedPlayer(recordId);
         }
 
         // --- Admin Tab ---
@@ -300,37 +227,5 @@ namespace BHD_ServerManager.Forms
             base.OnFormClosing(e);
         }
 
-        private void actionClick_importBans(object sender, EventArgs e)
-        {
-            // Ask if the user wants to clear existing bans
-            // If yes, clear the bans first
-            // If no, just import the new bans
-            var result = MessageBox.Show(
-                "Do you want to clear existing bans before importing new ones?",
-                "Clear Existing Bans",
-                MessageBoxButtons.YesNoCancel,
-                MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                instanceBans.BannedPlayerAddresses.Clear();
-                instanceBans.BannedPlayerNames.Clear();
-                banInstanceManager.UpdateBannedTables();
-                banInstanceManager.ImportSettings();
-            }
-            else if (result == DialogResult.No)
-            {
-                banInstanceManager.ImportSettings();
-            }
-            else
-            {
-                // User cancelled the import
-                return;
-            }
-        }
-
-        private void actionClick_exportBanSettings(object sender, EventArgs e)
-        {
-            banInstanceManager.ExportSettings();
-        }
     }
 }

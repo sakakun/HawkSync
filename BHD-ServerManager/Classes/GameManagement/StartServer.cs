@@ -315,11 +315,12 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 foreach (var map in mapInstance.currentMapPlaylist)
                 {
-                    byte[] mapFile = Encoding.Default.GetBytes(map.MapFile!);
+
+                    byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes(map.MapFile);
                     ms.Write(mapFile, 0, mapFile.Length);
 
                     ms.Seek(ms.Position + (0x20F - mapFile.Length), SeekOrigin.Begin);
-                    byte[] mapName = Encoding.Default.GetBytes(map.MapName!);
+                    byte[] mapName = Encoding.GetEncoding("Windows-1252").GetBytes(map.MapName);
                     ms.Write(mapName, 0, mapName.Length);
 
                     ms.Seek(ms.Position + (0x305 - mapName.Length), SeekOrigin.Begin);
@@ -335,11 +336,11 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 for (int i = mapInstance.currentMapPlaylist.Count; i < 128; i++)
                 {
-                    byte[] mapFile = Encoding.Default.GetBytes("NA.bms");
+                    byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes("NA.bms");
                     ms.Write(mapFile, 0, mapFile.Length);
 
                     ms.Seek(ms.Position + (0x20F - mapFile.Length), SeekOrigin.Begin);
-                    byte[] mapName = Encoding.Default.GetBytes("NA");
+                    byte[] mapName = Encoding.GetEncoding("Windows-1252").GetBytes("NA");
                     ms.Write(mapName, 0, mapName.Length);
 
                     ms.Seek(ms.Position + (0x305 - mapName.Length), SeekOrigin.Begin);
@@ -383,7 +384,10 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 try
                 {
-                    if (string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase))
+                    bool fileMatch = string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase);
+                    bool titleMatch = string.Equals(searchProcess.MainWindowTitle, windowTitle, StringComparison.Ordinal);
+
+                    if (fileMatch && titleMatch)
                     {
                         AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
                         thisInstance.instanceAttachedPID = searchProcess.Id;
