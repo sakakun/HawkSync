@@ -90,6 +90,7 @@ namespace BHD_ServerManager.Forms.Panels
                     else
                     {
                         playerCards[slotNum].ToggleSlot(slotNum, true);
+                        playerCards[slotNum].ResetStatus(slotNum);
                     }
                 }
             }

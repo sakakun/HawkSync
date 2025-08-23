@@ -1322,11 +1322,11 @@ namespace BHD_ServerManager.Classes.GameManagement
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
             // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] disablePlayerWeapon = BitConverter.GetBytes(0);
             int disablePlayerWeaponWrite = 0;
-            WriteProcessMemory((int)processHandle, playerlistStartingLocation + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
+            WriteProcessMemory((int)processHandle, playerNewLocationAddress + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
 
 
         }
@@ -1348,20 +1348,17 @@ namespace BHD_ServerManager.Classes.GameManagement
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
             // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] disablePlayerWeapon = BitConverter.GetBytes(1);
             int disablePlayerWeaponWrite = 0;
-            WriteProcessMemory((int)processHandle, playerlistStartingLocation + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
+            WriteProcessMemory((int)processHandle, playerNewLocationAddress + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
 
 
         }
         // Function: WriteMemoryKillPlayer
         public static void WriteMemoryKillPlayer(int playerSlot)
         {
-
-
-
             int buffer = 0;
             byte[] PointerAddr9 = new byte[4];
             var Pointer = baseAddr + 0x005ED600;
@@ -1375,12 +1372,11 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
-            // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] playerObjectLocationBytes = new byte[4];
             int playerObjectLocationRead = 0;
-            ReadProcessMemory((int)processHandle, playerlistStartingLocation + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
+            ReadProcessMemory((int)processHandle, playerNewLocationAddress + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
             int playerObjectLocation = BitConverter.ToInt32(playerObjectLocationBytes, 0);
 
             byte[] setPlayerHealth = BitConverter.GetBytes(0);
@@ -1410,11 +1406,11 @@ namespace BHD_ServerManager.Classes.GameManagement
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
             // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] playerObjectLocationBytes = new byte[4];
             int playerObjectLocationRead = 0;
-            ReadProcessMemory((int)processHandle, playerlistStartingLocation + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
+            ReadProcessMemory((int)processHandle, playerNewLocationAddress + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
             int playerObjectLocation = BitConverter.ToInt32(playerObjectLocationBytes, 0);
 
             byte[] setPlayerHealth = BitConverter.GetBytes(health); //set god mode health
@@ -1650,7 +1646,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             if (NumPlayers > 0)
             {
 
-
                 int buffer = 0;
                 var Pointer = baseAddr + 0x005ED600;
 
@@ -1756,7 +1751,11 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
             }
-            thisInstance.playerList = currentPlayerList;
+            thisInstance.playerList.Clear();
+            foreach (var kvp in currentPlayerList)
+            {
+                thisInstance.playerList[kvp.Key] = kvp.Value;
+            }
             // CoreManager.DebugLog("PlayerList Updated");
         }
         // Function: ReadMemoryGrabPlayerIPAddress

@@ -224,6 +224,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
         public void UpdateStatus(playerObject playerInfo)
         {
+                      
             Player = playerInfo;
 
             // Decode Base64 and interpret as Windows-1252
@@ -243,9 +244,9 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 _ => Color.Black
             };
             this.contextMenu.Items[0].Text = decodedPlayerName;
-            this.contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms";
+            this.contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms - Slot: {Player.PlayerSlot}";
 
-            player_Tooltip.SetToolTip(this, $"Ping: {Player.PlayerPing} ms");
+            player_Tooltip.SetToolTip(this, $"Ping: {Player.PlayerPing} ms - Slot: {Player.PlayerSlot}");
             playerContextMenuIcon.Visible = true;
         }
 
@@ -258,6 +259,8 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 PlayerIPAddress = ""
             };
             label_dataIPinfo.Text = Player.PlayerIPAddress;
+            label_dataPlayerNameRole.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+            label_dataPlayerNameRole.UseCompatibleTextRendering = true;
             label_dataPlayerNameRole.Text = $"{Player.PlayerName}";
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Color.Black;
