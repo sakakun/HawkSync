@@ -171,32 +171,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             // Trigger "Gets" for the Tabs
             thisServer.ProfileTab.functionEvent_GetProfileSettings(null, null!);
             thisServer.ServerTab.functionEvent_GetServerSettings((updatedInstance != null ? updatedInstance : null!));
-
-            // Stats Settings
-            thisServer.cb_enableWebStats.Checked = newInstance.WebStatsEnabled;
-            thisServer.tb_webStatsServerPath.Text = newInstance.WebStatsServerPath;
-            thisServer.cb_enableAnnouncements.Checked = newInstance.WebStatsAnnouncements;
-            thisServer.num_WebStatsReport.Value = newInstance.WebStatsReportInterval;
-            thisServer.num_WebStatsUpdates.Value = newInstance.WebStatsUpdateInterval;
-
-            bool statsEnabled = newInstance.WebStatsEnabled;
-            bool announcementsEnabled = statsEnabled && newInstance.WebStatsAnnouncements;
-
-            thisServer.tb_webStatsServerPath.Enabled = statsEnabled;
-            thisServer.cb_enableAnnouncements.Enabled = statsEnabled;
-            thisServer.num_WebStatsReport.Enabled = announcementsEnabled;
-            thisServer.num_WebStatsUpdates.Enabled = statsEnabled;
+            thisServer.StatsTab.functionEvent_GetStatSettings((updatedInstance != null ? updatedInstance : null!));
 
         }
         public void SetServerVariables()
         {
-
-            // Stats Settings
-            thisInstance.WebStatsEnabled = thisServer.cb_enableWebStats.Checked;
-            thisInstance.WebStatsServerPath = thisServer.tb_webStatsServerPath.Text;
-            thisInstance.WebStatsAnnouncements = thisServer.cb_enableAnnouncements.Checked;
-            thisInstance.WebStatsReportInterval = (int)thisServer.num_WebStatsReport.Value;
-            thisInstance.WebStatsUpdateInterval = (int)thisServer.num_WebStatsUpdates.Value;
+            // TO DO: Remove the need for SetServerVariables in theInstanceManager.
 
         }
         public void ValidateGameServerType(string serverPath)

@@ -322,35 +322,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         public void UpdateAdminLogDialog()
         {
-            // Only update if 15 seconds have passed
-            if ((DateTime.UtcNow - _lastUpdate).TotalSeconds < 15)
-                return;
-
-            _lastUpdate = DateTime.UtcNow;
-
-            // Clear the existing rows
-            thisServer.dg_AdminUsers.Rows.Clear();
-            // Populate the DataGridView with the admin accounts
-            foreach (var admin in instanceAdmin.Admins)
-            {
-                thisServer.dg_AdminUsers.Rows.Add(admin.UserId, admin.Username, admin.Role.ToString());
-            }
-
-            thisServer.dg_adminLog.Rows.Clear();
-
-            foreach (AdminLog log in instanceAdmin.Logs
-            .OrderByDescending(l => l.Timestamp)
-            .Take(50))
-            {
-                var admin = instanceAdmin.Admins.FirstOrDefault(a => a.UserId == log.UserId);
-                string username = admin != null ? admin.Username : $"UserId:{log.UserId}";
-
-                thisServer.dg_adminLog.Rows.Add(
-                    log.Timestamp,
-                    username,
-                    log.Action
-                );
-            }
+            // TO DO: Remvoe this method if not needed
         }
 
     }

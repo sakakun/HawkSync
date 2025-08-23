@@ -483,15 +483,15 @@ namespace BHD_ServerManager.Classes.StatsManagement
 
         private static void AddStatsLogRowSafe(ServerManager thisServer, string dateTime, string message)
         {
-            if (thisServer.dg_statsLog.InvokeRequired)
+            if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
             {
-                thisServer.dg_statsLog.Invoke(new Action(() =>
-                    thisServer.dg_statsLog.Rows.Add(dateTime, message)
+                thisServer.StatsTab.dg_statsLog.Invoke(new Action(() =>
+                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTime, message)
                 ));
             }
             else
             {
-                thisServer.dg_statsLog.Rows.Add(dateTime, message);
+                thisServer.StatsTab.dg_statsLog.Rows.Add(dateTime, message);
             }
         }
 
@@ -501,41 +501,12 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 return;
             _lastPlayerStatsUpdate = DateTime.UtcNow;
 
-            DataGridView dataGridViewPlayerStats = thisServer.dataGridViewPlayerStats;
+            DataGridView dataGridViewPlayerStats = thisServer.StatsTab.dataGridViewPlayerStats;
 
             if (dataGridViewPlayerStats.InvokeRequired)
             {
                 dataGridViewPlayerStats.Invoke(new Action(() => PopulatePlayerStatsGrid()));
                 return;
-            }
-
-            if (dataGridViewPlayerStats.Columns.Count == 0)
-            {
-                dataGridViewPlayerStats.Columns.Add("PlayerName", "Player Name");
-                dataGridViewPlayerStats.Columns.Add("Suicides", "Suicides");
-                dataGridViewPlayerStats.Columns.Add("Murders", "Murders");
-                dataGridViewPlayerStats.Columns.Add("Kills", "Kills");
-                dataGridViewPlayerStats.Columns.Add("Deaths", "Deaths");
-                dataGridViewPlayerStats.Columns.Add("ZoneTime", "Zone Time");
-                dataGridViewPlayerStats.Columns.Add("FBCaptures", "Flag Captures");
-                dataGridViewPlayerStats.Columns.Add("FlagSaves", "Flag Saves");
-                dataGridViewPlayerStats.Columns.Add("ADTargetsDestroyed", "Targets Destroyed");
-                dataGridViewPlayerStats.Columns.Add("RevivesReceived", "Revives Received");
-                dataGridViewPlayerStats.Columns.Add("RevivesGiven", "Revives Given");
-                dataGridViewPlayerStats.Columns.Add("PSPAttempts", "PSP Attempts");
-                dataGridViewPlayerStats.Columns.Add("PSPTakeovers", "PSP Takeovers");
-                dataGridViewPlayerStats.Columns.Add("FBCarrierKills", "FB Carrier Kills");
-                dataGridViewPlayerStats.Columns.Add("DoubleKills", "Double Kills");
-                dataGridViewPlayerStats.Columns.Add("Headshots", "Headshots");
-                dataGridViewPlayerStats.Columns.Add("KnifeKills", "Knife Kills");
-                dataGridViewPlayerStats.Columns.Add("SniperKills", "Sniper Kills");
-                dataGridViewPlayerStats.Columns.Add("TKOTHDefenseKills", "TKOTH Defense Kills");
-                dataGridViewPlayerStats.Columns.Add("TKOTHAttackKills", "TKOTH Attack Kills");
-                dataGridViewPlayerStats.Columns.Add("ShotsPerKill", "Shots Per Kill");
-                dataGridViewPlayerStats.Columns.Add("ExperiencePoints", "Experience Points");
-                dataGridViewPlayerStats.Columns.Add("PlayerTeam", "Player Team");
-                dataGridViewPlayerStats.Columns.Add("PlayerActive", "Active");
-                dataGridViewPlayerStats.Columns.Add("TimePlayed", "Time Played (s)");
             }
 
             dataGridViewPlayerStats.Rows.Clear();
@@ -574,20 +545,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
                     player.PlayerTimePlayed
                 );
             }
-            foreach (DataGridViewColumn col in dataGridViewPlayerStats.Columns)
-            {
-                col.HeaderCell.ToolTipText = col.HeaderText;
-            }
 
-            dataGridViewPlayerStats.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewPlayerStats.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewPlayerStats.RowHeadersVisible = false;
-            dataGridViewPlayerStats.Columns[0].MinimumWidth = 100;
-
-            for (int i = 1; i < dataGridViewPlayerStats.Columns.Count; i++)
-            {
-                dataGridViewPlayerStats.Columns[i].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            }
         }
 
         public static void PopulateWeaponStatsGrid()
@@ -596,34 +554,12 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 return;
             _lastWeaponStatsUpdate = DateTime.UtcNow;
 
-            DataGridView dataGridViewWeaponStats = thisServer.dataGridViewWeaponStats;
+            DataGridView dataGridViewWeaponStats = thisServer.StatsTab.dataGridViewWeaponStats;
 
             if (dataGridViewWeaponStats.InvokeRequired)
             {
                 dataGridViewWeaponStats.Invoke(new Action(() => PopulateWeaponStatsGrid()));
                 return;
-            }
-
-            if (dataGridViewWeaponStats.Columns.Count == 0)
-            {
-                dataGridViewWeaponStats.Columns.Add("PlayerName", "Player Name");
-                dataGridViewWeaponStats.Columns.Add("WeaponName", "Weapon Name");
-                dataGridViewWeaponStats.Columns.Add("Timer", "Time Used (s)");
-                dataGridViewWeaponStats.Columns.Add("Kills", "Kills");
-                dataGridViewWeaponStats.Columns.Add("Shots", "Shots");
-
-                foreach (DataGridViewColumn col in dataGridViewWeaponStats.Columns)
-                {
-                    col.HeaderCell.ToolTipText = col.HeaderText;
-                }
-
-                dataGridViewWeaponStats.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                dataGridViewWeaponStats.Columns[0].MinimumWidth = 100;
-
-                for (int i = 1; i < dataGridViewWeaponStats.Columns.Count; i++)
-                {
-                    dataGridViewWeaponStats.Columns[i].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                }
             }
 
             dataGridViewWeaponStats.Rows.Clear();
@@ -642,9 +578,6 @@ namespace BHD_ServerManager.Classes.StatsManagement
                     );
                 }
             }
-
-            dataGridViewWeaponStats.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewWeaponStats.RowHeadersVisible = false;
         }
     }
 }

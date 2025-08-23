@@ -331,9 +331,6 @@ namespace BHD_ServerManager.Forms.Panels
                 theInstance.profileEnableRemote = cb_enableRemote.Checked;
                 theInstance.profileRemotePort = (int)num_remotePort.Value;
             }
-            
-            // TODO: Remove this when the remaining tabs are implemented
-            theInstanceManager.SetServerVariables();                            // Set the server variables based on the current instance settings 
 
             AppDebug.Log(this.Name, "Server settings saved.");
         }

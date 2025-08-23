@@ -64,8 +64,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
                 thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
                 thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
-
-                adminInstanceManager.UpdateAdminLogDialog();                                    // Update Admin Log Dialog
+                thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
             });
 
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
