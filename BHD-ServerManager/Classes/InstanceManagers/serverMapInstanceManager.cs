@@ -242,9 +242,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var parts = line.Split(',');
                 if (parts.Length < 3) continue;
 
-                // Decode from Base64
-                string decodedMapFile = Encoding.Default.GetString(Convert.FromBase64String(parts[0]));
-                string decodedMapName = Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(parts[1]));
+                string decodedMapFile;
+                string decodedMapName;
+
+                // Try Base64 decode, fallback to plain text
+                decodedMapFile = TryDecodeBase64(parts[0], Encoding.Default);
+                decodedMapName = TryDecodeBase64(parts[1], Encoding.GetEncoding("Windows-1252"));
 
                 var mapItem = instanceMaps.availableMaps
                     .FirstOrDefault(m => string.Equals(m.MapFile, decodedMapFile, StringComparison.OrdinalIgnoreCase)
@@ -265,6 +268,25 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             return newMapPlaylist;
         }
+
+        // Helper: Try to decode Base64, fallback to plain text
+        private static string TryDecodeBase64(string input, Encoding encoding)
+        {
+            input = input.Trim();
+            if ((input.Length % 4 == 0) && System.Text.RegularExpressions.Regex.IsMatch(input, @"^[A-Za-z0-9\+/]*={0,2}$"))
+            {
+                try
+                {
+                    return encoding.GetString(Convert.FromBase64String(input));
+                }
+                catch
+                {
+                    // Not valid Base64, fall through
+                }
+            }
+            return input;
+        }
+
         public List<mapFileInfo> BuildCurrentMapPlaylist()
         {
             DataGridView ogList = thisServer.MapsTab.dataGridView_currentMaps;
@@ -321,5 +343,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             Recurse(numbers, target, new List<int>());
         }
 
+        // Helper to check if a string is valid Base64
+        private static bool IsBase64String(string s)
+        {
+            s = s.Trim();
+            return (s.Length % 4 == 0) && 
+                   System.Text.RegularExpressions.Regex.IsMatch(s, @"^[A-Za-z0-9\+/]*={0,2}$", System.Text.RegularExpressions.RegexOptions.None);
+        }
     }
 }
