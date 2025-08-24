@@ -10,13 +10,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using Windows.Storage;
-using Button = System.Windows.Controls.Button;
-using UserControl = System.Windows.Forms.UserControl;
 
-namespace BHD_ServerManager.Forms.Panels
+namespace BHD_RemoteClient.Forms.Panels
 {
     public partial class tabProfile : UserControl
     {
@@ -141,7 +138,7 @@ namespace BHD_ServerManager.Forms.Panels
             // Enable/disable mod fields based on /mod checked and OFFLINE status
             tb_modFile.Enabled = currentState && isModChecked;
             btn_profileBrowse2.Enabled = currentState && isModChecked;
-
+            
             // Highlight differences
             functionEvent_HighlightDiffFields();
         }

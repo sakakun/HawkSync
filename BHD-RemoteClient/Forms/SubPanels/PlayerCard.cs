@@ -259,6 +259,16 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             playerTeamIcon.IconColor = Color.Black; // Reset to default color
             playerContextMenuIcon.Visible = false; // Hide context menu icon by default
         }
+        public void ToggleSlot(int slotNum, bool visible = true)
+        {
+            if (this.Visible == visible)
+            {
+                // If the visibility is already set, do nothing.
+                return;
+            }
 
+            this.ResetStatus(slotNum);
+            this.Visible = visible;
+        }
     }
 }

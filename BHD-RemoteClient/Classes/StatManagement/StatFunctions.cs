@@ -22,7 +22,7 @@ namespace BHD_RemoteClient.Classes.StatManagement
                 return;
             _lastPlayerStatsUpdate = DateTime.UtcNow;
 
-            DataGridView dataGridViewPlayerStats = thisServer.dataGridViewPlayerStats;
+            DataGridView dataGridViewPlayerStats = thisServer.StatsTab.dataGridViewPlayerStats;
 
             if (dataGridViewPlayerStats.InvokeRequired)
             {
@@ -117,7 +117,7 @@ namespace BHD_RemoteClient.Classes.StatManagement
                 return;
             _lastWeaponStatsUpdate = DateTime.UtcNow;
 
-            DataGridView dataGridViewWeaponStats = thisServer.dataGridViewWeaponStats;
+            DataGridView dataGridViewWeaponStats = thisServer.StatsTab.dataGridViewWeaponStats;
 
             if (dataGridViewWeaponStats.InvokeRequired)
             {

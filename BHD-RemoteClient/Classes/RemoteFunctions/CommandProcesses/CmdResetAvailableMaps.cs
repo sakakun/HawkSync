@@ -27,7 +27,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
 
             if (response != null && response.Success)
             {
-                thisServer.functionEvent_PopulateMapDataGrid(thisServer.dataGridView_availableMaps, instanceMaps.availableMaps, false);
+                thisServer.MapsTab.functionEvent_PopulateAvailableMapData();
                 // ResponseData is a boolean indicating if the process is attached
                 return bool.TryParse(response.Success.ToString(), out bool mapsReset) && mapsReset;
             }

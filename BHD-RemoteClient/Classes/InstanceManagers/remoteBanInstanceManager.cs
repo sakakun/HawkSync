@@ -36,13 +36,13 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
         public void UpdateBannedTables()
         {
             if (!theInstance.banInstanceUpdated && 
-               !(thisServer.dg_playerNames.Rows.Count != instanceBans.BannedPlayerNames.Count 
-                 || thisServer.dg_IPAddresses.Rows.Count != instanceBans.BannedPlayerAddresses.Count))
+               !(thisServer.BanTab.dg_playerNames.Rows.Count != instanceBans.BannedPlayerNames.Count 
+                 || thisServer.BanTab.dg_IPAddresses.Rows.Count != instanceBans.BannedPlayerAddresses.Count))
             { return; }
 
             // Clear existing rows
-            thisServer.dg_playerNames.Rows.Clear();
-            thisServer.dg_IPAddresses.Rows.Clear();
+            thisServer.BanTab.dg_playerNames.Rows.Clear();
+            thisServer.BanTab.dg_IPAddresses.Rows.Clear();
 
             // Add banned player names
             foreach (var bannedName in instanceBans.BannedPlayerNames)
@@ -52,19 +52,19 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
                 string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
 
                 // Add row and apply font
-                int rowIndex = thisServer.dg_playerNames.Rows.Add(
+                int rowIndex = thisServer.BanTab.dg_playerNames.Rows.Add(
                     bannedName.recordId,
                     decodedPlayerName
                 );
-                var row = thisServer.dg_playerNames.Rows[rowIndex];
-                row.DefaultCellStyle.Font = thisServer.dg_playerNames.Font;
+                var row = thisServer.BanTab.dg_playerNames.Rows[rowIndex];
+                row.DefaultCellStyle.Font = thisServer.BanTab.dg_playerNames.Font;
                 // DataGridView uses GDI+ text rendering by default; no need to set UseCompatibleTextRendering
             }
 
             // Add banned player addresses
             foreach (var bannedAddress in instanceBans.BannedPlayerAddresses)
             {
-                thisServer.dg_IPAddresses.Rows.Add(
+                thisServer.BanTab.dg_IPAddresses.Rows.Add(
                     bannedAddress.recordId,
                     $"{bannedAddress.playerIP}/{bannedAddress.subnetMask}"
                 );

@@ -53,7 +53,31 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Forms\PlayerCard.cs">
+    <Compile Update="Forms\Panels\tabAdmins.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabBans.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabChat.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabMaps.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabPlayers.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabProfile.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabServer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabStats.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\PlayerCard.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Forms\ServerManager.cs">
