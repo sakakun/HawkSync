@@ -31,7 +31,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             var resourceName = "BHD_ServerManager.DataStores.defaultMapsBHD.csv";
 
             using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
-            using StreamReader reader = new(stream, Encoding.UTF8);
+            using StreamReader reader = new(stream, Encoding.Default);
 
             bool isFirstLine = true;
             while (!reader.EndOfStream)
@@ -193,18 +193,81 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var sb = new StringBuilder();
                 foreach (var map in mapList)
                 {
-                    sb.AppendLine($"{map.MapFile},{map.MapName},{map.MapType}");
+                    // Convert MapFile, MapName to Base64\
+                    string encodedMapFile = Convert.ToBase64String(Encoding.Default.GetBytes(map.MapFile));
+                    string encodedMapName = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(map.MapName));
+                    sb.AppendLine($"{encodedMapFile},{encodedMapName},{map.MapType}");
                 }
-                File.WriteAllText(savePath, sb.ToString(), Encoding.UTF8);
+                File.WriteAllText(savePath, sb.ToString(), Encoding.Default);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to save map playlist:\n" + ex.Message, "Save Error");
             }
         }
+        public string[]? GetFileLinesFromDialog(bool saveDialog, string filter, string title, string initialDirectory, string defaultFileName)
+        {
+            string? filePath = Functions.ShowFileDialog(saveDialog, filter, title, initialDirectory, defaultFileName);
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+                return null;
+            return File.ReadAllLines(filePath, Encoding.Default);
+        }
+        public List<mapFileInfo> LoadCustomMapPlaylist(bool external = false)
+        {
+            string? startPath = CommonCore.AppDataPath;
+            string[] lines;
+
+            if (external)
+            {
+                try
+                {
+                    lines = GetFileLinesFromDialog(false, "Map Playlist (*.mpl)|*.mpl|All files (*.*)|*.*", "Open Map Playlist File", startPath, "currentMapPlaylist.mpl")!;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Failed to open map playlist file:\n" + ex.Message, "Open Error");
+                    return null!;
+                }
+            }
+            else
+            {
+                lines = File.ReadAllLines(startPath + "currentMapPlaylist.mpl", Encoding.UTF8);
+            }
+
+            List<mapFileInfo> newMapPlaylist = new List<mapFileInfo>();
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                var parts = line.Split(',');
+                if (parts.Length < 3) continue;
+
+                // Decode from Base64
+                string decodedMapFile = Encoding.Default.GetString(Convert.FromBase64String(parts[0]));
+                string decodedMapName = Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(parts[1]));
+
+                var mapItem = instanceMaps.availableMaps
+                    .FirstOrDefault(m => string.Equals(m.MapFile, decodedMapFile, StringComparison.OrdinalIgnoreCase)
+                                      && string.Equals(m.MapName, decodedMapName, StringComparison.OrdinalIgnoreCase)
+                                      && string.Equals(m.MapType, parts[2], StringComparison.OrdinalIgnoreCase));
+
+                if (mapItem != null)
+                {
+                    newMapPlaylist.Add(mapItem);
+                }
+                else
+                {
+                    MessageBox.Show($"Map file '{decodedMapFile}' does not exist in the server path.", "File Not Found");
+                    AppDebug.Log("serverMapInstanceManager", $"Map file '{decodedMapFile}' does not exist in the server path.");
+                    continue; // Skip this map if the file doesn't exist
+                }
+            }
+
+            return newMapPlaylist;
+        }
         public List<mapFileInfo> BuildCurrentMapPlaylist()
         {
-            DataGridView ogList = thisServer.dataGridView_currentMaps;
+            DataGridView ogList = thisServer.MapsTab.dataGridView_currentMaps;
 
             var newPlaylist = new List<mapFileInfo>();
 
@@ -213,15 +276,17 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 if (row.IsNewRow) continue;
 
-                string? mapName = row.Cells["MapName"].Value?.ToString();
-                string? gameType = row.Cells["MapType"].Value?.ToString();
+                string? mapName = row.Cells["current_MapName"].Value?.ToString();
+                string? gameType = row.Cells["current_MapType"].Value?.ToString();
+                string? mapFile = row.Cells["current_MapFileName"].Value?.ToString();
 
                 if (string.IsNullOrWhiteSpace(mapName) || string.IsNullOrWhiteSpace(gameType))
                     continue;
 
                 var map = instanceMaps.availableMaps
                     .FirstOrDefault(m => string.Equals(m.MapName, mapName, StringComparison.OrdinalIgnoreCase)
-                                      && string.Equals(m.MapType, gameType, StringComparison.OrdinalIgnoreCase));
+                                        && string.Equals(m.MapFile, mapFile, StringComparison.OrdinalIgnoreCase)    
+                                        && string.Equals(m.MapType, gameType, StringComparison.OrdinalIgnoreCase));
 
                 if (map == null)
                     continue;

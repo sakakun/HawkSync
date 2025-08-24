@@ -50,7 +50,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             }
 
             chatInstanceManagers.RemoveAutoMessage(messageIndex);
-            thisServer.functionEvent_UpdateAutoMessages();
+            thisServer.ChatTab.functionEvent_UpdateAutoMessages();
 
             return new CommandResponse
             {

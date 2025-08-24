@@ -315,11 +315,12 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 foreach (var map in mapInstance.currentMapPlaylist)
                 {
-                    byte[] mapFile = Encoding.Default.GetBytes(map.MapFile!);
+
+                    byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes(map.MapFile);
                     ms.Write(mapFile, 0, mapFile.Length);
 
                     ms.Seek(ms.Position + (0x20F - mapFile.Length), SeekOrigin.Begin);
-                    byte[] mapName = Encoding.Default.GetBytes(map.MapName!);
+                    byte[] mapName = Encoding.GetEncoding("Windows-1252").GetBytes(map.MapName);
                     ms.Write(mapName, 0, mapName.Length);
 
                     ms.Seek(ms.Position + (0x305 - mapName.Length), SeekOrigin.Begin);
@@ -335,11 +336,11 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 for (int i = mapInstance.currentMapPlaylist.Count; i < 128; i++)
                 {
-                    byte[] mapFile = Encoding.Default.GetBytes("NA.bms");
+                    byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes("NA.bms");
                     ms.Write(mapFile, 0, mapFile.Length);
 
                     ms.Seek(ms.Position + (0x20F - mapFile.Length), SeekOrigin.Begin);
-                    byte[] mapName = Encoding.Default.GetBytes("NA");
+                    byte[] mapName = Encoding.GetEncoding("Windows-1252").GetBytes("NA");
                     ms.Write(mapName, 0, mapName.Length);
 
                     ms.Seek(ms.Position + (0x305 - mapName.Length), SeekOrigin.Begin);
@@ -378,12 +379,15 @@ namespace BHD_ServerManager.Classes.GameManagement
             string FullFileName = Path.Combine(thisInstance.profileServerPath!, file_name);
             string windowTitle = $"BHD Server - {thisInstance.gameServerName}";
 
-            // Is there an instance already running? Locate by the profileServerPath
-            foreach (var searchProcess in Process.GetProcesses())
+            // Filter by process name first (much faster)
+            foreach (var searchProcess in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file_name)))
             {
                 try
                 {
-                    if (string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase))
+                    bool fileMatch = string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase);
+                    bool titleMatch = string.Equals(searchProcess.MainWindowTitle, windowTitle, StringComparison.Ordinal);
+
+                    if (fileMatch && titleMatch)
                     {
                         AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
                         thisInstance.instanceAttachedPID = searchProcess.Id;
@@ -402,7 +406,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     continue;
                 }
             }
-            
+
             return false;
         }
 
@@ -428,7 +432,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 {
                     FileName = FullFileName,
                     WorkingDirectory = thisInstance.profileServerPath,
-                    Arguments = "/w /LOADBAR /NOSYSDUMP /serveonly /autorestart",
+                    Arguments = (thisInstance.profileModifierList1.Count > 0 || thisInstance.profileModifierList2.Count > 0)
+                                ? string.Join(" ", thisInstance.profileModifierList1.Concat(thisInstance.profileModifierList2))
+                                : string.Empty,
                     // WindowStyle = ProcessWindowStyle.Minimized
                 };
                 Process? process = Process.Start(startInfo);

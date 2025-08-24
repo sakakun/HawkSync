@@ -31,8 +31,11 @@ namespace BHD_SharedResources.Classes.Instances
 
         // Profile Server Information
         public int profileServerType { get; set; }
-        public string profileServerPath { get; set; } = null!;
-        public string profileBindIP { get; set; } = null!;
+        public string profileServerPath { get; set; } = String.Empty;
+        public string profileModFileName { get; set; } = String.Empty;
+        public List<string> profileModifierList1 { get; set; } = new();
+        public List<string> profileModifierList2 { get; set; } = new();
+        public string profileBindIP { get; set; } = String.Empty;
         public int profileBindPort { get; set; } = 17479;
         public bool profileEnableRemote { get; set; } = false; // Enable/Disable Remote Connections
         public int profileRemotePort { get; set; } = 8083;  // Remote IP for the server

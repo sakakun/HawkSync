@@ -21,13 +21,6 @@ namespace BHD_ServerManager.Classes.Tickers
         private static string? _lastProcessedMessageText = null;
 
         // Helper for UI thread safety
-        private static void SafeInvoke(Control control, Action action)
-        {
-            if (control.InvokeRequired)
-                control.Invoke(action);
-            else
-                action();
-        }
 
         public static void runTicker()
         {
@@ -47,12 +40,17 @@ namespace BHD_ServerManager.Classes.Tickers
 
             lock (tickerLock)
             {
+
                 // Only process chat when server is online or in start delay
                 if (thisInstance.instanceStatus != InstanceStatus.ONLINE &&
                     thisInstance.instanceStatus != InstanceStatus.STARTDELAY)
                 {
                     return;
                 }
+
+                // Ensure the chat tab is initialized before proceeding
+                thisServer.ChatTab.ChatTickerHook();
+
 
                 if (ServerMemory.ReadMemoryIsProcessAttached())
                 {
@@ -63,14 +61,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     Task.Run(ProcessAutoMessages);
 
                     // Process latest chat message and update UI (non-blocking)
-                    Task.Run(() =>
-                    {
-                        ProcessChatMessages();
-                        SafeInvoke(thisServer.dataGridView_chatMessages, () =>
-                        {
-                            chatInstanceManagers.UpdateChatMessagesGrid();
-                        });
-                    });
+                    Task.Run(ProcessChatMessages);
                 }
                 else
                 {

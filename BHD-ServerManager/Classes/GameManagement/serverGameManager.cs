@@ -42,9 +42,9 @@ namespace BHD_ServerManager.Classes.GameManagement
         public void UpdateSecondaryMapList() => ServerMemory.UpdateSecondaryMapList();
         public void UpdateNovaID() => ServerMemory.UpdateNovaID();
         public void UpdateGlobalGameType() => ServerMemory.UpdateGlobalGameType();
-        public void UpdateMapCycleCounter() => ServerMemory.UpdateMapCycleCounter();
+        public void UpdateMapCycleCounter() => ServerMemory.ReadMapCycleCounter();
         public void UpdateScoreBoardTimer() => ServerMemory.UpdateScoreBoardTimer();
-        public void UpdateNextMapGameType() => ServerMemory.UpdateNextMapGameType();
+        public void UpdateNextMapGameType() => ServerMemory.GetNextMapType();
         public void UpdateGameScores() => ServerMemory.UpdateGameScores();
         public void UpdatePlayerTeam() => ServerMemory.UpdatePlayerTeam();
         public void UpdateNextMap(int NextMapIndex) => ServerMemory.UpdateNextMap(NextMapIndex);

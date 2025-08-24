@@ -42,19 +42,6 @@ namespace BHD_ServerManager.Classes.Tickers
             // Functions that run all the time, even offline
             HandleRemoteServer();
 
-            // UI updates that should always run
-            SafeInvoke(thisServer, () =>
-            {
-                thisServer.functionEvent_swapFieldsStartStop();
-                adminInstanceManager.UpdateAdminLogDialog();
-            });
-
-            // UI Updates Regardless of Server Status
-            adminInstanceManager.UpdateAdminLogDialog();                                        // Admin Log Tab
-            SafeInvoke(thisServer, () => theInstanceManager.HighlightDifferences());            // Instance Settings Differences Check
-            tickerEvent_checkMapDiff();                                                         // Map Playlist Difference Check
-            tickerEvent_updateLabels(thisServer);                                               // Update the Labels on the UI
-
             // Only run the rest if it's time for an update
             DateTime currentTime = DateTime.Now;
             if (DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) >= 0)
@@ -67,45 +54,66 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     theInstance.instanceStatus = InstanceStatus.OFFLINE;
                     SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());
-                    theInstance.instanceNextUpdateTime = currentTime.AddSeconds(20);
-                    theInstance.instanceLastUpdateTime = currentTime;
-                    return;
                 }
+            }
+
+            // UI updates that should always run
+            SafeInvoke(thisServer, () =>
+            {
+                // --- UI Update Hooks ---
+                thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
+                thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
+                thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
+                thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
+            });
+
+            if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
+            {
+                // If the server is offline, we can skip the rest of the processing
+                theInstance.instanceNextUpdateTime = currentTime.AddSeconds(5);
+                theInstance.instanceLastUpdateTime = currentTime;
+                return;
             }
 
             // --- Server is online: run status-specific logic in order ---
             // 1. Always update status and basic info
             ServerMemory.ReadMemoryServerStatus();                                  // Server Status
             SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());  // Update Server Status
-            ServerMemory.UpdateNovaID();                                            // Nova ID Update
-            ServerMemory.ReadMemoryGameTimeLeft();                                  // Time Left in the Current Game
-            ServerMemory.ReadMemoryCurrentMissionName();                            // Get Current Mission Name
-            ServerMemory.ReadMemoryCurrentGameType();                               // Get Current Game Type
-            ServerMemory.ReadMemoryCurrentNumPlayers();                             // Get Current Number of Players
-            ServerMemory.UpdateGlobalGameType();                                    // Pinger Game Type Update
-            ServerMemory.UpdateNextMapGameType();                                   // Grab the Current Map Type and the Next Map Type
-            ServerMemory.UpdateGameScores();                                        // Update the Scores Required to Win the Game
-            ServerMemory.UpdateMapCycleCounter();                                   // Map Cycle Counter (How Maps Have Been Played)
+
+            if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP || theInstance.instanceStatus != InstanceStatus.SCORING)
+            {
+                // Map Ended, Wait for Updates
+                ServerMemory.UpdateNovaID();                                        // Nova ID Update
+                ServerMemory.ReadMemoryGameTimeLeft();                              // Time Left in the Current Game
+                ServerMemory.ReadMemoryCurrentMissionName();                        // Get Current Mission Name
+                ServerMemory.ReadMemoryCurrentGameType();                           // Get Current Game Type
+                ServerMemory.ReadMemoryCurrentNumPlayers();                         // Get Current Number of Players
+                ServerMemory.ReadMapCycleCounter();                                 // Map Cycle Counter (How Maps Have Been Played)
+                ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
+            }
 
             // 2. Loading Map
             if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
             {
+                theInstance.instanceScoringProcRun = true;
                 tickerEvent_preGameProcessing();                                    // Run pre-game processing
                 ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
+                ServerMemory.UpdateGlobalGameType();                                // Pinger Game Type Update
             }
             // 3. Start Delay
             else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
             {
                 theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
                 theInstance.instanceCrashCounter = 0;                               // Reset crash counter
-                ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
                 ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
+                ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
             }
             // 4. Online (game in progress)
             else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
             {
-                ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
+
                 ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
+                ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
 
                 // Stats update
                 StatFunctions.RunPlayerStatsUpdate();                               // Collect Player Stats
@@ -135,14 +143,7 @@ namespace BHD_ServerManager.Classes.Tickers
             else if (theInstance.instanceStatus == InstanceStatus.SCORING)
             {
                 tickerEvent_scoringGameProcessing();                                // Run scoring processing
-
                 ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable     
-            }
-
-            if (theInstance.instanceStatus != InstanceStatus.SCORING)
-            {
-                // If not scoring, reset scoring processing flag
-                theInstance.instanceScoringProcRun = true;
             }
 
             theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);
@@ -168,31 +169,6 @@ namespace BHD_ServerManager.Classes.Tickers
             }
         }
 
-        // --- Map Playlist Difference Check ---
-        private static void tickerEvent_checkMapDiff()
-        {
-            if (thisServer == null) return;
-
-            SafeInvoke(thisServer, () =>
-            {
-                if (instanceMaps.currentMapPlaylist.Count != thisServer.dataGridView_currentMaps.Rows.Count)
-                {
-                    thisServer.ib_resetCurrentMaps.BackColor = Color.Red;
-                    return;
-                }
-                for (int i = 0; i < instanceMaps.currentMapPlaylist.Count; i++)
-                {
-                    if (instanceMaps.currentMapPlaylist[i].MapName != thisServer.dataGridView_currentMaps.Rows[i].Cells["MapName"].Value?.ToString())
-                    {
-                        AppDebug.Log("tickerServerManagement", "Map Playlist Name Mismatch Detected at index " + i);
-                        thisServer.ib_resetCurrentMaps.BackColor = Color.Red;
-                        return;
-                    }
-                }
-                thisServer.ib_resetCurrentMaps.BackColor = Color.Transparent;
-            });
-        }
-
         // --- Pre-Game Processing (Loading Map) ---
         private static void tickerEvent_preGameProcessing()
         {
@@ -200,10 +176,12 @@ namespace BHD_ServerManager.Classes.Tickers
             {
                 AppDebug.Log("tickerServerManagement", "Pre-game Processing...");
                 theInstance.instancePreGameProcRun = false;               
+                ServerMemory.SetNextMapType();                                                  // Set the Next Map Type
+                ServerMemory.UpdateGameScores();                                                // Update the Scores Required to Win the Game
+                instanceChat.AutoMessageCounter = 0;
                 instanceChat.ChatLog?.Clear();
                 theInstance.playerList.Clear();
                 StatFunctions.ResetPlayerStats();
-                
             }
             
         }
@@ -211,36 +189,24 @@ namespace BHD_ServerManager.Classes.Tickers
         // --- Scoring Processing ---
         private static void tickerEvent_scoringGameProcessing()
         {
-            ServerMemory.ReadMemoryWinningTeam();
-
-            if (theInstance.instanceScoringProcRun)
+            if (!theInstance.instanceScoringProcRun)
             {
-                AppDebug.Log("tickerServerManagement", "Scoring Processing...");
-                theInstance.instanceScoringProcRun = false;
-                instanceChat.AutoMessageCounter = 0;
-                Task.Run(() => StatFunctions.SendImportData(thisServer!));
-                CommonCore.Ticker?.Start("ScoreboardTicker", 500, () => tickerEvent_Scoreboard());
-                AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
+                return;
             }
+            
+            theInstance.instanceScoringProcRun = false;
+            
+            AppDebug.Log("tickerServerManagement", "Scoring Processing...");
+            ServerMemory.ReadMemoryWinningTeam();
+            AppDebug.Log("tickerServerManagement", "Sending Stats...");
+            Task.Run(() => StatFunctions.SendImportData(thisServer!));
+            AppDebug.Log("tickerServerManagement", "Updating Maps...");
+            ServerMemory.SetNextMapType();                                                  // Set the Next Map Type
+            ServerMemory.UpdateGameScores();                                                // Update the Scores Required to Win the Game
+            AppDebug.Log("tickerServerManagement", "Kill ScoreBoard...");
+            CommonCore.Ticker?.Start("ScoreboardTicker", 1000, () => tickerEvent_Scoreboard());
+            AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
 
-        }
-
-        // --- UI Label Updates ---
-        private static void tickerEvent_updateLabels(ServerManager thisServer)
-        {
-            int nextMapIndex = theInstance.gameInfoCurrentMapIndex >= instanceMaps.currentMapPlaylist.Count - 1
-                                || theInstance.gameInfoCurrentMapIndex < 0
-                                ? 0
-                                : theInstance.gameInfoCurrentMapIndex + 1;
-
-            SafeInvoke(thisServer, () =>
-            {
-                thisServer.label_dataCurrentMap.Text = theInstance.gameInfoMapName;
-                thisServer.label_dataNextMap.Text = instanceMaps.currentMapPlaylist.Count > 0
-                    ? instanceMaps.currentMapPlaylist[nextMapIndex].MapName + "[" + theInstance.gameInfoNextMapGameType + "]"
-                    : string.Empty;
-                thisServer.label_dataTimeLeft.Text = theInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss");
-            });
         }
 
         // --- Scoreboard Ticker ---
@@ -250,6 +216,7 @@ namespace BHD_ServerManager.Classes.Tickers
             ServerMemory.UpdateScoreBoardTimer();                                   // Set the scoreboard timer to 1 second.
             AppDebug.Log("tickerServerManagement", "Scoreboard Timer Complete");    // Log the completion of the scoreboard timer
             CommonCore.Ticker?.Stop("ScoreboardTicker");                            // Stop the scoreboard ticker
+            return;                                                                 // Should return to the main ticker loop
         }
 
     }

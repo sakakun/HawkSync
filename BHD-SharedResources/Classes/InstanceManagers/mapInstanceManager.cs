@@ -14,5 +14,8 @@ namespace BHD_SharedResources.Classes.InstanceManagers
         public static void LoadDefaultMaps() => Implementation.LoadDefaultMaps();
         public static void ResetAvailableMaps() => Implementation.ResetAvailableMaps();
         public static void SaveCurrentMapPlaylist(List<mapFileInfo> mapList, bool external) => Implementation.SaveCurrentMapPlaylist(mapList, external);
+        public static List<mapFileInfo> LoadCustomMapPlaylist(bool external = false) => Implementation.LoadCustomMapPlaylist(external);
+        public static string[]? GetFileLinesFromDialog(bool saveDialog, string filter, string title, string initialDirectory, string defaultFileName) => Implementation.GetFileLinesFromDialog(saveDialog, filter, title, initialDirectory, defaultFileName);
+        
     }
 }

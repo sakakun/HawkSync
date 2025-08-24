@@ -33,7 +33,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             AppDebug.Log("CmdSendChatMessage", $"Received data: {ChatMessage}-{TimerTigger}");
 
             chatInstanceManagers.AddAutoMessage(ChatMessage.Trim(), TimerTigger);
-            thisServer.functionEvent_UpdateAutoMessages();
+            thisServer.ChatTab.functionEvent_UpdateAutoMessages();
 
             return new CommandResponse
             {

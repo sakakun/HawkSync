@@ -943,7 +943,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static void UpdateSecondaryMapList()
         {
 
-
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;
             ReadProcessMemory((int)processHandle, baseAddr + 0x005ED5F8, ServerMapCyclePtr, ServerMapCyclePtr.Length, ref Pointer2Read);
@@ -983,8 +982,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 mapCycleList += 0x24;
             }
 
-
-
         }
         // Function: UpdateNovaID
         public static void UpdateNovaID()
@@ -993,8 +990,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 return; // since we are requiring nova login, just return.
             }
-
-
 
             byte[] CurrentAppIDBytes = new byte[4];
             int currentAppIDRead = 0;
@@ -1043,7 +1038,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
         }
         // Function: UpdateMapCycleCounter
-        public static void UpdateMapCycleCounter()
+        public static void ReadMapCycleCounter()
         {
 
             byte[] currentMapCycleCountBytes = new byte[4];
@@ -1073,7 +1068,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
         }
         // Function: UpdateNextMapGameType
-        public static void UpdateNextMapGameType()
+        public static void GetNextMapType()
         {
 
             // This will grab the current map index.
@@ -1098,32 +1093,34 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 currentMapIndex++;
             }
+
             AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.currentMapPlaylist.Count + " Current Map Index: " + currentMapIndex);
+            int currentMapType = getGameTypeID(thisInstance.gameInfoGameType!);
+            int nextMapType = getGameTypeID(mapInstance.currentMapPlaylist[currentMapIndex].MapType!);
+
+            AppDebug.Log("ServerMemory", "Current Map Type: " + thisInstance.gameInfoMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
+            AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].MapType + " - " + nextMapType);
+
+            thisInstance.gameInfoNextMapGameType = nextMapType;
+
+        }
+        public static void SetNextMapType()
+        {
             try
             {
-
-                int currentMapType = getGameTypeID(thisInstance.gameInfoGameType!);
-                int nextMapType = getGameTypeID(mapInstance.currentMapPlaylist[currentMapIndex].MapType!);
-
-                AppDebug.Log("ServerMemory", "Current Map Type: " + thisInstance.gameInfoMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
-                AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].MapType + " - " + nextMapType);
-
                 // Deal with the Players
-                theInstanceManager.changeTeamGameMode(currentMapType, nextMapType);
-                thisInstance.gameInfoNextMapGameType = nextMapType;
+                theInstanceManager.changeTeamGameMode(getGameTypeID(thisInstance.gameInfoGameType!), thisInstance.gameInfoNextMapGameType);
 
                 // Change the MapType for the next map
                 var CurrentGameTypeAddr = baseAddr + 0x5F21A4;
-                byte[] nextMaptypeBytes = BitConverter.GetBytes(nextMapType);
+                byte[] nextMaptypeBytes = BitConverter.GetBytes(thisInstance.gameInfoNextMapGameType);
                 int nextMaptypeBytesWrite = 0;
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
 
             }
             catch (Exception ex)
             {
-
                 AppDebug.Log("ServerMemory", "Something went wrong with ScoringProcessHandler: " + ex);
-                throw new Exception("Something went wrong with ScoringProcessHandler: " + ex);
             }
         }
         // Update the Game Score for the next map
@@ -1325,11 +1322,11 @@ namespace BHD_ServerManager.Classes.GameManagement
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
             // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] disablePlayerWeapon = BitConverter.GetBytes(0);
             int disablePlayerWeaponWrite = 0;
-            WriteProcessMemory((int)processHandle, playerlistStartingLocation + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
+            WriteProcessMemory((int)processHandle, playerNewLocationAddress + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
 
 
         }
@@ -1351,20 +1348,17 @@ namespace BHD_ServerManager.Classes.GameManagement
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
             // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] disablePlayerWeapon = BitConverter.GetBytes(1);
             int disablePlayerWeaponWrite = 0;
-            WriteProcessMemory((int)processHandle, playerlistStartingLocation + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
+            WriteProcessMemory((int)processHandle, playerNewLocationAddress + 0xADE08, disablePlayerWeapon, disablePlayerWeapon.Length, ref disablePlayerWeaponWrite);
 
 
         }
         // Function: WriteMemoryKillPlayer
         public static void WriteMemoryKillPlayer(int playerSlot)
         {
-
-
-
             int buffer = 0;
             byte[] PointerAddr9 = new byte[4];
             var Pointer = baseAddr + 0x005ED600;
@@ -1378,12 +1372,11 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
-            // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] playerObjectLocationBytes = new byte[4];
             int playerObjectLocationRead = 0;
-            ReadProcessMemory((int)processHandle, playerlistStartingLocation + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
+            ReadProcessMemory((int)processHandle, playerNewLocationAddress + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
             int playerObjectLocation = BitConverter.ToInt32(playerObjectLocationBytes, 0);
 
             byte[] setPlayerHealth = BitConverter.GetBytes(0);
@@ -1413,11 +1406,11 @@ namespace BHD_ServerManager.Classes.GameManagement
             int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
             // Directly calculate the player's PlayerIPAddress
-            int playerAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
 
             byte[] playerObjectLocationBytes = new byte[4];
             int playerObjectLocationRead = 0;
-            ReadProcessMemory((int)processHandle, playerlistStartingLocation + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
+            ReadProcessMemory((int)processHandle, playerNewLocationAddress + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
             int playerObjectLocation = BitConverter.ToInt32(playerObjectLocationBytes, 0);
 
             byte[] setPlayerHealth = BitConverter.GetBytes(health); //set god mode health
@@ -1464,7 +1457,9 @@ namespace BHD_ServerManager.Classes.GameManagement
         {
             // Check if PID and process handle are set
             if (thisInstance.instanceAttachedPID == null || thisInstance.instanceAttachedPID == 0 || processHandle == nint.Zero)
+            {
                 return false;
+            }
 
             try
             {
@@ -1483,6 +1478,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                         return false;
                     }
                 }
+
                 // If we got here, process is running and matches
                 return true;
             }
@@ -1491,13 +1487,13 @@ namespace BHD_ServerManager.Classes.GameManagement
                 // Process does not exist or access denied
                 thisInstance.instanceAttachedPID = null;
                 processHandle = nint.Zero; // Replace 'null' with 'IntPtr.Zero' for nint type
+                AppDebug.Log("ServerMemory", "Process not found or access denied.");
                 return false;
             }
         }
         // Function: ReadMemoryServerStatus
         public static void ReadMemoryServerStatus()
         {
-
 
             var startingPointer = baseAddr + 0x00098334;
             byte[] startingPointerBuffer = new byte[4];
@@ -1650,7 +1646,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             if (NumPlayers > 0)
             {
 
-
                 int buffer = 0;
                 var Pointer = baseAddr + 0x005ED600;
 
@@ -1756,7 +1751,11 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
             }
-            thisInstance.playerList = currentPlayerList;
+            thisInstance.playerList.Clear();
+            foreach (var kvp in currentPlayerList)
+            {
+                thisInstance.playerList[kvp.Key] = kvp.Value;
+            }
             // CoreManager.DebugLog("PlayerList Updated");
         }
         // Function: ReadMemoryGrabPlayerIPAddress
