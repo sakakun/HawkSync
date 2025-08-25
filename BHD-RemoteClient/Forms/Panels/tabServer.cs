@@ -362,7 +362,8 @@ namespace BHD_RemoteClient.Forms.Panels
             {
                 cb_serverIP.BackColor = cb_serverIP.SelectedItem?.ToString() != theInstance.profileBindIP ? Color.LightYellow : SystemColors.Window;
                 num_serverPort.BackColor = (int)num_serverPort.Value != theInstance.profileBindPort ? Color.LightYellow : SystemColors.Window;
-                tb_serverID.BackColor = tb_serverID.Text != theInstance.gamePasswordLobby ? Color.LightYellow : SystemColors.Window;
+                tb_serverID.BackColor = tb_serverID.Text != theInstance.WebStatsProfileID ? Color.LightYellow : SystemColors.Window;
+                tb_serverPassword.BackColor = tb_serverPassword.Text != theInstance.gamePasswordLobby ? Color.LightYellow : SystemColors.Window;
                 cb_serverDedicated.BackColor = cb_serverDedicated.Checked != theInstance.gameDedicated ? Color.LightYellow : SystemColors.Window;
                 cb_requireNova.BackColor = cb_requireNova.Checked != theInstance.gameRequireNova ? Color.LightYellow : SystemColors.Window;
                 cb_sessionType.BackColor = cb_sessionType.SelectedIndex != theInstance.gameSessionType ? Color.LightYellow : SystemColors.Window;

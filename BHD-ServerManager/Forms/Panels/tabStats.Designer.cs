@@ -51,6 +51,15 @@
             tabPlayerStats = new TabPage();
             tableLayoutPanel2 = new TableLayoutPanel();
             dataGridViewPlayerStats = new DataGridView();
+            panel2 = new Panel();
+            label1 = new Label();
+            tabWeaponStats = new TabPage();
+            dataGridViewWeaponStats = new DataGridView();
+            Weapon_PlayerName = new DataGridViewTextBoxColumn();
+            WeaponName = new DataGridViewTextBoxColumn();
+            Timer = new DataGridViewTextBoxColumn();
+            Weapon_Kills = new DataGridViewTextBoxColumn();
+            Weapon_Shots = new DataGridViewTextBoxColumn();
             PlayerName = new DataGridViewTextBoxColumn();
             Suicides = new DataGridViewTextBoxColumn();
             Murders = new DataGridViewTextBoxColumn();
@@ -61,11 +70,13 @@
             FlagSaves = new DataGridViewTextBoxColumn();
             ADTargetsDestroyed = new DataGridViewTextBoxColumn();
             RevivesReceived = new DataGridViewTextBoxColumn();
+            RevivesGiven = new DataGridViewTextBoxColumn();
             PSPAttempts = new DataGridViewTextBoxColumn();
             PSPTakeovers = new DataGridViewTextBoxColumn();
             FBCarrierKills = new DataGridViewTextBoxColumn();
             DoubleKills = new DataGridViewTextBoxColumn();
             Headshots = new DataGridViewTextBoxColumn();
+            KnifeKills = new DataGridViewTextBoxColumn();
             SniperKills = new DataGridViewTextBoxColumn();
             TKOTHDefenseKills = new DataGridViewTextBoxColumn();
             TKOTHAttackKills = new DataGridViewTextBoxColumn();
@@ -74,15 +85,6 @@
             PlayerTeam = new DataGridViewTextBoxColumn();
             PlayerActive = new DataGridViewTextBoxColumn();
             TimePlayed = new DataGridViewTextBoxColumn();
-            panel2 = new Panel();
-            label1 = new Label();
-            tabWeaponStats = new TabPage();
-            dataGridViewWeaponStats = new DataGridView();
-            Weapon_PlayerName = new DataGridViewTextBoxColumn();
-            WeaponName = new DataGridViewTextBoxColumn();
-            Timer = new DataGridViewTextBoxColumn();
-            Weapon_Kills = new DataGridViewTextBoxColumn();
-            Weapon_Shots = new DataGridViewTextBoxColumn();
             tabControl1.SuspendLayout();
             tabBabstats.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -366,7 +368,7 @@
             dataGridViewPlayerStats.AllowUserToResizeColumns = false;
             dataGridViewPlayerStats.AllowUserToResizeRows = false;
             dataGridViewPlayerStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewPlayerStats.Columns.AddRange(new DataGridViewColumn[] { PlayerName, Suicides, Murders, Kills, Deaths, ZoneTime, FBCaptures, FlagSaves, ADTargetsDestroyed, RevivesReceived, PSPAttempts, PSPTakeovers, FBCarrierKills, DoubleKills, Headshots, SniperKills, TKOTHDefenseKills, TKOTHAttackKills, ShotsPerKill, ExperiencePoints, PlayerTeam, PlayerActive, TimePlayed });
+            dataGridViewPlayerStats.Columns.AddRange(new DataGridViewColumn[] { PlayerName, Suicides, Murders, Kills, Deaths, ZoneTime, FBCaptures, FlagSaves, ADTargetsDestroyed, RevivesReceived, RevivesGiven, PSPAttempts, PSPTakeovers, FBCarrierKills, DoubleKills, Headshots, KnifeKills, SniperKills, TKOTHDefenseKills, TKOTHAttackKills, ShotsPerKill, ExperiencePoints, PlayerTeam, PlayerActive, TimePlayed });
             dataGridViewPlayerStats.Dock = DockStyle.Fill;
             dataGridViewPlayerStats.Location = new Point(0, 83);
             dataGridViewPlayerStats.Margin = new Padding(0);
@@ -376,187 +378,6 @@
             dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
             dataGridViewPlayerStats.Size = new Size(888, 245);
             dataGridViewPlayerStats.TabIndex = 1;
-            // 
-            // PlayerName
-            // 
-            PlayerName.HeaderText = "Player Name";
-            PlayerName.MinimumWidth = 200;
-            PlayerName.Name = "PlayerName";
-            PlayerName.ReadOnly = true;
-            PlayerName.Width = 200;
-            // 
-            // Suicides
-            // 
-            Suicides.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Suicides.HeaderText = "";
-            Suicides.Name = "Suicides";
-            Suicides.ReadOnly = true;
-            Suicides.ToolTipText = "Suicides";
-            // 
-            // Murders
-            // 
-            Murders.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Murders.HeaderText = "";
-            Murders.Name = "Murders";
-            Murders.ReadOnly = true;
-            Murders.ToolTipText = "Murders";
-            // 
-            // Kills
-            // 
-            Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Kills.HeaderText = "";
-            Kills.Name = "Kills";
-            Kills.ReadOnly = true;
-            Kills.ToolTipText = "Kills";
-            // 
-            // Deaths
-            // 
-            Deaths.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Deaths.HeaderText = "";
-            Deaths.Name = "Deaths";
-            Deaths.ReadOnly = true;
-            Deaths.ToolTipText = "Deaths";
-            // 
-            // ZoneTime
-            // 
-            ZoneTime.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ZoneTime.HeaderText = "";
-            ZoneTime.Name = "ZoneTime";
-            ZoneTime.ReadOnly = true;
-            ZoneTime.ToolTipText = "Flag Captures";
-            // 
-            // FBCaptures
-            // 
-            FBCaptures.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            FBCaptures.HeaderText = "";
-            FBCaptures.Name = "FBCaptures";
-            FBCaptures.ReadOnly = true;
-            FBCaptures.ToolTipText = "Flag Saves";
-            // 
-            // FlagSaves
-            // 
-            FlagSaves.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            FlagSaves.HeaderText = "";
-            FlagSaves.Name = "FlagSaves";
-            FlagSaves.ReadOnly = true;
-            FlagSaves.ToolTipText = "Targets Destroyed";
-            // 
-            // ADTargetsDestroyed
-            // 
-            ADTargetsDestroyed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ADTargetsDestroyed.HeaderText = "";
-            ADTargetsDestroyed.Name = "ADTargetsDestroyed";
-            ADTargetsDestroyed.ReadOnly = true;
-            ADTargetsDestroyed.ToolTipText = "Revices Received";
-            // 
-            // RevivesReceived
-            // 
-            RevivesReceived.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            RevivesReceived.HeaderText = "";
-            RevivesReceived.Name = "RevivesReceived";
-            RevivesReceived.ReadOnly = true;
-            RevivesReceived.ToolTipText = "Revives Given";
-            // 
-            // PSPAttempts
-            // 
-            PSPAttempts.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PSPAttempts.HeaderText = "";
-            PSPAttempts.Name = "PSPAttempts";
-            PSPAttempts.ReadOnly = true;
-            // 
-            // PSPTakeovers
-            // 
-            PSPTakeovers.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PSPTakeovers.HeaderText = "";
-            PSPTakeovers.Name = "PSPTakeovers";
-            PSPTakeovers.ReadOnly = true;
-            // 
-            // FBCarrierKills
-            // 
-            FBCarrierKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            FBCarrierKills.HeaderText = "";
-            FBCarrierKills.Name = "FBCarrierKills";
-            FBCarrierKills.ReadOnly = true;
-            // 
-            // DoubleKills
-            // 
-            DoubleKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            DoubleKills.HeaderText = "";
-            DoubleKills.Name = "DoubleKills";
-            DoubleKills.ReadOnly = true;
-            DoubleKills.ToolTipText = "Double Kills";
-            // 
-            // Headshots
-            // 
-            Headshots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Headshots.HeaderText = "";
-            Headshots.Name = "Headshots";
-            Headshots.ReadOnly = true;
-            Headshots.ToolTipText = "Headshots";
-            // 
-            // SniperKills
-            // 
-            SniperKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            SniperKills.HeaderText = "";
-            SniperKills.Name = "SniperKills";
-            SniperKills.ReadOnly = true;
-            SniperKills.ToolTipText = "Sniper Kills";
-            // 
-            // TKOTHDefenseKills
-            // 
-            TKOTHDefenseKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            TKOTHDefenseKills.HeaderText = "";
-            TKOTHDefenseKills.Name = "TKOTHDefenseKills";
-            TKOTHDefenseKills.ReadOnly = true;
-            TKOTHDefenseKills.ToolTipText = "TKOTH Defense Kills";
-            // 
-            // TKOTHAttackKills
-            // 
-            TKOTHAttackKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            TKOTHAttackKills.HeaderText = "";
-            TKOTHAttackKills.Name = "TKOTHAttackKills";
-            TKOTHAttackKills.ReadOnly = true;
-            TKOTHAttackKills.ToolTipText = "TKOTH Attack Kills";
-            // 
-            // ShotsPerKill
-            // 
-            ShotsPerKill.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ShotsPerKill.HeaderText = "";
-            ShotsPerKill.Name = "ShotsPerKill";
-            ShotsPerKill.ReadOnly = true;
-            ShotsPerKill.ToolTipText = "Shots Per Kill";
-            // 
-            // ExperiencePoints
-            // 
-            ExperiencePoints.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ExperiencePoints.HeaderText = "";
-            ExperiencePoints.Name = "ExperiencePoints";
-            ExperiencePoints.ReadOnly = true;
-            ExperiencePoints.ToolTipText = "Experience Points";
-            // 
-            // PlayerTeam
-            // 
-            PlayerTeam.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PlayerTeam.HeaderText = "";
-            PlayerTeam.Name = "PlayerTeam";
-            PlayerTeam.ReadOnly = true;
-            PlayerTeam.ToolTipText = "Player Team";
-            // 
-            // PlayerActive
-            // 
-            PlayerActive.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PlayerActive.HeaderText = "";
-            PlayerActive.Name = "PlayerActive";
-            PlayerActive.ReadOnly = true;
-            PlayerActive.ToolTipText = "Active";
-            // 
-            // TimePlayed
-            // 
-            TimePlayed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            TimePlayed.HeaderText = "";
-            TimePlayed.Name = "TimePlayed";
-            TimePlayed.ReadOnly = true;
-            TimePlayed.ToolTipText = "Time Played (s)";
             // 
             // panel2
             // 
@@ -637,6 +458,206 @@
             Weapon_Shots.Name = "Weapon_Shots";
             Weapon_Shots.ReadOnly = true;
             // 
+            // PlayerName
+            // 
+            PlayerName.HeaderText = "Player Name";
+            PlayerName.MinimumWidth = 200;
+            PlayerName.Name = "PlayerName";
+            PlayerName.ReadOnly = true;
+            PlayerName.Width = 200;
+            // 
+            // Suicides
+            // 
+            Suicides.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Suicides.HeaderText = "";
+            Suicides.Name = "Suicides";
+            Suicides.ReadOnly = true;
+            Suicides.ToolTipText = "Suicides";
+            // 
+            // Murders
+            // 
+            Murders.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Murders.HeaderText = "";
+            Murders.Name = "Murders";
+            Murders.ReadOnly = true;
+            Murders.ToolTipText = "Murders";
+            // 
+            // Kills
+            // 
+            Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Kills.HeaderText = "";
+            Kills.Name = "Kills";
+            Kills.ReadOnly = true;
+            Kills.ToolTipText = "Kills";
+            // 
+            // Deaths
+            // 
+            Deaths.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Deaths.HeaderText = "";
+            Deaths.Name = "Deaths";
+            Deaths.ReadOnly = true;
+            Deaths.ToolTipText = "Deaths";
+            // 
+            // ZoneTime
+            // 
+            ZoneTime.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ZoneTime.HeaderText = "";
+            ZoneTime.Name = "ZoneTime";
+            ZoneTime.ReadOnly = true;
+            ZoneTime.ToolTipText = "Zone Time";
+            // 
+            // FBCaptures
+            // 
+            FBCaptures.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            FBCaptures.HeaderText = "";
+            FBCaptures.Name = "FBCaptures";
+            FBCaptures.ReadOnly = true;
+            FBCaptures.ToolTipText = "FlagBall Captures";
+            // 
+            // FlagSaves
+            // 
+            FlagSaves.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            FlagSaves.HeaderText = "";
+            FlagSaves.Name = "FlagSaves";
+            FlagSaves.ReadOnly = true;
+            FlagSaves.ToolTipText = "Flag Saves";
+            // 
+            // ADTargetsDestroyed
+            // 
+            ADTargetsDestroyed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ADTargetsDestroyed.HeaderText = "";
+            ADTargetsDestroyed.Name = "ADTargetsDestroyed";
+            ADTargetsDestroyed.ReadOnly = true;
+            ADTargetsDestroyed.ToolTipText = "ADTargetsDestroyed";
+            // 
+            // RevivesReceived
+            // 
+            RevivesReceived.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            RevivesReceived.HeaderText = "";
+            RevivesReceived.Name = "RevivesReceived";
+            RevivesReceived.ReadOnly = true;
+            RevivesReceived.ToolTipText = "Revives Received";
+            // 
+            // RevivesGiven
+            // 
+            RevivesGiven.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            RevivesGiven.HeaderText = "";
+            RevivesGiven.Name = "RevivesGiven";
+            RevivesGiven.ReadOnly = true;
+            RevivesGiven.ToolTipText = "Revives Given";
+            // 
+            // PSPAttempts
+            // 
+            PSPAttempts.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            PSPAttempts.HeaderText = "";
+            PSPAttempts.Name = "PSPAttempts";
+            PSPAttempts.ReadOnly = true;
+            PSPAttempts.ToolTipText = "PSP Attempts";
+            // 
+            // PSPTakeovers
+            // 
+            PSPTakeovers.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            PSPTakeovers.HeaderText = "";
+            PSPTakeovers.Name = "PSPTakeovers";
+            PSPTakeovers.ReadOnly = true;
+            PSPTakeovers.ToolTipText = "PSP Takeovers";
+            // 
+            // FBCarrierKills
+            // 
+            FBCarrierKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            FBCarrierKills.HeaderText = "";
+            FBCarrierKills.Name = "FBCarrierKills";
+            FBCarrierKills.ReadOnly = true;
+            FBCarrierKills.ToolTipText = "FB Carrier Kills";
+            // 
+            // DoubleKills
+            // 
+            DoubleKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DoubleKills.HeaderText = "";
+            DoubleKills.Name = "DoubleKills";
+            DoubleKills.ReadOnly = true;
+            DoubleKills.ToolTipText = "Double Kills";
+            // 
+            // Headshots
+            // 
+            Headshots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Headshots.HeaderText = "";
+            Headshots.Name = "Headshots";
+            Headshots.ReadOnly = true;
+            Headshots.ToolTipText = "Headshots";
+            // 
+            // KnifeKills
+            // 
+            KnifeKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            KnifeKills.HeaderText = "";
+            KnifeKills.Name = "KnifeKills";
+            KnifeKills.ReadOnly = true;
+            KnifeKills.ToolTipText = "Knife Kills";
+            // 
+            // SniperKills
+            // 
+            SniperKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            SniperKills.HeaderText = "";
+            SniperKills.Name = "SniperKills";
+            SniperKills.ReadOnly = true;
+            SniperKills.ToolTipText = "Sniper Kills";
+            // 
+            // TKOTHDefenseKills
+            // 
+            TKOTHDefenseKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            TKOTHDefenseKills.HeaderText = "";
+            TKOTHDefenseKills.Name = "TKOTHDefenseKills";
+            TKOTHDefenseKills.ReadOnly = true;
+            TKOTHDefenseKills.ToolTipText = "TKOTH Defense Kills";
+            // 
+            // TKOTHAttackKills
+            // 
+            TKOTHAttackKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            TKOTHAttackKills.HeaderText = "";
+            TKOTHAttackKills.Name = "TKOTHAttackKills";
+            TKOTHAttackKills.ReadOnly = true;
+            TKOTHAttackKills.ToolTipText = "TKOTH Attack Kills";
+            // 
+            // ShotsPerKill
+            // 
+            ShotsPerKill.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ShotsPerKill.HeaderText = "";
+            ShotsPerKill.Name = "ShotsPerKill";
+            ShotsPerKill.ReadOnly = true;
+            ShotsPerKill.ToolTipText = "Shots Per Kill";
+            // 
+            // ExperiencePoints
+            // 
+            ExperiencePoints.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ExperiencePoints.HeaderText = "";
+            ExperiencePoints.Name = "ExperiencePoints";
+            ExperiencePoints.ReadOnly = true;
+            ExperiencePoints.ToolTipText = "Experience Points";
+            // 
+            // PlayerTeam
+            // 
+            PlayerTeam.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            PlayerTeam.HeaderText = "";
+            PlayerTeam.Name = "PlayerTeam";
+            PlayerTeam.ReadOnly = true;
+            PlayerTeam.ToolTipText = "Player Team";
+            // 
+            // PlayerActive
+            // 
+            PlayerActive.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            PlayerActive.HeaderText = "";
+            PlayerActive.Name = "PlayerActive";
+            PlayerActive.ReadOnly = true;
+            PlayerActive.ToolTipText = "Active";
+            // 
+            // TimePlayed
+            // 
+            TimePlayed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            TimePlayed.HeaderText = "";
+            TimePlayed.Name = "TimePlayed";
+            TimePlayed.ReadOnly = true;
+            TimePlayed.ToolTipText = "Time Played (s)";
+            // 
             // tabStats
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -696,6 +717,14 @@
         private Button btn_SaveSettings;
         private TableLayoutPanel tableLayoutPanel2;
         internal DataGridView dataGridViewPlayerStats;
+        private Panel panel2;
+        private Label label1;
+        internal DataGridView dataGridViewWeaponStats;
+        private DataGridViewTextBoxColumn Weapon_PlayerName;
+        private DataGridViewTextBoxColumn WeaponName;
+        private DataGridViewTextBoxColumn Timer;
+        private DataGridViewTextBoxColumn Weapon_Kills;
+        private DataGridViewTextBoxColumn Weapon_Shots;
         private DataGridViewTextBoxColumn PlayerName;
         private DataGridViewTextBoxColumn Suicides;
         private DataGridViewTextBoxColumn Murders;
@@ -706,11 +735,13 @@
         private DataGridViewTextBoxColumn FlagSaves;
         private DataGridViewTextBoxColumn ADTargetsDestroyed;
         private DataGridViewTextBoxColumn RevivesReceived;
+        private DataGridViewTextBoxColumn RevivesGiven;
         private DataGridViewTextBoxColumn PSPAttempts;
         private DataGridViewTextBoxColumn PSPTakeovers;
         private DataGridViewTextBoxColumn FBCarrierKills;
         private DataGridViewTextBoxColumn DoubleKills;
         private DataGridViewTextBoxColumn Headshots;
+        private DataGridViewTextBoxColumn KnifeKills;
         private DataGridViewTextBoxColumn SniperKills;
         private DataGridViewTextBoxColumn TKOTHDefenseKills;
         private DataGridViewTextBoxColumn TKOTHAttackKills;
@@ -719,13 +750,5 @@
         private DataGridViewTextBoxColumn PlayerTeam;
         private DataGridViewTextBoxColumn PlayerActive;
         private DataGridViewTextBoxColumn TimePlayed;
-        private Panel panel2;
-        private Label label1;
-        internal DataGridView dataGridViewWeaponStats;
-        private DataGridViewTextBoxColumn Weapon_PlayerName;
-        private DataGridViewTextBoxColumn WeaponName;
-        private DataGridViewTextBoxColumn Timer;
-        private DataGridViewTextBoxColumn Weapon_Kills;
-        private DataGridViewTextBoxColumn Weapon_Shots;
     }
 }
