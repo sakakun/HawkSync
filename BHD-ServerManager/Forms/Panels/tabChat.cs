@@ -180,6 +180,12 @@ namespace BHD_ServerManager.Forms.Panels
         }
         private void actionKeyPress_SubmitMessage(object sender, KeyPressEventArgs e)
         {
+
+            if (e.KeyChar != (char)Keys.Enter)
+            {
+                return;
+            }
+
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE ||
                 theInstance.instanceStatus == InstanceStatus.LOADINGMAP ||
                 theInstance.instanceStatus == InstanceStatus.SCORING)

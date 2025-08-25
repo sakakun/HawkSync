@@ -34,6 +34,11 @@ namespace BHD_RemoteClient.Forms
             components = new System.ComponentModel.Container();
             toolStrip = new ToolStrip();
             toolStripStatus = new ToolStripLabel();
+            label_TimeLeft = new ToolStripLabel();
+            label_WinCondition = new ToolStripLabel();
+            label_RedScore = new ToolStripLabel();
+            label_BlueScore = new ToolStripLabel();
+            label_PlayersOnline = new ToolStripLabel();
             mainPanel = new Panel();
             tabControl = new TabControl();
             tabProfile = new TabPage();
@@ -42,16 +47,10 @@ namespace BHD_RemoteClient.Forms
             tabPlayers = new TabPage();
             tabChat = new TabPage();
             tabBans = new TabPage();
-            tabMessages = new TabPage();
             tabStats = new TabPage();
             tabAdmin = new TabPage();
             openFileDialog = new OpenFileDialog();
             toolTip = new ToolTip(components);
-            label_TimeLeft = new ToolStripLabel();
-            label_WinCondition = new ToolStripLabel();
-            label_RedScore = new ToolStripLabel();
-            label_BlueScore = new ToolStripLabel();
-            label_PlayersOnline = new ToolStripLabel();
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
@@ -72,126 +71,6 @@ namespace BHD_RemoteClient.Forms
             toolStripStatus.Name = "toolStripStatus";
             toolStripStatus.Size = new Size(117, 22);
             toolStripStatus.Text = "Current Server Status";
-            // 
-            // mainPanel
-            // 
-            mainPanel.Controls.Add(tabControl);
-            mainPanel.Dock = DockStyle.Fill;
-            mainPanel.Location = new Point(0, 0);
-            mainPanel.Name = "mainPanel";
-            mainPanel.Padding = new Padding(5);
-            mainPanel.Size = new Size(920, 400);
-            mainPanel.TabIndex = 2;
-            // 
-            // tabControl
-            // 
-            tabControl.Controls.Add(tabProfile);
-            tabControl.Controls.Add(tabServer);
-            tabControl.Controls.Add(tabMaps);
-            tabControl.Controls.Add(tabPlayers);
-            tabControl.Controls.Add(tabChat);
-            tabControl.Controls.Add(tabBans);
-            tabControl.Controls.Add(tabMessages);
-            tabControl.Controls.Add(tabStats);
-            tabControl.Controls.Add(tabAdmin);
-            tabControl.Dock = DockStyle.Fill;
-            tabControl.Location = new Point(5, 5);
-            tabControl.Multiline = true;
-            tabControl.Name = "tabControl";
-            tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(910, 390);
-            tabControl.TabIndex = 0;
-            // 
-            // tabProfile
-            // 
-            tabProfile.Location = new Point(4, 24);
-            tabProfile.Name = "tabProfile";
-            tabProfile.Padding = new Padding(3);
-            tabProfile.Size = new Size(902, 362);
-            tabProfile.TabIndex = 8;
-            tabProfile.Text = "Profile";
-            tabProfile.UseVisualStyleBackColor = true;
-            // 
-            // tabServer
-            // 
-            tabServer.Location = new Point(4, 24);
-            tabServer.Name = "tabServer";
-            tabServer.Padding = new Padding(3);
-            tabServer.Size = new Size(902, 362);
-            tabServer.TabIndex = 0;
-            tabServer.Text = "Server";
-            tabServer.UseVisualStyleBackColor = true;
-            // 
-            // tabMaps
-            // 
-            tabMaps.Location = new Point(4, 24);
-            tabMaps.Name = "tabMaps";
-            tabMaps.Padding = new Padding(3);
-            tabMaps.Size = new Size(902, 362);
-            tabMaps.TabIndex = 1;
-            tabMaps.Text = "Maps";
-            tabMaps.UseVisualStyleBackColor = true;
-            // 
-            // tabPlayers
-            // 
-            tabPlayers.Location = new Point(4, 24);
-            tabPlayers.Name = "tabPlayers";
-            tabPlayers.Size = new Size(902, 362);
-            tabPlayers.TabIndex = 2;
-            tabPlayers.Text = "Players";
-            tabPlayers.UseVisualStyleBackColor = true;
-            // 
-            // tabChat
-            // 
-            tabChat.Location = new Point(4, 24);
-            tabChat.Name = "tabChat";
-            tabChat.Size = new Size(902, 362);
-            tabChat.TabIndex = 3;
-            tabChat.Text = "Chat";
-            tabChat.UseVisualStyleBackColor = true;
-            // 
-            // tabBans
-            // 
-            tabBans.Location = new Point(4, 24);
-            tabBans.Name = "tabBans";
-            tabBans.Padding = new Padding(3);
-            tabBans.Size = new Size(902, 362);
-            tabBans.TabIndex = 4;
-            tabBans.Text = "Bans";
-            tabBans.UseVisualStyleBackColor = true;
-            // 
-            // tabMessages
-            // 
-            tabMessages.Location = new Point(4, 24);
-            tabMessages.Name = "tabMessages";
-            tabMessages.Size = new Size(902, 362);
-            tabMessages.TabIndex = 5;
-            tabMessages.Text = "Messages";
-            tabMessages.UseVisualStyleBackColor = true;
-            // 
-            // tabStats
-            // 
-            tabStats.Location = new Point(4, 24);
-            tabStats.Name = "tabStats";
-            tabStats.Padding = new Padding(3);
-            tabStats.Size = new Size(902, 362);
-            tabStats.TabIndex = 6;
-            tabStats.Text = "Stats";
-            tabStats.UseVisualStyleBackColor = true;
-            // 
-            // tabAdmin
-            // 
-            tabAdmin.Location = new Point(4, 24);
-            tabAdmin.Name = "tabAdmin";
-            tabAdmin.Padding = new Padding(3);
-            tabAdmin.Size = new Size(902, 362);
-            tabAdmin.TabIndex = 7;
-            tabAdmin.Text = "Admin";
-            tabAdmin.UseVisualStyleBackColor = true;
-            // 
-            // openFileDialog
-            // 
-            openFileDialog.FileName = "openFileDialog";
             // 
             // label_TimeLeft
             // 
@@ -233,6 +112,116 @@ namespace BHD_RemoteClient.Forms
             label_PlayersOnline.Text = "[Players Online]";
             label_PlayersOnline.ToolTipText = "Future Feature";
             // 
+            // mainPanel
+            // 
+            mainPanel.Controls.Add(tabControl);
+            mainPanel.Dock = DockStyle.Fill;
+            mainPanel.Location = new Point(0, 0);
+            mainPanel.Name = "mainPanel";
+            mainPanel.Padding = new Padding(5);
+            mainPanel.Size = new Size(920, 400);
+            mainPanel.TabIndex = 2;
+            // 
+            // tabControl
+            // 
+            tabControl.Controls.Add(tabProfile);
+            tabControl.Controls.Add(tabServer);
+            tabControl.Controls.Add(tabMaps);
+            tabControl.Controls.Add(tabPlayers);
+            tabControl.Controls.Add(tabChat);
+            tabControl.Controls.Add(tabBans);
+            tabControl.Controls.Add(tabStats);
+            tabControl.Controls.Add(tabAdmin);
+            tabControl.Dock = DockStyle.Fill;
+            tabControl.Location = new Point(5, 5);
+            tabControl.Multiline = true;
+            tabControl.Name = "tabControl";
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(910, 390);
+            tabControl.TabIndex = 0;
+            // 
+            // tabProfile
+            // 
+            tabProfile.Location = new Point(4, 24);
+            tabProfile.Name = "tabProfile";
+            tabProfile.Padding = new Padding(3);
+            tabProfile.Size = new Size(902, 362);
+            tabProfile.TabIndex = 8;
+            tabProfile.Text = "Game Profile";
+            tabProfile.UseVisualStyleBackColor = true;
+            // 
+            // tabServer
+            // 
+            tabServer.Location = new Point(4, 24);
+            tabServer.Name = "tabServer";
+            tabServer.Padding = new Padding(3);
+            tabServer.Size = new Size(902, 362);
+            tabServer.TabIndex = 0;
+            tabServer.Text = "Game Server";
+            tabServer.UseVisualStyleBackColor = true;
+            // 
+            // tabMaps
+            // 
+            tabMaps.Location = new Point(4, 24);
+            tabMaps.Name = "tabMaps";
+            tabMaps.Padding = new Padding(3);
+            tabMaps.Size = new Size(902, 362);
+            tabMaps.TabIndex = 1;
+            tabMaps.Text = "Maps";
+            tabMaps.UseVisualStyleBackColor = true;
+            // 
+            // tabPlayers
+            // 
+            tabPlayers.Location = new Point(4, 24);
+            tabPlayers.Name = "tabPlayers";
+            tabPlayers.Size = new Size(902, 362);
+            tabPlayers.TabIndex = 2;
+            tabPlayers.Text = "Players";
+            tabPlayers.UseVisualStyleBackColor = true;
+            // 
+            // tabChat
+            // 
+            tabChat.Location = new Point(4, 24);
+            tabChat.Name = "tabChat";
+            tabChat.Size = new Size(902, 362);
+            tabChat.TabIndex = 3;
+            tabChat.Text = "Chat";
+            tabChat.UseVisualStyleBackColor = true;
+            // 
+            // tabBans
+            // 
+            tabBans.Location = new Point(4, 24);
+            tabBans.Name = "tabBans";
+            tabBans.Padding = new Padding(3);
+            tabBans.Size = new Size(902, 362);
+            tabBans.TabIndex = 4;
+            tabBans.Text = "Bans";
+            tabBans.UseVisualStyleBackColor = true;
+            // 
+            // tabStats
+            // 
+            tabStats.Location = new Point(4, 24);
+            tabStats.Name = "tabStats";
+            tabStats.Padding = new Padding(3);
+            tabStats.Size = new Size(902, 362);
+            tabStats.TabIndex = 6;
+            tabStats.Text = "Stats";
+            tabStats.UseVisualStyleBackColor = true;
+            // 
+            // tabAdmin
+            // 
+            tabAdmin.Location = new Point(4, 24);
+            tabAdmin.Name = "tabAdmin";
+            tabAdmin.Padding = new Padding(3);
+            tabAdmin.Size = new Size(902, 362);
+            tabAdmin.TabIndex = 7;
+            tabAdmin.Text = "Admin";
+            tabAdmin.UseVisualStyleBackColor = true;
+            // 
+            // openFileDialog
+            // 
+            openFileDialog.FileName = "openFileDialog";
+            // 
             // ServerManager
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -264,7 +253,6 @@ namespace BHD_RemoteClient.Forms
         internal ToolStripLabel toolStripStatus;
         private TabPage tabBans;
         internal TabControl tabControl;
-        private TabPage tabMessages;
         private TabPage tabStats;
         private TabPage tabAdmin;
         private TabPage tabProfile;
