@@ -1,4 +1,5 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
+﻿using BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses;
+using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
@@ -62,7 +63,8 @@ namespace BHD_RemoteClient.Forms.Panels
                     cb_serverIP.SelectedIndex = 0; // or default to the first item (assumed "0.0.0.0") if not found
                 }
                 num_serverPort.Value = newInstance.profileBindPort;
-                tb_serverID.Text = newInstance.gamePasswordLobby;
+                tb_serverID.Text = newInstance.WebStatsProfileID;
+                tb_serverPassword.Text = newInstance.gamePasswordLobby;        
                 cb_serverDedicated.Checked = newInstance.gameDedicated;
                 cb_requireNova.Checked = newInstance.gameRequireNova;
                 cb_sessionType.SelectedIndex = newInstance.gameSessionType;
@@ -224,115 +226,127 @@ namespace BHD_RemoteClient.Forms.Panels
             // Log the action
             AppDebug.Log(this.Name, "Saving server settings...");
 
+            theInstance updatedInfo = new theInstance(); // Reset to defaults before applying new settings
+
             // Host Information (4 fields)
             {
-                theInstance.WebStatsProfileID = tb_serverID.Text;
-                theInstance.gameServerName = tb_serverName.Text;
-                theInstance.gameHostName = tb_hostName.Text;
-                theInstance.gameMOTD = tb_serverMessage.Text;
+                updatedInfo.WebStatsProfileID = tb_serverID.Text;
+                updatedInfo.gameServerName = tb_serverName.Text;
+                updatedInfo.gameHostName = tb_hostName.Text;
+                updatedInfo.gameMOTD = tb_serverMessage.Text;
             }
             // Server Details (6 fields)
             {
-                theInstance.profileBindIP = cb_serverIP.SelectedItem?.ToString() ?? "0.0.0.0";
-                theInstance.profileBindPort = (int)num_serverPort.Value;
-                theInstance.gamePasswordLobby = tb_serverID.Text;
-                theInstance.gameDedicated = cb_serverDedicated.Checked;
-                theInstance.gameRequireNova = cb_requireNova.Checked;
-                theInstance.gameSessionType = cb_sessionType.SelectedIndex;
+                updatedInfo.profileBindIP = cb_serverIP.SelectedItem?.ToString() ?? "0.0.0.0";
+                updatedInfo.profileBindPort = (int)num_serverPort.Value;
+                updatedInfo.gamePasswordLobby = tb_serverPassword.Text;
+                updatedInfo.gameDedicated = cb_serverDedicated.Checked;
+                updatedInfo.gameRequireNova = cb_requireNova.Checked;
+                updatedInfo.gameSessionType = cb_sessionType.SelectedIndex;
             }
             // Server Options (6 fields)
             {
-                theInstance.gameTimeLimit = (int)num_gameTimeLimit.Value;
-                theInstance.gameLoopMaps = cb_replayMaps.SelectedIndex;
-                theInstance.gameStartDelay = (int)num_gameStartDelay.Value;
-                theInstance.gameRespawnTime = (int)num_respawnTime.Value;
-                theInstance.gameScoreBoardDelay = (int)num_scoreBoardDelay.Value;
-                theInstance.gameMaxSlots = (int)num_maxPlayers.Value;
+                updatedInfo.gameTimeLimit = (int)num_gameTimeLimit.Value;
+                updatedInfo.gameLoopMaps = cb_replayMaps.SelectedIndex;
+                updatedInfo.gameStartDelay = (int)num_gameStartDelay.Value;
+                updatedInfo.gameRespawnTime = (int)num_respawnTime.Value;
+                updatedInfo.gameScoreBoardDelay = (int)num_scoreBoardDelay.Value;
+                updatedInfo.gameMaxSlots = (int)num_maxPlayers.Value;
             }
             // Scoring Options (3 fields)
             {
-                theInstance.gameScoreZoneTime = (int)num_scoresKOTH.Value;
-                theInstance.gameScoreKills = (int)num_scoresDM.Value;
-                theInstance.gameScoreFlags = (int)num_scoresFB.Value;
+                updatedInfo.gameScoreZoneTime = (int)num_scoresKOTH.Value;
+                updatedInfo.gameScoreKills = (int)num_scoresDM.Value;
+                updatedInfo.gameScoreFlags = (int)num_scoresFB.Value;
             }
             // Team Options (3 fields)
             {
-                theInstance.gameOptionAutoBalance = cb_autoBalance.Checked;
-                theInstance.gamePasswordBlue = tb_bluePassword.Text;
-                theInstance.gamePasswordRed = tb_redPassword.Text;
+                updatedInfo.gameOptionAutoBalance = cb_autoBalance.Checked;
+                updatedInfo.gamePasswordBlue = tb_bluePassword.Text;
+                updatedInfo.gamePasswordRed = tb_redPassword.Text;
             }
             // Game Play Settings (6 fields)
             {
-                theInstance.gameOptionShowTracers = cb_showTracers.Checked;
-                theInstance.gameShowTeamClays = cb_showClays.Checked;
-                theInstance.gameOptionAutoRange = cb_autoRange.Checked;
-                theInstance.gamePSPTOTimer = (int)num_pspTakeoverTimer.Value;
-                theInstance.gameFlagReturnTime = (int)num_flagReturnTime.Value;
-                theInstance.gameMaxTeamLives = (int)num_maxTeamLives.Value;
+                updatedInfo.gameOptionShowTracers = cb_showTracers.Checked;
+                updatedInfo.gameShowTeamClays = cb_showClays.Checked;
+                updatedInfo.gameOptionAutoRange = cb_autoRange.Checked;
+                updatedInfo.gamePSPTOTimer = (int)num_pspTakeoverTimer.Value;
+                updatedInfo.gameFlagReturnTime = (int)num_flagReturnTime.Value;
+                updatedInfo.gameMaxTeamLives = (int)num_maxTeamLives.Value;
             }
             // Friendly Fire (4 fields)
             {
-                theInstance.gameOptionFF = cb_enableFFkills.Checked;
-                theInstance.gameFriendlyFireKills = (int)num_maxFFKills.Value;
-                theInstance.gameOptionFFWarn = cb_warnFFkils.Checked;
-                theInstance.gameOptionFriendlyTags = cb_showTeamTags.Checked;
+                updatedInfo.gameOptionFF = cb_enableFFkills.Checked;
+                updatedInfo.gameFriendlyFireKills = (int)num_maxFFKills.Value;
+                updatedInfo.gameOptionFFWarn = cb_warnFFkils.Checked;
+                updatedInfo.gameOptionFriendlyTags = cb_showTeamTags.Checked;
             }
             // Ping Checking (4 fields)
             {
-                theInstance.gameMinPing = cb_enableMinCheck.Checked;
-                theInstance.gameMaxPing = cb_enableMaxCheck.Checked;
-                theInstance.gameMinPingValue = (int)num_minPing.Value;
-                theInstance.gameMaxPingValue = (int)num_maxPing.Value;
+                updatedInfo.gameMinPing = cb_enableMinCheck.Checked;
+                updatedInfo.gameMaxPing = cb_enableMaxCheck.Checked;
+                updatedInfo.gameMinPingValue = (int)num_minPing.Value;
+                updatedInfo.gameMaxPingValue = (int)num_maxPing.Value;
             }
             // Misc (5 fields)
             {
-                theInstance.gameCustomSkins = cb_customSkins.Checked;
-                theInstance.gameDestroyBuildings = cb_enableDistroyBuildings.Checked;
-                theInstance.gameFatBullets = cb_enableFatBullets.Checked;
-                theInstance.gameOneShotKills = cb_enableOneShotKills.Checked;
-                theInstance.gameAllowLeftLeaning = cb_enableLeftLean.Checked;
+                updatedInfo.gameCustomSkins = cb_customSkins.Checked;
+                updatedInfo.gameDestroyBuildings = cb_enableDistroyBuildings.Checked;
+                updatedInfo.gameFatBullets = cb_enableFatBullets.Checked;
+                updatedInfo.gameOneShotKills = cb_enableOneShotKills.Checked;
+                updatedInfo.gameAllowLeftLeaning = cb_enableLeftLean.Checked;
             }
             // Restrictions Weapons (Many Fields)
             {
-                theInstance.weaponColt45 = cb_weapColt45.Checked;
-                theInstance.weaponM9Beretta = cb_weapM9Bereatta.Checked;
-                theInstance.weaponCar15 = cb_weapCAR15.Checked;
-                theInstance.weaponCar15203 = cb_weapCAR15203.Checked;
-                theInstance.weaponM16 = cb_weapM16.Checked;
-                theInstance.weaponM16203 = cb_weapM16203.Checked;
-                theInstance.weaponG3 = cb_weapG3.Checked;
-                theInstance.weaponG36 = cb_weapG36.Checked;
-                theInstance.weaponM60 = cb_weapM60.Checked;
-                theInstance.weaponM240 = cb_weapM240.Checked;
-                theInstance.weaponMP5 = cb_weapMP5.Checked;
-                theInstance.weaponSAW = cb_weapSaw.Checked;
-                theInstance.weaponMCRT300 = cb_weap300Tact.Checked;
-                theInstance.weaponM21 = cb_weapM21.Checked;
-                theInstance.weaponM24 = cb_weapM24.Checked;
-                theInstance.weaponBarrett = cb_weapBarret.Checked;
-                theInstance.weaponPSG1 = cb_weapPSG1.Checked;
-                theInstance.weaponShotgun = cb_weapShotgun.Checked;
-                theInstance.weaponFragGrenade = cb_weapFragGrenade.Checked;
-                theInstance.weaponSmokeGrenade = cb_weapSmokeGrenade.Checked;
-                theInstance.weaponSatchelCharges = cb_weapSatchel.Checked;
-                theInstance.weaponAT4 = cb_weapAT4.Checked;
-                theInstance.weaponFlashGrenade = cb_weapFlashBang.Checked;
-                theInstance.weaponClaymore = cb_weapClay.Checked;
+                updatedInfo.weaponColt45 = cb_weapColt45.Checked;
+                updatedInfo.weaponM9Beretta = cb_weapM9Bereatta.Checked;
+                updatedInfo.weaponCar15 = cb_weapCAR15.Checked;
+                updatedInfo.weaponCar15203 = cb_weapCAR15203.Checked;
+                updatedInfo.weaponM16 = cb_weapM16.Checked;
+                updatedInfo.weaponM16203 = cb_weapM16203.Checked;
+                updatedInfo.weaponG3 = cb_weapG3.Checked;
+                updatedInfo.weaponG36 = cb_weapG36.Checked;
+                updatedInfo.weaponM60 = cb_weapM60.Checked;
+                updatedInfo.weaponM240 = cb_weapM240.Checked;
+                updatedInfo.weaponMP5 = cb_weapMP5.Checked;
+                updatedInfo.weaponSAW = cb_weapSaw.Checked;
+                updatedInfo.weaponMCRT300 = cb_weap300Tact.Checked;
+                updatedInfo.weaponM21 = cb_weapM21.Checked;
+                updatedInfo.weaponM24 = cb_weapM24.Checked;
+                updatedInfo.weaponBarrett = cb_weapBarret.Checked;
+                updatedInfo.weaponPSG1 = cb_weapPSG1.Checked;
+                updatedInfo.weaponShotgun = cb_weapShotgun.Checked;
+                updatedInfo.weaponFragGrenade = cb_weapFragGrenade.Checked;
+                updatedInfo.weaponSmokeGrenade = cb_weapSmokeGrenade.Checked;
+                updatedInfo.weaponSatchelCharges = cb_weapSatchel.Checked;
+                updatedInfo.weaponAT4 = cb_weapAT4.Checked;
+                updatedInfo.weaponFlashGrenade = cb_weapFlashBang.Checked;
+                updatedInfo.weaponClaymore = cb_weapClay.Checked;
             }
             // Role Restrictions (4 fields)
             {
-                theInstance.roleCQB = cb_roleCQB.Checked;
-                theInstance.roleGunner = cb_roleGunner.Checked;
-                theInstance.roleSniper = cb_roleSniper.Checked;
-                theInstance.roleMedic = cb_roleMedic.Checked;
+                updatedInfo.roleCQB = cb_roleCQB.Checked;
+                updatedInfo.roleGunner = cb_roleGunner.Checked;
+                updatedInfo.roleSniper = cb_roleSniper.Checked;
+                updatedInfo.roleMedic = cb_roleMedic.Checked;
             }
             // Remote Settings
             {
-                theInstance.profileEnableRemote = cb_enableRemote.Checked;
-                theInstance.profileRemotePort = (int)num_remotePort.Value;
+                updatedInfo.profileEnableRemote = cb_enableRemote.Checked;
+                updatedInfo.profileRemotePort = (int)num_remotePort.Value;
             }
 
-            AppDebug.Log(this.Name, "Server settings saved.");
+
+            if (CmdSetServerVariables.ProcessCommand(updatedInfo))
+            {
+                MessageBox.Show("Server settings applied successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                AppDebug.Log(this.Name, "Server settings applied.");
+            }
+            else
+            {
+                AppDebug.Log(this.Name, "Failed to apply server settings."); // Apply the new settings
+
+            }
         }
         // --- Highligh Differences ---
         private void functionEvent_HighlighDiffFields()

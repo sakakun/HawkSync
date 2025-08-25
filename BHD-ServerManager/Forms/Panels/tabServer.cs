@@ -62,7 +62,8 @@ namespace BHD_ServerManager.Forms.Panels
                     cb_serverIP.SelectedIndex = 0; // or default to the first item (assumed "0.0.0.0") if not found
                 }
                 num_serverPort.Value = newInstance.profileBindPort;
-                tb_serverID.Text = newInstance.gamePasswordLobby;
+                tb_serverID.Text = newInstance.WebStatsProfileID;
+                tb_serverPassword.Text = newInstance.gamePasswordLobby;
                 cb_serverDedicated.Checked = newInstance.gameDedicated;
                 cb_requireNova.Checked = newInstance.gameRequireNova;
                 cb_sessionType.SelectedIndex = newInstance.gameSessionType;
@@ -235,7 +236,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 theInstance.profileBindIP = cb_serverIP.SelectedItem?.ToString() ?? "0.0.0.0";
                 theInstance.profileBindPort = (int)num_serverPort.Value;
-                theInstance.gamePasswordLobby = tb_serverID.Text;
+                theInstance.gamePasswordLobby = tb_serverPassword.Text;
                 theInstance.gameDedicated = cb_serverDedicated.Checked;
                 theInstance.gameRequireNova = cb_requireNova.Checked;
                 theInstance.gameSessionType = cb_sessionType.SelectedIndex;
@@ -348,7 +349,8 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 cb_serverIP.BackColor = cb_serverIP.SelectedItem?.ToString() != theInstance.profileBindIP ? Color.LightYellow : SystemColors.Window;
                 num_serverPort.BackColor = (int)num_serverPort.Value != theInstance.profileBindPort ? Color.LightYellow : SystemColors.Window;
-                tb_serverID.BackColor = tb_serverID.Text != theInstance.gamePasswordLobby ? Color.LightYellow : SystemColors.Window;
+                tb_serverID.BackColor = tb_serverID.Text != theInstance.WebStatsProfileID ? Color.LightYellow : SystemColors.Window;
+                tb_serverPassword.BackColor = tb_serverPassword.Text != theInstance.gamePasswordLobby ? Color.LightYellow : SystemColors.Window;
                 cb_serverDedicated.BackColor = cb_serverDedicated.Checked != theInstance.gameDedicated ? Color.LightYellow : SystemColors.Window;
                 cb_requireNova.BackColor = cb_requireNova.Checked != theInstance.gameRequireNova ? Color.LightYellow : SystemColors.Window;
                 cb_sessionType.BackColor = cb_sessionType.SelectedIndex != theInstance.gameSessionType ? Color.LightYellow : SystemColors.Window;
