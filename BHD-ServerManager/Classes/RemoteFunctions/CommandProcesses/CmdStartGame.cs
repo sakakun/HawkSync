@@ -1,4 +1,7 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
+using BHD_SharedResources.Classes.InstanceManagers;
+using BHD_SharedResources.Classes.SupportClasses;
+using System.Text.Json;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
@@ -7,6 +10,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
     {
         public static CommandResponse ProcessCommand(object data)
         {
+            theInstanceManager.SetServerVariables();
             bool isStarted = StartServer.startGame();
 
             // Wait for the server to be fully running (max 10 seconds)
@@ -19,7 +23,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 
             bool isRunning = ServerMemory.ReadMemoryIsProcessAttached();
 
-            return new CommandResponse
+            CommandResponse response = new CommandResponse
             {
                 Success = isStarted && isRunning,
                 Message = isRunning
@@ -27,6 +31,12 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
                     : "The server start command was issued, but the server did not start in time.",
                 ResponseData = isRunning.ToString()
             };
+
+            // After creating CommandResponse
+            AppDebug.Log("CmdStartGame", $"Sending response: {JsonSerializer.Serialize(response)}");
+            // Log any network exceptions
+
+            return response;
         }
 
     }

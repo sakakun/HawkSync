@@ -55,7 +55,14 @@ namespace BHD_ServerManager.Classes.Tickers
                     theInstance.instanceStatus = InstanceStatus.OFFLINE;
                     SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());
                 }
+            } else
+            {
+                // --- Server is online: run status-specific logic in order ---
+                // 1. Always update status and basic info
+                ServerMemory.ReadMemoryServerStatus();                                  // Server Status
+                SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());  // Update Server Status
             }
+
 
             // UI updates that should always run
             SafeInvoke(thisServer, () =>
@@ -64,6 +71,10 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
                 thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
                 thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
+                thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
+                thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
+                thisServer.BanTab.BanTickerHook();                                              // Update Bans Tab
+                thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
                 thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
             });
 
@@ -74,11 +85,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 theInstance.instanceLastUpdateTime = currentTime;
                 return;
             }
-
-            // --- Server is online: run status-specific logic in order ---
-            // 1. Always update status and basic info
-            ServerMemory.ReadMemoryServerStatus();                                  // Server Status
-            SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());  // Update Server Status
 
             if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP || theInstance.instanceStatus != InstanceStatus.SCORING)
             {

@@ -14,11 +14,6 @@ namespace BHD_RemoteClient.Classes.Tickers
     {
         // The Instances (Data)
         private static theInstance theInstance => CommonCore.theInstance!;
-        private static chatInstance instanceChat => CommonCore.instanceChat!;
-        private static mapInstance instanceMaps => CommonCore.instanceMaps!;
-        private static banInstance instanceBans => CommonCore.instanceBans!;
-        private static statInstance instanceStats => CommonCore.instanceStats!;
-        private static adminInstance instanceAdmin => CommonCore.instanceAdmin!;
         private static ServerManager thisServer => Program.ServerManagerUI!;
 
         // Helper for UI thread safety
@@ -32,11 +27,6 @@ namespace BHD_RemoteClient.Classes.Tickers
 
         public static void runTicker()
         {
-
-            InstanceStatus status = theInstance.instanceStatus;
-            int maxSlots = theInstance.gameMaxSlots;
-            List<playerObject> players = theInstance.playerList.Values.ToList();
-
             DateTime currentTime = DateTime.Now;
             if (!(DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) < 0))
                 return;
@@ -44,38 +34,18 @@ namespace BHD_RemoteClient.Classes.Tickers
             // UI updates that should always run
             SafeInvoke(thisServer, () =>
             {
-                // --- UI Update Hooks ---
-                thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
-                thisServer.PlayersTab.tickerPlayerHook();                                       // Ticker for Players
-                thisServer.ChatTab.ChatTickerHook();
-                thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
-                thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
-                thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
-            });
-
-
-            // Now update the UI
-            SafeInvoke(thisServer, () =>
-            {
-                // Gather data off the UI thread
-                bool isAttached = GameManager.ReadMemoryIsProcessAttached();
-
                 // Server Status and Buttons
                 thisServer.functionEvent_serverStatus();
 
-                // Server Settings Refresh Tasks
-                theInstanceManager.HighlightDifferences();
-
-                // Chat Messages Refresh Tasks
-                chatInstanceManagers.UpdateChatMessagesGrid();
-
-                // Ban Management Refresh Tasks
-                banInstanceManager.UpdateBannedTables();
-
-                // Stats Refresh Tasks
-                StatFunctions.PopulatePlayerStatsGrid();
-                StatFunctions.PopulateWeaponStatsGrid();
-
+                // --- UI Update Hooks ---
+                thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
+                thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
+                thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
+                thisServer.PlayersTab.tickerPlayerHook();                                       // Ticker for Players
+                thisServer.ChatTab.ChatTickerHook();
+                thisServer.BanTab.BanTickerHook();                                             // Update Bans Tab
+                thisServer.StatsTab.StatsTickerHook();                                         // Update Stats Tab
+                thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
             });
 
             theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);

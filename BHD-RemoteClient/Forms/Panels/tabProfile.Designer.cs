@@ -46,7 +46,6 @@
             tb_profileServerPath = new TextBox();
             panel1 = new Panel();
             btn_resetProfile = new Button();
-            btn_saveProfile = new Button();
             folderProfileBrowserDialog = new FolderBrowserDialog();
             openFileDialog1 = new OpenFileDialog();
             tableLayoutPanel1.SuspendLayout();
@@ -159,6 +158,7 @@
             // 
             // cb_profileModifierList2
             // 
+            cb_profileModifierList2.Enabled = false;
             cb_profileModifierList2.FormattingEnabled = true;
             cb_profileModifierList2.Items.AddRange(new object[] { "/shadowmap", "/s", "/NOSTAT", "/NETLOG", "/NETFLOW", "/SYSDUMP", "/NOSYSDUMP", "/STACKTRACE", "/NOSTACKTRACE", "/LOADBAR", "/DUMP" });
             cb_profileModifierList2.Location = new Point(177, 103);
@@ -168,6 +168,7 @@
             // 
             // cb_profileModifierList1
             // 
+            cb_profileModifierList1.Enabled = false;
             cb_profileModifierList1.FormattingEnabled = true;
             cb_profileModifierList1.Items.AddRange(new object[] { "/D", "/WDM", "/FRISK", "/mod", "/betamp", "/noreload", "/w", "/autorestart", "/L", "/BADPACKETS", "/PUNT.TXT" });
             cb_profileModifierList1.Location = new Point(6, 103);
@@ -185,7 +186,6 @@
             btn_profileBrowse2.TabIndex = 5;
             btn_profileBrowse2.Text = "Browse";
             btn_profileBrowse2.UseVisualStyleBackColor = true;
-            btn_profileBrowse2.Click += actionClick_profileOpenFileDialog;
             // 
             // tb_modFile
             // 
@@ -206,6 +206,7 @@
             // 
             // btn_profileBrowse1
             // 
+            btn_profileBrowse1.Enabled = false;
             btn_profileBrowse1.FlatStyle = FlatStyle.Flat;
             btn_profileBrowse1.Location = new Point(267, 20);
             btn_profileBrowse1.Name = "btn_profileBrowse1";
@@ -213,7 +214,6 @@
             btn_profileBrowse1.TabIndex = 2;
             btn_profileBrowse1.Text = "Browse";
             btn_profileBrowse1.UseVisualStyleBackColor = true;
-            btn_profileBrowse1.Click += actionClick_profileOpenFolderDialog;
             // 
             // label_profileServerPath
             // 
@@ -226,6 +226,7 @@
             // 
             // tb_profileServerPath
             // 
+            tb_profileServerPath.Enabled = false;
             tb_profileServerPath.Location = new Point(6, 20);
             tb_profileServerPath.Name = "tb_profileServerPath";
             tb_profileServerPath.Size = new Size(255, 23);
@@ -234,7 +235,6 @@
             // panel1
             // 
             panel1.Controls.Add(btn_resetProfile);
-            panel1.Controls.Add(btn_saveProfile);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(3, 322);
             panel1.Name = "panel1";
@@ -243,23 +243,13 @@
             // 
             // btn_resetProfile
             // 
-            btn_resetProfile.Location = new Point(84, 4);
+            btn_resetProfile.Location = new Point(6, 5);
             btn_resetProfile.Name = "btn_resetProfile";
             btn_resetProfile.Size = new Size(75, 23);
             btn_resetProfile.TabIndex = 1;
             btn_resetProfile.Text = "Reset";
             btn_resetProfile.UseVisualStyleBackColor = true;
             btn_resetProfile.Click += actionClick_ResetProfile;
-            // 
-            // btn_saveProfile
-            // 
-            btn_saveProfile.Location = new Point(3, 4);
-            btn_saveProfile.Name = "btn_saveProfile";
-            btn_saveProfile.Size = new Size(75, 23);
-            btn_saveProfile.TabIndex = 0;
-            btn_saveProfile.Text = "Save";
-            btn_saveProfile.UseVisualStyleBackColor = true;
-            btn_saveProfile.Click += actionClick_SaveProfile;
             // 
             // openFileDialog1
             // 
@@ -297,7 +287,6 @@
         private GroupBox gp_profileSettings;
         private Panel panel1;
         private Button btn_resetProfile;
-        private Button btn_saveProfile;
         private Label label_profileServerPath;
         private TextBox tb_profileServerPath;
         private Button btn_profileBrowse1;

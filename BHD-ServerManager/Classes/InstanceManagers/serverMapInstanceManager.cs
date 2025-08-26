@@ -231,6 +231,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             else
             {
+                string filePath = Path.Combine(startPath, "currentMapPlaylist.mpl");
+                if (!File.Exists(filePath))
+                    return new List<mapFileInfo>();
+
                 lines = File.ReadAllLines(startPath + "currentMapPlaylist.mpl", Encoding.UTF8);
             }
 

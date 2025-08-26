@@ -30,7 +30,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             return new CommandResponse
             {
                 Success = true,
-                Message = $"Disarmed player in slot " + playerSlot.ToString(),
+                Message = $"Rearm player in slot " + playerSlot.ToString(),
                 ResponseData = true.ToString()
             };
 

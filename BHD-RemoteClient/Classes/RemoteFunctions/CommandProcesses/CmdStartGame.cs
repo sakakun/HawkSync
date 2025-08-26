@@ -6,21 +6,25 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
     public static class CmdStartGame
     {
         private static RemoteClient theRemoteClient => Program.theRemoteClient!;
-
         public static bool ProcessCommand()
         {
             var packet = new CommandPacket
             {
                 AuthToken = theRemoteClient.AuthToken,
-                Command = "startGame",
+                Command = "CmdStartGame",
                 CommandData = string.Empty
             };
 
-            var response = theRemoteClient.SendCommandAndGetResponse(packet, 1000);
+            var response = theRemoteClient.SendCommandAndGetResponse(packet, 12000); // 12 seconds
 
-            AppDebug.Log("startGame", JsonSerializer.Serialize(response));
+            if (response == null)
+            {
+                AppDebug.Log("CmdStartGame", "No response received from server. Check server logs and network.");
+                return false;
+            }
 
-            return response!.Success;
+            AppDebug.Log("CmdStartGame", JsonSerializer.Serialize(response));
+            return response.Success;
         }
     }
 }
