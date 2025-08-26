@@ -130,13 +130,16 @@ namespace BHD_SharedResources.Classes.Instances
         public bool roleSniper { get; set; } = true;
 
         // Game Info
-        public TimeSpan gameInfoTimeRemaining { get; set; }                  /* Time Remaining in Game, used for the Info Panel */
-        public string gameInfoMapName { get; set; } = "";            /* Map Name, used for the Info Panel */
-        public string gameInfoGameType { get; set; } = "";            /* Game Type, used for the Info Panel */
-        public int gameInfoCurrentNumPlayers { get; set; } = 0;           /* Current Number of Players, used for the Info Panel */
-        public int gameInfoMapCycleIndex { get; set; } = 0;             /* Map Cycle Index, used for the Info Panel */
-        public int gameInfoCurrentMapIndex { get; set; } = 0;             /* Current Map Index, used for the Info Panel */
-        public int gameInfoNextMapGameType { get; set; } = 0;             /* Next Map Game Type, used for the Info Panel */
+        public TimeSpan gameInfoTimeRemaining { get; set; }                     /* Time Remaining in Game, used for the Info Panel */
+        public string gameInfoMapName { get; set; } = "";                       /* Map Name, used for the Info Panel */
+        public string gameInfoGameType { get; set; } = "";                      /* Game Type, used for the Info Panel */
+        public int gameInfoCurrentNumPlayers { get; set; } = 0;                 /* Current Number of Players, used for the Info Panel */
+        public int gameInfoCurrentGameScore { get; set; } = 0;                  /* Current Game Score, used for the Info Panel */
+        public int gameInfoCurrentBlueScore { get; set; } = 0;                  /* Current Blue Score, used for the Info Panel */
+        public int gameInfoCurrentRedScore { get; set; } = 0;                   /* Current Red Score, used for the Info Panel */
+        public int gameInfoMapCycleIndex { get; set; } = 0;                     /* Map Cycle Index, used for the Info Panel */
+        public int gameInfoCurrentMapIndex { get; set; } = 0;                   /* Current Map Index, used for the Info Panel */
+        public int gameInfoNextMapGameType { get; set; } = 0;                   /* Next Map Game Type, used for the Info Panel */
 
         // Instance Update Statements
         public bool banInstanceUpdated { get; set; } = false;

@@ -1,3 +1,4 @@
+using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.RemoteFunctions;
 using BHD_ServerManager.Forms.Panels;
 using BHD_SharedResources.Classes.CoreObjects;
@@ -61,8 +62,9 @@ namespace BHD_ServerManager.Forms
         }
 
         // --- Server Status and Controls ---
-        public void functionEvent_serverStatus()
+        public void functionEvent_tickerServerGUI()
         {
+            // Update the Server Status Text
             toolStripStatus.Text = thisInstance.instanceStatus switch
             {
                 InstanceStatus.OFFLINE => "Server is not running.",
@@ -72,7 +74,19 @@ namespace BHD_ServerManager.Forms
                 InstanceStatus.STARTDELAY => "Server is running. Game ready, waiting for start.",
                 _ => toolStripStatus.Text
             };
-        }        
+            // Update Label for Win Condition
+            functionEvent_UpdateScoreLabels();
+        }
+
+        private void functionEvent_UpdateScoreLabels()
+        {
+            if (thisInstance.instanceStatus == InstanceStatus.OFFLINE)
+            {
+                label_WinCondition.Text = "[Win Condition]";
+                return;
+            }
+            label_WinCondition.Text = $"{thisInstance.gameInfoCurrentGameScore} ({thisInstance.gameInfoGameType})";
+        }
 
         // --- Form Closing ---
         protected override void OnFormClosing(FormClosingEventArgs e)

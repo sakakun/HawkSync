@@ -53,20 +53,21 @@ namespace BHD_ServerManager.Classes.Tickers
                 if (!StartServer.CheckForExistingProcess())
                 {
                     theInstance.instanceStatus = InstanceStatus.OFFLINE;
-                    SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());
                 }
             } else
             {
                 // --- Server is online: run status-specific logic in order ---
                 // 1. Always update status and basic info
                 ServerMemory.ReadMemoryServerStatus();                                  // Server Status
-                SafeInvoke(thisServer, () => thisServer.functionEvent_serverStatus());  // Update Server Status
             }
 
 
             // UI updates that should always run
             SafeInvoke(thisServer, () =>
             {
+                // Server UI Updates
+                thisServer.functionEvent_tickerServerGUI();                                     // Ticker for the Main Server GUI
+
                 // --- UI Update Hooks ---
                 thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
                 thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
@@ -96,28 +97,29 @@ namespace BHD_ServerManager.Classes.Tickers
                 ServerMemory.ReadMemoryCurrentNumPlayers();                         // Get Current Number of Players
                 ServerMemory.ReadMapCycleCounter();                                 // Map Cycle Counter (How Maps Have Been Played)
                 ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
+                // Score Reading
+                ServerMemory.ReadMemoryCurrentGameScore();                          // Read current game scores          
             }
 
             // 2. Loading Map
             if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
             {
                 theInstance.instanceScoringProcRun = true;
+                theInstance.instanceCrashCounter = 0;                               // Reset crash counter
                 tickerEvent_preGameProcessing();                                    // Run pre-game processing
                 ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
-                ServerMemory.UpdateGlobalGameType();                                // Pinger Game Type Update
             }
             // 3. Start Delay
             else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
             {
                 theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
-                theInstance.instanceCrashCounter = 0;                               // Reset crash counter
                 ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
                 ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
             }
             // 4. Online (game in progress)
             else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
             {
-
+                theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
                 ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
                 ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
 
@@ -178,41 +180,39 @@ namespace BHD_ServerManager.Classes.Tickers
         // --- Pre-Game Processing (Loading Map) ---
         private static void tickerEvent_preGameProcessing()
         {
-            if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP && theInstance.instancePreGameProcRun)
+            if (theInstance.instancePreGameProcRun)
             {
                 AppDebug.Log("tickerServerManagement", "Pre-game Processing...");
                 theInstance.instancePreGameProcRun = false;               
-                ServerMemory.SetNextMapType();                                                  // Set the Next Map Type
-                ServerMemory.UpdateGameScores();                                                // Update the Scores Required to Win the Game
                 instanceChat.AutoMessageCounter = 0;
                 instanceChat.ChatLog?.Clear();
                 theInstance.playerList.Clear();
                 StatFunctions.ResetPlayerStats();
+
+                AppDebug.Log("tickerServerManagement", "Updating Maps...");
+                ServerMemory.UpdateGlobalGameType();
             }
-            
+            ServerMemory.UpdateGameScores();                                                // Update the Scores Required to Win the Game
         }
 
         // --- Scoring Processing ---
         private static void tickerEvent_scoringGameProcessing()
         {
-            if (!theInstance.instanceScoringProcRun)
+            if (theInstance.instanceScoringProcRun)
             {
-                return;
+                theInstance.instanceScoringProcRun = false;
+
+                AppDebug.Log("tickerServerManagement", "Scoring Processing...");
+                ServerMemory.ReadMemoryWinningTeam();
+                AppDebug.Log("tickerServerManagement", "Sending Stats...");
+                Task.Run(() => StatFunctions.SendImportData(thisServer!));
+                ServerMemory.SetNextMapType();                                                  // Set the Next Map Type
+                AppDebug.Log("tickerServerManagement", "Kill ScoreBoard...");
+                CommonCore.Ticker?.Start("ScoreboardTicker", 1000, () => tickerEvent_Scoreboard());
+                AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
             }
             
-            theInstance.instanceScoringProcRun = false;
-            
-            AppDebug.Log("tickerServerManagement", "Scoring Processing...");
-            ServerMemory.ReadMemoryWinningTeam();
-            AppDebug.Log("tickerServerManagement", "Sending Stats...");
-            Task.Run(() => StatFunctions.SendImportData(thisServer!));
-            AppDebug.Log("tickerServerManagement", "Updating Maps...");
-            ServerMemory.SetNextMapType();                                                  // Set the Next Map Type
             ServerMemory.UpdateGameScores();                                                // Update the Scores Required to Win the Game
-            AppDebug.Log("tickerServerManagement", "Kill ScoreBoard...");
-            CommonCore.Ticker?.Start("ScoreboardTicker", 1000, () => tickerEvent_Scoreboard());
-            AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
-
         }
 
         // --- Scoreboard Ticker ---

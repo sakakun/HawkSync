@@ -1106,6 +1106,8 @@ namespace BHD_ServerManager.Classes.GameManagement
         }
         public static void SetNextMapType()
         {
+            AppDebug.Log("SetNextMapType", "Updated the Map Type for the Next Map");
+
             try
             {
                 // Deal with the Players
@@ -1126,6 +1128,8 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Update the Game Score for the next map
         public static void UpdateGameScores()
         {
+
+            AppDebug.Log("UpdateGameScores", "Updated Game Scores");
 
             // This changes the score needed to win on the next map played.
             int nextGameScore = 0;
@@ -1593,8 +1597,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return;
             }
 
-
-
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;
             ReadProcessMemory((int)processHandle, baseAddr + 0x005ED5F8, ServerMapCyclePtr, ServerMapCyclePtr.Length, ref Pointer2Read);
@@ -1995,6 +1997,61 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
             return new string[] { ChatLogAddr.ToString(), LastMessage, msgTypeBytes };
+        }
+
+        public static void ReadMemoryCurrentGameScore()
+        {
+            int scoreAddress1 = 0;
+            int scoreAddress2 = 0;
+            int currentGameScore = 0;
+            
+            // thisInstance.gameInfoGameType
+            switch (objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == thisInstance.gameInfoGameType)!.DatabaseId)
+            {
+                // KOTH/TKOTH
+                case 3:
+                case 4:
+                    scoreAddress1 = baseAddr + 0x5F21B8;
+                    scoreAddress2 = baseAddr + 0x6344B4;
+                    break;
+                // flag ball
+                case 8:
+                    scoreAddress1 = baseAddr + 0x5F21AC;
+                    scoreAddress2 = baseAddr + 0x6034B8;
+                    break;
+                // all other game types...
+                default:
+                    scoreAddress1 = baseAddr + 0x5F21AC;
+                    scoreAddress2 = baseAddr + 0x6034B8;
+                    break;
+            }
+
+            // Try reading from the first address
+            byte[] scoreBytes = new byte[4];
+            int bytesRead = 0;
+            bool success = ReadProcessMemory((int)processHandle, scoreAddress1, scoreBytes, scoreBytes.Length, ref bytesRead);
+
+            if (success && bytesRead == 4)
+            {
+                currentGameScore = BitConverter.ToInt32(scoreBytes, 0);
+            }
+            else
+            {
+                // Fallback: try the second address
+                bytesRead = 0;
+                success = ReadProcessMemory((int)processHandle, scoreAddress2, scoreBytes, scoreBytes.Length, ref bytesRead);
+                if (success && bytesRead == 4)
+                {
+                    currentGameScore = BitConverter.ToInt32(scoreBytes, 0);
+                }
+                else
+                {
+                    AppDebug.Log("ReadMemoryCurrentGameScore", "Failed to read game score from memory.");
+                    currentGameScore = -1;
+                }
+            }
+
+            thisInstance.gameInfoCurrentGameScore = currentGameScore;
         }
 
     }

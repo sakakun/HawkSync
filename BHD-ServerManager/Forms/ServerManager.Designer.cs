@@ -86,7 +86,7 @@ namespace BHD_ServerManager.Forms
             label_WinCondition.Name = "label_WinCondition";
             label_WinCondition.Size = new Size(92, 22);
             label_WinCondition.Text = "[Win Condition]";
-            label_WinCondition.ToolTipText = "Future Feature";
+            label_WinCondition.ToolTipText = "Win Condition (Game Type)";
             // 
             // label_RedScore
             // 

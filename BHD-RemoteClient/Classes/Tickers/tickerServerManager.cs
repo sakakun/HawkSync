@@ -35,7 +35,7 @@ namespace BHD_RemoteClient.Classes.Tickers
             SafeInvoke(thisServer, () =>
             {
                 // Server Status and Buttons
-                thisServer.functionEvent_serverStatus();
+                thisServer.functionEvent_tickerServerGUI();
 
                 // --- UI Update Hooks ---
                 thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status

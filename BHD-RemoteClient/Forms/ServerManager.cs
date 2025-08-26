@@ -74,31 +74,35 @@ namespace BHD_RemoteClient.Forms
         // Event Handlers for ServerManager
         // Description: Function calls not made by a Click or KeyPress event.
         //
-        // Function: functionEvent_serverStatus, Updates the status label based on the server's current status.
-        internal void functionEvent_serverStatus()
+        // Function: functionEvent_tickerServerGUI, Updates the status label based on the server's current status.
+        internal void functionEvent_tickerServerGUI()
+        {
+            // Update the Server Status Text
+            toolStripStatus.Text = theInstance.instanceStatus switch
+            {
+                InstanceStatus.OFFLINE => "Server is not running.",
+                InstanceStatus.ONLINE => "Server is running. Game in progress.",
+                InstanceStatus.SCORING => "Server is running. Game has ended, currently scoring.",
+                InstanceStatus.LOADINGMAP => "Server is running. Game reset in progress.",
+                InstanceStatus.STARTDELAY => "Server is running. Game ready, waiting for start.",
+                _ => toolStripStatus.Text
+            };
+
+            // Update Label for Win Condition
+            functionEvent_UpdateScoreLabels();
+        }
+
+        private void functionEvent_UpdateScoreLabels()
         {
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
             {
-                toolStripStatus.Text = "Server is not running.";
+                label_WinCondition.Text = "[Win Condition]";
+                return;
             }
-            if (theInstance.instanceStatus == InstanceStatus.ONLINE)
-            {
-                toolStripStatus.Text = "Server is running. Game in progress.";
-            }
-            if (theInstance.instanceStatus == InstanceStatus.SCORING)
-            {
-                toolStripStatus.Text = "Server is running. Game has ended, currently scoring.";
-            }
-            if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
-            {
-                toolStripStatus.Text = "Server is running. Game reset in progress.";
-            }
-            if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
-            {
-                toolStripStatus.Text = "Server is running. Game ready, waiting for start.";
-            }
+            label_WinCondition.Text = $"{theInstance.gameInfoCurrentGameScore} ({theInstance.gameInfoGameType})";
         }
-       
+
+
         // Action Click Handlers
         //
         // Scope: Program, Function: OnFormClosing override, Handles the form closing event to prompt the user and perform cleanup.
