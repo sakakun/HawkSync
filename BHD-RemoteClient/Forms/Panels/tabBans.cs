@@ -77,6 +77,10 @@ namespace BHD_RemoteClient.Forms.Panels
                 cb_banSubMask.SelectedIndex = cb_banSubMask.Items.Count - 1;
                 return;
             }
+
+            // Ban Management Refresh Tasks
+            banInstanceManager.UpdateBannedTables();
+
         }
 
         private void actionClick_addBanInformation(object sender, EventArgs e)

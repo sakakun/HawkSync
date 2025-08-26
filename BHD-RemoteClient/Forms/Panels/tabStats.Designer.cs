@@ -50,6 +50,7 @@
             tb_webStatsServerPath = new TextBox();
             tabPlayerStats = new TabPage();
             tableLayoutPanel2 = new TableLayoutPanel();
+            dataGridViewPlayerStats = new DataGridView();
             panel2 = new Panel();
             label1 = new Label();
             tabWeaponStats = new TabPage();
@@ -59,7 +60,6 @@
             Timer = new DataGridViewTextBoxColumn();
             Weapon_Kills = new DataGridViewTextBoxColumn();
             Weapon_Shots = new DataGridViewTextBoxColumn();
-            dataGridViewPlayerStats = new DataGridView();
             PlayerName = new DataGridViewTextBoxColumn();
             Suicides = new DataGridViewTextBoxColumn();
             Murders = new DataGridViewTextBoxColumn();
@@ -98,10 +98,10 @@
             groupBox1.SuspendLayout();
             tabPlayerStats.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).BeginInit();
             panel2.SuspendLayout();
             tabWeaponStats.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).BeginInit();
             SuspendLayout();
             // 
             // tabControl1
@@ -361,6 +361,24 @@
             tableLayoutPanel2.Size = new Size(888, 328);
             tableLayoutPanel2.TabIndex = 0;
             // 
+            // dataGridViewPlayerStats
+            // 
+            dataGridViewPlayerStats.AllowUserToAddRows = false;
+            dataGridViewPlayerStats.AllowUserToDeleteRows = false;
+            dataGridViewPlayerStats.AllowUserToResizeColumns = false;
+            dataGridViewPlayerStats.AllowUserToResizeRows = false;
+            dataGridViewPlayerStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewPlayerStats.Columns.AddRange(new DataGridViewColumn[] { PlayerName, Suicides, Murders, Kills, Deaths, ZoneTime, FBCaptures, FlagSaves, ADTargetsDestroyed, RevivesReceived, RevivesGiven, PSPAttempts, PSPTakeovers, FBCarrierKills, DoubleKills, Headshots, KnifeKills, SniperKills, TKOTHDefenseKills, TKOTHAttackKills, ShotsPerKill, ExperiencePoints, PlayerTeam, PlayerActive, TimePlayed });
+            dataGridViewPlayerStats.Dock = DockStyle.Fill;
+            dataGridViewPlayerStats.Location = new Point(0, 83);
+            dataGridViewPlayerStats.Margin = new Padding(0);
+            dataGridViewPlayerStats.Name = "dataGridViewPlayerStats";
+            dataGridViewPlayerStats.ReadOnly = true;
+            dataGridViewPlayerStats.RowHeadersVisible = false;
+            dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
+            dataGridViewPlayerStats.Size = new Size(888, 245);
+            dataGridViewPlayerStats.TabIndex = 1;
+            // 
             // panel2
             // 
             panel2.Controls.Add(label1);
@@ -440,26 +458,9 @@
             Weapon_Shots.Name = "Weapon_Shots";
             Weapon_Shots.ReadOnly = true;
             // 
-            // dataGridViewPlayerStats
-            // 
-            dataGridViewPlayerStats.AllowUserToAddRows = false;
-            dataGridViewPlayerStats.AllowUserToDeleteRows = false;
-            dataGridViewPlayerStats.AllowUserToResizeColumns = false;
-            dataGridViewPlayerStats.AllowUserToResizeRows = false;
-            dataGridViewPlayerStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewPlayerStats.Columns.AddRange(new DataGridViewColumn[] { PlayerName, Suicides, Murders, Kills, Deaths, ZoneTime, FBCaptures, FlagSaves, ADTargetsDestroyed, RevivesReceived, RevivesGiven, PSPAttempts, PSPTakeovers, FBCarrierKills, DoubleKills, Headshots, KnifeKills, SniperKills, TKOTHDefenseKills, TKOTHAttackKills, ShotsPerKill, ExperiencePoints, PlayerTeam, PlayerActive, TimePlayed });
-            dataGridViewPlayerStats.Dock = DockStyle.Fill;
-            dataGridViewPlayerStats.Location = new Point(0, 83);
-            dataGridViewPlayerStats.Margin = new Padding(0);
-            dataGridViewPlayerStats.Name = "dataGridViewPlayerStats";
-            dataGridViewPlayerStats.ReadOnly = true;
-            dataGridViewPlayerStats.RowHeadersVisible = false;
-            dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
-            dataGridViewPlayerStats.Size = new Size(888, 245);
-            dataGridViewPlayerStats.TabIndex = 3;
-            // 
             // PlayerName
             // 
+            PlayerName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             PlayerName.HeaderText = "Player Name";
             PlayerName.MinimumWidth = 200;
             PlayerName.Name = "PlayerName";
@@ -683,11 +684,11 @@
             groupBox1.PerformLayout();
             tabPlayerStats.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).EndInit();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             tabWeaponStats.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).EndInit();
             ResumeLayout(false);
         }
 
@@ -716,6 +717,7 @@
         public NumericUpDown num_WebStatsUpdates;
         private Button btn_SaveSettings;
         private TableLayoutPanel tableLayoutPanel2;
+        internal DataGridView dataGridViewPlayerStats;
         private Panel panel2;
         private Label label1;
         internal DataGridView dataGridViewWeaponStats;
@@ -724,7 +726,6 @@
         private DataGridViewTextBoxColumn Timer;
         private DataGridViewTextBoxColumn Weapon_Kills;
         private DataGridViewTextBoxColumn Weapon_Shots;
-        internal DataGridView dataGridViewPlayerStats;
         private DataGridViewTextBoxColumn PlayerName;
         private DataGridViewTextBoxColumn Suicides;
         private DataGridViewTextBoxColumn Murders;

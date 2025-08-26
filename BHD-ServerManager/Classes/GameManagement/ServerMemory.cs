@@ -1334,7 +1334,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static void WriteMemoryArmPlayer(int playerSlot)
         {
 
-
             int buffer = 0;
             byte[] PointerAddr9 = new byte[4];
             var Pointer = baseAddr + 0x005ED600;

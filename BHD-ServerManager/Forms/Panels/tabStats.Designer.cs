@@ -460,6 +460,7 @@
             // 
             // PlayerName
             // 
+            PlayerName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             PlayerName.HeaderText = "Player Name";
             PlayerName.MinimumWidth = 200;
             PlayerName.Name = "PlayerName";

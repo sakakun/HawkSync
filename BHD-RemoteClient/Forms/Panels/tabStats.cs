@@ -1,4 +1,5 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
+﻿using BHD_RemoteClient.Classes.StatManagement;
+using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.StatsManagement;
@@ -73,6 +74,10 @@ namespace BHD_RemoteClient.Forms.Panels
                 functionEvent_GetStatSettings(null!);
                 return;
             }
+
+            // Stats Refresh Tasks
+            StatFunctions.PopulatePlayerStatsGrid();
+            StatFunctions.PopulateWeaponStatsGrid();
 
         }
 

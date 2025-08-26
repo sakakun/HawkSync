@@ -25,7 +25,8 @@ namespace BHD_ServerManager.Forms.Panels
         private new string Name = "PlayerTab";                      // Name of the tab for logging purposes.
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
 
-        private Dictionary<int, PlayerCard> playerCards = new Dictionary<int, PlayerCard>();            // Array to hold player cards for easy access.
+        private PlayerCard[] playerCards = new PlayerCard[50];
+
         // --- Generate Init. Cards ---
         private void functionEvent_GeneratePlayerCards()
         {
@@ -41,13 +42,13 @@ namespace BHD_ServerManager.Forms.Panels
             for (int i = 0; i < 50; i++)
             {
                 int slotNum = i + 1;
-                PlayerCard card = new PlayerCard();
+                PlayerCard card = new PlayerCard(slotNum);
                 card.Name = $"PlayerCard_{slotNum}";
                 card.Dock = DockStyle.Fill;
                 card.Margin = new Padding(0);
                 card.Padding = new Padding(0);
-                card.ToggleSlot(slotNum, (i) < theInstance.gameMaxSlots ? true : false);
-                playerCards[slotNum] = card;
+                card.ToggleSlot((i) < theInstance.gameMaxSlots ? true : false);
+                playerCards[i] = card;
 
                 // Column by column: column = i / 10, row = i % 10
                 PlayerCards.Controls.Add(card, i / 10, i % 10);
@@ -62,37 +63,41 @@ namespace BHD_ServerManager.Forms.Panels
 
         public void tickerPlayerHook()
         {
-            // Check if the first load is complete
-            if (!_firstLoadComplete)
+            playerLayout.SuspendLayout();
+            try
             {
-                // Set the first load complete flag to true
-                _firstLoadComplete = true;
-                // Get the server settings on first load
-                functionEvent_GeneratePlayerCards();
-            }
+                if (!_firstLoadComplete)
+                {
+                    _firstLoadComplete = true;
+                    functionEvent_GeneratePlayerCards();
+                }
 
-            if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
-            {
-                for(int i = 0; i < 50; i++)
+                if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
                 {
-                    playerCards[i + 1].ToggleSlot(i + 1, false);
-                }
-            } else
-            {
-                for (int i = 0; i < theInstance.gameMaxSlots; i++)
-                {
-                    int slotNum = i + 1;
-                    if (theInstance.playerList.ContainsKey(slotNum))
+                    for (int i = 0; i < 50; i++)
                     {
-                        playerCards[slotNum].ToggleSlot(slotNum, true);
-                        playerCards[slotNum].UpdateStatus(theInstance.playerList[slotNum]);
-                    }
-                    else
-                    {
-                        playerCards[slotNum].ToggleSlot(slotNum, true);
-                        playerCards[slotNum].ResetStatus(slotNum);
+                        playerCards[i].UpdateCard(null, false);
                     }
                 }
+                else
+                {
+                    for (int i = 0; i < theInstance.gameMaxSlots; i++)
+                    {
+                        int slotNum = i + 1;
+                        if (theInstance.playerList.TryGetValue(slotNum, out var playerInfo))
+                        {
+                            playerCards[i].UpdateCard(playerInfo, true);
+                        }
+                        else
+                        {
+                            playerCards[i].UpdateCard(null, true);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                playerLayout.ResumeLayout();
             }
         }
     }

@@ -1,11 +1,8 @@
-﻿using BHD_RemoteClient.Classes.RemoteFunctions;
-using BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses;
-using BHD_SharedResources.Classes.CoreObjects;
+﻿using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -15,260 +12,328 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 {
     public partial class PlayerCard : UserControl
     {
-        private static theInstance thisInstance = CommonCore.theInstance!;
-        private static chatInstance chatInstance = CommonCore.instanceChat!;
-        public playerObject Player { get; set; } = new playerObject();
-        private ContextMenuStrip contextMenu = new ContextMenuStrip();
+        private const int GodModeHealth = 9999;
+        private const int NormalHealth = 100;
+        private const string EncodingName = "Windows-1252";
 
-        private bool isArmed = true;
-        private bool isGod = false;
+        private static theInstance ThisInstance = CommonCore.theInstance!;
+        private static chatInstance ChatInstance = CommonCore.instanceChat!;
+        private playerObject Player { get; set; } = new playerObject();
+        private int SlotNumber = 0;
+        private ContextMenuStrip ContextMenu;
 
-        // Constructor: Initializes the PlayerCard control and builds the context menu.
-        public PlayerCard()
+        private playerObject? LastPlayerData = null;
+        private bool LastVisible = true;
+
+        private bool IsArmed = true;
+        private bool IsGod = false;
+
+        public PlayerCard(int slotNum)
         {
             InitializeComponent();
+
+            SlotNumber = slotNum;
+            label_dataSlotNum.Text = slotNum.ToString();
+
+            ContextMenu = new ContextMenuStrip();
+            playerContextMenuIcon.ContextMenuStrip = ContextMenu;
+            playerContextMenuIcon.Click -= PlayerContextMenuIcon_Click;
+            playerContextMenuIcon.Click += PlayerContextMenuIcon_Click;
+
             BuildContextMenu();
+
+            this.ResetStatus();
+
         }
 
-        // Function: BuildContextMenu, constructs the context menu for the PlayerCard control.
         private void BuildContextMenu()
         {
-            ToolStripMenuItem playerName = new ToolStripMenuItem();
-            ToolStripMenuItem playerPing = new ToolStripMenuItem();
-            ToolStripMenuItem command_ArmDisarm = command_ArmDisarm_Click();
-            ToolStripMenuItem command_Warning = command_Warning_Click();
-            ToolStripMenuItem command_Kick = command_Kick_Click();
-            ToolStripMenuItem command_Kill = command_Kill_Click();
-            ToolStripMenuItem command_Ban = command_Ban_Click();
+            var playerName = new ToolStripMenuItem(Player.PlayerName ?? "Unknown");
+            var playerPing = new ToolStripMenuItem($"Ping: {Player.PlayerPing} ms");
+            var ArmCommand = CreateArmMenuItem();
+            var DisarmCommand = CreateDisarmMenuItem();
+            var warningCommand = CreateWarningMenuItem();
+            var kickCommand = CreateKickMenuItem();
+            var killCommand = CreateKillMenuItem();
+            var banCommand = CreateBanMenuItem();
+            var godModeCommand = CreateGodModeMenuItem();
+            var switchTeamCommand = CreateSwitchTeamMenuItem();
 
-            contextMenu.Items.Add(playerName);
-            contextMenu.Items.Add(playerPing);
-            contextMenu.Items.Add(new ToolStripSeparator());
-            contextMenu.Items.Add(command_ArmDisarm);
-            contextMenu.Items.Add(command_Warning);
-            contextMenu.Items.Add(command_Kick);
-            contextMenu.Items.Add(new ToolStripSeparator());
-            contextMenu.Items.Add(command_Kill);
-            contextMenu.Items.Add(command_Ban);
-            contextMenu.Items.Add(new ToolStripSeparator());
-            contextMenu.Items.Add(command_GodMode_Click());
-            contextMenu.Items.Add(command_SwitchTeam_Click());
-
-            playerContextMenuIcon.ContextMenuStrip = contextMenu;
-            playerContextMenuIcon.Click += (sender, e) =>
-            {
-                contextMenu.Show(this, new Point(playerContextMenuIcon.Location.X, playerContextMenuIcon.Location.Y));
-            };
+            ContextMenu.Items.Add(playerName);
+            ContextMenu.Items.Add(playerPing);
+            ContextMenu.Items.Add(new ToolStripSeparator());
+            ContextMenu.Items.Add(ArmCommand);
+            ContextMenu.Items.Add(DisarmCommand);
+            ContextMenu.Items.Add(warningCommand);
+            ContextMenu.Items.Add(kickCommand);
+            ContextMenu.Items.Add(new ToolStripSeparator());
+            ContextMenu.Items.Add(killCommand);
+            ContextMenu.Items.Add(banCommand);
+            ContextMenu.Items.Add(new ToolStripSeparator());
+            ContextMenu.Items.Add(godModeCommand);
+            ContextMenu.Items.Add(switchTeamCommand);
         }
-        // Function: command_ArmDisarm_Click, creates a menu item for arming or disarming the player.
-        private ToolStripMenuItem command_ArmDisarm_Click()
-        {
 
-            ToolStripMenuItem command = new ToolStripMenuItem(isArmed ? "Disarm Player" : "Arm Player");
+        private void PlayerContextMenuIcon_Click(object? sender, EventArgs e)
+        {
+            ContextMenu.Show(this, new Point(playerContextMenuIcon.Location.X, playerContextMenuIcon.Location.Y));
+        }
+
+        private ToolStripMenuItem CreateArmMenuItem()
+        {
+            var command = new ToolStripMenuItem("Arm Player");
             command.Click += (sender, e) =>
             {
-                // Armed = True/Disarmed False
-                command.Text = isArmed ? "Disarm Player" : "Arm Player";
-                // Placeholder for actual command logic
-                if (isArmed)
-                {
-                    GameManager.WriteMemoryDisarmPlayer(Player.PlayerSlot);
-                }
-                else
-                {
-                    GameManager.WriteMemoryArmPlayer(Player.PlayerSlot);
-                }
-                isArmed = !isArmed;
-                MessageBox.Show($"Player {Player.PlayerName} has been {(isArmed ? "armed" : "disarmed")}.", "Player Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Player {Player.PlayerName} is now {(isArmed ? "armed" : "disarmed")}");
+                command.Text = "Arm Player";
+                GameManager.WriteMemoryArmPlayer(Player.PlayerSlot);
+                MessageBox.Show($"Player {Player.PlayerName} has been Armed.", "Player Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Debug.WriteLine($"Player {Player.PlayerName} is now Armed.");
             };
             return command;
         }
-        // Function: command_Warning_Click, creates a menu item for warning the player with slap messages.
-        private ToolStripMenuItem command_Warning_Click()
+        private ToolStripMenuItem CreateDisarmMenuItem()
         {
-            ToolStripMenuItem command = new ToolStripMenuItem("Warn Player");
-            command = AddSlaps2WarningSubMenu(command);
+            var command = new ToolStripMenuItem("Disarm Player");
+            command.Click += (sender, e) =>
+            {
+                command.Text = "Disarm Player";
+                GameManager.WriteMemoryDisarmPlayer(Player.PlayerSlot);
+                MessageBox.Show($"Player {Player.PlayerName} has been Disarmed.", "Player Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Debug.WriteLine($"Player {Player.PlayerName} is now Disarmed.");
+            };
             return command;
         }
-        // Function: AddSlaps2WarningSubMenu, adds slap messages to the warning command's sub-menu.
-        private ToolStripMenuItem AddSlaps2WarningSubMenu(ToolStripMenuItem thisCommand)
+
+
+        private ToolStripMenuItem CreateWarningMenuItem()
         {
-            // Clear existing items to avoid duplicates
-            thisCommand.DropDownItems.Clear();
-            foreach (var slapMessage in chatInstance.SlapMessages)
+            var command = new ToolStripMenuItem("Warn Player");
+            AddSlapsToWarningSubMenu(command);
+            return command;
+        }
+
+        private void AddSlapsToWarningSubMenu(ToolStripMenuItem command)
+        {
+            command.DropDownItems.Clear();
+            foreach (var slapMessage in ChatInstance.SlapMessages)
             {
-                ToolStripMenuItem slapItem = new ToolStripMenuItem(slapMessage.SlapMessageText);
+                var slapItem = new ToolStripMenuItem(slapMessage.SlapMessageText);
                 slapItem.Click += (sender, e) =>
                 {
-                    // Placeholder for actual slap logic
-                    GameManager.WriteMemorySendChatMessage(1, Player.PlayerName + ", " + slapMessage.SlapMessageText);
+                    GameManager.WriteMemorySendChatMessage(1, $"{Player.PlayerName}, {slapMessage.SlapMessageText}");
                     MessageBox.Show($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Debug.WriteLine($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}");
                 };
-                thisCommand.DropDownItems.Add(slapItem);
+                command.DropDownItems.Add(slapItem);
             }
-
-            return thisCommand; // Placeholder for actual slap logic, if needed
         }
-        // Function: command_Kick_Click, creates a menu item for kicking the player from the server.
-        private ToolStripMenuItem command_Kick_Click()
+
+        private ToolStripMenuItem CreateKickMenuItem()
         {
-            ToolStripMenuItem command = new ToolStripMenuItem("Kick Player");
+            var command = new ToolStripMenuItem("Kick Player");
             command.Click += (sender, e) =>
             {
-                // Placeholder for actual command logic
                 GameManager.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been kicked from the server.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} has been kicked from the server.");
             };
             return command;
         }
-        // Function: command_GodMode_Click, creates a menu item for toggling God Mode for the player.
-        private ToolStripMenuItem command_GodMode_Click()
+
+        private ToolStripMenuItem CreateKillMenuItem()
         {
-            ToolStripMenuItem command = new ToolStripMenuItem(isGod ? "Disable God Mode" : "Enable God Mode");
+            var command = new ToolStripMenuItem("Kill Player");
             command.Click += (sender, e) =>
             {
-                if (!isGod)
-                {
-                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, 9999); // Enable God Mode
-                }
-                else
-                {
-                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, 100); // Disable God Mode
-                }
-                isGod = !isGod;
-                command.Text = isGod ? "Disable God Mode" : "Enable God Mode";
-                MessageBox.Show($"Player {Player.PlayerName} has been {(isGod ? "enabled God Mode" : "disabled God Mode")}.", "Player Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Player {Player.PlayerName} is now {(isGod ? "in God Mode" : "not in God Mode")}");
-            };
-            return command;
-        }
-        // Function: command_Kill_Click, creates a menu item for killing the player.
-        private ToolStripMenuItem command_Kill_Click()
-        {
-            ToolStripMenuItem command = new ToolStripMenuItem("Kill Player");
-            command.Click += (sender, e) =>
-            {
-                // Placeholder for actual command logic
                 GameManager.WriteMemoryKillPlayer(Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been killed.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} has been killed.");
-            }
-            ;
+            };
             return command;
         }
-        // Function: command_Ban_Click, creates a menu item for banning the player with options for name, IP, or both.
-        private ToolStripMenuItem command_Ban_Click()
-        {
-            ToolStripMenuItem command = new ToolStripMenuItem("Ban Player");
-            ToolStripMenuItem banByName = new ToolStripMenuItem("Ban Name");
-            ToolStripMenuItem banByIP = new ToolStripMenuItem("Ban IP Address");
-            ToolStripMenuItem banByNameAndIP = new ToolStripMenuItem("Ban Both");
 
-            // Add sub-menu items for banning
+        private ToolStripMenuItem CreateBanMenuItem()
+        {
+            var command = new ToolStripMenuItem("Ban Player");
+            var banByName = new ToolStripMenuItem("Ban Name");
+            var banByIP = new ToolStripMenuItem("Ban IP Address");
+            var banByNameAndIP = new ToolStripMenuItem("Ban Both");
+
             command.DropDownItems.Add(banByName);
             command.DropDownItems.Add(banByIP);
             command.DropDownItems.Add(banByNameAndIP);
 
             banByName.Click += (sender, e) =>
             {
-                // Ban by name logic
                 banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!);
                 MessageBox.Show($"Player {Player.PlayerName} has been banned by name.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Ban by name command clicked for player {Player.PlayerName}.");
             };
             banByIP.Click += (sender, e) =>
             {
-                // Ban by name logic
-                IPAddress iPAddress = IPAddress.Parse(Player.PlayerIPAddress!);
-                banInstanceManager.AddBannedPlayer(null!, iPAddress, 32);
-                MessageBox.Show($"Player {Player.PlayerName} has been banned by name.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Ban by name command clicked for player {Player.PlayerName}.");
+                var ipAddress = IPAddress.Parse(Player.PlayerIPAddress!);
+                banInstanceManager.AddBannedPlayer(null!, ipAddress, 32);
+                MessageBox.Show($"Player {Player.PlayerName} has been banned by IP.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Debug.WriteLine($"Ban by IP command clicked for player {Player.PlayerName}.");
             };
             banByNameAndIP.Click += (sender, e) =>
             {
-                // Ban Both
-                IPAddress playerAddress = IPAddress.Parse(Player.PlayerIPAddress!);
+                var playerAddress = IPAddress.Parse(Player.PlayerIPAddress!);
                 banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!, playerAddress, 32);
                 MessageBox.Show($"Player {Player.PlayerName} has been banned.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Ban command clicked for player {Player.PlayerName}, but functionality is not implemented.");
+                Debug.WriteLine($"Ban command clicked for player {Player.PlayerName}.");
             };
 
             return command;
         }
-        // Function: command_SwitchTeam_Click, creates a menu item for switching the player's team.
-        private ToolStripMenuItem command_SwitchTeam_Click()
+
+        private ToolStripMenuItem CreateGodModeMenuItem()
         {
-            ToolStripMenuItem command = new ToolStripMenuItem("Switch Team");
+            var command = new ToolStripMenuItem(IsGod ? "Disable God Mode" : "Enable God Mode");
             command.Click += (sender, e) =>
             {
-                CommandResponse response = CmdSwitchPlayerTeam.ProcessCommand(Player.PlayerSlot)!;
-
-                MessageBox.Show(response!.Message, "Player Action (Switch Teams) " + (response.Success ? "Success" : "Failed"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (!IsGod)
+                {
+                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, GodModeHealth);
+                }
+                else
+                {
+                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, NormalHealth);
+                }
+                IsGod = !IsGod;
+                command.Text = IsGod ? "Disable God Mode" : "Enable God Mode";
+                MessageBox.Show($"Player {Player.PlayerName} has been {(IsGod ? "enabled God Mode" : "disabled God Mode")}.", "Player Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Debug.WriteLine($"Player {Player.PlayerName} is now {(IsGod ? "in God Mode" : "not in God Mode")}");
             };
             return command;
         }
-        // Function: UpdateStatus, updates the PlayerCard with the current player information.
+
+        private ToolStripMenuItem CreateSwitchTeamMenuItem()
+        {
+            var command = new ToolStripMenuItem("Switch Team");
+            command.Click += (sender, e) =>
+            {
+                var existing = ThisInstance.playerChangeTeamList
+                    .FirstOrDefault(p => p.slotNum == Player.PlayerSlot);
+
+                if (existing != null)
+                {
+                    ThisInstance.playerChangeTeamList.Remove(existing);
+                    MessageBox.Show($"Team switch for {Player.PlayerName} has been undone.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Debug.WriteLine($"Team switch for {Player.PlayerName} (PlayerSlot {Player.PlayerSlot}) has been undone.");
+                }
+                else
+                {
+                    int newTeam = Player.PlayerTeam == 1 ? 2 : Player.PlayerTeam == 2 ? 1 : Player.PlayerTeam;
+                    if (newTeam != Player.PlayerTeam)
+                    {
+                        ThisInstance.playerChangeTeamList.Add(new playerTeamObject
+                        {
+                            slotNum = Player.PlayerSlot,
+                            Team = newTeam
+                        });
+                        MessageBox.Show($"Player {Player.PlayerName} has been switched to PlayerTeam {(newTeam == 1 ? "Blue" : "Red")} for the next map.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        Debug.WriteLine($"Player {Player.PlayerName} has been switched to PlayerTeam {newTeam}.");
+                    }
+                }
+            };
+            return command;
+        }
+
         public void UpdateStatus(playerObject playerInfo)
         {
             Player = playerInfo;
 
             // Decode Base64 and interpret as Windows-1252
-            byte[] decodedBytes = Convert.FromBase64String(Player.PlayerNameBase64);
-            string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
+            byte[] decodedBytes = Convert.FromBase64String(Player.PlayerNameBase64 ?? "");
+            string decodedPlayerName = Encoding.GetEncoding(EncodingName).GetString(decodedBytes);
 
-            // Update UI
             label_dataPlayerNameRole.Font = new Font("Segoe UI", 10, FontStyle.Regular);
             label_dataPlayerNameRole.UseCompatibleTextRendering = true;
             label_dataPlayerNameRole.Text = decodedPlayerName;
 
-            // Other updates...
             label_dataIPinfo.Text = Player.PlayerIPAddress;
-            label_dataSlotNum.Text = Player.PlayerSlot.ToString();
             playerTeamIcon.IconColor = Player.PlayerTeam switch
             {
-                1 => Color.Blue, // Blue Team
-                2 => Color.Red,  // Red Team
-                _ => Color.Black // Default color for unassigned or unknown teams
+                1 => Color.Blue,
+                2 => Color.Red,
+                _ => Color.Black
             };
+            ContextMenu.Items[0].Text = decodedPlayerName;
+            ContextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms";
+
             player_Tooltip.SetToolTip(this, $"Ping: {Player.PlayerPing} ms");
-
-            // Conext Updates
-            playerContextMenuIcon.Visible = true; // Show context menu icon when player info is updated
-            contextMenu.Items[0].Text = Player.PlayerName; // Update player name in context menu
-            contextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms"; // Update PlayerPing in context menu
-
-            ToolStripMenuItem? WarnMenuUpdate = contextMenu.Items[4] as ToolStripMenuItem;
-            AddSlaps2WarningSubMenu(WarnMenuUpdate!);
-
+            playerContextMenuIcon.Visible = true;
         }
-        // Function: ResetStatus, resets the PlayerCard to default values for an empty slot.
-        public void ResetStatus(int slotNum)
+
+        public void ResetStatus()
         {
             Player = new playerObject
             {
-                PlayerSlot = slotNum,
+                PlayerSlot = SlotNumber,
                 PlayerName = "Slot Empty",
                 PlayerIPAddress = ""
             };
+            LastPlayerData = Player;
+
             label_dataIPinfo.Text = Player.PlayerIPAddress;
-            label_dataPlayerNameRole.Text = $"{Player.PlayerName}";
+            label_dataPlayerNameRole.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+            label_dataPlayerNameRole.UseCompatibleTextRendering = true;
+            label_dataPlayerNameRole.Text = Player.PlayerName;
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
-            playerTeamIcon.IconColor = Color.Black; // Reset to default color
-            playerContextMenuIcon.Visible = false; // Hide context menu icon by default
+            playerTeamIcon.IconColor = Color.Black;
+            playerContextMenuIcon.Visible = false;
         }
-        public void ToggleSlot(int slotNum, bool visible = true)
+
+        public void ToggleSlot(bool visible = true)
         {
-            if (this.Visible == visible)
+            if (Visible == visible)
             {
                 // If the visibility is already set, do nothing.
                 return;
             }
 
-            this.ResetStatus(slotNum);
-            this.Visible = visible;
+            ResetStatus();
+            Visible = visible;
+        }
+
+        public void UpdateCard(playerObject? playerInfo, bool visible)
+        {
+            // Only update visibility if it changes
+            if (Visible != visible)
+            {
+                Visible = visible;
+                LastVisible = visible;
+            }
+
+            // Only update player data if the reference or key properties have changed
+            if (playerInfo != null)
+            {
+                if (!ReferenceEquals(playerInfo, LastPlayerData) || !IsSamePlayer(playerInfo, LastPlayerData))
+                {
+                    UpdateStatus(playerInfo);
+                    LastPlayerData = playerInfo;
+                }
+            }
+            else if (LastPlayerData != null && playerInfo == null)
+            {
+                ResetStatus();
+            }
+            else if (LastPlayerData == playerInfo)
+            {
+                // Do nothing...
+                return;
+            }
+        }
+
+        private static bool IsSamePlayer(playerObject? a, playerObject? b)
+        {
+            if (a == null || b == null) return false;
+            return a.PlayerSlot == b.PlayerSlot &&
+                   a.PlayerName == b.PlayerName &&
+                   a.PlayerIPAddress == b.PlayerIPAddress &&
+                   a.PlayerTeam == b.PlayerTeam &&
+                   a.PlayerPing == b.PlayerPing;
         }
     }
 }

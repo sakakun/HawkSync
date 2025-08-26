@@ -55,29 +55,7 @@ namespace BHD_RemoteClient.Forms.Panels
                 MessageBox.Show("Profile data loaded successfully.", "Profile Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-        // --- Save Profile --- Allow to be triggered externally
-        public void funtionEvent_SetProfileSettings()
-        {
-            // Set the data from the form to the "theInterface" object.
-            // Trigger the save function in "theInstanceManager".
-            theInstance.profileServerPath = tb_profileServerPath.Text;
-            theInstance.profileModFileName = tb_modFile.Text;
-            theInstance.profileModifierList1 = cb_profileModifierList1.CheckedItems.Cast<string>().ToList();
-            theInstance.profileModifierList2 = cb_profileModifierList2.CheckedItems.Cast<string>().ToList();
-            // Save the instance data
-            try
-            {
-                theInstanceManager.SaveSettings();
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log(this.Name, $"Failed to save profile settings: {ex.Message}");
-                MessageBox.Show("Failed to save profile settings. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // Show a message box to confirm the save.
-            MessageBox.Show("Profile settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
+        
         // --- Highlight Differences --- Allow to be triggered
         private void functionEvent_HighlightDiffFields()
         {
@@ -115,7 +93,7 @@ namespace BHD_RemoteClient.Forms.Panels
                 if (theInstance.profileServerPath == string.Empty || !Directory.Exists(theInstance.profileServerPath))
                 {
                     theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[0];
-                    MessageBox.Show("Please set the Server Path in the Profile tab.", "Server Path Not Set", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Server path is not set on the server.  Please have an admin ", "Server Path Not Set", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -127,85 +105,16 @@ namespace BHD_RemoteClient.Forms.Panels
             bool currentState = (theInstance.instanceStatus == InstanceStatus.OFFLINE);
             bool isModChecked = cb_profileModifierList1.CheckedItems.Contains("/mod");
 
-            // Enable/disable all profile controls (except mod fields)
-            tb_profileServerPath.Enabled = currentState;
-            cb_profileModifierList1.Enabled = currentState;
-            cb_profileModifierList2.Enabled = currentState;
-            btn_profileBrowse1.Enabled = currentState;
-            btn_resetProfile.Enabled = currentState;
-            btn_saveProfile.Enabled = currentState;
-
-            // Enable/disable mod fields based on /mod checked and OFFLINE status
-            tb_modFile.Enabled = currentState && isModChecked;
-            btn_profileBrowse2.Enabled = currentState && isModChecked;
-            
             // Highlight differences
             functionEvent_HighlightDiffFields();
         }
 
         // --- Action Click Events ---
-        // --- Save Profile Button Clicked ---
-        private void actionClick_SaveProfile(object sender, EventArgs e)
-        {
-            funtionEvent_SetProfileSettings();
-        }
         // --- Reset Profile Button Clicked ---
         private void actionClick_ResetProfile(object sender, EventArgs e)
         {
             functionEvent_GetProfileSettings(sender, e); // Re-fetch the profile data to reset the form.
         }
-        // --- Open Profile Folder Button Clicked ---
-        private void actionClick_profileOpenFolderDialog(object sender, EventArgs e)
-        {
-            // This will open the folder dialog and allow the user to select a folder, once selected , it will place the folder path in tb.profileServerPath.
-            try
-            {
-                // Create a new FolderBrowserDialog instance.
-                using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-                {
-                    // Set the description for the dialog.
-                    folderBrowserDialog.Description = "Select the Mod Profile Folder";
-                    // Show the dialog and check if the user selected a folder.
-                    if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        // Set the text of the tb.profileServerPath to the selected folder path.
-                        tb_profileServerPath.Text = folderBrowserDialog.SelectedPath;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log(this.Name, $"Failed to open profile folder dialog: {ex.Message}");
-                MessageBox.Show("Failed to open profile folder dialog. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        // --- Open Profile File Button Clicked ---
-        private void actionClick_profileOpenFileDialog(object sender, EventArgs e)
-        {
-            // This will open the file dialog and allow the user to select a *.pff file.  Once selected, it will place the file name (no extension) int tb.modFile.
-            try
-            {
-                // Create a new OpenFileDialog instance.
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
-                {
-                    // Set the filter for the file dialog to only show *.pff files.
-                    openFileDialog.Filter = "Mod Files (*.pff)|*.pff";
-                    openFileDialog.Title = "Select a Mod File";
-                    // Show the dialog and check if the user selected a file.
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        // Get the selected file name without the extension.
-                        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-                        // Set the text of the tb_modFile to the selected file name.
-                        tb_modFile.Text = fileNameWithoutExtension;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log(this.Name, $"Failed to open profile file dialog: {ex.Message}");
-                MessageBox.Show("Failed to open profile file dialog. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+
     }
 }

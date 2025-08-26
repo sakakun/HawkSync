@@ -12,13 +12,13 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
             var packet = new CommandPacket
             {
                 AuthToken = theRemoteClient.AuthToken,
-                Command = "ValidateGameServerPath",
+                Command = "CmdValidateGameServerPath",
                 CommandData = string.Empty
             };
 
             var response = theRemoteClient.SendCommandAndGetResponse(packet);
 
-            AppDebug.Log("ValidateGameServerPath", JsonSerializer.Serialize(response));
+            AppDebug.Log("CmdValidateGameServerPath", JsonSerializer.Serialize(response));
 
             try
             {
@@ -30,7 +30,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
             }
             catch (Exception ex)
             {
-                AppDebug.Log("Error processing ValidateGameServerPath command", ex.Message);
+                AppDebug.Log("Error processing CmdValidateGameServerPath command", ex.Message);
                 return false;
             }
 

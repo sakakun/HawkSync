@@ -8,8 +8,11 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
         private static ServerManager thisServer => Program.ServerManagerUI!;
         public static CommandResponse ProcessCommand(object data)
         {
-
-            thisServer.MapsTab.functionEvent_ResetAvailableMaps();
+            // UI updates that should always run
+            SafeInvoke(thisServer, () =>
+            {
+                thisServer.MapsTab.functionEvent_ResetAvailableMaps();
+            });
 
             return new CommandResponse
             {
@@ -17,6 +20,14 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
                 Message = string.Empty,
                 ResponseData = string.Empty
             };
+        }
+
+        private static void SafeInvoke(Control control, Action action)
+        {
+            if (control.InvokeRequired)
+                control.Invoke(action);
+            else
+                action();
         }
 
     }

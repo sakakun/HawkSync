@@ -333,6 +333,8 @@ namespace BHD_ServerManager.Forms.Panels
                 theInstance.profileRemotePort = (int)num_remotePort.Value;
             }
 
+            theInstanceManager.SaveSettings();
+
             AppDebug.Log(this.Name, "Server settings saved.");
         }
         // --- Highligh Differences ---
