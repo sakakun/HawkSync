@@ -25,15 +25,17 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
             {
                 if (row.IsNewRow) continue;
 
-                string? mapName = row.Cells["MapName"].Value?.ToString();
-                string? gameType = row.Cells["MapType"].Value?.ToString();
+                string? mapName = row.Cells["current_MapName"].Value?.ToString();
+                string? gameType = row.Cells["current_MapType"].Value?.ToString();
+                string? mapFile = row.Cells["current_MapFileName"].Value?.ToString();
 
                 if (string.IsNullOrWhiteSpace(mapName) || string.IsNullOrWhiteSpace(gameType))
                     continue;
 
                 var map = instanceMaps.availableMaps
                     .FirstOrDefault(m => string.Equals(m.MapName, mapName, StringComparison.OrdinalIgnoreCase)
-                                      && string.Equals(m.MapType, gameType, StringComparison.OrdinalIgnoreCase));
+                                        && string.Equals(m.MapFile, mapFile, StringComparison.OrdinalIgnoreCase)
+                                        && string.Equals(m.MapType, gameType, StringComparison.OrdinalIgnoreCase));
 
                 if (map == null)
                     continue;
