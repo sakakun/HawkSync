@@ -6,17 +6,23 @@ using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.StatsManagement;
+using System.Reflection;
 
 namespace BHD_ServerManager
 {
     public static class Program
     {
 
+        // Server Manager UI Object
         public static ServerManager? ServerManagerUI { get; private set; }
+
+        // Major Version Number
+        public static string ApplicationVersion = "1.1.2";
 
         [STAThread]
         static void Main()
-        {
+        {   
+
             // Encoding for legacy code pages
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 

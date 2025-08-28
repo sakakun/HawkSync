@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+	<BuildNumber>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmm"))</BuildNumber>
+	<AssemblyInformationalVersion>$(BuildNumber)</AssemblyInformationalVersion>
 	<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <RootNamespace>BHD_RemoteClient</RootNamespace>
     <Nullable>enable</Nullable>
@@ -53,6 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\AboutWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\Panels\tabAdmins.cs">
       <SubType>UserControl</SubType>
     </Compile>

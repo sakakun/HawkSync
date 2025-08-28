@@ -9,6 +9,7 @@ using BHD_SharedResources.Classes.StatsManagement;
 using BHD_SharedResources.Classes.SupportClasses;
 using System.Data;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace BHD_RemoteClient.Forms
@@ -102,7 +103,6 @@ namespace BHD_RemoteClient.Forms
             label_WinCondition.Text = $"{theInstance.gameInfoCurrentGameScore} ({theInstance.gameInfoGameType})";
         }
 
-
         // Action Click Handlers
         //
         // Scope: Program, Function: OnFormClosing override, Handles the form closing event to prompt the user and perform cleanup.
@@ -132,6 +132,39 @@ namespace BHD_RemoteClient.Forms
             base.OnFormClosing(e);
 
         }
+
+        // --- About Window Start---
+        // Win32 API constants and methods
+        private const int WM_SYSCOMMAND = 0x112;
+        private const int ABOUT_SYSMENU_ID = 0x1FFF; // Custom ID for AboutWindow
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+        [DllImport("user32.dll")]
+        private static extern bool InsertMenu(IntPtr hMenu, int wPosition, int wFlags, int wIDNewItem, string lpNewItem);
+        private const int MF_STRING = 0x00000000;
+        private const int MF_SEPARATOR = 0x00000800;
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+
+            // Get the system menu handle
+            IntPtr systemMenuHandle = GetSystemMenu(this.Handle, false);
+
+            // Add a separator and the AboutWindow item
+            InsertMenu(systemMenuHandle, -1, MF_SEPARATOR, 0, string.Empty);
+            InsertMenu(systemMenuHandle, -1, MF_STRING, ABOUT_SYSMENU_ID, "About");
+        }
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_SYSCOMMAND && (int)m.WParam == ABOUT_SYSMENU_ID)
+            {
+                var about = new AboutWindow();
+                about.ShowDialog();
+                return;
+            }
+            base.WndProc(ref m);
+        }
+        // --- About Window End ---
 
     }
 }

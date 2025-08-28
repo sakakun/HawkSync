@@ -12,8 +12,14 @@ namespace BHD_RemoteClient
 {
     internal static class Program
     {
+
+        // Server Manager UI Object
+        // Remote Client Object
         public static ServerManager? ServerManagerUI { get; set; }
         public static RemoteClient? theRemoteClient { get; set; }
+
+        // Major Version Number
+        public static string ApplicationVersion = "1.1.2";
 
         [STAThread]
         static void Main()
