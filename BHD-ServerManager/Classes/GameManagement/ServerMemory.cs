@@ -1725,6 +1725,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                             PlayerStats.PlayerSlot = playerSlot;
                             byte[] trimmedPlayerNameBytes = playerNameBytes.Where(b => b != 0).ToArray();
                             PlayerStats.PlayerNameBase64 = Convert.ToBase64String(trimmedPlayerNameBytes);
+                            PlayerStats.PlayerName = formattedPlayerName;
                             PlayerStats.PlayerTeam = playerTeam;
                             PlayerStats.PlayerIPAddress = playerIP;
                             PlayerStats.PlayerPing = PlayerStats.PlayerPing;
@@ -1842,14 +1843,14 @@ namespace BHD_ServerManager.Classes.GameManagement
             int bytesread = 0;
 
             ReadProcessMemory((int)processHandle, beginaddr + 0x1C, read_name, read_name.Length, ref bytesread);
-            var PlayerName = Encoding.Default.GetString(read_name).Replace("\0", "");
+            var PlayerName = Encoding.GetEncoding("Windows-1252").GetString(read_name).Replace("\0", "");
 
             if (string.IsNullOrEmpty(PlayerName))
             {
                 beginaddr += 0xAF33C;
                 // Retry read if player name is empty
                 ReadProcessMemory((int)processHandle, beginaddr + 0x1C, read_name, read_name.Length, ref bytesread);
-                PlayerName = Encoding.Default.GetString(read_name).Replace("\0", "");
+                PlayerName = Encoding.GetEncoding("Windows-1252").GetString(read_name).Replace("\0", "");
             }
 
             // Handle failure if still no player name found
@@ -2001,8 +2002,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static string[] ReadMemoryLastChatMessage()
         {
 
-
-
             var starterPtr = baseAddr + 0x00062D10;
             byte[] ChatLogPtr = new byte[4];
             int ChatLogPtrRead = 0;
@@ -2021,8 +2020,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             int msgTypeRead = 0;
             ReadProcessMemory((int)processHandle, msgTypeAddr, msgType, msgType.Length, ref msgTypeRead);
             string msgTypeBytes = BitConverter.ToString(msgType).Replace("-", "");
-
-
 
             return new string[] { ChatLogAddr.ToString(), LastMessage, msgTypeBytes };
         }

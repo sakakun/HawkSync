@@ -82,47 +82,58 @@ namespace BHD_ServerManager.Forms
 
         private void functionEvent_UpdateStatusLabels()
         {
+            // Offline Labels
             if (thisInstance.instanceStatus == InstanceStatus.OFFLINE)
             {
                 label_PlayersOnline.Text = "[Players Online]";
+                label_BlueScore.Text = "[Blue Score]";
+                label_RedScore.Text = "[Red Score]";
                 label_WinCondition.Text = "[Win Condition]";
                 label_TimeLeft.Text = "[Time Left]";
                 return;
             }
-
+            // Variables
             int scoreTotal = 0;
             string playerName = string.Empty;
             playerObject? topPlayer = null;
+            string winConditions = string.Empty;
             
+            // Player Online Label
+            label_PlayersOnline.Text = $"[{thisInstance.gameInfoCurrentNumPlayers}/{thisInstance.gameMaxSlots}]";
+            
+
             if (thisInstance.playerList.Count > 0)
             {
+                winConditions = $"[{thisInstance.gameInfoCurrentGameScore} ({thisInstance.gameInfoGameType})]";
+
                 if (thisInstance.gameInfoGameType == "DM")
                 {
                     topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
                     scoreTotal = topPlayer!.stat_Kills;
-                    playerName = topPlayer!.PlayerName;
+                    playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
                     label_BlueScore.Text = $"[{scoreTotal}]";
                     label_RedScore.Text = $"[{playerName}]";
                 } else if (thisInstance.gameInfoGameType == "KOTH")
                 {
                     topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
                     scoreTotal = topPlayer!.ActiveZoneTime;
-                    playerName = topPlayer!.PlayerName.Trim();
+                    playerName = ( scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
                     label_BlueScore.Text = $"[{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}]";
                     label_RedScore.Text = $"[{playerName}]";
-                }
+                    winConditions = $"[{TimeSpan.FromSeconds(thisInstance.gameInfoCurrentGameScore*60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
+                } 
             } else
             {
-                label_BlueScore.Text = "[N/A]";
-                label_RedScore.Text = "[N/A]";
+                label_BlueScore.Text = "[NOT]";
+                label_RedScore.Text = "[ACTIVE]";
             }
 
 
             // Red Team Label
+            label_WinCondition.Text = winConditions;
 
 
-            label_PlayersOnline.Text = $"[{thisInstance.gameInfoCurrentNumPlayers}/{thisInstance.gameMaxSlots}]";
-            label_WinCondition.Text = $"{thisInstance.gameInfoCurrentGameScore} ({thisInstance.gameInfoGameType})";
+
             label_TimeLeft.Text = "[ "+ thisInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss") + " ]";
         }
 
