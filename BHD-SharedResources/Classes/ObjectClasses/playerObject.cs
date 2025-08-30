@@ -22,6 +22,9 @@ namespace BHD_SharedResources.Classes.ObjectClasses
         public int RoleID { get; set; }
         public string RoleName { get; set; } = string.Empty;
 
+        // In-Game Values
+        public int ActiveZoneTime { get; set; }
+
         // Player Statistics
         public int stat_Kills { get; set; }
         public int stat_Deaths { get; set; }

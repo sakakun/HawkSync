@@ -104,7 +104,6 @@ namespace BHD_RemoteClient.Forms
         }
 
         // Action Click Handlers
-        //
         // Scope: Program, Function: OnFormClosing override, Handles the form closing event to prompt the user and perform cleanup.
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
@@ -133,7 +132,7 @@ namespace BHD_RemoteClient.Forms
 
         }
 
-        // --- About Window Start---
+        // About Window Start
         // Win32 API constants and methods
         private const int WM_SYSCOMMAND = 0x112;
         private const int ABOUT_SYSMENU_ID = 0x1FFF; // Custom ID for AboutWindow
@@ -164,7 +163,7 @@ namespace BHD_RemoteClient.Forms
             }
             base.WndProc(ref m);
         }
-        // --- About Window End ---
+        // About Window End
 
     }
 }

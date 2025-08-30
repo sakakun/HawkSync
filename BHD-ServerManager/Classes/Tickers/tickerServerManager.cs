@@ -98,7 +98,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 ServerMemory.ReadMapCycleCounter();                                 // Map Cycle Counter (How Maps Have Been Played)
                 ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
                 // Score Reading
-                ServerMemory.ReadMemoryCurrentGameScore();                          // Read current game scores          
+                ServerMemory.ReadMemoryCurrentGameScoreConditions();                          // Read current game scores          
             }
 
             // 2. Loading Map

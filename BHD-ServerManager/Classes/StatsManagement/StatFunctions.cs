@@ -106,6 +106,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 PlayerTimePlayed = CurrentPlayerObject.PlayerTimePlayed - PreviousPlayerObject.PlayerTimePlayed,
                 RoleID = CurrentPlayerObject.RoleID,
                 RoleName = CurrentPlayerObject.RoleName,
+                ActiveZoneTime = CurrentPlayerObject.ActiveZoneTime - PreviousPlayerObject.ActiveZoneTime,
                 stat_Kills = CurrentPlayerObject.stat_Kills - PreviousPlayerObject.stat_Kills,
                 stat_Deaths = CurrentPlayerObject.stat_Deaths - PreviousPlayerObject.stat_Deaths,
                 stat_ZoneTime = CurrentPlayerObject.stat_ZoneTime - PreviousPlayerObject.stat_ZoneTime,

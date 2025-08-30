@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using Windows.Storage;
 
 namespace BHD_ServerManager.Classes.GameManagement
 {
@@ -1835,6 +1836,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
             }
 
+            int playerMemStart = beginaddr;
+
             byte[] read_name = new byte[15];
             int bytesread = 0;
 
@@ -1861,11 +1864,30 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, beginaddr + 0x000ADB40, read_ping, read_ping.Length, ref bytesread);
 
             int[] offsets = {
-                0x000ADAB4, 0x000ADA94, 0x000ADA98, 0x000ADA8C, 0x000ADAD0,
-                0x000ADA90, 0x000ADAD4, 0x000ADAF4, 0x000ADABC, 0x000ADAC0,
-                0x000ADAC4, 0x000ADACC, 0x000ADACC, 0x000ADAA8, 0x000ADAC8,
-                0x000ADAD4, 0x000ADAA4, 0x000ADADC, 0x000ADA94, 0x000ADAB0,
-                0x000ADAAC, 0x000ADAD8, 0x000ADADC, 0x000ADAE0
+                0x000ADAB4, // stat_TotalShotsFired
+                0x000ADA94, // stat_Kills
+                0x000ADA98, // stat_Deaths
+                0x000ADA8C, // stat_Suicides
+                0x000ADAD0, // stat_Headshots
+                0x000ADA90, // stat_Murders
+                0x000ADAD4, // stat_KnifeKills
+                0x000ADAF4, // stat_ExperiencePoints
+                0x000ADABC, // stat_RevivesReceived
+                0x000ADAC0, // stat_PSPAttempts
+                0x000ADAC4, // stat_PSPTakeovers
+                0x000ADACC, // stat_DoubleKills
+                0x000ADACC, // stat_RevivesGiven
+                0x000ADAA8, // stat_FBCaptures
+                0x000ADAC8, // stat_FBCarrierKills
+                0x000ADAD4, // stat_FBCarrierDeaths
+                0x000ADAA4, // stat_ZoneTime
+                0x000ADADC, // stat_ZoneKills
+                0x000ADA94, // stat_ZoneDefendKills
+                0x000ADAB0, // stat_ADTargetsDestroyed
+                0x000ADAAC, // stat_FlagSaves
+                0x000ADAD8, // stat_SniperKills
+                0x000ADADC, // stat_TKOTHDefenseKills
+                0x000ADAE0 // stat_TKOTHAttackKills
             };
 
             var stats = new int[offsets.Length];
@@ -1893,14 +1915,19 @@ namespace BHD_ServerManager.Classes.GameManagement
                 ReadProcessMemory((int)processHandle, beginaddr + offsets2[i], read_data, read_data.Length, ref bytesread);
                 stats2[i] = BitConverter.ToInt32(read_data, 0);
             }
-            //Console.WriteLine(PlayerName);
-            //Console.WriteLine(JsonConvert.SerializeObject(stats));
-            //Console.WriteLine(JsonConvert.SerializeObject(stats2));
 
+            // Read Player Flag Time
+            byte[] read_playerActiveZoneTimeByte = new byte[4];
+            int activeZoneTimerLoc = playerMemStart + 0xADB2C;
+            ReadProcessMemory((int)processHandle, activeZoneTimerLoc, read_playerActiveZoneTimeByte, read_playerActiveZoneTimeByte.Length, ref bytesread);
+            int read_playerActiveZoneTimeInt = BitConverter.ToInt32(read_playerActiveZoneTimeByte, 0);
+
+            // Read Player Object
             byte[] read_playerObjectLocation = new byte[4];
             ReadProcessMemory((int)processHandle, beginaddr + 0x5E7C, read_playerObjectLocation, read_playerObjectLocation.Length, ref bytesread);
             int read_playerObject = BitConverter.ToInt32(read_playerObjectLocation, 0);
 
+            // Selected Weapon & Character Class
             byte[] read_selectedWeapon = new byte[4];
             ReadProcessMemory((int)processHandle, read_playerObject + 0x178, read_selectedWeapon, read_selectedWeapon.Length, ref bytesread);
             int SelectedWeapon = BitConverter.ToInt32(read_selectedWeapon, 0);
@@ -1908,7 +1935,8 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] read_selectedCharacterClass = new byte[4];
             ReadProcessMemory((int)processHandle, read_playerObject + 0x244, read_selectedCharacterClass, read_selectedCharacterClass.Length, ref bytesread);
             int SelectedCharacterClass = BitConverter.ToInt32(read_selectedCharacterClass, 0);
-
+            
+            // Weapons
             byte[] read_weapons = new byte[250];
             ReadProcessMemory((int)processHandle, beginaddr + 0x000ADB70, read_weapons, read_weapons.Length, ref bytesread);
             var MemoryWeapons = Encoding.Default.GetString(read_weapons).Replace("\0", "|");
@@ -1935,7 +1963,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
             }
 
-
             return new playerObject
             {
                 PlayerName = Encoding.GetEncoding("Windows-1252").GetString(read_name),
@@ -1943,6 +1970,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 RoleID = SelectedCharacterClass,
                 SelectedWeaponID = SelectedWeapon,
                 PlayerWeapons = WeaponList,
+                ActiveZoneTime = read_playerActiveZoneTimeInt,
                 stat_TotalShotsFired = stats[0],
                 stat_Kills = stats[1],
                 stat_Deaths = stats[2],
@@ -1999,7 +2027,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             return new string[] { ChatLogAddr.ToString(), LastMessage, msgTypeBytes };
         }
 
-        public static void ReadMemoryCurrentGameScore()
+        public static void ReadMemoryCurrentGameScoreConditions()
         {
             int scoreAddress1 = 0;
             int scoreAddress2 = 0;
@@ -2046,7 +2074,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
                 else
                 {
-                    AppDebug.Log("ReadMemoryCurrentGameScore", "Failed to read game score from memory.");
+                    AppDebug.Log("ReadMemoryCurrentGameScoreConditions", "Failed to read game score from memory.");
                     currentGameScore = -1;
                 }
             }

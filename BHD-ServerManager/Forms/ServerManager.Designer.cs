@@ -78,7 +78,7 @@ namespace BHD_ServerManager.Forms
             label_TimeLeft.Name = "label_TimeLeft";
             label_TimeLeft.Size = new Size(65, 22);
             label_TimeLeft.Text = "[Time Left]";
-            label_TimeLeft.ToolTipText = "Future Feature";
+            label_TimeLeft.ToolTipText = "Time Left";
             // 
             // label_WinCondition
             // 
@@ -94,7 +94,7 @@ namespace BHD_ServerManager.Forms
             label_RedScore.Name = "label_RedScore";
             label_RedScore.Size = new Size(67, 22);
             label_RedScore.Text = "[Red Score]";
-            label_RedScore.ToolTipText = "Future Feature";
+            label_RedScore.ToolTipText = "Red Score";
             // 
             // label_BlueScore
             // 
@@ -102,7 +102,7 @@ namespace BHD_ServerManager.Forms
             label_BlueScore.Name = "label_BlueScore";
             label_BlueScore.Size = new Size(70, 22);
             label_BlueScore.Text = "[Blue Score]";
-            label_BlueScore.ToolTipText = "Future Feature";
+            label_BlueScore.ToolTipText = "Blue Score";
             // 
             // label_PlayersOnline
             // 
@@ -110,7 +110,7 @@ namespace BHD_ServerManager.Forms
             label_PlayersOnline.Name = "label_PlayersOnline";
             label_PlayersOnline.Size = new Size(90, 22);
             label_PlayersOnline.Text = "[Players Online]";
-            label_PlayersOnline.ToolTipText = "Future Feature";
+            label_PlayersOnline.ToolTipText = "Players Online";
             // 
             // mainPanel
             // 

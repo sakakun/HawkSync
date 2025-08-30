@@ -8,6 +8,7 @@ using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
 using BHD_SharedResources.Classes.StatsManagement;
 using BHD_SharedResources.Classes.SupportClasses;
+using Microsoft.VisualBasic.Logging;
 using System.Data;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -76,17 +77,53 @@ namespace BHD_ServerManager.Forms
                 _ => toolStripStatus.Text
             };
             // Update Label for Win Condition
-            functionEvent_UpdateScoreLabels();
+            functionEvent_UpdateStatusLabels();
         }
 
-        private void functionEvent_UpdateScoreLabels()
+        private void functionEvent_UpdateStatusLabels()
         {
             if (thisInstance.instanceStatus == InstanceStatus.OFFLINE)
             {
+                label_PlayersOnline.Text = "[Players Online]";
                 label_WinCondition.Text = "[Win Condition]";
+                label_TimeLeft.Text = "[Time Left]";
                 return;
             }
+
+            int scoreTotal = 0;
+            string playerName = string.Empty;
+            playerObject? topPlayer = null;
+            
+            if (thisInstance.playerList.Count > 0)
+            {
+                if (thisInstance.gameInfoGameType == "DM")
+                {
+                    topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
+                    scoreTotal = topPlayer!.stat_Kills;
+                    playerName = topPlayer!.PlayerName;
+                    label_BlueScore.Text = $"[{scoreTotal}]";
+                    label_RedScore.Text = $"[{playerName}]";
+                } else if (thisInstance.gameInfoGameType == "KOTH")
+                {
+                    topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
+                    scoreTotal = topPlayer!.ActiveZoneTime;
+                    playerName = topPlayer!.PlayerName.Trim();
+                    label_BlueScore.Text = $"[{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}]";
+                    label_RedScore.Text = $"[{playerName}]";
+                }
+            } else
+            {
+                label_BlueScore.Text = "[N/A]";
+                label_RedScore.Text = "[N/A]";
+            }
+
+
+            // Red Team Label
+
+
+            label_PlayersOnline.Text = $"[{thisInstance.gameInfoCurrentNumPlayers}/{thisInstance.gameMaxSlots}]";
             label_WinCondition.Text = $"{thisInstance.gameInfoCurrentGameScore} ({thisInstance.gameInfoGameType})";
+            label_TimeLeft.Text = "[ "+ thisInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss") + " ]";
         }
 
         // --- Form Closing ---
