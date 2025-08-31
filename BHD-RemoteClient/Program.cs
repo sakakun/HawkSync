@@ -19,7 +19,7 @@ namespace BHD_RemoteClient
         public static RemoteClient? theRemoteClient { get; set; }
 
         // Major Version Number
-        public static string ApplicationVersion = "1.1.2";
+        public static string ApplicationVersion = "1.1.3";
 
         [STAThread]
         static void Main()

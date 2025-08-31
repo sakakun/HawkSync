@@ -17,7 +17,7 @@ namespace BHD_ServerManager
         public static ServerManager? ServerManagerUI { get; private set; }
 
         // Major Version Number
-        public static string ApplicationVersion = "1.1.2";
+        public static string ApplicationVersion = "1.1.3";
 
         [STAThread]
         static void Main()
