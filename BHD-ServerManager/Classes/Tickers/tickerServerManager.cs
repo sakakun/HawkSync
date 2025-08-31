@@ -207,7 +207,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 ServerMemory.ReadMemoryWinningTeam();
                 AppDebug.Log("tickerServerManagement", "Sending Stats...");
                 Task.Run(() => StatFunctions.SendImportData(thisServer!));
-                ServerMemory.SetNextMapType();                                                  // Set the Next Map Type
+                ServerMemory.SetNextMapType();     // Set the Next Map Type
                 AppDebug.Log("tickerServerManagement", "Kill ScoreBoard...");
                 CommonCore.Ticker?.Start("ScoreboardTicker", 1000, () => tickerEvent_Scoreboard());
                 AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");

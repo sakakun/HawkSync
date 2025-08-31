@@ -144,8 +144,8 @@ namespace BHD_RemoteClient.Forms
                 }
                 else if (theInstance.gameInfoGameType == "AD")
                 {
-                    blueScore = $"{(theInstance.gameInfoCurrentGameDefendingTeamBlue ? "Red Attacking" : theInstance.gameInfoCurrentBlueScore)}";
-                    redScore = $"{(theInstance.gameInfoCurrentGameDefendingTeamBlue == false ? "Blue Attacking" : theInstance.gameInfoCurrentRedScore)}";
+                    blueScore = $"{(theInstance.gameInfoCurrentGameDefendingTeamBlue == false ? "Red Attacking" : theInstance.gameInfoCurrentBlueScore)}";
+                    redScore = $"{(theInstance.gameInfoCurrentGameDefendingTeamBlue ? "Blue Attacking" : theInstance.gameInfoCurrentRedScore)}";
                     winConditions = $"[{theInstance.gameInfoCurrentGameWinCond} Targets ({theInstance.gameInfoGameType})]";
                 }
                 else if (theInstance.gameInfoGameType == "TKOTH")

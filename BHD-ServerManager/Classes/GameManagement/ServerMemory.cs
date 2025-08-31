@@ -1023,7 +1023,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, CurrentGameTypeAddr, read_currentgametype, read_currentgametype.Length, ref read_currentgametypeBytesRead);
             int CurrentGameType = BitConverter.ToInt32(read_currentgametype, 0);
 
-            // to prevent locking of this PlayerIPAddress simply look at each PlayerIPAddress before writing to the PlayerIPAddress...
             if (PingerGameType != CurrentGameType)
             {
                 int UpdatePingerQuery = 0;
@@ -1111,14 +1110,15 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             try
             {
-                // Deal with the Players
-                theInstanceManager.changeTeamGameMode(getGameTypeID(thisInstance.gameInfoGameType!), thisInstance.gameInfoNextMapGameType);
-
                 // Change the MapType for the next map
                 var CurrentGameTypeAddr = baseAddr + 0x5F21A4;
                 byte[] nextMaptypeBytes = BitConverter.GetBytes(thisInstance.gameInfoNextMapGameType);
                 int nextMaptypeBytesWrite = 0;
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
+
+                // Deal with the Players
+                theInstanceManager.changeTeamGameMode(getGameTypeID(thisInstance.gameInfoGameType), thisInstance.gameInfoNextMapGameType);
+                ServerMemory.UpdatePlayerTeam();                    // Move players to their teams if applicable
 
             }
             catch (Exception ex)
@@ -1209,7 +1209,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: UpdatePlayMapNext
         public static void UpdateNextMap(int NextMapIndex)
         {
-
 
             byte[] ServerMapCyclePtr = new byte[4];
             int Pointer2Read = 0;

@@ -129,8 +129,8 @@ namespace BHD_ServerManager.Forms
                     winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Targets ({thisInstance.gameInfoGameType})]";
                 } else if (thisInstance.gameInfoGameType == "AD")
                 {
-                    blueScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue ? "Red Attacking" : thisInstance.gameInfoCurrentBlueScore) }";
-                    redScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue == false ? "Blue Attacking" : thisInstance.gameInfoCurrentRedScore )}";
+                    blueScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue == false ? "Red Attacking" : thisInstance.gameInfoCurrentBlueScore) }";
+                    redScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue ? "Blue Attacking" : thisInstance.gameInfoCurrentRedScore )}";
                     winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Targets ({thisInstance.gameInfoGameType})]";
                 } else if (thisInstance.gameInfoGameType == "TKOTH")
                 {
