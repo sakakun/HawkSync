@@ -89,18 +89,103 @@ namespace BHD_RemoteClient.Forms
                 _ => toolStripStatus.Text
             };
 
-            // Update Label for Win Condition
-            functionEvent_UpdateScoreLabels();
+            functionEvent_UpdateStatusLabels();
         }
 
-        private void functionEvent_UpdateScoreLabels()
+        private void functionEvent_UpdateStatusLabels()
         {
+            // Offline Labels
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
             {
+                label_PlayersOnline.Text = "[Players Online]";
+                label_BlueScore.Text = "[Blue Score]";
+                label_RedScore.Text = "[Red Score]";
                 label_WinCondition.Text = "[Win Condition]";
+                label_TimeLeft.Text = "[Time Left]";
                 return;
             }
-            label_WinCondition.Text = $"{theInstance.gameInfoCurrentGameScore} ({theInstance.gameInfoGameType})";
+            // Variables
+            int scoreTotal = 0;
+            string blueScore = string.Empty;
+            string redScore = string.Empty;
+            string playerName = string.Empty;
+            playerObject? topPlayer = null;
+            string winConditions = string.Empty;
+
+            // Player Online Label
+            label_PlayersOnline.Text = $"[{theInstance.gameInfoCurrentNumPlayers}/{theInstance.gameMaxSlots}]";
+
+            if (theInstance.playerList.Count > 0)
+            {
+                winConditions = $"[{theInstance.gameInfoCurrentGameWinCond} Kills ({theInstance.gameInfoGameType})]";
+
+                if (theInstance.gameInfoGameType == "DM")
+                {
+                    topPlayer = theInstance.playerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
+                    scoreTotal = topPlayer!.stat_Kills;
+                    playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
+                    blueScore = $"{scoreTotal}";
+                    redScore = $"{playerName}";
+                }
+                else if (theInstance.gameInfoGameType == "KOTH")
+                {
+                    topPlayer = theInstance.playerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
+                    scoreTotal = topPlayer!.ActiveZoneTime;
+                    playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
+                    blueScore = $"{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}";
+                    redScore = $"{playerName}";
+                    winConditions = $"[Time of {TimeSpan.FromSeconds(theInstance.gameInfoCurrentGameWinCond * 60):hh\\:mm\\:ss} ({theInstance.gameInfoGameType})]";
+                }
+                else if (theInstance.gameInfoGameType == "SD")
+                {
+                    blueScore = $"{theInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{theInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{theInstance.gameInfoCurrentGameWinCond} Targets ({theInstance.gameInfoGameType})]";
+                }
+                else if (theInstance.gameInfoGameType == "AD")
+                {
+                    blueScore = $"{(theInstance.gameInfoCurrentGameDefendingTeamBlue ? "Red Attacking" : theInstance.gameInfoCurrentBlueScore)}";
+                    redScore = $"{(theInstance.gameInfoCurrentGameDefendingTeamBlue == false ? "Blue Attacking" : theInstance.gameInfoCurrentRedScore)}";
+                    winConditions = $"[{theInstance.gameInfoCurrentGameWinCond} Targets ({theInstance.gameInfoGameType})]";
+                }
+                else if (theInstance.gameInfoGameType == "TKOTH")
+                {
+                    blueScore = $"{TimeSpan.FromSeconds(theInstance.gameInfoCurrentBlueScore * 60):hh\\:mm\\:ss}";
+                    redScore = $"{TimeSpan.FromSeconds(theInstance.gameInfoCurrentRedScore * 60):hh\\:mm\\:ss}";
+                    winConditions = $"[Time of {TimeSpan.FromSeconds(theInstance.gameInfoCurrentGameWinCond * 60):hh\\:mm\\:ss} ({theInstance.gameInfoGameType})]";
+                }
+                else if (theInstance.gameInfoGameType == "CTF" || theInstance.gameInfoGameType == "FB")
+                {
+                    blueScore = $"{theInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{theInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{theInstance.gameInfoCurrentGameWinCond} Captures ({theInstance.gameInfoGameType})]";
+                }
+                else if (theInstance.gameInfoGameType == "TDM")
+                {
+                    blueScore = $"{theInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{theInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{theInstance.gameInfoCurrentGameWinCond} Kills ({theInstance.gameInfoGameType})]";
+                }
+                else
+                {
+                    blueScore = $"{theInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{theInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{theInstance.gameInfoCurrentGameWinCond} Kills ({theInstance.gameInfoGameType})]";
+                }
+
+
+                label_BlueScore.Text = $"[{blueScore}]";
+                label_RedScore.Text = $"[{redScore}]";
+
+            }
+            else
+            {
+                label_BlueScore.Text = "[NO]";
+                label_RedScore.Text = "[PLAYERS]";
+            }
+
+            label_WinCondition.Text = winConditions;
+            label_TimeLeft.Text = "[ " + theInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss") + " ]";
         }
 
         // Action Click Handlers

@@ -94,46 +94,77 @@ namespace BHD_ServerManager.Forms
             }
             // Variables
             int scoreTotal = 0;
+            string blueScore = string.Empty;
+            string redScore = string.Empty;
             string playerName = string.Empty;
             playerObject? topPlayer = null;
             string winConditions = string.Empty;
-            
+
             // Player Online Label
             label_PlayersOnline.Text = $"[{thisInstance.gameInfoCurrentNumPlayers}/{thisInstance.gameMaxSlots}]";
-            
 
             if (thisInstance.playerList.Count > 0)
             {
-                winConditions = $"[{thisInstance.gameInfoCurrentGameScore} ({thisInstance.gameInfoGameType})]";
+                winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Kills ({thisInstance.gameInfoGameType})]";
 
                 if (thisInstance.gameInfoGameType == "DM")
                 {
                     topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
                     scoreTotal = topPlayer!.stat_Kills;
                     playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
-                    label_BlueScore.Text = $"[{scoreTotal}]";
-                    label_RedScore.Text = $"[{playerName}]";
+                    blueScore = $"{scoreTotal}";
+                    redScore = $"{playerName}";
                 } else if (thisInstance.gameInfoGameType == "KOTH")
                 {
                     topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
                     scoreTotal = topPlayer!.ActiveZoneTime;
                     playerName = ( scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
-                    label_BlueScore.Text = $"[{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}]";
-                    label_RedScore.Text = $"[{playerName}]";
-                    winConditions = $"[{TimeSpan.FromSeconds(thisInstance.gameInfoCurrentGameScore*60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
-                } 
+                    blueScore = $"{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}";
+                    redScore = $"{playerName}";
+                    winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoCurrentGameWinCond*60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
+                } else if (thisInstance.gameInfoGameType == "SD")
+                {
+                    blueScore = $"{thisInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{thisInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Targets ({thisInstance.gameInfoGameType})]";
+                } else if (thisInstance.gameInfoGameType == "AD")
+                {
+                    blueScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue ? "Red Attacking" : thisInstance.gameInfoCurrentBlueScore) }";
+                    redScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue == false ? "Blue Attacking" : thisInstance.gameInfoCurrentRedScore )}";
+                    winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Targets ({thisInstance.gameInfoGameType})]";
+                } else if (thisInstance.gameInfoGameType == "TKOTH")
+                {
+                    blueScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoCurrentBlueScore * 60):hh\\:mm\\:ss}";
+                    redScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoCurrentRedScore * 60):hh\\:mm\\:ss}";
+                    winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoCurrentGameWinCond * 60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
+                } else if (thisInstance.gameInfoGameType == "CTF" || thisInstance.gameInfoGameType == "FB")
+                {
+                    blueScore = $"{thisInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{thisInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Captures ({thisInstance.gameInfoGameType})]";
+                } else if (thisInstance.gameInfoGameType == "TDM")
+                {
+                    blueScore = $"{thisInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{thisInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Kills ({thisInstance.gameInfoGameType})]";
+                } else
+                {
+                    blueScore = $"{thisInstance.gameInfoCurrentBlueScore}";
+                    redScore = $"{thisInstance.gameInfoCurrentRedScore}";
+                    winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Kills ({thisInstance.gameInfoGameType})]";
+                }
+
+
+                label_BlueScore.Text = $"[{blueScore}]";
+                label_RedScore.Text = $"[{redScore}]";
+
             } else
             {
-                label_BlueScore.Text = "[NOT]";
-                label_RedScore.Text = "[ACTIVE]";
+                label_BlueScore.Text = "[NO]";
+                label_RedScore.Text = "[PLAYERS]";
             }
 
-
-            // Red Team Label
             label_WinCondition.Text = winConditions;
-
-
-
             label_TimeLeft.Text = "[ "+ thisInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss") + " ]";
         }
 

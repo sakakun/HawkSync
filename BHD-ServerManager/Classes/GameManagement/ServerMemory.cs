@@ -1178,7 +1178,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             else
             {
 
-
                 int buffer = 0;
                 byte[] PointerAddr9 = new byte[4];
                 var Pointer = baseAddr + 0x005ED600;
@@ -1521,8 +1520,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 thisInstance.gameInfoTimeRemaining = TimeSpan.FromMinutes(thisInstance.gameStartDelay + thisInstance.gameTimeLimit);
             }
-
-
 
             byte[] Ptr = new byte[4];
             int ReadPtr = 0;
@@ -1884,11 +1881,13 @@ namespace BHD_ServerManager.Classes.GameManagement
                 0x000ADAA4, // stat_ZoneTime
                 0x000ADADC, // stat_ZoneKills
                 0x000ADA94, // stat_ZoneDefendKills
-                0x000ADAB0, // stat_ADTargetsDestroyed
+                0x000ADAB0, // stat_SDADTargetsDestroyed
                 0x000ADAAC, // stat_FlagSaves
                 0x000ADAD8, // stat_SniperKills
                 0x000ADADC, // stat_TKOTHDefenseKills
-                0x000ADAE0 // stat_TKOTHAttackKills
+                0x000ADAE0, // stat_TKOTHAttackKills
+                0x000ADAE4, // stat_SDADDefendKill
+                0x000ADAEC, // stat_SDADAttackKill
             };
 
             var stats = new int[offsets.Length];
@@ -1903,19 +1902,51 @@ namespace BHD_ServerManager.Classes.GameManagement
             // Trail Checks
             int[] offsets2 =
             {
-                0x000ADA90, 0x000ADA94, 0x000ADA98, 0x000ADA9C,
-                0x000ADAA8, 0x000ADAAC, 0x000ADAB0, 0x000ADAB4,
-                0x000ADAB8, 0x000ADABC, 0x000ADAC0, 0x000ADAC4,
-                0x000ADAC8, 0x000ADACC, 0x000ADAD0, 0x000ADAD4,
-                0x000ADAE4, 0x000ADAE8, 0x000ADAEC
+                // 20 fields before the first offset
+                0x000ADA8C - 80, 0x000ADA8C - 76, 0x000ADA8C - 72, 0x000ADA8C - 68, 0x000ADA8C - 64,
+                0x000ADA8C - 60, 0x000ADA8C - 56, 0x000ADA8C - 52, 0x000ADA8C - 48, 0x000ADA8C - 44,
+                0x000ADA8C - 40, 0x000ADA8C - 36, 0x000ADA8C - 32, 0x000ADA8C - 28, 0x000ADA8C - 24,
+                0x000ADA8C - 20, 0x000ADA8C - 16, 0x000ADA8C - 12, 0x000ADA8C - 8,  0x000ADA8C - 4,
+
+                // All offsets between the lowest and highest, in 4-byte increments
+                // From 0x000ADA8C to 0x000ADAF4
+                0x000ADA8C, 0x000ADA90, 0x000ADA94, 0x000ADA98, 0x000ADA9C,
+                0x000ADAA0, 0x000ADAA4, 0x000ADAA8, 0x000ADAAC, 0x000ADAB0,
+                0x000ADAB4, 0x000ADAB8, 0x000ADABC, 0x000ADAC0, 0x000ADAC4,
+                0x000ADAC8, 0x000ADACC, 0x000ADAD0, 0x000ADAD4, 0x000ADAD8,
+                0x000ADADC, 0x000ADAE0, 0x000ADAE4, 0x000ADAE8, 0x000ADAEC,
+                0x000ADAF0, 0x000ADAF4,
+
+                // 20 fields after the last offset
+                0x000ADAF4 + 4,  0x000ADAF4 + 8,  0x000ADAF4 + 12, 0x000ADAF4 + 16, 0x000ADAF4 + 20,
+                0x000ADAF4 + 24, 0x000ADAF4 + 28, 0x000ADAF4 + 32, 0x000ADAF4 + 36, 0x000ADAF4 + 40,
+                0x000ADAF4 + 44, 0x000ADAF4 + 48, 0x000ADAF4 + 52, 0x000ADAF4 + 56, 0x000ADAF4 + 60,
+                0x000ADAF4 + 64, 0x000ADAF4 + 68, 0x000ADAF4 + 72, 0x000ADAF4 + 76, 0x000ADAF4 + 80
             };
-            var stats2 = new int[offsets2.Length];
-            for (int i = 0; i < offsets2.Length; i++)
+
+            // Remove offsets in offsets2 that are present in offsets
+            int[] filteredOffsets2 = offsets2.Except(offsets).ToArray();
+
+            var stats2 = new int[filteredOffsets2.Length];
+            for (int i = 0; i < filteredOffsets2.Length; i++)
             {
                 byte[] read_data = new byte[4];
-                ReadProcessMemory((int)processHandle, beginaddr + offsets2[i], read_data, read_data.Length, ref bytesread);
+                ReadProcessMemory((int)processHandle, beginaddr + filteredOffsets2[i], read_data, read_data.Length, ref bytesread);
                 stats2[i] = BitConverter.ToInt32(read_data, 0);
             }
+
+            // For offsets2, skip entries where stats2[i] == 0
+            string offsets2Log = string.Join(", ",
+                filteredOffsets2
+                    .Select((offset, i) => (offset, value: stats2[i]))
+                    .Where(pair => pair.value != 0)
+                    .Select(pair => $"{beginaddr + pair.offset:X8}:{pair.offset:X8} => {pair.value}\n")
+            );
+            AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsets2Log);
+            
+            // Score Offsets
+            string offsetsLog = string.Join(", ", offsets.Select((offset, i) => $"{beginaddr + offset:X8}:{offset:X8} => {stats[i]}\n"));
+            AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsetsLog);
 
             // Read Player Flag Time
             byte[] read_playerActiveZoneTimeByte = new byte[4];
@@ -1991,11 +2022,13 @@ namespace BHD_ServerManager.Classes.GameManagement
                 stat_ZoneTime = stats[16],
                 stat_ZoneKills = stats[17],
                 stat_ZoneDefendKills = stats[18],
-                stat_ADTargetsDestroyed = stats[19],
+                stat_SDADTargetsDestroyed = stats[19],
                 stat_FlagSaves = stats[20],
                 stat_SniperKills = stats[21],
                 stat_TKOTHDefenseKills = stats[22],
-                stat_TKOTHAttackKills = stats[23]
+                stat_TKOTHAttackKills = stats[23],
+                stat_SDADDefenseKills = stats[24],
+                stat_SDADAttackKills = stats[25]
             };
         }
         // Function: ReadMemoryLastChatMessage
@@ -2024,20 +2057,36 @@ namespace BHD_ServerManager.Classes.GameManagement
             return new string[] { ChatLogAddr.ToString(), LastMessage, msgTypeBytes };
         }
 
-        public static void ReadMemoryCurrentGameScoreConditions()
+        public static void ReadMemoryCurrentGameWinConditions()
         {
             int scoreAddress1 = 0;
             int scoreAddress2 = 0;
-            int currentGameScore = 0;
-            
+            int gameTypeId = objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == thisInstance.gameInfoGameType)!.DatabaseId;
+
             // thisInstance.gameInfoGameType
-            switch (objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == thisInstance.gameInfoGameType)!.DatabaseId)
+            switch (gameTypeId)
             {
                 // KOTH/TKOTH
                 case 3:
                 case 4:
                     scoreAddress1 = baseAddr + 0x5F21B8;
                     scoreAddress2 = baseAddr + 0x6344B4;
+                    break;
+                // SD & AD
+                case 5:
+                case 6:
+                    // Blue and Red Win Conditions are stored in different memory locations
+                    // SD = Both Teams have a "Win Condition" (Targets Destroyed)
+                    // AD = Only the Attacking Team has a "Win Condition" (Targets Destroyed), Defending Team has to last the timer.
+                    scoreAddress1 = baseAddr + 0x5DDCAC; // Blue
+                    scoreAddress2 = baseAddr + 0x5DDCB0; // Red
+                    break;
+                // CTF
+                case 7:
+                    // Blue and Red Win Conditions are stored in different memory locations
+                    // Based on the number of red and blue flags in map, ideally both addresses should be the same.
+                    scoreAddress1 = baseAddr + 0x5DDCA4; // Blue
+                    scoreAddress2 = baseAddr + 0x5DDCA8; // Red
                     break;
                 // flag ball
                 case 8:
@@ -2051,32 +2100,115 @@ namespace BHD_ServerManager.Classes.GameManagement
                     break;
             }
 
-            // Try reading from the first address
+            // Blue Win Condition
             byte[] scoreBytes = new byte[4];
             int bytesRead = 0;
             bool success = ReadProcessMemory((int)processHandle, scoreAddress1, scoreBytes, scoreBytes.Length, ref bytesRead);
+            int winConditionBlue = (success ? BitConverter.ToInt32(scoreBytes, 0) : 0);
 
-            if (success && bytesRead == 4)
+            // Red Win Condition
+            byte[] score2Bytes = new byte[4];
+            int bytes2Read = 0;
+            bool success2 = ReadProcessMemory((int)processHandle, scoreAddress2, score2Bytes, score2Bytes.Length, ref bytes2Read);
+            int winConditionRed = (success2 ? BitConverter.ToInt32(score2Bytes, 0) : 0);
+
+            if (winConditionBlue == winConditionRed || winConditionBlue > winConditionRed)
             {
-                currentGameScore = BitConverter.ToInt32(scoreBytes, 0);
+                if (gameTypeId == 6) { thisInstance.gameInfoCurrentGameDefendingTeamBlue = true; }
+                thisInstance.gameInfoCurrentGameWinCond = winConditionBlue;
+            }
+            else if (winConditionBlue < winConditionRed)
+            {
+                if (gameTypeId == 6) { thisInstance.gameInfoCurrentGameDefendingTeamBlue = false; }
+                thisInstance.gameInfoCurrentGameWinCond = winConditionRed;
             }
             else
             {
-                // Fallback: try the second address
-                bytesRead = 0;
-                success = ReadProcessMemory((int)processHandle, scoreAddress2, scoreBytes, scoreBytes.Length, ref bytesRead);
-                if (success && bytesRead == 4)
-                {
-                    currentGameScore = BitConverter.ToInt32(scoreBytes, 0);
-                }
-                else
-                {
-                    AppDebug.Log("ReadMemoryCurrentGameScoreConditions", "Failed to read game score from memory.");
-                    currentGameScore = -1;
-                }
+                // Should never hit this, but just in case...
+                thisInstance.gameInfoCurrentGameWinCond = winConditionRed;
+            }
+            
+        }
+
+        public static void ReadMemoryCurrentGameScores()
+        {
+            // DM = First Player to Reach Win Condition
+            //    Return 0
+            // KOTH = First Team to Reach Win Condition
+            //    Return 0
+            // COOP = NA
+            //    Return 0
+            // TDM = First Team to Reach Win Condition
+            //     BLUE OFFSET = 0x5E07EC
+            //     RED OFFSET  = 0x5E08D4
+            // TKOTH = First Team to Reach Win Condition
+            //     BLUE OFFSET = 0x5E0884
+            //     RED OFFSET  = 0x5E096C
+            // FB/CTF = First Team to Reach Win Condition
+            //     BLUE OFFSET = 0x5E0800
+            //     RED OFFSET  = 0x5E08E8
+            // SD/AD = First Team to Reach Win Condition
+            //     BLUE OFFSET = 0x5E0808
+            //     RED OFFSET  = 0x5E08F0
+
+            int scoreAddress1 = 0;
+            int scoreAddress2 = 0;
+            int gameTypeId = objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == thisInstance.gameInfoGameType)!.DatabaseId;
+
+            switch (gameTypeId)
+            {
+                // KOTH/TKOTH
+                case 3:
+                    scoreAddress1 = baseAddr + 0x5E0884; // Blue Score
+                    scoreAddress2 = baseAddr + 0x5E096C; // Red Score
+                    break;
+                // SD & AD
+                case 5:
+                case 6:
+                    // Blue and Red Win Conditions are stored in different memory locations
+                    // SD = Both Teams have a "Win Condition" (Targets Destroyed)
+                    // AD = Only the Attacking Team has a "Win Condition" (Targets Destroyed), Defending Team has to last the timer.
+                    scoreAddress1 = baseAddr + 0x5E0808; // Blue Score
+                    scoreAddress2 = baseAddr + 0x5E08F0; // Red Score
+                    break;
+                // CTF
+                case 7:
+                case 8:
+                    // Blue and Red Win Conditions are stored in different memory locations
+                    // Based on the number of red and blue flags in map, ideally both addresses should be the same.
+                    scoreAddress1 = baseAddr + 0x5DDCA4; // Blue Score
+                    scoreAddress2 = baseAddr + 0x5DDCA8; // Red Score
+                    break;
+                // all other game types...
+                default:
+                    scoreAddress1 = baseAddr + 0x5E07EC; // Blue Score
+                    scoreAddress2 = baseAddr + 0x5E08D4; // Red Score
+                    break;
             }
 
-            thisInstance.gameInfoCurrentGameScore = currentGameScore;
+            if (gameTypeId == 0 || gameTypeId == 2 || gameTypeId == 4)
+            {
+                thisInstance.gameInfoCurrentBlueScore = 0;
+                thisInstance.gameInfoCurrentRedScore = 0;
+                return;
+            }
+
+            // Blue Win Condition
+            byte[] scoreBytes = new byte[4];
+            int bytesRead = 0;
+            bool success = ReadProcessMemory((int)processHandle, scoreAddress1, scoreBytes, scoreBytes.Length, ref bytesRead);
+            int blueTeamScore = (success ? BitConverter.ToInt32(scoreBytes, 0) : 0);
+
+            // Red Win Condition
+            byte[] score2Bytes = new byte[4];
+            int bytes2Read = 0;
+            bool success2 = ReadProcessMemory((int)processHandle, scoreAddress2, score2Bytes, score2Bytes.Length, ref bytes2Read);
+            int redTeamScore = (success2 ? BitConverter.ToInt32(score2Bytes, 0) : 0);
+
+            thisInstance.gameInfoCurrentBlueScore = blueTeamScore;
+            thisInstance.gameInfoCurrentRedScore = redTeamScore;
+            return;
+
         }
 
     }
