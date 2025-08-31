@@ -125,7 +125,9 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 stat_FBCarrierKills = CurrentPlayerObject.stat_FBCarrierKills - PreviousPlayerObject.stat_FBCarrierKills,
                 stat_FBCarrierDeaths = CurrentPlayerObject.stat_FBCarrierDeaths - PreviousPlayerObject.stat_FBCarrierDeaths,
                 stat_ExperiencePoints = CurrentPlayerObject.stat_ExperiencePoints - PreviousPlayerObject.stat_ExperiencePoints,
-                stat_ADTargetsDestroyed = CurrentPlayerObject.stat_ADTargetsDestroyed - PreviousPlayerObject.stat_ADTargetsDestroyed,
+                stat_SDADTargetsDestroyed = CurrentPlayerObject.stat_SDADTargetsDestroyed - PreviousPlayerObject.stat_SDADTargetsDestroyed,
+                stat_SDADDefenseKills = CurrentPlayerObject.stat_SDADDefenseKills - PreviousPlayerObject.stat_SDADDefenseKills,
+                stat_SDADAttackKills = CurrentPlayerObject.stat_SDADAttackKills - PreviousPlayerObject.stat_SDADAttackKills,
                 stat_FlagSaves = CurrentPlayerObject.stat_FlagSaves - PreviousPlayerObject.stat_FlagSaves,
                 stat_SniperKills = CurrentPlayerObject.stat_SniperKills - PreviousPlayerObject.stat_SniperKills,
                 stat_TKOTHDefenseKills = CurrentPlayerObject.stat_TKOTHDefenseKills - PreviousPlayerObject.stat_TKOTHDefenseKills,
@@ -169,7 +171,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 stat_FBCarrierKills = obj.stat_FBCarrierKills,
                 stat_FBCarrierDeaths = obj.stat_FBCarrierDeaths,
                 stat_ExperiencePoints = obj.stat_ExperiencePoints,
-                stat_ADTargetsDestroyed = obj.stat_ADTargetsDestroyed,
+                stat_SDADTargetsDestroyed = obj.stat_SDADTargetsDestroyed,
                 stat_FlagSaves = obj.stat_FlagSaves,
                 stat_SniperKills = obj.stat_SniperKills,
                 stat_TKOTHDefenseKills = obj.stat_TKOTHDefenseKills,
@@ -248,7 +250,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             PlayerStatLine += player.stat_ZoneTime + " ";
             PlayerStatLine += player.stat_FBCaptures + " ";
             PlayerStatLine += player.stat_FlagSaves + " ";
-            PlayerStatLine += player.stat_ADTargetsDestroyed + " ";
+            PlayerStatLine += player.stat_SDADTargetsDestroyed + " ";
             PlayerStatLine += player.stat_RevivesReceived + " ";
             PlayerStatLine += player.stat_RevivesGiven + " ";
             PlayerStatLine += player.stat_PSPAttempts + " ";
@@ -260,12 +262,12 @@ namespace BHD_ServerManager.Classes.StatsManagement
             PlayerStatLine += player.stat_SniperKills + " ";
             PlayerStatLine += player.stat_TKOTHDefenseKills + " ";
             PlayerStatLine += player.stat_TKOTHAttackKills + " ";
-            PlayerStatLine += "0 ";
-            PlayerStatLine += "0 ";
-            PlayerStatLine += "0 ";
-            PlayerStatLine += "0 ";
+            PlayerStatLine += player.stat_SDADDefenseKills + " ";
+            PlayerStatLine += "0 "; // sdadpolicekills
+            PlayerStatLine += player.stat_SDADAttackKills + " ";
+            PlayerStatLine += "0 "; // sdadsecurekills
             PlayerStatLine += player.stat_Kills > 0 ? (player.stat_TotalShotsFired / player.stat_Kills).ToString() : "0";
-            PlayerStatLine += " ";
+            PlayerStatLine += " "; // spacer for the SPK ratio
             PlayerStatLine += player.stat_ExperiencePoints + " ";
             PlayerStatLine += player.PlayerTeam + " ";
             bool playerActive = theInstance.playerList.Values.Any(p => p.PlayerName == player.PlayerName);
@@ -527,7 +529,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
                     player.stat_ZoneTime,
                     player.stat_FBCaptures,
                     player.stat_FlagSaves,
-                    player.stat_ADTargetsDestroyed,
+                    player.stat_SDADTargetsDestroyed,
                     player.stat_RevivesReceived,
                     player.stat_RevivesGiven,
                     player.stat_PSPAttempts,

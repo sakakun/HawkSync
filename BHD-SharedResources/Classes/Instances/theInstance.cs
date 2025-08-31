@@ -134,7 +134,8 @@ namespace BHD_SharedResources.Classes.Instances
         public string gameInfoMapName { get; set; } = "";                       /* Map Name, used for the Info Panel */
         public string gameInfoGameType { get; set; } = "";                      /* Game Type, used for the Info Panel */
         public int gameInfoCurrentNumPlayers { get; set; } = 0;                 /* Current Number of Players, used for the Info Panel */
-        public int gameInfoCurrentGameScore { get; set; } = 0;                  /* Current Game Score, used for the Info Panel */
+        public int gameInfoCurrentGameWinCond { get; set; } = 0;                /* Current Game Score, used for the Info Panel */
+        public bool gameInfoCurrentGameDefendingTeamBlue { get; set; }          /* Current Game Defending Team, used for the Info Panel */
         public int gameInfoCurrentBlueScore { get; set; } = 0;                  /* Current Blue Score, used for the Info Panel */
         public int gameInfoCurrentRedScore { get; set; } = 0;                   /* Current Red Score, used for the Info Panel */
         public int gameInfoMapCycleIndex { get; set; } = 0;                     /* Map Cycle Index, used for the Info Panel */

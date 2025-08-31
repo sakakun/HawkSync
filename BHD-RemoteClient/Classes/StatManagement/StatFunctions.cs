@@ -47,7 +47,7 @@ namespace BHD_RemoteClient.Classes.StatManagement
                     player.stat_ZoneTime,
                     player.stat_FBCaptures,
                     player.stat_FlagSaves,
-                    player.stat_ADTargetsDestroyed,
+                    player.stat_SDADTargetsDestroyed,
                     player.stat_RevivesReceived,
                     player.stat_RevivesGiven,
                     player.stat_PSPAttempts,

@@ -94,7 +94,7 @@ namespace BHD_ServerManager.Forms
             label_RedScore.Name = "label_RedScore";
             label_RedScore.Size = new Size(67, 22);
             label_RedScore.Text = "[Red Score]";
-            label_RedScore.ToolTipText = "Red Score";
+            label_RedScore.ToolTipText = "Score";
             // 
             // label_BlueScore
             // 
@@ -102,7 +102,7 @@ namespace BHD_ServerManager.Forms
             label_BlueScore.Name = "label_BlueScore";
             label_BlueScore.Size = new Size(70, 22);
             label_BlueScore.Text = "[Blue Score]";
-            label_BlueScore.ToolTipText = "Blue Score";
+            label_BlueScore.ToolTipText = "Score";
             // 
             // label_PlayersOnline
             // 

@@ -44,7 +44,9 @@ namespace BHD_SharedResources.Classes.ObjectClasses
         public int stat_FBCarrierKills { get; set; }
         public int stat_FBCarrierDeaths { get; set; }
         public int stat_ExperiencePoints { get; set; }
-        public int stat_ADTargetsDestroyed { get; set; }
+        public int stat_SDADTargetsDestroyed { get; set; }
+        public int stat_SDADDefenseKills { get; set; }
+        public int stat_SDADAttackKills { get; set; }
         public int stat_FlagSaves { get; set; }
         public int stat_SniperKills { get; set; }
         public int stat_TKOTHDefenseKills { get; set; }
