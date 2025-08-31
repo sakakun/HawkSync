@@ -29,8 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(tabMaps));
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel2 = new TableLayoutPanel();
             btn_mapsSkip = new Button();
@@ -215,14 +216,14 @@
             dataGridView_availableMaps.AllowUserToDeleteRows = false;
             dataGridView_availableMaps.AllowUserToResizeColumns = false;
             dataGridView_availableMaps.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dataGridView_availableMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = SystemColors.Control;
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
+            dataGridView_availableMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             dataGridView_availableMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_availableMaps.Columns.AddRange(new DataGridViewColumn[] { avail_MapID, avail_MapName, avail_MapFileName, avail_MapType, avail_MapDelete });
             dataGridView_availableMaps.Dock = DockStyle.Fill;
@@ -334,7 +335,7 @@
             ib_SaveMapList.Name = "ib_SaveMapList";
             ib_SaveMapList.Size = new Size(50, 26);
             ib_SaveMapList.TabIndex = 1;
-            toolTip1.SetToolTip(ib_SaveMapList, "Refresh Available Maps");
+            toolTip1.SetToolTip(ib_SaveMapList, resources.GetString("ib_SaveMapList.ToolTip"));
             ib_SaveMapList.UseVisualStyleBackColor = true;
             ib_SaveMapList.Click += actionClick_SaveCurrentPlaylist;
             // 
@@ -434,14 +435,14 @@
             dataGridView_currentMaps.AllowUserToDeleteRows = false;
             dataGridView_currentMaps.AllowUserToResizeColumns = false;
             dataGridView_currentMaps.AllowUserToResizeRows = false;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dataGridView_currentMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dataGridView_currentMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dataGridView_currentMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_currentMaps.Columns.AddRange(new DataGridViewColumn[] { current_MapID, current_MapName, current_MapFileName, current_MapType });
             dataGridView_currentMaps.Dock = DockStyle.Fill;

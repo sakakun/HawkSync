@@ -334,7 +334,7 @@
             ib_SaveMapList.Name = "ib_SaveMapList";
             ib_SaveMapList.Size = new Size(50, 26);
             ib_SaveMapList.TabIndex = 1;
-            toolTip1.SetToolTip(ib_SaveMapList, "Refresh Available Maps");
+            toolTip1.SetToolTip(ib_SaveMapList, "Save Maps List");
             ib_SaveMapList.UseVisualStyleBackColor = true;
             ib_SaveMapList.Click += actionClick_SaveCurrentPlaylist;
             // 
