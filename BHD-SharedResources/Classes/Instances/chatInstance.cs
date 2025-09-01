@@ -9,6 +9,8 @@ namespace BHD_SharedResources.Classes.Instances
         public List<SlapMessages> SlapMessages { get; set; } = new List<SlapMessages>();
         public List<AutoMessages> AutoMessages { get; set; } = new List<AutoMessages>();
         public List<ChatLogObject> ChatLog { get; set; } = new List<ChatLogObject>();
+
+        public Dictionary<DateTime, ChatQueueObject> MessageQueue = new();
         [JsonIgnore]
         public int AutoMessageCounter { get; set; } = 0;
         [JsonIgnore]
@@ -16,6 +18,13 @@ namespace BHD_SharedResources.Classes.Instances
         [JsonIgnore]
         public DateTime lastAutoMessageSent { get; set; } = DateTime.MinValue;
 
+    }
+
+    public class ChatQueueObject
+    {
+        public bool ConsoleMsg { get; set; } // false = no, true = yes
+        public int MessageType { get; set; } // 0 Global, 1 Yellow, 2 Red, 3 Blue
+        public string MessageText { get; set; } = string.Empty;
     }
 
     public class ChatLogObject
