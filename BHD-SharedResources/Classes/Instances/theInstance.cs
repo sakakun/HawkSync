@@ -96,6 +96,8 @@ namespace BHD_SharedResources.Classes.Instances
         public bool WebStatsAnnouncements { get; set; } = false;         // Enable/Disable WebStats Announcements/Ranks
         public int WebStatsReportInterval { get; set; } = 60;            // Interval in seconds for the WebStats Report Request
         public int WebStatsUpdateInterval { get; set; } = 60;            // Interval in seconds for the WebStats Update Request
+        public bool WebStatsEnableMinReqPlayers { get; set; } = false; // Enable/Disable Minimum Required Players for WebStats Update
+        public int WebStatsMinReqPlayers { get; set; } = 2;          // Minimum Required Players for WebStats Update
 
         // Weapon Restrictions
         public bool weaponColt45 { get; set; } = true;

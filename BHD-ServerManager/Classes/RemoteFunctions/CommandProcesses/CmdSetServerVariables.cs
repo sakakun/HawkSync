@@ -159,6 +159,8 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             thisInstance.WebStatsAnnouncements = updatedInstance.WebStatsAnnouncements;
             thisInstance.WebStatsReportInterval = updatedInstance.WebStatsReportInterval;
             thisInstance.WebStatsUpdateInterval = updatedInstance.WebStatsUpdateInterval;
+            thisInstance.WebStatsEnableMinReqPlayers = updatedInstance.WebStatsEnableMinReqPlayers;
+            thisInstance.WebStatsMinReqPlayers = updatedInstance.WebStatsMinReqPlayers;            
 
             theInstanceManager.SaveSettings();
 

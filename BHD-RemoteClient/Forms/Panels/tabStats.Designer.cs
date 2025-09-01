@@ -35,6 +35,9 @@
             statsLog_DateTime = new DataGridViewTextBoxColumn();
             statLog_Message = new DataGridViewTextBoxColumn();
             panel1 = new Panel();
+            groupBox5 = new GroupBox();
+            cb_WebStatsEnableMinReqPlayers = new CheckBox();
+            num_WebStatsMinReqPlayers = new NumericUpDown();
             groupBox4 = new GroupBox();
             btn_SaveSettings = new Button();
             groupBox3 = new GroupBox();
@@ -51,15 +54,6 @@
             tabPlayerStats = new TabPage();
             tableLayoutPanel2 = new TableLayoutPanel();
             dataGridViewPlayerStats = new DataGridView();
-            panel2 = new Panel();
-            label1 = new Label();
-            tabWeaponStats = new TabPage();
-            dataGridViewWeaponStats = new DataGridView();
-            Weapon_PlayerName = new DataGridViewTextBoxColumn();
-            WeaponName = new DataGridViewTextBoxColumn();
-            Timer = new DataGridViewTextBoxColumn();
-            Weapon_Kills = new DataGridViewTextBoxColumn();
-            Weapon_Shots = new DataGridViewTextBoxColumn();
             PlayerName = new DataGridViewTextBoxColumn();
             Suicides = new DataGridViewTextBoxColumn();
             Murders = new DataGridViewTextBoxColumn();
@@ -85,11 +79,23 @@
             PlayerTeam = new DataGridViewTextBoxColumn();
             PlayerActive = new DataGridViewTextBoxColumn();
             TimePlayed = new DataGridViewTextBoxColumn();
+            panel2 = new Panel();
+            label1 = new Label();
+            tabWeaponStats = new TabPage();
+            dataGridViewWeaponStats = new DataGridView();
+            Weapon_PlayerName = new DataGridViewTextBoxColumn();
+            WeaponName = new DataGridViewTextBoxColumn();
+            Timer = new DataGridViewTextBoxColumn();
+            Weapon_Kills = new DataGridViewTextBoxColumn();
+            Weapon_Shots = new DataGridViewTextBoxColumn();
+            btn_ResetWebStats = new Button();
             tabControl1.SuspendLayout();
             tabBabstats.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dg_statsLog).BeginInit();
             panel1.SuspendLayout();
+            groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)num_WebStatsMinReqPlayers).BeginInit();
             groupBox4.SuspendLayout();
             groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).BeginInit();
@@ -175,6 +181,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(groupBox5);
             panel1.Controls.Add(groupBox4);
             panel1.Controls.Add(groupBox3);
             panel1.Controls.Add(groupBox2);
@@ -186,8 +193,42 @@
             panel1.Size = new Size(289, 328);
             panel1.TabIndex = 2;
             // 
+            // groupBox5
+            // 
+            groupBox5.Controls.Add(cb_WebStatsEnableMinReqPlayers);
+            groupBox5.Controls.Add(num_WebStatsMinReqPlayers);
+            groupBox5.Dock = DockStyle.Fill;
+            groupBox5.Location = new Point(0, 222);
+            groupBox5.Name = "groupBox5";
+            groupBox5.Size = new Size(289, 49);
+            groupBox5.TabIndex = 4;
+            groupBox5.TabStop = false;
+            groupBox5.Text = "Misc";
+            // 
+            // cb_WebStatsEnableMinReqPlayers
+            // 
+            cb_WebStatsEnableMinReqPlayers.AutoSize = true;
+            cb_WebStatsEnableMinReqPlayers.CheckAlign = ContentAlignment.MiddleRight;
+            cb_WebStatsEnableMinReqPlayers.Location = new Point(15, 20);
+            cb_WebStatsEnableMinReqPlayers.Name = "cb_WebStatsEnableMinReqPlayers";
+            cb_WebStatsEnableMinReqPlayers.Size = new Size(207, 19);
+            cb_WebStatsEnableMinReqPlayers.TabIndex = 1;
+            cb_WebStatsEnableMinReqPlayers.Text = "Enable Minimum Required Players";
+            cb_WebStatsEnableMinReqPlayers.UseVisualStyleBackColor = true;
+            cb_WebStatsEnableMinReqPlayers.CheckedChanged += ActionEvent_MinPlayersReqChange;
+            // 
+            // num_WebStatsMinReqPlayers
+            // 
+            num_WebStatsMinReqPlayers.Location = new Point(228, 18);
+            num_WebStatsMinReqPlayers.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
+            num_WebStatsMinReqPlayers.Name = "num_WebStatsMinReqPlayers";
+            num_WebStatsMinReqPlayers.Size = new Size(55, 23);
+            num_WebStatsMinReqPlayers.TabIndex = 0;
+            num_WebStatsMinReqPlayers.TextAlign = HorizontalAlignment.Center;
+            // 
             // groupBox4
             // 
+            groupBox4.Controls.Add(btn_ResetWebStats);
             groupBox4.Controls.Add(btn_SaveSettings);
             groupBox4.Dock = DockStyle.Bottom;
             groupBox4.Location = new Point(0, 271);
@@ -200,7 +241,7 @@
             // 
             // btn_SaveSettings
             // 
-            btn_SaveSettings.Location = new Point(6, 22);
+            btn_SaveSettings.Location = new Point(87, 22);
             btn_SaveSettings.Name = "btn_SaveSettings";
             btn_SaveSettings.Size = new Size(75, 23);
             btn_SaveSettings.TabIndex = 10;
@@ -378,85 +419,6 @@
             dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
             dataGridViewPlayerStats.Size = new Size(888, 245);
             dataGridViewPlayerStats.TabIndex = 1;
-            // 
-            // panel2
-            // 
-            panel2.Controls.Add(label1);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(0, 0);
-            panel2.Margin = new Padding(0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(888, 83);
-            panel2.TabIndex = 2;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(354, 34);
-            label1.Name = "label1";
-            label1.Size = new Size(181, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Header Information To Be Added";
-            // 
-            // tabWeaponStats
-            // 
-            tabWeaponStats.Controls.Add(dataGridViewWeaponStats);
-            tabWeaponStats.Location = new Point(4, 24);
-            tabWeaponStats.Name = "tabWeaponStats";
-            tabWeaponStats.Size = new Size(894, 334);
-            tabWeaponStats.TabIndex = 2;
-            tabWeaponStats.Text = "Weapon Stats";
-            tabWeaponStats.UseVisualStyleBackColor = true;
-            // 
-            // dataGridViewWeaponStats
-            // 
-            dataGridViewWeaponStats.AllowUserToAddRows = false;
-            dataGridViewWeaponStats.AllowUserToDeleteRows = false;
-            dataGridViewWeaponStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewWeaponStats.Columns.AddRange(new DataGridViewColumn[] { Weapon_PlayerName, WeaponName, Timer, Weapon_Kills, Weapon_Shots });
-            dataGridViewWeaponStats.Dock = DockStyle.Fill;
-            dataGridViewWeaponStats.Location = new Point(0, 0);
-            dataGridViewWeaponStats.Name = "dataGridViewWeaponStats";
-            dataGridViewWeaponStats.ReadOnly = true;
-            dataGridViewWeaponStats.RowHeadersVisible = false;
-            dataGridViewWeaponStats.Size = new Size(894, 334);
-            dataGridViewWeaponStats.TabIndex = 1;
-            // 
-            // Weapon_PlayerName
-            // 
-            Weapon_PlayerName.HeaderText = "Player Name";
-            Weapon_PlayerName.MinimumWidth = 200;
-            Weapon_PlayerName.Name = "Weapon_PlayerName";
-            Weapon_PlayerName.ReadOnly = true;
-            Weapon_PlayerName.Width = 200;
-            // 
-            // WeaponName
-            // 
-            WeaponName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            WeaponName.HeaderText = "Weapon Name";
-            WeaponName.Name = "WeaponName";
-            WeaponName.ReadOnly = true;
-            // 
-            // Timer
-            // 
-            Timer.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Timer.HeaderText = "Time Used (s)";
-            Timer.Name = "Timer";
-            Timer.ReadOnly = true;
-            // 
-            // Weapon_Kills
-            // 
-            Weapon_Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Weapon_Kills.HeaderText = "Kills";
-            Weapon_Kills.Name = "Weapon_Kills";
-            Weapon_Kills.ReadOnly = true;
-            // 
-            // Weapon_Shots
-            // 
-            Weapon_Shots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Weapon_Shots.HeaderText = "Shots";
-            Weapon_Shots.Name = "Weapon_Shots";
-            Weapon_Shots.ReadOnly = true;
             // 
             // PlayerName
             // 
@@ -659,6 +621,95 @@
             TimePlayed.ReadOnly = true;
             TimePlayed.ToolTipText = "Time Played (s)";
             // 
+            // panel2
+            // 
+            panel2.Controls.Add(label1);
+            panel2.Dock = DockStyle.Fill;
+            panel2.Location = new Point(0, 0);
+            panel2.Margin = new Padding(0);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(888, 83);
+            panel2.TabIndex = 2;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(354, 34);
+            label1.Name = "label1";
+            label1.Size = new Size(181, 15);
+            label1.TabIndex = 0;
+            label1.Text = "Header Information To Be Added";
+            // 
+            // tabWeaponStats
+            // 
+            tabWeaponStats.Controls.Add(dataGridViewWeaponStats);
+            tabWeaponStats.Location = new Point(4, 24);
+            tabWeaponStats.Name = "tabWeaponStats";
+            tabWeaponStats.Size = new Size(894, 334);
+            tabWeaponStats.TabIndex = 2;
+            tabWeaponStats.Text = "Weapon Stats";
+            tabWeaponStats.UseVisualStyleBackColor = true;
+            // 
+            // dataGridViewWeaponStats
+            // 
+            dataGridViewWeaponStats.AllowUserToAddRows = false;
+            dataGridViewWeaponStats.AllowUserToDeleteRows = false;
+            dataGridViewWeaponStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewWeaponStats.Columns.AddRange(new DataGridViewColumn[] { Weapon_PlayerName, WeaponName, Timer, Weapon_Kills, Weapon_Shots });
+            dataGridViewWeaponStats.Dock = DockStyle.Fill;
+            dataGridViewWeaponStats.Location = new Point(0, 0);
+            dataGridViewWeaponStats.Name = "dataGridViewWeaponStats";
+            dataGridViewWeaponStats.ReadOnly = true;
+            dataGridViewWeaponStats.RowHeadersVisible = false;
+            dataGridViewWeaponStats.Size = new Size(894, 334);
+            dataGridViewWeaponStats.TabIndex = 1;
+            // 
+            // Weapon_PlayerName
+            // 
+            Weapon_PlayerName.HeaderText = "Player Name";
+            Weapon_PlayerName.MinimumWidth = 200;
+            Weapon_PlayerName.Name = "Weapon_PlayerName";
+            Weapon_PlayerName.ReadOnly = true;
+            Weapon_PlayerName.Width = 200;
+            // 
+            // WeaponName
+            // 
+            WeaponName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            WeaponName.HeaderText = "Weapon Name";
+            WeaponName.Name = "WeaponName";
+            WeaponName.ReadOnly = true;
+            // 
+            // Timer
+            // 
+            Timer.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Timer.HeaderText = "Time Used (s)";
+            Timer.Name = "Timer";
+            Timer.ReadOnly = true;
+            // 
+            // Weapon_Kills
+            // 
+            Weapon_Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Weapon_Kills.HeaderText = "Kills";
+            Weapon_Kills.Name = "Weapon_Kills";
+            Weapon_Kills.ReadOnly = true;
+            // 
+            // Weapon_Shots
+            // 
+            Weapon_Shots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Weapon_Shots.HeaderText = "Shots";
+            Weapon_Shots.Name = "Weapon_Shots";
+            Weapon_Shots.ReadOnly = true;
+            // 
+            // btn_ResetWebStats
+            // 
+            btn_ResetWebStats.Location = new Point(6, 22);
+            btn_ResetWebStats.Name = "btn_ResetWebStats";
+            btn_ResetWebStats.Size = new Size(75, 23);
+            btn_ResetWebStats.TabIndex = 11;
+            btn_ResetWebStats.Text = "Reset";
+            btn_ResetWebStats.UseVisualStyleBackColor = true;
+            btn_ResetWebStats.Click += ActionClick_ResetChanges;
+            // 
             // tabStats
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -673,6 +724,9 @@
             tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dg_statsLog).EndInit();
             panel1.ResumeLayout(false);
+            groupBox5.ResumeLayout(false);
+            groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)num_WebStatsMinReqPlayers).EndInit();
             groupBox4.ResumeLayout(false);
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
@@ -751,5 +805,9 @@
         private DataGridViewTextBoxColumn PlayerTeam;
         private DataGridViewTextBoxColumn PlayerActive;
         private DataGridViewTextBoxColumn TimePlayed;
+        private GroupBox groupBox5;
+        private CheckBox cb_WebStatsEnableMinReqPlayers;
+        private NumericUpDown num_WebStatsMinReqPlayers;
+        private Button btn_ResetWebStats;
     }
 }

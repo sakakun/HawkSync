@@ -30,6 +30,37 @@ namespace BHD_ServerManager.Forms.Panels
             InitializeComponent();
         }
 
+        private void functionEvent_HighlightDiffFields()
+        {
+            // Web Stats Enabled
+            cb_enableWebStats.BackColor = cb_enableWebStats.Checked != theInstance.WebStatsEnabled
+                ? Color.LightYellow : SystemColors.Control;
+
+            // Web Stats Server Path
+            tb_webStatsServerPath.BackColor = tb_webStatsServerPath.Text != theInstance.WebStatsServerPath
+                ? Color.LightYellow : SystemColors.Window;
+
+            // Announcements Enabled
+            cb_enableAnnouncements.BackColor = cb_enableAnnouncements.Checked != theInstance.WebStatsAnnouncements
+                ? Color.LightYellow : SystemColors.Control;
+
+            // Report Interval
+            num_WebStatsReport.BackColor = (int)num_WebStatsReport.Value != theInstance.WebStatsReportInterval
+                ? Color.LightYellow : SystemColors.Window;
+
+            // Update Interval
+            num_WebStatsUpdates.BackColor = (int)num_WebStatsUpdates.Value != theInstance.WebStatsUpdateInterval
+                ? Color.LightYellow : SystemColors.Window;
+
+            // Min Required Players Enabled
+            cb_WebStatsEnableMinReqPlayers.BackColor = cb_WebStatsEnableMinReqPlayers.Checked != theInstance.WebStatsEnableMinReqPlayers
+                ? Color.LightYellow : SystemColors.Control;
+
+            // Min Required Players Value
+            num_WebStatsMinReqPlayers.BackColor = (int)num_WebStatsMinReqPlayers.Value != theInstance.WebStatsMinReqPlayers
+                ? Color.LightYellow : SystemColors.Window;
+        }
+
         public void functionEvent_GetStatSettings(theInstance updatedInstance)
         {
             var newInstance = updatedInstance != null ? updatedInstance : theInstance;
@@ -40,6 +71,8 @@ namespace BHD_ServerManager.Forms.Panels
             cb_enableAnnouncements.Checked = newInstance.WebStatsAnnouncements;
             num_WebStatsReport.Value = newInstance.WebStatsReportInterval;
             num_WebStatsUpdates.Value = newInstance.WebStatsUpdateInterval;
+            cb_WebStatsEnableMinReqPlayers.Checked = newInstance.WebStatsEnableMinReqPlayers;
+            num_WebStatsMinReqPlayers.Value = newInstance.WebStatsMinReqPlayers;
 
             bool statsEnabled = newInstance.WebStatsEnabled;
             bool announcementsEnabled = statsEnabled && newInstance.WebStatsAnnouncements;
@@ -48,6 +81,7 @@ namespace BHD_ServerManager.Forms.Panels
             cb_enableAnnouncements.Enabled = statsEnabled;
             num_WebStatsReport.Enabled = announcementsEnabled;
             num_WebStatsUpdates.Enabled = statsEnabled;
+            num_WebStatsMinReqPlayers.Enabled = statsEnabled && cb_WebStatsEnableMinReqPlayers.Checked;
         }
 
         public void functionEvent_SaveSettings()
@@ -58,6 +92,8 @@ namespace BHD_ServerManager.Forms.Panels
             theInstance.WebStatsAnnouncements = cb_enableAnnouncements.Checked;
             theInstance.WebStatsReportInterval = (int)num_WebStatsReport.Value;
             theInstance.WebStatsUpdateInterval = (int)num_WebStatsUpdates.Value;
+            theInstance.WebStatsEnableMinReqPlayers = cb_WebStatsEnableMinReqPlayers.Checked;
+            theInstance.WebStatsMinReqPlayers = (int)num_WebStatsMinReqPlayers.Value;
 
             // Save the settings to file
             theInstanceManager.SaveSettings();
@@ -74,6 +110,8 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
 
+            functionEvent_HighlightDiffFields();
+
         }
 
         private void ActionEvent_EnableAnnouncements(object sender, EventArgs e) => num_WebStatsReport.Enabled = cb_enableAnnouncements.Checked;
@@ -85,6 +123,8 @@ namespace BHD_ServerManager.Forms.Panels
             cb_enableAnnouncements.Enabled = enabled;
             num_WebStatsUpdates.Enabled = enabled;
             num_WebStatsReport.Enabled = cb_enableAnnouncements.Checked;
+            cb_WebStatsEnableMinReqPlayers.Enabled = enabled;
+            num_WebStatsMinReqPlayers.Enabled = enabled;
         }
 
         private async void ActionEvent_TestBabstatConnection(object sender, EventArgs e)
@@ -101,6 +141,16 @@ namespace BHD_ServerManager.Forms.Panels
         private void actionClick_SaveStatSettings(object sender, EventArgs e)
         {
             functionEvent_SaveSettings();
+        }
+
+        private void ActionEvent_MinPlayersReqChange(object sender, EventArgs e)
+        {
+            num_WebStatsMinReqPlayers.Enabled = cb_WebStatsEnableMinReqPlayers.Checked;
+        }
+
+        private void ActionClick_ResetChanges(object sender, EventArgs e)
+        {
+            functionEvent_GetStatSettings(null!);
         }
     }
 }

@@ -29,7 +29,6 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             AppDebug.Log("CmdSendChatMessage", $"Received data: {ChatMessage}-{TimerTigger}");
 
             chatInstanceManagers.AddSlapMessage(ChatMessage.Trim());
-            thisServer.ChatTab.fuctionEvent_UpdateSlapMessages();
 
             return new CommandResponse
             {

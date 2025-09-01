@@ -154,6 +154,7 @@ namespace BHD_RemoteClient.Forms.Panels
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
+                e.Handled = true;
                 chatInstanceManagers.AddSlapMessage(tb_slapMessage.Text);
                 tb_slapMessage.Clear();
                 fuctionEvent_UpdateSlapMessages();
@@ -167,10 +168,14 @@ namespace BHD_RemoteClient.Forms.Panels
         }
         private void actionKeyPressed_AddAutoMessage(object sender, KeyPressEventArgs e)
         {
-            chatInstanceManagers.AddAutoMessage(tb_autoMessage.Text.Trim(), (int)num_AutoMessageTrigger.Value);
-            functionEvent_UpdateAutoMessages();
-            tb_autoMessage.Text = string.Empty;
-            num_AutoMessageTrigger.Value = 0;
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                chatInstanceManagers.AddAutoMessage(tb_autoMessage.Text.Trim(), (int)num_AutoMessageTrigger.Value);
+                functionEvent_UpdateAutoMessages();
+                tb_autoMessage.Text = string.Empty;
+                num_AutoMessageTrigger.Value = 0;
+            }
         }
         private void actionClick_RemoveAutoMessage(object sender, DataGridViewCellEventArgs e)
         {

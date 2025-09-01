@@ -11,6 +11,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Windows.Storage;
@@ -226,7 +227,8 @@ namespace BHD_RemoteClient.Forms.Panels
             // Log the action
             AppDebug.Log(this.Name, "Saving server settings...");
 
-            theInstance updatedInfo = new theInstance(); // Reset to defaults before applying new settings
+            // Deep copy theInstance using serialization
+            theInstance updatedInfo = JsonSerializer.Deserialize<theInstance>(JsonSerializer.Serialize(theInstance))!;
 
             // Host Information (4 fields)
             {
