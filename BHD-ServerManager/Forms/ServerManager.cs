@@ -30,6 +30,7 @@ namespace BHD_ServerManager.Forms
         public tabBans    BanTab     = null!;                   // The Bans Tab User Control
         public tabStats   StatsTab   = null!;                   // The Stats Tab User Control
         public tabAdmins  AdminTab   = null!;                   // The Admins Tab User Control
+        public tabAddons  AddonsTab  = null!;                   // The Addons Tab User Control
 
         public ServerManager()
         {
@@ -61,6 +62,7 @@ namespace BHD_ServerManager.Forms
             tabBans.Controls.Add(BanTab = new tabBans());
             tabStats.Controls.Add(StatsTab = new tabStats());
             tabAdmin.Controls.Add(AdminTab = new tabAdmins());
+            tabAddons.Controls.Add(AddonsTab = new tabAddons());
         }
 
         // --- Server Status and Controls ---

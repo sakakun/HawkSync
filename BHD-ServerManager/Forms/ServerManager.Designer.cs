@@ -51,6 +51,7 @@ namespace BHD_ServerManager.Forms
             tabAdmin = new TabPage();
             openFileDialog = new OpenFileDialog();
             toolTip = new ToolTip(components);
+            tabAddons = new TabPage();
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
@@ -126,6 +127,7 @@ namespace BHD_ServerManager.Forms
             // 
             tabControl.Controls.Add(tabProfile);
             tabControl.Controls.Add(tabServer);
+            tabControl.Controls.Add(tabAddons);
             tabControl.Controls.Add(tabMaps);
             tabControl.Controls.Add(tabPlayers);
             tabControl.Controls.Add(tabChat);
@@ -222,6 +224,16 @@ namespace BHD_ServerManager.Forms
             // 
             openFileDialog.FileName = "openFileDialog";
             // 
+            // tabAddons
+            // 
+            tabAddons.Location = new Point(4, 24);
+            tabAddons.Name = "tabAddons";
+            tabAddons.Padding = new Padding(3);
+            tabAddons.Size = new Size(902, 362);
+            tabAddons.TabIndex = 10;
+            tabAddons.Text = "Add-ons";
+            tabAddons.UseVisualStyleBackColor = true;
+            // 
             // ServerManager
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -263,5 +275,6 @@ namespace BHD_ServerManager.Forms
         private ToolStripLabel label_BlueScore;
         private ToolStripLabel label_PlayersOnline;
         private TabPage tabChat;
+        private TabPage tabAddons;
     }
 }

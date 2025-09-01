@@ -140,18 +140,25 @@ namespace BHD_SharedResources.Classes.Instances
         public bool gameInfoCurrentGameDefendingTeamBlue { get; set; }          /* Current Game Defending Team, used for the Info Panel */
         public int gameInfoCurrentBlueScore { get; set; } = 0;                  /* Current Blue Score, used for the Info Panel */
         public int gameInfoCurrentRedScore { get; set; } = 0;                   /* Current Red Score, used for the Info Panel */
-        public int gameInfoMapCycleIndex { get; set; } = 0;                     /* Map Cycle Index, used for the Info Panel */
+        public int gameInfoNumberMapsPlayed { get; set; } = 0;                     /* Map Cycle Index, used for the Info Panel */
         public int gameInfoCurrentMapIndex { get; set; } = 0;                   /* Current Map Index, used for the Info Panel */
         public int gameInfoNextMapGameType { get; set; } = 0;                   /* Next Map Game Type, used for the Info Panel */
 
         // Instance Update Statements
         public bool banInstanceUpdated { get; set; } = false;
 
-
         // Player Team Information
         public Dictionary<int, playerObject> playerList { get; set; } = new();
         public List<playerTeamObject> playerChangeTeamList { get; set; } = new();
         public List<playerTeamObject> playerPreviousTeamList { get; set; } = new();
+
+        // Chat Command Variables
+        // Chat Command: Skip Map Voting
+        public bool chatCommandSkipMap_Enabled { get; set; } = false;
+        public int chatCommandSkipMap_VotePercent { get; set; } = 51;
+        public int chatCommandSkipMap_VotingPeriod { get; set; } = 2;
+        public int chatCommandSkipMap_MaxVotingSessions { get; set; } = 2;
+        public int chatCommandSkipMap_VotingStarts { get; set; } = 2;
     }
 
     public enum InstanceStatus

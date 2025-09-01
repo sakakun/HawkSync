@@ -77,6 +77,9 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.BanTab.BanTickerHook();                                              // Update Bans Tab
                 thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
                 thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
+
+                // --- Addon Ticker Hooks ---
+                thisServer.AddonsTab.ChatCommandsTab.TickerChatCommandsHook();                  // Update Chat Commands Tab
             });
 
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)

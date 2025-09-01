@@ -1050,7 +1050,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             int currentMapCycleCount = BitConverter.ToInt32(currentMapCycleCountBytes, 0);
 
-            thisInstance.gameInfoMapCycleIndex = currentMapCycleCount;
+            thisInstance.gameInfoNumberMapsPlayed = currentMapCycleCount;
 
 
         }
@@ -1253,8 +1253,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         {
             int colorbuffer_written = 0;
             byte[] colorcode;
-
-
 
             switch (MsgLocation)
             {
@@ -1941,11 +1939,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                     .Where(pair => pair.value != 0)
                     .Select(pair => $"{beginaddr + pair.offset:X8}:{pair.offset:X8} => {pair.value}\n")
             );
-            AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsets2Log);
+            // AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsets2Log);
             
             // Score Offsets
             string offsetsLog = string.Join(", ", offsets.Select((offset, i) => $"{beginaddr + offset:X8}:{offset:X8} => {stats[i]}\n"));
-            AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsetsLog);
+            // AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsetsLog);
 
             // Read Player Flag Time
             byte[] read_playerActiveZoneTimeByte = new byte[4];
