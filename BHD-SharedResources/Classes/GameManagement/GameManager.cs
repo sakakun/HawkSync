@@ -70,7 +70,5 @@ namespace BHD_SharedResources.Classes.GameManagement
         public static playerObject ReadMemoryPlayerStats(int reqslot) => Implementation.ReadMemoryPlayerStats(reqslot);
         public static string[] ReadMemoryLastChatMessage() => Implementation.ReadMemoryLastChatMessage();
 
-
-
     }
 }

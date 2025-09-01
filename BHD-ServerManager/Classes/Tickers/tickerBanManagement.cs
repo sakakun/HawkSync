@@ -1,6 +1,7 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Forms;
 using BHD_SharedResources.Classes.CoreObjects;
+using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.ObjectClasses;
@@ -76,7 +77,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 bool isBanned = banInstance.BannedPlayerNames.Any(b => b.playerName == playerRecord.PlayerNameBase64);
                 if (isBanned)
                 {
-                    ServerMemory.WriteMemorySendConsoleCommand($"punt {playerRecord.PlayerSlot}");
+                    chatInstanceManagers.SendMessageToQueue(true, 0, $"punt {playerRecord.PlayerSlot}");
                     AppDebug.Log("tickerBanManagement", $"Punting player {playerRecord.PlayerNameBase64} in PlayerSlot {playerRecord.PlayerSlot} due to name ban.");
                     continue; // No need to check IP if already banned by name
                 }
@@ -85,7 +86,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 bool isIpBanned = IsIpBanned(playerRecord.PlayerIPAddress!, banInstance.BannedPlayerAddresses);
                 if (isIpBanned)
                 {
-                    ServerMemory.WriteMemorySendConsoleCommand($"punt {playerRecord.PlayerSlot}");
+                    chatInstanceManagers.SendMessageToQueue(true, 0, $"punt {playerRecord.PlayerSlot}");
                     AppDebug.Log("tickerBanManagement", $"Punting player {playerRecord.PlayerIPAddress} in PlayerSlot {playerRecord.PlayerSlot} due to IP ban.");
                 }
             }

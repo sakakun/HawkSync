@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -246,12 +247,14 @@ namespace BHD_ServerManager.Forms.Panels
                 for (int i = 0; i < message.Length; i += 59)
                 {
                     string chunk = message.Substring(i, Math.Min(59, message.Length - i));
-                    GameManager.WriteMemorySendChatMessage(channel, chunk);
+                    chatInstanceManagers.SendMessageToQueue(false, channel, chunk);
+                    // GameManager.WriteMemorySendChatMessage(channel, chunk);
                 }
             }
             else
             {
-                GameManager.WriteMemorySendChatMessage(channel, message);
+                chatInstanceManagers.SendMessageToQueue(false, channel, message);
+                // GameManager.WriteMemorySendChatMessage(channel, message);
             }
 
             tb_chatMessage.Clear();

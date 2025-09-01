@@ -4,6 +4,7 @@ using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
+using System.Reflection.Metadata.Ecma335;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -54,14 +55,17 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 if (ServerMemory.ReadMemoryIsProcessAttached())
                 {
-                    // Recover auto message counter before processing auto messages
-                    RecoverAutoMessageCounter();
-
-                    // Process auto messages (non-blocking)
-                    Task.Run(ProcessAutoMessages);
-
+                    // --- Incoming Chat Messages ---
                     // Process latest chat message and update UI (non-blocking)
                     Task.Run(ProcessChatMessages);
+
+                    // --- Outgoing Chat/Console Messages ---
+                    // Recover auto message counter before processing auto messages
+                    RecoverAutoMessageCounter();
+                    // Process auto messages (non-blocking)
+                    Task.Run(ProcessAutoMessages);
+                    // Process Queued Messages (non-blocking)
+                    Task.Run(ProcessQueuedMessages);
                 }
                 else
                 {
@@ -93,12 +97,12 @@ namespace BHD_ServerManager.Classes.Tickers
             string playerName = lastMessage.Substring(0, msgStart).Trim();
             string playerMessage = lastMessage.Substring(msgStart + 1).Trim();
 
-            // Prevent duplicate messages based on last processed message
-            if (_lastProcessedPlayerName == playerName && _lastProcessedMessageText == playerMessage)
-                return;
-
             lock (chatLog)
             {
+                // Prevent duplicate messages based on last processed message
+                if (_lastProcessedPlayerName == playerName && _lastProcessedMessageText == playerMessage)
+                    return;
+
                 // Message type mapping
                 int msgType = msgTypeBytes switch
                 {
@@ -133,7 +137,12 @@ namespace BHD_ServerManager.Classes.Tickers
                 };
 
                 chatLog.Add(newChat);
-                thisServer.AddonsTab.ChatCommandsTab.ChatCommandSkipChatHook(newChat);
+                // --- Chat Command Hooks ---
+                // Ignore Server Messages
+                if (newChat.MessageType != 0)
+                {
+                    thisServer.AddonsTab.ChatCommandsTab.ChatCommandSkipChatHook(newChat);
+                }
 
                 // Update last processed message for deduplication
                 _lastProcessedPlayerName = playerName;
@@ -156,7 +165,10 @@ namespace BHD_ServerManager.Classes.Tickers
             if (autoMessages == null || autoMessages.Count == 0)
                 return;
 
-            // Calculate elapsed minutes since map started
+            
+
+
+            // Calculate elapsed minutes since game play started (after start delay)
             double elapsedMinutes = Math.Max(0, thisInstance.gameTimeLimit - thisInstance.gameInfoTimeRemaining.TotalMinutes);
 
             lock (autoMessages)
@@ -175,7 +187,8 @@ namespace BHD_ServerManager.Classes.Tickers
 
                     if (elapsedMinutes >= autoMsg.AutoMessageTigger)
                     {
-                        ServerMemory.WriteMemorySendChatMessage(1, autoMsg.AutoMessageText);
+                        chatInstanceManagers.SendMessageToQueue(false, 1, autoMsg.AutoMessageText);
+                        // ServerMemory.WriteMemorySendChatMessage(1, autoMsg.AutoMessageText);
                         instanceChat.AutoMessageCounter++;
                         instanceChat.lastAutoMessageSent = DateTime.Now;
                     }
@@ -221,6 +234,43 @@ namespace BHD_ServerManager.Classes.Tickers
             _autoMessageRecoveryDone = true;
         }
 
+        public static void ProcessQueuedMessages()
+        {
+            var messageQueue = instanceChat.MessageQueue;
+            if (messageQueue == null || messageQueue.Count == 0)
+                return;
+            List<int> keysToRemove = new List<int>();
+
+            lock (messageQueue)
+            {
+                // Sort the keys in ascending order
+                var sortedKeys = messageQueue.Keys.OrderBy(k => k).ToList();
+                foreach (var recordID in sortedKeys)
+                {
+                    ChatQueueObject msgObj = messageQueue[recordID];
+                    Thread.Sleep(1000); // 1 second delay between messages
+                    if (msgObj.ConsoleMsg)
+                    {
+                        // Send the console message
+                        ServerMemory.WriteMemorySendConsoleCommand(msgObj.MessageText);
+                        keysToRemove.Add(recordID);
+                        continue;
+                    }
+                    else
+                    {
+                        // Send the chat message
+                        ServerMemory.WriteMemorySendChatMessage(msgObj.MessageType, msgObj.MessageText);
+                        keysToRemove.Add(recordID);
+                        continue;
+                    }
+                }
+                // Remove processed messages from the queue
+                foreach (var key in keysToRemove)
+                {
+                    messageQueue.Remove(key);
+                }
+            }
+        }
 
     }
 }

@@ -587,7 +587,8 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Server Lock Lobby ----
         private void actionClick_ServerLockLobby(object sender, EventArgs e)
         {
-            GameManager.WriteMemorySendConsoleCommand("lockgame");
+            chatInstanceManagers.SendMessageToQueue(true, 0, "lockgame");
+            //GameManager.WriteMemorySendConsoleCommand("lockgame");
         }
     }
 }

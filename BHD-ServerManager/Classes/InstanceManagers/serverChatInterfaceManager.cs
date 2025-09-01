@@ -14,6 +14,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         private static chatInstance instanceChat = CommonCore.instanceChat!;
 
         private static DateTime _lastGridUpdate = DateTime.MinValue;
+        private static int _nextMessageQueueId = 1;
 
         // Function: loadChatSettings, loads the chat settings from a JSON file. If it does not exist, it initializes empty lists and saves them.
         public void LoadSettings()
@@ -143,6 +144,15 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             // To Do: Remove
         }
-
+        public void SendMessageToQueue(bool consoleMsg, int messageType, string messageText)
+        {
+            var chatQueueObject = new ChatQueueObject
+            {
+                ConsoleMsg = consoleMsg,
+                MessageType = messageType,
+                MessageText = messageText
+            };
+            instanceChat.MessageQueue[_nextMessageQueueId++] = chatQueueObject;
+        }
     }
 }

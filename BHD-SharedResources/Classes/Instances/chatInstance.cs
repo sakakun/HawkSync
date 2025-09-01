@@ -10,7 +10,7 @@ namespace BHD_SharedResources.Classes.Instances
         public List<AutoMessages> AutoMessages { get; set; } = new List<AutoMessages>();
         public List<ChatLogObject> ChatLog { get; set; } = new List<ChatLogObject>();
 
-        public Dictionary<DateTime, ChatQueueObject> MessageQueue = new();
+        public Dictionary<int, ChatQueueObject> MessageQueue = new();
         [JsonIgnore]
         public int AutoMessageCounter { get; set; } = 0;
         [JsonIgnore]

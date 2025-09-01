@@ -14,5 +14,6 @@ namespace BHD_SharedResources.Classes.InstanceInterfaces
         IReadOnlyList<SlapMessages> GetSlapMessages();
         IReadOnlyList<AutoMessages> GetAutoMessages();
         void UpdateChatMessagesGrid();
+        void SendMessageToQueue(bool consoleMsg, int messageType, string messageText);
     }
 }

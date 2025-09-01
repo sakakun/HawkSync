@@ -1,4 +1,5 @@
 ﻿using BHD_SharedResources.Classes.GameManagement;
+using BHD_SharedResources.Classes.InstanceManagers;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
@@ -22,7 +23,8 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
                     message = msg;
             }
 
-            GameManager.WriteMemorySendConsoleCommand(message);
+            chatInstanceManagers.SendMessageToQueue(true, 0, message);
+            //GameManager.WriteMemorySendConsoleCommand(message);
 
             return new CommandResponse
             {

@@ -33,6 +33,7 @@ namespace BHD_ServerManager.Forms.Panels.Addons
         private int _chatCommandSkipMap_VotingSessions = 0;
         private List<string> _chatCommandSkipMap_VotedPlayers = new List<string>();
         private DateTime _chatCommandSkipMap_VotingEnds = DateTime.MinValue;
+
         // Thread Blocking
         private readonly object _skipMapTickerLock = new();
         private DateTime _lastVotingStart = DateTime.MinValue;
@@ -88,16 +89,14 @@ namespace BHD_ServerManager.Forms.Panels.Addons
                 theInstance.instanceStatus == InstanceStatus.STARTDELAY)
             {
                 // Command: !skipmap Voting Reset
-                _chatCommandSkipMap_VotingStarted = false;
-                _chatCommandSkipMap_VotingPassed = false;
-                _chatCommandSkipMap_VotedPlayers = new List<string>();
-                _chatCommandSkipMap_VotingEnds = DateTime.MinValue;
                 _chatCommandSkipMap_VotingSessions = 0;
+                ResetSkipMapVotingState();
+
             }
+
             if (theInstance.instanceStatus == InstanceStatus.ONLINE)
             {
                 ChatCommandSkipMapTicker();
-                return;
             }
 
         }
@@ -109,42 +108,56 @@ namespace BHD_ServerManager.Forms.Panels.Addons
                 if (!theInstance.chatCommandSkipMap_Enabled) return;
                 if (_chatCommandSkipMap_VotingSessions >= theInstance.chatCommandSkipMap_MaxVotingSessions) return;
 
-                // Only allow voting to start if not started and not recently started
+                double bufferSeconds = (theInstance.chatCommandSkipMap_VotingPeriod * 60) + 20;
+
+                // Start voting session
                 if (!_chatCommandSkipMap_VotingStarted &&
                     theInstance.gameInfoTimeRemaining.TotalMinutes < (theInstance.gameTimeLimit - theInstance.chatCommandSkipMap_VotingStarts) &&
-                    (DateTime.Now - _lastVotingStart).TotalSeconds > 6) // 5 seconds guard
+                    (DateTime.Now - _lastVotingStart).TotalSeconds > bufferSeconds)
                 {
+                    _chatCommandSkipMap_VotingSessions++;
                     _chatCommandSkipMap_VotedPlayers.Clear();
                     _chatCommandSkipMap_VotingStarted = true;
                     _chatCommandSkipMap_VotingPassed = false;
                     _lastVotingStart = DateTime.Now;
 
-                    int nextMapIndex = ((theInstance.gameInfoCurrentMapIndex + 1) < instanceMaps.currentMapPlaylist.Count ? theInstance.gameInfoCurrentMapIndex + 1 : 0);
+                    int nextMapIndex = theInstance.gameInfoCurrentMapIndex >= instanceMaps.currentMapPlaylist.Count - 1
+                                || theInstance.gameInfoCurrentMapIndex < 0
+                                ? 0
+                                : theInstance.gameInfoCurrentMapIndex + 1;
 
                     mapFileInfo mapInfo = instanceMaps.currentMapPlaylist[nextMapIndex];
-                    ServerMemory.WriteMemorySendChatMessage(1, $"Next Map is {mapInfo.MapName} ({mapInfo.MapType})");
-                    Thread.Sleep(700);
-                    ServerMemory.WriteMemorySendChatMessage(1, $"Skip Map voting is now open! Type !skipmap in chat to vote to skip the next map.");
-                    Thread.Sleep(700);
-                    ServerMemory.WriteMemorySendChatMessage(1, $"Voting ends in {theInstance.chatCommandSkipMap_VotingPeriod} minutes.");
-                    Thread.Sleep(700);
+                    chatInstanceManagers.SendMessageToQueue(false, 1, $"Next Map is {mapInfo.MapName} ({mapInfo.MapType})");
+                    chatInstanceManagers.SendMessageToQueue(false, 1, $"Skip Map voting session {_chatCommandSkipMap_VotingSessions} is now open!");
+                    chatInstanceManagers.SendMessageToQueue(false, 1, "Type !skipmap in chat to vote to skip the next map.");
+                    chatInstanceManagers.SendMessageToQueue(false, 1, $"Voting session {_chatCommandSkipMap_VotingSessions} ends in {theInstance.chatCommandSkipMap_VotingPeriod} minutes.");
 
-                    _chatCommandSkipMap_VotingSessions++;
                     _chatCommandSkipMap_VotingEnds = DateTime.Now.AddMinutes(theInstance.chatCommandSkipMap_VotingPeriod);
                     return;
                 }
 
+                AppDebug.Log("Voting Logic", $"Voting Started: {_chatCommandSkipMap_VotingStarted}, {DateTime.Now} - {_chatCommandSkipMap_VotingEnds}" );
+
                 // Voting ended, check if passed
                 if (_chatCommandSkipMap_VotingStarted && DateTime.Now >= _chatCommandSkipMap_VotingEnds)
                 {
+                    int nextMapIndex = theInstance.gameInfoCurrentMapIndex >= instanceMaps.currentMapPlaylist.Count - 1
+                                || theInstance.gameInfoCurrentMapIndex < 0
+                                ? 0
+                                : theInstance.gameInfoCurrentMapIndex + 1;
+
                     if (_chatCommandSkipMap_VotingPassed)
                     {
+                        AppDebug.Log("VotingSkipMap", "Vote Passed");
+                        chatInstanceManagers.SendMessageToQueue(false, 1, $"Voting session {_chatCommandSkipMap_VotingSessions} passed! The next map will not be played.");
+                        mapFileInfo mapInfo = instanceMaps.currentMapPlaylist[nextMapIndex + 1];
+                        chatInstanceManagers.SendMessageToQueue(false, 1, $"Next Map will be {mapInfo.MapName} ({mapInfo.MapType})");
+                        GameManager.UpdateNextMap(nextMapIndex + 1);
                         ResetSkipMapVotingState();
                     }
                     else
                     {
-                        ServerMemory.WriteMemorySendChatMessage(1, "Skip Map voting has ended. Next map will be played.");
-                        Thread.Sleep(700);
+                        chatInstanceManagers.SendMessageToQueue(false, 1, $"Skip Map voting session {_chatCommandSkipMap_VotingSessions} has ended. Map will be played.");
                         ResetSkipMapVotingState();
                         _chatCommandSkipMap_VotingSessions = theInstance.chatCommandSkipMap_MaxVotingSessions;
                     }
@@ -162,37 +175,35 @@ namespace BHD_ServerManager.Forms.Panels.Addons
 
         public void ChatCommandSkipChatHook(ChatLogObject chatMessage)
         {
-
             if (!theInstance.chatCommandSkipMap_Enabled) return;
             if (_chatCommandSkipMap_VotingSessions >= theInstance.chatCommandSkipMap_MaxVotingSessions) return;
-            if (_chatCommandSkipMap_VotingStarted && DateTime.Now < _chatCommandSkipMap_VotingEnds)
-            {
-                AppDebug.Log("SkipMap", $"Message Sent: {chatMessage.MessageText}");
-                if (chatMessage.MessageText != null && chatMessage.MessageText.Contains("!skipmap", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (!_chatCommandSkipMap_VotedPlayers.Contains(chatMessage.PlayerName))
-                    {
-                        _chatCommandSkipMap_VotedPlayers.Add(chatMessage.PlayerName);
-                        int currentPlayers = theInstance.gameInfoCurrentNumPlayers;
-                        int votesNeeded = (int)Math.Ceiling((theInstance.chatCommandSkipMap_VotePercent / 100.0) * currentPlayers);
-                        int votesReceived = _chatCommandSkipMap_VotedPlayers.Count;
 
-                        if (votesReceived >= votesNeeded && currentPlayers > 0)
-                        {
-                            ServerMemory.WriteMemorySendChatMessage(1, $"{chatMessage.PlayerName} has voted to skip the next map. ({votesReceived} votes)");
-                            Thread.Sleep(700);
-                            ServerMemory.WriteMemorySendChatMessage(1, "Vote passed! The next map will not be played.");
-                            Thread.Sleep(700);
-                            GameManager.UpdateNextMap(theInstance.gameInfoCurrentMapIndex + 2);
-                            _chatCommandSkipMap_VotingPassed = true;
-                            _chatCommandSkipMap_VotingStarted = false;
-                            ResetSkipMapVotingState();
-                        }
-                        else
-                        {
-                            ServerMemory.WriteMemorySendChatMessage(1, $"{chatMessage.PlayerName} has voted to skip the next map. ({votesReceived}/{votesNeeded} votes)");
-                            Thread.Sleep(700);
-                        }
+            // Prevent votes after voting has ended
+            if (!_chatCommandSkipMap_VotingStarted || DateTime.Now >= _chatCommandSkipMap_VotingEnds)
+                return;
+
+            AppDebug.Log("SkipMap", $"Message Sent: {chatMessage.MessageText}");
+            if (chatMessage.MessageText != null && chatMessage.MessageText.StartsWith("!skipmap", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!_chatCommandSkipMap_VotedPlayers.Contains(chatMessage.PlayerName))
+                {
+                    _chatCommandSkipMap_VotedPlayers.Add(chatMessage.PlayerName);
+                    int currentPlayers = theInstance.gameInfoCurrentNumPlayers;
+                    int votesNeeded = (int)Math.Ceiling((theInstance.chatCommandSkipMap_VotePercent / 100.0) * currentPlayers);
+                    int votesReceived = _chatCommandSkipMap_VotedPlayers.Count;
+
+                    if (votesReceived >= votesNeeded && currentPlayers > 0)
+                    {
+                        ServerMemory.WriteMemorySendChatMessage(1, $"{chatMessage.PlayerName} has voted to skip the next map. ({votesReceived} votes)");
+                        _chatCommandSkipMap_VotingPassed = true;
+                        _chatCommandSkipMap_VotingEnds = DateTime.Now; // End voting immediately
+                        
+                        // Do NOT reset or update map here; let the ticker handle it
+                        ChatCommandSkipMapTicker();
+                    }
+                    else
+                    {
+                        ServerMemory.WriteMemorySendChatMessage(1, $"{chatMessage.PlayerName} has voted to skip the next map. ({votesReceived}/{votesNeeded} votes)");
                     }
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using BHD_SharedResources.Classes.GameManagement;
+using BHD_SharedResources.Classes.InstanceManagers;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
@@ -8,8 +9,8 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 
         public static CommandResponse ProcessCommand(object data)
         {
-
-            GameManager.WriteMemorySendConsoleCommand("resetgames");
+            chatInstanceManagers.SendMessageToQueue(true, 0, "resetgames");
+            // GameManager.WriteMemorySendConsoleCommand("resetgames");
 
             return new CommandResponse
             {

@@ -16,5 +16,6 @@ namespace BHD_SharedResources.Classes.InstanceManagers
         public static IReadOnlyList<SlapMessages> GetSlapMessages() => Implementation.GetSlapMessages();
         public static IReadOnlyList<AutoMessages> GetAutoMessages() => Implementation.GetAutoMessages();
         public static void UpdateChatMessagesGrid() => Implementation.UpdateChatMessagesGrid();
+        public static void SendMessageToQueue(bool consoleMsg, int messageType, string messageText) => Implementation.SendMessageToQueue(consoleMsg, messageType, messageText);
     }
 }

@@ -279,7 +279,8 @@ namespace BHD_ServerManager.Forms.Panels
             if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP)
             {
                 theInstance.instanceMapSkipped = true;
-                GameManager.WriteMemorySendConsoleCommand("resetgames");
+                chatInstanceManagers.SendMessageToQueue(true, 0, "resetgames");
+                // GameManager.WriteMemorySendConsoleCommand("resetgames");
             }
             else
             {

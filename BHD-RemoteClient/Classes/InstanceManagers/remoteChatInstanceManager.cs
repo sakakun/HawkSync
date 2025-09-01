@@ -46,5 +46,9 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
             // To Do: Remove
         }
 
+        void chatInstanceInterface.SendMessageToQueue(bool consoleMsg, int messageType, string messageText)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

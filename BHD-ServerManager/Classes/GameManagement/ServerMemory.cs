@@ -1227,8 +1227,9 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] newMapIndexBytes = BitConverter.GetBytes(NextMapIndex);
             int newMapIndexBytesWritten = 0;
             WriteProcessMemory((int)processHandle, MapCycleIndex, newMapIndexBytes, newMapIndexBytes.Length, ref newMapIndexBytesWritten);
-
-
+            
+            // Update the Current Map Index Right away.
+            ReadMemoryCurrentMapIndex();
         }
         // Function: WriteMemoryScoreMap
         public static void WriteMemoryScoreMap()
@@ -1428,7 +1429,6 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static void WriteMemorySendConsoleCommand(string Command)
         {
 
-
             // open cmdConsole
             PostMessage(windowHandle, (ushort)WM_KEYDOWN, cmdConsole, 0);
             PostMessage(windowHandle, (ushort)WM_KEYUP, cmdConsole, 0);
@@ -1445,7 +1445,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
         }
-
 
         //
         // Read Memory

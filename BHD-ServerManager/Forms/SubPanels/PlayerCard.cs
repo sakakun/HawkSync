@@ -120,7 +120,8 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 var slapItem = new ToolStripMenuItem(slapMessage.SlapMessageText);
                 slapItem.Click += (sender, e) =>
                 {
-                    GameManager.WriteMemorySendChatMessage(1, $"{Player.PlayerName}, {slapMessage.SlapMessageText}");
+                    chatInstanceManagers.SendMessageToQueue(false, 1, $"{Player.PlayerName}, {slapMessage.SlapMessageText}");
+                    // GameManager.WriteMemorySendChatMessage(1, $"{Player.PlayerName}, {slapMessage.SlapMessageText}");
                     MessageBox.Show($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Debug.WriteLine($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}");
                 };
@@ -133,7 +134,8 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Kick Player");
             command.Click += (sender, e) =>
             {
-                GameManager.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
+                chatInstanceManagers.SendMessageToQueue(true, 0, "punt " + Player.PlayerSlot);
+                // GameManager.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been kicked from the server.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} has been kicked from the server.");
             };
