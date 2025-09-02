@@ -5,6 +5,8 @@ using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
 using System.Reflection.Metadata.Ecma335;
+using System.Threading.Channels;
+using System.Windows.Forms;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -188,7 +190,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     if (elapsedMinutes >= autoMsg.AutoMessageTigger)
                     {
                         chatInstanceManagers.SendMessageToQueue(false, 1, autoMsg.AutoMessageText);
-                        // ServerMemory.WriteMemorySendChatMessage(1, autoMsg.AutoMessageText);
                         instanceChat.AutoMessageCounter++;
                         instanceChat.lastAutoMessageSent = DateTime.Now;
                     }
@@ -258,8 +259,22 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                     else
                     {
+                        string message = msgObj.MessageText;
+                        if (message.Length > 59)
+                        {
+                            for (int i = 0; i < message.Length; i += 59)
+                            {
+                                string chunk = message.Substring(i, Math.Min(59, message.Length - i));
+                                ServerMemory.WriteMemorySendChatMessage(msgObj.MessageType, chunk);
+                                Thread.Sleep(1000);
+                            }
+                        }
+                        else
+                        {
+                            ServerMemory.WriteMemorySendChatMessage(msgObj.MessageType, msgObj.MessageText);
+                        }
+
                         // Send the chat message
-                        ServerMemory.WriteMemorySendChatMessage(msgObj.MessageType, msgObj.MessageText);
                         keysToRemove.Add(recordID);
                         continue;
                     }
