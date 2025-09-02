@@ -1,4 +1,5 @@
 ﻿using BHD_SharedResources.Classes.GameManagement;
+using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.SupportClasses;
 
 namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
@@ -30,7 +31,8 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             // Optionally, handle anonymous object via reflection (less common, not recommended)
             AppDebug.Log("CmdSendChatMessage", $"Received data: {channel}-{message}");
 
-            GameManager.WriteMemorySendChatMessage(channel, message);
+            chatInstanceManagers.SendMessageToQueue(false, channel, message);
+            // GameManager.WriteMemorySendChatMessage(channel, message);
 
             return new CommandResponse
             {
