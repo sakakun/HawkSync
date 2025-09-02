@@ -2042,7 +2042,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] Message = new byte[74];
             int MessageRead = 0;
             ReadProcessMemory((int)processHandle, ChatLogAddr, Message, Message.Length, ref MessageRead);
-            string LastMessage = Encoding.Default.GetString(Message).Replace("\0", "");
+            string LastMessage = Encoding.GetEncoding("Windows-1252").GetString(Message).Replace("\0", "");
 
             int msgTypeAddr = ChatLogAddr + 0x78;
             byte[] msgType = new byte[4];
