@@ -143,7 +143,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Ignore Server Messages
                 if (newChat.MessageType != 0)
                 {
-                    thisServer.AddonsTab.ChatCommandsTab.ChatCommandSkipChatHook(newChat);
+                    thisServer.AddonsTab.ChatCommandsTab.TickerChatCommandsHook2(newChat);
                 }
 
                 // Update last processed message for deduplication
@@ -262,11 +262,28 @@ namespace BHD_ServerManager.Classes.Tickers
                         string message = msgObj.MessageText;
                         if (message.Length > 59)
                         {
-                            for (int i = 0; i < message.Length; i += 59)
+                            // Split message into chunks without breaking words
+                            int maxLen = 59;
+                            int start = 0;
+                            while (start < message.Length)
                             {
-                                string chunk = message.Substring(i, Math.Min(59, message.Length - i));
+                                int length = Math.Min(maxLen, message.Length - start);
+                                // If the chunk ends in the middle of a word, move back to the last space
+                                if (start + length < message.Length && !char.IsWhiteSpace(message[start + length]))
+                                {
+                                    int lastSpace = message.LastIndexOf(' ', start + length - 1, length);
+                                    if (lastSpace > start)
+                                    {
+                                        length = lastSpace - start;
+                                    }
+                                }
+                                string chunk = message.Substring(start, length).Trim();
                                 ServerMemory.WriteMemorySendChatMessage(msgObj.MessageType, chunk);
                                 Thread.Sleep(1000);
+                                start += length;
+                                // Skip any spaces at the start of the next chunk
+                                while (start < message.Length && char.IsWhiteSpace(message[start]))
+                                    start++;
                             }
                         }
                         else

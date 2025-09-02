@@ -44,6 +44,7 @@
             panel1 = new Panel();
             btn_ChatCommandSave = new Button();
             btn_ChatCommandsReset = new Button();
+            cb_ccEnableStartDelaySkipMap = new CheckBox();
             flowLayoutPanel1.SuspendLayout();
             groupBox_skipMaps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingMaxSessions).BeginInit();
@@ -64,18 +65,19 @@
             // 
             // groupBox_skipMaps
             // 
-            groupBox_skipMaps.Controls.Add(label4);
-            groupBox_skipMaps.Controls.Add(num_SkipVotingMaxSessions);
+            groupBox_skipMaps.Controls.Add(cb_ccEnableStartDelaySkipMap);
             groupBox_skipMaps.Controls.Add(label2);
+            groupBox_skipMaps.Controls.Add(label4);
+            groupBox_skipMaps.Controls.Add(num_SkipPercentRequired);
+            groupBox_skipMaps.Controls.Add(num_SkipVotingMaxSessions);
             groupBox_skipMaps.Controls.Add(label3);
             groupBox_skipMaps.Controls.Add(num_SkipVotingStarts);
-            groupBox_skipMaps.Controls.Add(num_SkipPercentRequired);
             groupBox_skipMaps.Controls.Add(label1);
             groupBox_skipMaps.Controls.Add(num_SkipVotingPeriod);
             groupBox_skipMaps.Controls.Add(cb_ccEnableSkipping);
             groupBox_skipMaps.Location = new Point(3, 3);
             groupBox_skipMaps.Name = "groupBox_skipMaps";
-            groupBox_skipMaps.Size = new Size(250, 201);
+            groupBox_skipMaps.Size = new Size(250, 198);
             groupBox_skipMaps.TabIndex = 0;
             groupBox_skipMaps.TabStop = false;
             groupBox_skipMaps.Text = "Voting: Skip Map";
@@ -83,7 +85,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(67, 140);
+            label4.Location = new Point(67, 111);
             label4.Name = "label4";
             label4.Size = new Size(113, 15);
             label4.TabIndex = 8;
@@ -91,7 +93,7 @@
             // 
             // num_SkipVotingMaxSessions
             // 
-            num_SkipVotingMaxSessions.Location = new Point(186, 136);
+            num_SkipVotingMaxSessions.Location = new Point(186, 107);
             num_SkipVotingMaxSessions.Maximum = new decimal(new int[] { 60, 0, 0, 0 });
             num_SkipVotingMaxSessions.Name = "num_SkipVotingMaxSessions";
             num_SkipVotingMaxSessions.Size = new Size(48, 23);
@@ -103,7 +105,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(10, 109);
+            label2.Location = new Point(10, 138);
             label2.Name = "label2";
             label2.Size = new Size(170, 15);
             label2.TabIndex = 4;
@@ -131,7 +133,7 @@
             // 
             // num_SkipPercentRequired
             // 
-            num_SkipPercentRequired.Location = new Point(186, 107);
+            num_SkipPercentRequired.Location = new Point(186, 136);
             num_SkipPercentRequired.Name = "num_SkipPercentRequired";
             num_SkipPercentRequired.Size = new Size(48, 23);
             num_SkipPercentRequired.TabIndex = 3;
@@ -200,6 +202,18 @@
             btn_ChatCommandsReset.UseVisualStyleBackColor = true;
             btn_ChatCommandsReset.Click += actionClick_ResetSettings;
             // 
+            // cb_ccEnableStartDelaySkipMap
+            // 
+            cb_ccEnableStartDelaySkipMap.AutoSize = true;
+            cb_ccEnableStartDelaySkipMap.CheckAlign = ContentAlignment.MiddleRight;
+            cb_ccEnableStartDelaySkipMap.Location = new Point(36, 165);
+            cb_ccEnableStartDelaySkipMap.Name = "cb_ccEnableStartDelaySkipMap";
+            cb_ccEnableStartDelaySkipMap.Size = new Size(198, 19);
+            cb_ccEnableStartDelaySkipMap.TabIndex = 9;
+            cb_ccEnableStartDelaySkipMap.Text = "Enable Start Delay Skip Map Vote";
+            toolTip1.SetToolTip(cb_ccEnableStartDelaySkipMap, "Allow players, to vote to \"skip\" the current map during the start delay.");
+            cb_ccEnableStartDelaySkipMap.UseVisualStyleBackColor = true;
+            // 
             // tabChatCommands
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -238,5 +252,6 @@
         private NumericUpDown num_SkipVotingMaxSessions;
         private Label label3;
         private NumericUpDown num_SkipVotingStarts;
+        private CheckBox cb_ccEnableStartDelaySkipMap;
     }
 }
