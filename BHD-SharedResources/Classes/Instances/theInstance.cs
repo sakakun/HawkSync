@@ -156,6 +156,7 @@ namespace BHD_SharedResources.Classes.Instances
         // Chat Command: Skip Map Voting
         public bool chatCommandSkipMap_Enabled { get; set; } = false;
         public bool chatCommandSkipMap_StartDelay { get; set; } = false;
+        public bool chatCommandSkipMap_InGame { get; set; } = false;
         public int chatCommandSkipMap_VotePercent { get; set; } = 51;
         public int chatCommandSkipMap_VotingPeriod { get; set; } = 2;
         public int chatCommandSkipMap_MaxVotingSessions { get; set; } = 2;
