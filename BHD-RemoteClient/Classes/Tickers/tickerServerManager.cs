@@ -43,9 +43,13 @@ namespace BHD_RemoteClient.Classes.Tickers
                 thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
                 thisServer.PlayersTab.tickerPlayerHook();                                       // Ticker for Players
                 thisServer.ChatTab.ChatTickerHook();
-                thisServer.BanTab.BanTickerHook();                                             // Update Bans Tab
-                thisServer.StatsTab.StatsTickerHook();                                         // Update Stats Tab
+                thisServer.BanTab.BanTickerHook();                                              // Update Bans Tab
+                thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
                 thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
+
+                // --- Addon Ticker Hooks ---
+                thisServer.AddonsTab.ChatCommandsTab.TickerChatCommandsHook();                  // Update Chat Commands Tab
+
             });
 
             theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);

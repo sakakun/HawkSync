@@ -160,7 +160,16 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
             thisInstance.WebStatsReportInterval = updatedInstance.WebStatsReportInterval;
             thisInstance.WebStatsUpdateInterval = updatedInstance.WebStatsUpdateInterval;
             thisInstance.WebStatsEnableMinReqPlayers = updatedInstance.WebStatsEnableMinReqPlayers;
-            thisInstance.WebStatsMinReqPlayers = updatedInstance.WebStatsMinReqPlayers;            
+            thisInstance.WebStatsMinReqPlayers = updatedInstance.WebStatsMinReqPlayers;
+
+            // Chat Coommand: Skip Map
+            thisInstance.chatCommandSkipMap_Enabled = updatedInstance.chatCommandSkipMap_Enabled;
+            thisInstance.chatCommandSkipMap_StartDelay = updatedInstance.chatCommandSkipMap_StartDelay;
+            thisInstance.chatCommandSkipMap_InGame = updatedInstance.chatCommandSkipMap_InGame;
+            thisInstance.chatCommandSkipMap_VotePercent = updatedInstance.chatCommandSkipMap_VotePercent;
+            thisInstance.chatCommandSkipMap_VotingStarts = updatedInstance.chatCommandSkipMap_VotingStarts;
+            thisInstance.chatCommandSkipMap_VotingPeriod = updatedInstance.chatCommandSkipMap_VotingPeriod;
+            thisInstance.chatCommandSkipMap_MaxVotingSessions = updatedInstance.chatCommandSkipMap_MaxVotingSessions;
 
             theInstanceManager.SaveSettings();
 

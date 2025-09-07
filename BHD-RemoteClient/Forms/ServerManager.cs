@@ -28,6 +28,7 @@ namespace BHD_RemoteClient.Forms
         public tabBans BanTab = null!;                          // The Bans Tab User Control
         public tabStats StatsTab = null!;                       // The Stats Tab User Control
         public tabAdmins AdminTab = null!;                      // The Admins Tab User Control
+        public tabAddons AddonsTab = null!;                   // The Addons Tab User Control
 
         // Admin Selections
         private int adminSelectedId = -1; // Selected Admin ID for actions
@@ -70,6 +71,7 @@ namespace BHD_RemoteClient.Forms
             tabBans.Controls.Add(BanTab = new tabBans());
             tabStats.Controls.Add(StatsTab = new tabStats());
             tabAdmin.Controls.Add(AdminTab = new tabAdmins());
+            tabAddons.Controls.Add(AddonsTab = new tabAddons());
         }
         //
         // Event Handlers for ServerManager

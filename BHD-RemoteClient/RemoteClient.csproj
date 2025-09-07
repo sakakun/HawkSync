@@ -58,6 +58,12 @@
     <Compile Update="Forms\AboutWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\Panels\Addons\tabChatCommands.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabAddons.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="Forms\Panels\tabAdmins.cs">
       <SubType>UserControl</SubType>
     </Compile>
