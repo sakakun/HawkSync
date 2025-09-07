@@ -67,7 +67,7 @@ namespace BHD_ServerManager.Forms.Panels.Addons
             control.BackColor = highlight ? Color.LightYellow : SystemColors.Window;
         }
 
-        public void functionAction_GetSettings(theInstance updatedInstance = null!)
+        public void functionEvent_GetChatCommandSettings(theInstance updatedInstance = null!)
         {
             theInstance thisInstance = updatedInstance != null ? updatedInstance : theInstance;
 
@@ -82,7 +82,7 @@ namespace BHD_ServerManager.Forms.Panels.Addons
 
         }
 
-        public void functionAction_SetSettings()
+        public void functionEvent_SetChatCommandSettings()
         {
 
             // Chat Coommand: Skip Map
@@ -102,7 +102,7 @@ namespace BHD_ServerManager.Forms.Panels.Addons
             if (!_firstLoadComplete)
             {
                 _firstLoadComplete = true;
-                functionAction_GetSettings();
+                functionEvent_GetChatCommandSettings();
             }
 
             if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP ||
@@ -299,12 +299,12 @@ namespace BHD_ServerManager.Forms.Panels.Addons
 
         private void actionClick_ResetSettings(object sender, EventArgs e)
         {
-            functionAction_GetSettings();
+            functionEvent_GetChatCommandSettings();
         }
 
         private void actionClick_SaveSettings(object sender, EventArgs e)
         {
-            functionAction_SetSettings();               // Set the Instance Settings from the UI to the Instance Object.
+            functionEvent_SetChatCommandSettings();               // Set the Instance Settings from the UI to the Instance Object.
             theInstanceManager.SaveSettings();          // Save the Instance Settings to file.
         }
     }

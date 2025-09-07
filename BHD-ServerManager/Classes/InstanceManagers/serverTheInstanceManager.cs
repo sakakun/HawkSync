@@ -172,6 +172,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             thisServer.ProfileTab.functionEvent_GetProfileSettings(null, null!);
             thisServer.ServerTab.functionEvent_GetServerSettings((updatedInstance != null ? updatedInstance : null!));
             thisServer.StatsTab.functionEvent_GetStatSettings((updatedInstance != null ? updatedInstance : null!));
+            thisServer.AddonsTab.ChatCommandsTab.functionEvent_GetChatCommandSettings((updatedInstance != null ? updatedInstance : null!));
 
         }
         public void SetServerVariables()
@@ -247,13 +248,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             // Update Game Scores for the next game.
             ServerMemory.UpdateGameScores();
-
-            //
-            // To Be Moved to Ticker Event
-            //
-
-            // Player State Check
-            //thisInstance.gameAllowLeftLeaning = thisServer.ServerTab.cb_enableLeftLean.Checked;
 
         }
         public void InitializeTickers()
