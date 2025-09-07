@@ -335,6 +335,12 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 return;
             }
 
+            if (theInstance.WebStatsEnableMinReqPlayers && theInstance.playerList.Count < theInstance.WebStatsMinReqPlayers)
+            {
+                AppDebug.Log("StatsManager", $"Not enough players to send stats. Current: {theInstance.playerList.Count}, Required: {theInstance.WebStatsMinReqPlayers}");
+                return;
+            }
+
             string POST_URL = theInstance.WebStatsServerPath + "stats_import.php";
             Dictionary<string, string> DATA = new Dictionary<string, string>
             {
