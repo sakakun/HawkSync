@@ -39,6 +39,7 @@
             cb_WebStatsEnableMinReqPlayers = new CheckBox();
             num_WebStatsMinReqPlayers = new NumericUpDown();
             groupBox4 = new GroupBox();
+            btn_WebStatsReset = new Button();
             btn_SaveSettings = new Button();
             groupBox3 = new GroupBox();
             labelUpatedInterval = new Label();
@@ -88,7 +89,6 @@
             Timer = new DataGridViewTextBoxColumn();
             Weapon_Kills = new DataGridViewTextBoxColumn();
             Weapon_Shots = new DataGridViewTextBoxColumn();
-            btn_WebStatsReset = new Button();
             tabControl1.SuspendLayout();
             tabBabstats.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -216,6 +216,7 @@
             cb_WebStatsEnableMinReqPlayers.TabIndex = 1;
             cb_WebStatsEnableMinReqPlayers.Text = "Enable Minimum Required Players";
             cb_WebStatsEnableMinReqPlayers.UseVisualStyleBackColor = true;
+            cb_WebStatsEnableMinReqPlayers.CheckedChanged += ActionEvent_MinPlayersReqChange;
             // 
             // num_WebStatsMinReqPlayers
             // 
@@ -239,6 +240,16 @@
             groupBox4.TabIndex = 3;
             groupBox4.TabStop = false;
             groupBox4.Text = "Controls";
+            // 
+            // btn_WebStatsReset
+            // 
+            btn_WebStatsReset.Location = new Point(6, 22);
+            btn_WebStatsReset.Name = "btn_WebStatsReset";
+            btn_WebStatsReset.Size = new Size(75, 23);
+            btn_WebStatsReset.TabIndex = 11;
+            btn_WebStatsReset.Text = "Reset";
+            btn_WebStatsReset.UseVisualStyleBackColor = true;
+            btn_WebStatsReset.Click += ActionClick_ResetChanges;
             // 
             // btn_SaveSettings
             // 
@@ -700,16 +711,6 @@
             Weapon_Shots.HeaderText = "Shots";
             Weapon_Shots.Name = "Weapon_Shots";
             Weapon_Shots.ReadOnly = true;
-            // 
-            // btn_WebStatsReset
-            // 
-            btn_WebStatsReset.Location = new Point(6, 22);
-            btn_WebStatsReset.Name = "btn_WebStatsReset";
-            btn_WebStatsReset.Size = new Size(75, 23);
-            btn_WebStatsReset.TabIndex = 11;
-            btn_WebStatsReset.Text = "Reset";
-            btn_WebStatsReset.UseVisualStyleBackColor = true;
-            btn_WebStatsReset.Click += ActionClick_ResetChanges;
             // 
             // tabStats
             // 

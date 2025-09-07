@@ -1,4 +1,5 @@
 ﻿using BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses;
+using BHD_RemoteClient.Forms;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
@@ -6,6 +7,7 @@ using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace BHD_RemoteClient.Classes.RemoteFunctions
@@ -17,6 +19,8 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
         private static mapInstance instanceMaps => CommonCore.instanceMaps!;
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static adminInstance instanceAdmin => CommonCore.instanceAdmin!;
+        private static ServerManager? ServerManagerUI => Program.ServerManagerUI;
+        private static LoginWindow? LoginWindowUI => Program.LoginWindowUI;
 
         private readonly string _serverAddress;
         private readonly int _commPort;
@@ -218,6 +222,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                 if ((DateTime.UtcNow - handshakeStart).TotalSeconds > 60)
                 {
                     AppDebug.Log("RemoteClient", "Update Token Handshake timeout.");
+                    KillServerManagerUI();
                     break;
                 }
             }
@@ -236,6 +241,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                 catch (Exception ex)
                 {
                     AppDebug.Log("RemoteClient", "Error in update loop: " + ex.Message);
+                    KillServerManagerUI();
                     break;
                 }
             }
@@ -284,5 +290,27 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
             // For demo purposes, accept any certificate. In production, validate properly!
             return true;
         }
+
+        public void KillServerManagerUI()
+        {
+            try
+            {
+                Disconnect();
+                ServerManagerUI?.Invoke((MethodInvoker)delegate
+                {
+                    ServerManagerUI.Close();
+                });
+                LoginWindowUI?.Invoke((MethodInvoker)delegate
+                {
+                    LoginWindowUI.ServerManagerUI_FormClosed(null, null!);
+                });
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("RemoteClient", "Error closing ServerManagerUI: " + ex.Message);
+            }
+        }
+
+
     }
 }

@@ -162,9 +162,9 @@ namespace BHD_RemoteClient.Forms
 
                     // Start Tickers
                     theInstanceManager.InitializeTickers();
-
                     // Hide the login window and show the server manager UI
                     this.Hide();
+                    
                     Program.ServerManagerUI.FormClosed -= ServerManagerUI_FormClosed;
                     Program.ServerManagerUI.FormClosed += ServerManagerUI_FormClosed;
                     Program.ServerManagerUI.Show();
@@ -182,7 +182,7 @@ namespace BHD_RemoteClient.Forms
             }
         }
 
-        private void ServerManagerUI_FormClosed(object? sender, FormClosedEventArgs e)
+        public void ServerManagerUI_FormClosed(object? sender, FormClosedEventArgs e)
         {
             this.Show();
 

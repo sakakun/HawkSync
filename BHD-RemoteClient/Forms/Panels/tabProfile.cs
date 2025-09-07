@@ -90,7 +90,7 @@ namespace BHD_RemoteClient.Forms.Panels
                 _firstLoadComplete = true;
 
                 // If the profileServerPath is not set or does not exist, switch to the Profile tab and show a message box.
-                if (theInstance.profileServerPath == string.Empty || !Directory.Exists(theInstance.profileServerPath))
+                if (theInstance.profileServerPath == string.Empty)
                 {
                     theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[0];
                     MessageBox.Show("Server path is not set on the server.  Please have an admin ", "Server Path Not Set", MessageBoxButtons.OK, MessageBoxIcon.Information);

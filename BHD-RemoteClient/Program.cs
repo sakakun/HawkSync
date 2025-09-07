@@ -16,10 +16,11 @@ namespace BHD_RemoteClient
         // Server Manager UI Object
         // Remote Client Object
         public static ServerManager? ServerManagerUI { get; set; }
+        public static LoginWindow? LoginWindowUI { get; set; }
         public static RemoteClient? theRemoteClient { get; set; }
 
         // Major Version Number
-        public static string ApplicationVersion = "1.1.3";
+        public static string ApplicationVersion = "1.1.4";
 
         [STAThread]
         static void Main()
@@ -42,8 +43,10 @@ namespace BHD_RemoteClient
 
             // Ensure the correct namespace or class is used for ApplicationConfiguration
             Application.EnableVisualStyles(); // This is a common initialization call
-            Application.SetCompatibleTextRenderingDefault(false); // Another common call    
-            Application.Run(new LoginWindow());
+            Application.SetCompatibleTextRenderingDefault(false); // Another common call
+
+            LoginWindowUI = new LoginWindow();
+            Application.Run(LoginWindowUI);
         }
 
     }
