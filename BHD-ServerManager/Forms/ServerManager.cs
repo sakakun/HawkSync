@@ -190,6 +190,8 @@ namespace BHD_ServerManager.Forms
             CommonCore.Ticker?.Stop("PlayerManager");
             CommonCore.Ticker?.Stop("BanManager");
             RemoteServer.Stop();
+            mapInstanceManager.SaveCurrentMapPlaylist(mapInstanceManager.BuildCurrentMapPlaylist(), false);
+            adminInstanceManager.SaveAdmins();
             theInstanceManager.SaveSettings();
             base.OnFormClosing(e);
         }

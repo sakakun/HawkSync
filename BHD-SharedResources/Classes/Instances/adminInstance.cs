@@ -15,6 +15,9 @@ namespace BHD_SharedResources.Classes.Instances
         public required string Username { get; set; } = string.Empty;
         public required string Password { get; set; } = string.Empty;
         public AdminRoles Role { get; set; } = AdminRoles.None;
+
+        public bool IsOnline { get; set; } = false;
+        public DateTime LastSeen { get; set; } = DateTime.MinValue;
     }
 
     public class AdminLog

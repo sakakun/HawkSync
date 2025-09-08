@@ -115,8 +115,10 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
         {
             _commListener!.Start();
             _updateListener!.Start();
-
+            
             AppDebug.Log("RemoteServer", "Server Started...");
+
+            DateTime lastCleanup = DateTime.UtcNow;
 
             while (_isRunning)
             {
@@ -136,6 +138,13 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                         AppDebug.Log("RemoteServer", $"Client connected on update port {((IPEndPoint)updateClient.Client.LocalEndPoint!).Port}");
                         updateClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                         Task.Run(() => HandleUpdateClient(updateClient));
+                    }
+
+                    // Cleanup every 10 seconds
+                    if ((DateTime.UtcNow - lastCleanup).TotalSeconds > 10)
+                    {
+                        CleanupStaleAuthorizedClients();
+                        lastCleanup = DateTime.UtcNow;
                     }
                 }
                 catch (Exception ex)
@@ -175,12 +184,12 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
 
         private static void HandleUpdateClient(TcpClient client)
         {
+            AuthorizedClient? authorizedClient = null;
             try
             {
                 using var sslStream = new SslStream(client.GetStream(), false);
                 sslStream.AuthenticateAsServer(_serverCertificate!, false, false);
 
-                AuthorizedClient? authorizedClient = null;
                 int attempts = 0;
                 var handshakeStart = DateTime.UtcNow;
 
@@ -212,11 +221,8 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                         continue;
                     }
 
-                    lock (_authorizedClients)
-                    {
-                        authorizedClient = _authorizedClients
-                            .Find(c => c.AuthorizationToken.Equals(responsePacket.AuthToken, StringComparison.OrdinalIgnoreCase));
-                    }
+                    authorizedClient = _authorizedClients
+                        .Find(c => c.AuthorizationToken.Equals(responsePacket.AuthToken, StringComparison.OrdinalIgnoreCase));
 
                     if (authorizedClient == null)
                     {
@@ -240,6 +246,10 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                     return;
                 }
 
+                // After successful authentication
+                authorizedClient.User.IsOnline = true;
+                authorizedClient.User.LastSeen = DateTime.UtcNow;
+
                 WriteMessage(sslStream, new CommandResponse
                 {
                     Success = true,
@@ -255,6 +265,10 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                         CommandData = GetUpdateDataForClient()
                     };
                     WriteMessage(sslStream, updatePacket);
+
+                    // Inside the update loop, on each update/command
+                    authorizedClient.User.LastSeen = DateTime.UtcNow;
+
                     Thread.Sleep(1000);
                 }
             }
@@ -265,6 +279,12 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
             finally
             {
                 client.Close();
+
+                // In finally block
+                if (authorizedClient != null)
+                {
+                    authorizedClient.User.IsOnline = false;
+                }
             }
         }
 
@@ -353,6 +373,28 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
 
             return base64;
         }
+
+        private static void CleanupStaleAuthorizedClients()
+        {
+            lock (_authorizedClients)
+            {
+                var now = DateTime.UtcNow;
+                // Find all stale clients
+                var staleClients = _authorizedClients
+                    .Where(c => (now - c.User.LastSeen).TotalSeconds > 60)
+                    .ToList();
+
+                // Set IsOnline to false for each stale client
+                foreach (var client in staleClients)
+                {
+                    client.User.IsOnline = false;
+                }
+
+                // Remove them from the authorized clients list
+                _authorizedClients.RemoveAll(c => staleClients.Contains(c));
+            }
+        }
+
     }
 
     public class AuthorizedClient

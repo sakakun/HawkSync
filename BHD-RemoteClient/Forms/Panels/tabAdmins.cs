@@ -49,11 +49,56 @@ namespace BHD_RemoteClient.Forms.Panels
         private void function_RefreshAdminDataGrid()
         {
             dg_AdminUsers.SuspendLayout();
-            dg_AdminUsers.Rows.Clear();
+
+            // Build a lookup for quick access
+            var adminLookup = instanceAdmin.Admins.ToDictionary(a => a.UserId);
+
+            // Remove rows for admins that no longer exist
+            for (int i = dg_AdminUsers.Rows.Count - 1; i >= 0; i--)
+            {
+                var row = dg_AdminUsers.Rows[i];
+                if (row.IsNewRow) continue;
+
+                int userId = Convert.ToInt32(row.Cells[0].Value);
+                if (!adminLookup.ContainsKey(userId))
+                {
+                    dg_AdminUsers.Rows.RemoveAt(i);
+                }
+            }
+
+            // Update existing rows and add new ones
+            var existingUserIds = dg_AdminUsers.Rows
+                .Cast<DataGridViewRow>()
+                .Where(r => !r.IsNewRow)
+                .Select(r => Convert.ToInt32(r.Cells[0].Value))
+                .ToHashSet();
 
             foreach (var admin in instanceAdmin.Admins)
             {
-                dg_AdminUsers.Rows.Add(admin.UserId, admin.Username, admin.Role.ToString());
+                // Try to find the row for this admin
+                var row = dg_AdminUsers.Rows
+                    .Cast<DataGridViewRow>()
+                    .FirstOrDefault(r => !r.IsNewRow && Convert.ToInt32(r.Cells[0].Value) == admin.UserId);
+
+                if (row != null)
+                {
+                    // Update existing row
+                    row.Cells[1].Value = admin.Username;
+                    row.Cells[2].Value = admin.Role.ToString();
+                    row.Cells[3].Value = admin.IsOnline ? "Online" : "Offline";
+                    row.Cells[4].Value = admin.LastSeen == DateTime.MinValue ? "" : admin.LastSeen.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+                else
+                {
+                    // Add new row
+                    dg_AdminUsers.Rows.Add(
+                        admin.UserId,
+                        admin.Username,
+                        admin.Role.ToString(),
+                        admin.IsOnline ? "Online" : "Offline",
+                        admin.LastSeen == DateTime.MinValue ? "" : admin.LastSeen.ToString("yyyy-MM-dd HH:mm:ss")
+                    );
+                }
             }
 
             dg_AdminUsers.ResumeLayout();
