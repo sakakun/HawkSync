@@ -31,8 +31,9 @@
             components = new System.ComponentModel.Container();
             flowLayoutPanel1 = new FlowLayoutPanel();
             groupBox_skipMaps = new GroupBox();
-            cb_ccEnableStartDelaySkipMap = new CheckBox();
             label2 = new Label();
+            cb_ccEnableInGameSkipMap = new CheckBox();
+            cb_ccEnableStartDelaySkipMap = new CheckBox();
             label4 = new Label();
             num_SkipPercentRequired = new NumericUpDown();
             num_SkipVotingMaxSessions = new NumericUpDown();
@@ -45,7 +46,8 @@
             panel1 = new Panel();
             btn_ChatCommandSave = new Button();
             btn_ChatCommandsReset = new Button();
-            cb_ccEnableInGameSkipMap = new CheckBox();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            groupBox_ConsoleCommands = new GroupBox();
             flowLayoutPanel1.SuspendLayout();
             groupBox_skipMaps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)num_SkipPercentRequired).BeginInit();
@@ -53,15 +55,18 @@
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingStarts).BeginInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingPeriod).BeginInit();
             panel1.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
             // flowLayoutPanel1
             // 
+            flowLayoutPanel1.Controls.Add(groupBox_ConsoleCommands);
             flowLayoutPanel1.Controls.Add(groupBox_skipMaps);
             flowLayoutPanel1.Dock = DockStyle.Fill;
             flowLayoutPanel1.Location = new Point(0, 0);
+            flowLayoutPanel1.Margin = new Padding(0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(894, 334);
+            flowLayoutPanel1.Size = new Size(255, 305);
             flowLayoutPanel1.TabIndex = 0;
             // 
             // groupBox_skipMaps
@@ -77,12 +82,33 @@
             groupBox_skipMaps.Controls.Add(label1);
             groupBox_skipMaps.Controls.Add(num_SkipVotingPeriod);
             groupBox_skipMaps.Controls.Add(cb_ccEnableSkipping);
-            groupBox_skipMaps.Location = new Point(3, 3);
+            groupBox_skipMaps.Location = new Point(3, 73);
             groupBox_skipMaps.Name = "groupBox_skipMaps";
             groupBox_skipMaps.Size = new Size(247, 220);
             groupBox_skipMaps.TabIndex = 0;
             groupBox_skipMaps.TabStop = false;
             groupBox_skipMaps.Text = "Voting: Skip Map";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(10, 184);
+            label2.Name = "label2";
+            label2.Size = new Size(170, 15);
+            label2.TabIndex = 4;
+            label2.Text = "Required # of Votes to Pass (%)";
+            // 
+            // cb_ccEnableInGameSkipMap
+            // 
+            cb_ccEnableInGameSkipMap.AutoSize = true;
+            cb_ccEnableInGameSkipMap.CheckAlign = ContentAlignment.MiddleRight;
+            cb_ccEnableInGameSkipMap.Location = new Point(73, 70);
+            cb_ccEnableInGameSkipMap.Name = "cb_ccEnableInGameSkipMap";
+            cb_ccEnableInGameSkipMap.Size = new Size(161, 19);
+            cb_ccEnableInGameSkipMap.TabIndex = 10;
+            cb_ccEnableInGameSkipMap.Text = "In-Game Skip Map Voting";
+            toolTip1.SetToolTip(cb_ccEnableInGameSkipMap, "Allow players, to vote to \"skip\" the current map during the start delay.");
+            cb_ccEnableInGameSkipMap.UseVisualStyleBackColor = true;
             // 
             // cb_ccEnableStartDelaySkipMap
             // 
@@ -95,15 +121,6 @@
             cb_ccEnableStartDelaySkipMap.Text = "Start Delay Skip Map Voting";
             toolTip1.SetToolTip(cb_ccEnableStartDelaySkipMap, "Allow players, to vote to \"skip\" the current map during the start delay.");
             cb_ccEnableStartDelaySkipMap.UseVisualStyleBackColor = true;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(10, 184);
-            label2.Name = "label2";
-            label2.Size = new Size(170, 15);
-            label2.TabIndex = 4;
-            label2.Text = "Required # of Votes to Pass (%)";
             // 
             // label4
             // 
@@ -216,24 +233,37 @@
             btn_ChatCommandsReset.UseVisualStyleBackColor = true;
             btn_ChatCommandsReset.Click += actionClick_ResetSettings;
             // 
-            // cb_ccEnableInGameSkipMap
+            // tableLayoutPanel1
             // 
-            cb_ccEnableInGameSkipMap.AutoSize = true;
-            cb_ccEnableInGameSkipMap.CheckAlign = ContentAlignment.MiddleRight;
-            cb_ccEnableInGameSkipMap.Location = new Point(73, 70);
-            cb_ccEnableInGameSkipMap.Name = "cb_ccEnableInGameSkipMap";
-            cb_ccEnableInGameSkipMap.Size = new Size(161, 19);
-            cb_ccEnableInGameSkipMap.TabIndex = 10;
-            cb_ccEnableInGameSkipMap.Text = "In-Game Skip Map Voting";
-            toolTip1.SetToolTip(cb_ccEnableInGameSkipMap, "Allow players, to vote to \"skip\" the current map during the start delay.");
-            cb_ccEnableInGameSkipMap.UseVisualStyleBackColor = true;
+            tableLayoutPanel1.ColumnCount = 3;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 255F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 318F));
+            tableLayoutPanel1.Controls.Add(flowLayoutPanel1, 0, 0);
+            tableLayoutPanel1.Dock = DockStyle.Fill;
+            tableLayoutPanel1.Location = new Point(0, 0);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 1;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.Size = new Size(894, 305);
+            tableLayoutPanel1.TabIndex = 2;
+            // 
+            // groupBox_ConsoleCommands
+            // 
+            groupBox_ConsoleCommands.Dock = DockStyle.Top;
+            groupBox_ConsoleCommands.Location = new Point(3, 3);
+            groupBox_ConsoleCommands.Name = "groupBox_ConsoleCommands";
+            groupBox_ConsoleCommands.Size = new Size(247, 64);
+            groupBox_ConsoleCommands.TabIndex = 2;
+            groupBox_ConsoleCommands.TabStop = false;
+            groupBox_ConsoleCommands.Text = "Console Commands";
             // 
             // tabChatCommands
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(tableLayoutPanel1);
             Controls.Add(panel1);
-            Controls.Add(flowLayoutPanel1);
             MaximumSize = new Size(894, 334);
             MinimumSize = new Size(894, 334);
             Name = "tabChatCommands";
@@ -246,6 +276,7 @@
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingStarts).EndInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingPeriod).EndInit();
             panel1.ResumeLayout(false);
+            tableLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -268,5 +299,7 @@
         private NumericUpDown num_SkipVotingStarts;
         private CheckBox cb_ccEnableStartDelaySkipMap;
         private CheckBox cb_ccEnableInGameSkipMap;
+        private TableLayoutPanel tableLayoutPanel1;
+        private GroupBox groupBox_ConsoleCommands;
     }
 }

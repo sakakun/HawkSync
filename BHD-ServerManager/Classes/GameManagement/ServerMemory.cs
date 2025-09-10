@@ -67,7 +67,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 processHandle = OpenProcess(PROCESS_WM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION, false, gameProcess.Id);
             }
         }
-
         // Call this ONCE when server is shutting down
         public static void DetachFromGameProcess()
         {
