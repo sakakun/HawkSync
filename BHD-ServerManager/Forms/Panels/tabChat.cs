@@ -154,7 +154,6 @@ namespace BHD_ServerManager.Forms.Panels
                 theInstance.instanceStatus == InstanceStatus.SCORING)
             {
                 tb_chatMessage.Enabled = false;
-                return;
             }
             else
             {
@@ -211,6 +210,16 @@ namespace BHD_ServerManager.Forms.Panels
             int channel = 0;
 
             channel = comboBox_chatGroup.SelectedIndex;
+
+            switch(comboBox_chatGroup.SelectedIndex)
+            {
+                case 0: channel = 0; break; // All
+                case 1: channel = 3; break; // Announcements
+                case 2: channel = 4; break; // Team Red
+                case 3: channel = 5; break; // Team Blue
+                case 4: channel = 9; break; // Server
+                default: channel = 0; break;
+            }
 
             if (message.Contains("{P:") && message.Contains("}"))
             {

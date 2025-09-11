@@ -148,6 +148,18 @@ namespace BHD_RemoteClient.Forms.Panels
                 functionEvent_UpdateChatMessagesGrid();
             }
 
+            if (theInstance.instanceStatus == InstanceStatus.OFFLINE ||
+                theInstance.instanceStatus == InstanceStatus.LOADINGMAP ||
+                theInstance.instanceStatus == InstanceStatus.SCORING)
+            {
+                tb_chatMessage.Enabled = false;
+            }
+            else
+            {
+                tb_chatMessage.Enabled = true;
+            }
+
+
         }
 
         private void actionKeyPress_slapAddMessage(object sender, KeyPressEventArgs e)
@@ -191,17 +203,6 @@ namespace BHD_RemoteClient.Forms.Panels
                 return;
             }
 
-            if (theInstance.instanceStatus == InstanceStatus.OFFLINE ||
-                theInstance.instanceStatus == InstanceStatus.LOADINGMAP ||
-                theInstance.instanceStatus == InstanceStatus.SCORING)
-            {
-                tb_chatMessage.Enabled = false;
-                return;
-            } else
-            {
-                tb_chatMessage.Enabled = true;
-            }
-
             string message = tb_chatMessage.Text.Trim();
             if (string.IsNullOrEmpty(message))
                 return;
@@ -209,6 +210,16 @@ namespace BHD_RemoteClient.Forms.Panels
             int channel = 0;
 
             channel = comboBox_chatGroup.SelectedIndex;
+
+            switch (comboBox_chatGroup.SelectedIndex)
+            {
+                case 0: channel = 0; break; // All
+                case 1: channel = 3; break; // Announcements
+                case 2: channel = 4; break; // Team Red
+                case 3: channel = 5; break; // Team Blue
+                case 4: channel = 9; break; // Server
+                default: channel = 0; break;
+            }
 
             if (message.Contains("{P:") && message.Contains("}"))
             {

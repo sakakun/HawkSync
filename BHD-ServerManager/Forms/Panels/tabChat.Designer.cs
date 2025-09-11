@@ -178,7 +178,7 @@
             comboBox_chatGroup.DropDownWidth = 125;
             comboBox_chatGroup.FormattingEnabled = true;
             comboBox_chatGroup.IntegralHeight = false;
-            comboBox_chatGroup.Items.AddRange(new object[] { "6A 00 Global (White Chat) - FF C0 A0 FF", "6A 01 Global (White Chat) - FF C0 A0 FF", "6A 02 Unknown - (Team Chat Color) - 00 FF 00 FF (Not Red Visible)", "6A 03 Announcement (Yellow Chat) - 00 FF FF FF", "6A 04 Unknown", "6A 05 Unknown", "6A 06 Unknown", "6A 07 Unknown", "6A 08 Unknown", "6A 09 Unknown" });
+            comboBox_chatGroup.Items.AddRange(new object[] { "Global", "Announcement", "Red Chat", "Blue Chat", "Notification", "White Notification" });
             comboBox_chatGroup.Location = new Point(0, 0);
             comboBox_chatGroup.Margin = new Padding(0);
             comboBox_chatGroup.Name = "comboBox_chatGroup";

@@ -178,7 +178,7 @@
             comboBox_chatGroup.DropDownWidth = 125;
             comboBox_chatGroup.FormattingEnabled = true;
             comboBox_chatGroup.IntegralHeight = false;
-            comboBox_chatGroup.Items.AddRange(new object[] { "Global", "Announcement", "Red Team", "Blue Team" });
+            comboBox_chatGroup.Items.AddRange(new object[] { "Global", "Announcement", "Red Chat", "Blue Chat", "Notification", "White Notification" });
             comboBox_chatGroup.Location = new Point(0, 0);
             comboBox_chatGroup.Margin = new Padding(0);
             comboBox_chatGroup.Name = "comboBox_chatGroup";
