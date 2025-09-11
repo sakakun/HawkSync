@@ -161,6 +161,9 @@ namespace BHD_SharedResources.Classes.Instances
         public int chatCommandSkipMap_VotingPeriod { get; set; } = 2;
         public int chatCommandSkipMap_MaxVotingSessions { get; set; } = 2;
         public int chatCommandSkipMap_VotingStarts { get; set; } = 2;
+        
+        // Chat Command: Console Commands
+        public bool chatCommandConsoleCommands { get; set; } = false;
     }
 
     public enum InstanceStatus

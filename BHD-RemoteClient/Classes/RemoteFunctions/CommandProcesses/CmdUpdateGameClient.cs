@@ -49,8 +49,15 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 if (!prop.CanRead || !prop.CanWrite || prop.GetIndexParameters().Length > 0)
                     continue;
 
+                // Skip properties with [JsonIgnore]
+                if (prop.GetCustomAttributes(typeof(System.Text.Json.Serialization.JsonIgnoreAttribute), true).Length > 0)
+                    continue;
+
                 try
                 {
+                    if (prop.Name == "instanceAttachedPID") { 
+                        AppDebug.Log("UpdateGameClient", $"'{prop.Name}': {prop.GetValue(updatedInstance)}");
+                    }
                     var updatedValue = prop.GetValue(updatedInstance);
                     prop.SetValue(theInstance, updatedValue);
                 }
@@ -59,6 +66,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                     AppDebug.Log("UpdateGameClient", $"Failed to set property '{prop.Name}': {ex.Message}");
                 }
             }
+
         }
         public static void ProcessingChatInstance(chatInstance updatedChatInstance)
         {

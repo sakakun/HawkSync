@@ -30,6 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             flowLayoutPanel1 = new FlowLayoutPanel();
+            groupBox_ConsoleCommands = new GroupBox();
             groupBox_skipMaps = new GroupBox();
             label2 = new Label();
             cb_ccEnableInGameSkipMap = new CheckBox();
@@ -47,8 +48,9 @@
             btn_ChatCommandSave = new Button();
             btn_ChatCommandsReset = new Button();
             tableLayoutPanel1 = new TableLayoutPanel();
-            groupBox_ConsoleCommands = new GroupBox();
+            cb_enableConsoleCommands = new CheckBox();
             flowLayoutPanel1.SuspendLayout();
+            groupBox_ConsoleCommands.SuspendLayout();
             groupBox_skipMaps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)num_SkipPercentRequired).BeginInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingMaxSessions).BeginInit();
@@ -68,6 +70,17 @@
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Size = new Size(255, 305);
             flowLayoutPanel1.TabIndex = 0;
+            // 
+            // groupBox_ConsoleCommands
+            // 
+            groupBox_ConsoleCommands.Controls.Add(cb_enableConsoleCommands);
+            groupBox_ConsoleCommands.Dock = DockStyle.Top;
+            groupBox_ConsoleCommands.Location = new Point(3, 3);
+            groupBox_ConsoleCommands.Name = "groupBox_ConsoleCommands";
+            groupBox_ConsoleCommands.Size = new Size(247, 64);
+            groupBox_ConsoleCommands.TabIndex = 2;
+            groupBox_ConsoleCommands.TabStop = false;
+            groupBox_ConsoleCommands.Text = "Console Commands";
             // 
             // groupBox_skipMaps
             // 
@@ -248,15 +261,16 @@
             tableLayoutPanel1.Size = new Size(894, 305);
             tableLayoutPanel1.TabIndex = 2;
             // 
-            // groupBox_ConsoleCommands
+            // cb_enableConsoleCommands
             // 
-            groupBox_ConsoleCommands.Dock = DockStyle.Top;
-            groupBox_ConsoleCommands.Location = new Point(3, 3);
-            groupBox_ConsoleCommands.Name = "groupBox_ConsoleCommands";
-            groupBox_ConsoleCommands.Size = new Size(247, 64);
-            groupBox_ConsoleCommands.TabIndex = 2;
-            groupBox_ConsoleCommands.TabStop = false;
-            groupBox_ConsoleCommands.Text = "Console Commands";
+            cb_enableConsoleCommands.AutoSize = true;
+            cb_enableConsoleCommands.CheckAlign = ContentAlignment.MiddleRight;
+            cb_enableConsoleCommands.Location = new Point(62, 28);
+            cb_enableConsoleCommands.Name = "cb_enableConsoleCommands";
+            cb_enableConsoleCommands.Size = new Size(172, 19);
+            cb_enableConsoleCommands.TabIndex = 0;
+            cb_enableConsoleCommands.Text = "Enable Console Commands";
+            cb_enableConsoleCommands.UseVisualStyleBackColor = true;
             // 
             // tabChatCommands
             // 
@@ -269,6 +283,8 @@
             Name = "tabChatCommands";
             Size = new Size(894, 334);
             flowLayoutPanel1.ResumeLayout(false);
+            groupBox_ConsoleCommands.ResumeLayout(false);
+            groupBox_ConsoleCommands.PerformLayout();
             groupBox_skipMaps.ResumeLayout(false);
             groupBox_skipMaps.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)num_SkipPercentRequired).EndInit();
@@ -301,5 +317,6 @@
         private CheckBox cb_ccEnableInGameSkipMap;
         private TableLayoutPanel tableLayoutPanel1;
         private GroupBox groupBox_ConsoleCommands;
+        private CheckBox cb_enableConsoleCommands;
     }
 }

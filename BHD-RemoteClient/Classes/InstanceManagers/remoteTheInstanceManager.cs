@@ -66,6 +66,7 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
         public void InitializeTickers()
         {
             CommonCore.Ticker.Start("ServerManager", 1000, () => tickerServerManager.runTicker());
+            CommonCore.Ticker.Start("ChatManager", 500, () => tickerChatManagement.runTicker());
         }
 
         public void LoadSettings(bool external, string path)

@@ -46,14 +46,18 @@
             btn_ChatCommandSave = new Button();
             btn_ChatCommandsReset = new Button();
             groupBox_ConsoleCommands = new GroupBox();
+            btn_commandConsole = new Button();
+            label_consoleCommands = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
             flowLayoutPanel2 = new FlowLayoutPanel();
+            button_test = new Button();
             groupBox_skipMaps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)num_SkipPercentRequired).BeginInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingMaxSessions).BeginInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingStarts).BeginInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingPeriod).BeginInit();
             panel1.SuspendLayout();
+            groupBox_ConsoleCommands.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             flowLayoutPanel2.SuspendLayout();
             SuspendLayout();
@@ -224,6 +228,8 @@
             // 
             // groupBox_ConsoleCommands
             // 
+            groupBox_ConsoleCommands.Controls.Add(btn_commandConsole);
+            groupBox_ConsoleCommands.Controls.Add(label_consoleCommands);
             groupBox_ConsoleCommands.Dock = DockStyle.Top;
             groupBox_ConsoleCommands.Location = new Point(3, 3);
             groupBox_ConsoleCommands.Name = "groupBox_ConsoleCommands";
@@ -232,6 +238,26 @@
             groupBox_ConsoleCommands.TabStop = false;
             groupBox_ConsoleCommands.Text = "Console Commands";
             // 
+            // btn_commandConsole
+            // 
+            btn_commandConsole.FlatStyle = FlatStyle.Flat;
+            btn_commandConsole.Location = new Point(140, 23);
+            btn_commandConsole.Name = "btn_commandConsole";
+            btn_commandConsole.Size = new Size(94, 26);
+            btn_commandConsole.TabIndex = 1;
+            btn_commandConsole.Text = "Attach Game";
+            btn_commandConsole.UseVisualStyleBackColor = true;
+            btn_commandConsole.Click += actionClick_AttachGameClient;
+            // 
+            // label_consoleCommands
+            // 
+            label_consoleCommands.AutoSize = true;
+            label_consoleCommands.Location = new Point(10, 29);
+            label_consoleCommands.Name = "label_consoleCommands";
+            label_consoleCommands.Size = new Size(97, 15);
+            label_consoleCommands.TabIndex = 0;
+            label_consoleCommands.Text = "Feature: Disabled";
+            // 
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 3;
@@ -239,6 +265,7 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 325F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 314F));
             tableLayoutPanel1.Controls.Add(flowLayoutPanel2, 0, 1);
+            tableLayoutPanel1.Controls.Add(button_test, 1, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -260,6 +287,16 @@
             flowLayoutPanel2.Size = new Size(255, 305);
             flowLayoutPanel2.TabIndex = 0;
             // 
+            // button_test
+            // 
+            button_test.Location = new Point(258, 3);
+            button_test.Name = "button_test";
+            button_test.Size = new Size(75, 23);
+            button_test.TabIndex = 1;
+            button_test.Text = "Test";
+            button_test.UseVisualStyleBackColor = true;
+            button_test.Click += actionClick_TestMessage;
+            // 
             // tabChatCommands
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -277,6 +314,8 @@
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingStarts).EndInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingPeriod).EndInit();
             panel1.ResumeLayout(false);
+            groupBox_ConsoleCommands.ResumeLayout(false);
+            groupBox_ConsoleCommands.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
             flowLayoutPanel2.ResumeLayout(false);
             ResumeLayout(false);
@@ -304,5 +343,8 @@
         private GroupBox groupBox_ConsoleCommands;
         private TableLayoutPanel tableLayoutPanel1;
         private FlowLayoutPanel flowLayoutPanel2;
+        private Button btn_commandConsole;
+        private Label label_consoleCommands;
+        private Button button_test;
     }
 }

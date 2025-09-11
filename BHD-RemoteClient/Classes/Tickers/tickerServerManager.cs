@@ -42,7 +42,6 @@ namespace BHD_RemoteClient.Classes.Tickers
                 thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
                 thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
                 thisServer.PlayersTab.tickerPlayerHook();                                       // Ticker for Players
-                thisServer.ChatTab.ChatTickerHook();
                 thisServer.BanTab.BanTickerHook();                                              // Update Bans Tab
                 thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
                 thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab

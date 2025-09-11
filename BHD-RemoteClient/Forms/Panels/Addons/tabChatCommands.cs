@@ -1,4 +1,5 @@
-﻿using BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses;
+﻿using BHD_RemoteClient.Classes.GameManagement;
+using BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -60,6 +62,7 @@ namespace BHD_RemoteClient.Forms.Panels.Addons
             HighlightControl(num_SkipVotingStarts, (int)num_SkipVotingStarts.Value != theInstance.chatCommandSkipMap_VotingStarts);
             HighlightControl(num_SkipVotingPeriod, (int)num_SkipVotingPeriod.Value != theInstance.chatCommandSkipMap_VotingPeriod);
             HighlightControl(num_SkipVotingMaxSessions, (int)num_SkipVotingMaxSessions.Value != theInstance.chatCommandSkipMap_MaxVotingSessions);
+
         }
 
         // Helper to highlight controls
@@ -81,6 +84,9 @@ namespace BHD_RemoteClient.Forms.Panels.Addons
             num_SkipVotingPeriod.Value = thisInstance.chatCommandSkipMap_VotingPeriod;
             num_SkipVotingMaxSessions.Value = thisInstance.chatCommandSkipMap_MaxVotingSessions;
 
+            // Chat Command: Console Commands
+            label_consoleCommands.Text = "Feature: " + (thisInstance.chatCommandConsoleCommands ? "Enabled" : "Disabled");
+            btn_commandConsole.Enabled = thisInstance.chatCommandConsoleCommands;
         }
 
         public void functionEvent_SetChatCommandSettings()
@@ -111,6 +117,46 @@ namespace BHD_RemoteClient.Forms.Panels.Addons
 
         }
 
+        public void functionEvent_AttachGameClient()
+        {
+            string file_name = "dfbhd.exe";
+            bool attached = false;
+
+            foreach (var searchProcess in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file_name)))
+            {
+                try
+                {
+                    AppDebug.Log("tabChatCommands", $"Found game process: {searchProcess.ProcessName} (PID: {searchProcess.Id})");
+                    theInstance.instanceAttachedPID = searchProcess.Id;
+                    theInstance.instanceProcessHandle = searchProcess.Handle;
+                    ClientMemory.AttachToGameProcess(searchProcess.Id);
+                    attached = true;
+                    MessageBox.Show("Successfully attached to the game process.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                }
+                catch (Win32Exception)
+                {
+                    continue;
+                }
+            }
+
+            AppDebug.Log("tabChatCommands", $"'{theInstance.instanceAttachedPID}': {theInstance.instanceProcess}");
+
+            if (!attached)
+            {
+                AppDebug.Log("tabChatCommands", "No accessible game process found.");
+                MessageBox.Show("No accessible game process found. Please ensure the game is running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void functionEvent_IsGameClientAttached()
+        {
+            label_consoleCommands.Text = "Feature: " + (theInstance.chatCommandConsoleCommands ? "Enabled" : "Disabled");
+            btn_commandConsole.Text = ClientMemory.ReadMemoryIsProcessAttached() ? "Game Attached" : "Attach Game";
+            btn_commandConsole.Enabled = !ClientMemory.ReadMemoryIsProcessAttached() && theInstance.chatCommandConsoleCommands;
+        }
+
+
         // Ticker Hook for the "Settings" Updates
         public void TickerChatCommandsHook()
         {
@@ -119,10 +165,15 @@ namespace BHD_RemoteClient.Forms.Panels.Addons
                 _firstLoadComplete = true;
                 functionEvent_GetChatCommandSettings();
             }
-            
+            // Check Game/Client Status
+            functionEvent_IsGameClientAttached();
+
             // Highlight Changes
             functionAction_HighlightChanges();
         }
+
+
+
 
         private void actionClick_ResetSettings(object sender, EventArgs e)
         {
@@ -132,6 +183,21 @@ namespace BHD_RemoteClient.Forms.Panels.Addons
         private void actionClick_SaveSettings(object sender, EventArgs e)
         {
             functionEvent_SetChatCommandSettings();               // Set the Instance Settings from the UI to the Instance Object.
+        }
+
+        private void actionClick_AttachGameClient(object sender, EventArgs e)
+        {
+            // Check Game/Client Status
+            functionEvent_AttachGameClient();
+        }
+
+        private void actionClick_TestMessage(object sender, EventArgs e)
+        {
+
+            // Limit to 95 characters or it will run off screen.
+            // 
+            ClientMemory.PushChatMessage("", 019, 3000);
+            
         }
     }
 }

@@ -59,6 +59,7 @@ namespace BHD_ServerManager.Forms.Panels.Addons
             HighlightControl(num_SkipVotingStarts, (int)num_SkipVotingStarts.Value != theInstance.chatCommandSkipMap_VotingStarts);
             HighlightControl(num_SkipVotingPeriod, (int)num_SkipVotingPeriod.Value != theInstance.chatCommandSkipMap_VotingPeriod);
             HighlightControl(num_SkipVotingMaxSessions, (int)num_SkipVotingMaxSessions.Value != theInstance.chatCommandSkipMap_MaxVotingSessions);
+            HighlightControl(cb_enableConsoleCommands, cb_enableConsoleCommands.Checked != theInstance.chatCommandConsoleCommands);
         }
 
         // Helper to highlight controls
@@ -80,6 +81,9 @@ namespace BHD_ServerManager.Forms.Panels.Addons
             num_SkipVotingPeriod.Value = thisInstance.chatCommandSkipMap_VotingPeriod;
             num_SkipVotingMaxSessions.Value = thisInstance.chatCommandSkipMap_MaxVotingSessions;
 
+            // Chat Commands: Console Commands
+            cb_enableConsoleCommands.Checked = thisInstance.chatCommandConsoleCommands;
+
         }
 
         public void functionEvent_SetChatCommandSettings()
@@ -93,6 +97,9 @@ namespace BHD_ServerManager.Forms.Panels.Addons
             theInstance.chatCommandSkipMap_VotingStarts = (int)num_SkipVotingStarts.Value;
             theInstance.chatCommandSkipMap_VotingPeriod = (int)num_SkipVotingPeriod.Value;
             theInstance.chatCommandSkipMap_MaxVotingSessions = (int)num_SkipVotingMaxSessions.Value;
+            
+            // Chat Commands: Console Commands
+            theInstance.chatCommandConsoleCommands = cb_enableConsoleCommands.Checked;
 
         }
 
@@ -295,7 +302,6 @@ namespace BHD_ServerManager.Forms.Panels.Addons
                 }
             }
         }
-
 
         private void actionClick_ResetSettings(object sender, EventArgs e)
         {
