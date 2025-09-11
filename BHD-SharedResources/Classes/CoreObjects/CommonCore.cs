@@ -20,6 +20,8 @@ namespace BHD_SharedResources.Classes.CoreObjects
         public static statInstance instanceStats { get; set; } = null;
         public static adminInstance instanceAdmin { get; set; } = null;
 
+        public static consoleInstance instanceConsole { get; set; } = null;
+
 
         // Object: Ticker, Timer Constructor for periodic tasks
         public static Ticker Ticker { get; set; }
@@ -33,6 +35,7 @@ namespace BHD_SharedResources.Classes.CoreObjects
             instanceBans = new banInstance();
             instanceStats = new statInstance();
             instanceAdmin = new adminInstance();
+            instanceConsole = new consoleInstance();
 
             // Initialize the Ticker
             Ticker = new Ticker();

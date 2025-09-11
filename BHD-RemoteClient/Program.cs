@@ -6,6 +6,7 @@ using BHD_RemoteClient.Forms;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.GameManagement;
 using BHD_SharedResources.Classes.InstanceManagers;
+using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.StatsManagement;
 
 namespace BHD_RemoteClient
@@ -37,6 +38,7 @@ namespace BHD_RemoteClient
             chatInstanceManagers.Implementation = new remoteChatInstanceManager();
             mapInstanceManager.Implementation = new remoteMapInstanceManager();
             adminInstanceManager.Implementation = new remoteAdminInstanceManager();
+            consoleInstanceManager.Implementation = new remoteConsoleInstanceManager();
 
             StatsManager.Implementation = new remoteStatsManager();
             GameManager.Implementation = new remoteGameManager();
