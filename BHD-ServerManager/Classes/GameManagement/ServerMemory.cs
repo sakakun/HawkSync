@@ -1251,28 +1251,72 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: WriteMemorySendChatMessage
         public static void WriteMemorySendChatMessage(int MsgLocation, string Msg)
         {
+            /*
+
+            6A 00 Global (White Chat) - FF C0 A0 FF
+            6A 01 Global (White Chat) - FF C0 A0 FF
+            6A 02 Team Chat - Blue Chat - 00 FF 00 FF
+            6A 03 Announcement (Yellow Chat) - 00 FF FF FF
+            6A 04 Team Chat - Red Chat - 00 FF 00 FF
+            6A 05 Team Chat - Unknown - 00 FF 00 FF
+            6A 06 Blue Notification - 00 00 00 FF
+            6A 07 Unknown - Did nothing visible
+            6A 08 Orange Notification - FF FF 60 00
+            6A 09 White Notification - Server -> Client
+            6A 0A Blue Notification - 00 00 00 FF -> Continues
+            */
+            
             int colorbuffer_written = 0;
             byte[] colorcode;
 
             switch (MsgLocation)
             {
-                case 1: // Yellow Message
+                case 1: // Global Chat: White
+                    colorcode = Functions.ToByteArray("6A 01".Replace(" ", ""));
+                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
+                    break;
+                case 2: // Team Chat: Blue - Why?
+                    colorcode = Functions.ToByteArray("6A 02".Replace(" ", ""));
+                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
+                    break;
+                case 3: // Yellow Message
                     colorcode = Functions.ToByteArray("6A 03".Replace(" ", ""));
                     WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
                     break;
-                case 2: // Team Chat: Red
+                case 4: // Team Chat: Red
                     colorcode = Functions.ToByteArray("6A 04".Replace(" ", ""));
                     WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
                     break;
-                case 3: // Team Chat: Blue
+                case 5: // Team Chat: Blue
                     colorcode = Functions.ToByteArray("6A 05".Replace(" ", ""));
                     WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
                     break;
-                default: // White
+                case 6: // Notification: Blue Text (Only in Chat Window)
+                    colorcode = Functions.ToByteArray("6A 06".Replace(" ", ""));
+                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
+                    break;
+                case 7: // Unknown
+                    colorcode = Functions.ToByteArray("6A 07".Replace(" ", ""));
+                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
+                    break;
+                case 8: // Notification: Orange Text
+                    colorcode = Functions.ToByteArray("6A 08".Replace(" ", ""));
+                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
+                    break;
+                case 9: // System Notification: White Text (6A 09)
+                    colorcode = Functions.ToByteArray("6A 09".Replace(" ", ""));
+                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
+                    break;
+                default: // General Chat (Global White)
                     colorcode = Functions.ToByteArray("6A 01".Replace(" ", ""));
                     WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
                     break;
             }
+
+            string logData = BitConverter.ToString(colorcode).Replace("-", " ");
+
+            AppDebug.Log("ChatMessage", $"{logData}:{MsgLocation}");
+
             // post message
             PostMessage(windowHandle, (ushort)WM_KEYDOWN, chatConsole, 0);
             PostMessage(windowHandle, (ushort)WM_KEYUP, chatConsole, 0);

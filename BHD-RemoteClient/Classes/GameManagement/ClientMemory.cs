@@ -155,11 +155,21 @@ namespace BHD_RemoteClient.Classes.GameManagement
             return message;
         }
 
-        public static void InjectChatMessage(string message, int rgbColor, ushort timer, int slot = 0)
+        public static void InjectMessage(int msgtype, string message, int rgbColor, ushort timer, int slot = 0)
         {
+            // Notification Max Message Length = 53 Characters to stay on Screen - Starts half way on screen.
+
+            // Extended Chat Message Lengths (Console and Notifications/Chat)
+            // Chat Max Message Length = 80 Characters to stay on Screen
+            // Notification Mac Message Lenth = 74 (50 Spaces + 24 Characters)
+
+
             // Each chat slot = 128 bytes
             var chatBufferBase = 0x00876008;
-            var targetAddr = chatBufferBase + (slot * 0x80);
+            var notificationBufferBase = 0x0087740C;
+
+            var baseAddr = msgtype == 0 ? chatBufferBase : notificationBufferBase;
+            var targetAddr = baseAddr + (slot * 0x80);
             uint argbColor = ChatColorRgbToArgb(rgbColor);
             byte[] buffer = new byte[0x80]; // 128 bytes
 
@@ -182,18 +192,22 @@ namespace BHD_RemoteClient.Classes.GameManagement
             WriteProcessMemory((int)processHandle, targetAddr, buffer, buffer.Length, ref bytesWritten);
         }
 
-        public static void PushChatMessage(string message, int rgbColor, ushort timer)
+        public static void PushMessage(int msgtype, string message, int rgbColor, ushort timer)
         {
             int maxSlots = 18; // number of chat messages visible
             int slotSize = 0x80;
             uint argbColor = ChatColorRgbToArgb(rgbColor);
+            
             var chatBufferBase = 0x00876008;
+            var notificationBufferBase = 0x0087740C;
+
+            var baseAddr = msgtype == 0 ? chatBufferBase : notificationBufferBase;
 
             // Shift down: slot[n-1] -> slot[n], starting from bottom
             for (int i = maxSlots - 1; i > 0; i--)
             {
-                var srcAddr = chatBufferBase + ((i - 1) * slotSize);
-                var dstAddr = chatBufferBase + (i * slotSize);
+                var srcAddr = baseAddr + ((i - 1) * slotSize);
+                var dstAddr = baseAddr + (i * slotSize);
 
                 byte[] slotData = new byte[slotSize];
                 int bytesRead = 0;
@@ -222,7 +236,7 @@ namespace BHD_RemoteClient.Classes.GameManagement
             buffer[126] = 0; buffer[127] = 0; // Already zero by default
 
             int written = 0;
-            WriteProcessMemory((int)processHandle, chatBufferBase, buffer, buffer.Length, ref written);
+            WriteProcessMemory((int)processHandle, baseAddr, buffer, buffer.Length, ref written);
         }
 
         public static uint ChatColorRgbToArgb(int rgb)

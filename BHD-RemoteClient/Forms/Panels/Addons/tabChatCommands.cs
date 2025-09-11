@@ -191,13 +191,5 @@ namespace BHD_RemoteClient.Forms.Panels.Addons
             functionEvent_AttachGameClient();
         }
 
-        private void actionClick_TestMessage(object sender, EventArgs e)
-        {
-
-            // Limit to 95 characters or it will run off screen.
-            // 
-            ClientMemory.PushChatMessage("", 019, 3000);
-            
-        }
     }
 }

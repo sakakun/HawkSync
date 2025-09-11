@@ -50,7 +50,6 @@
             label_consoleCommands = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
             flowLayoutPanel2 = new FlowLayoutPanel();
-            button_test = new Button();
             groupBox_skipMaps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)num_SkipPercentRequired).BeginInit();
             ((System.ComponentModel.ISupportInitialize)num_SkipVotingMaxSessions).BeginInit();
@@ -265,7 +264,6 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 325F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 314F));
             tableLayoutPanel1.Controls.Add(flowLayoutPanel2, 0, 1);
-            tableLayoutPanel1.Controls.Add(button_test, 1, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -286,16 +284,6 @@
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Size = new Size(255, 305);
             flowLayoutPanel2.TabIndex = 0;
-            // 
-            // button_test
-            // 
-            button_test.Location = new Point(258, 3);
-            button_test.Name = "button_test";
-            button_test.Size = new Size(75, 23);
-            button_test.TabIndex = 1;
-            button_test.Text = "Test";
-            button_test.UseVisualStyleBackColor = true;
-            button_test.Click += actionClick_TestMessage;
             // 
             // tabChatCommands
             // 
@@ -345,6 +333,5 @@
         private FlowLayoutPanel flowLayoutPanel2;
         private Button btn_commandConsole;
         private Label label_consoleCommands;
-        private Button button_test;
     }
 }

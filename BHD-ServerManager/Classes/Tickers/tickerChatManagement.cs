@@ -260,10 +260,10 @@ namespace BHD_ServerManager.Classes.Tickers
                     else
                     {
                         string message = msgObj.MessageText;
-                        if (message.Length > 59)
+                        if (message.Length > 55)
                         {
                             // Split message into chunks without breaking words
-                            int maxLen = 59;
+                            int maxLen = 55;
                             int start = 0;
                             while (start < message.Length)
                             {

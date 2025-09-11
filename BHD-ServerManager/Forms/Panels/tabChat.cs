@@ -149,6 +149,18 @@ namespace BHD_ServerManager.Forms.Panels
                 functionEvent_UpdateChatMessagesGrid();
             }
 
+            if (theInstance.instanceStatus == InstanceStatus.OFFLINE ||
+                theInstance.instanceStatus == InstanceStatus.LOADINGMAP ||
+                theInstance.instanceStatus == InstanceStatus.SCORING)
+            {
+                tb_chatMessage.Enabled = false;
+                return;
+            }
+            else
+            {
+                tb_chatMessage.Enabled = true;
+            }
+
         }
 
         private void actionKeyPress_slapAddMessage(object sender, KeyPressEventArgs e)
@@ -192,33 +204,13 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
 
-            if (theInstance.instanceStatus == InstanceStatus.OFFLINE ||
-                theInstance.instanceStatus == InstanceStatus.LOADINGMAP ||
-                theInstance.instanceStatus == InstanceStatus.SCORING)
-            {
-                tb_chatMessage.Enabled = false;
-                return;
-            } else
-            {
-                tb_chatMessage.Enabled = true;
-            }
-
             string message = tb_chatMessage.Text.Trim();
             if (string.IsNullOrEmpty(message))
                 return;
 
             int channel = 0;
 
-            switch (comboBox_chatGroup.SelectedIndex)
-            {
-                
-                case 1: channel = 1; break;
-                case 2: channel = 2; break;
-                case 3: channel = 3; break;
-                case 0: channel = 0; break;
-                default: channel = 0; break;
-
-            }
+            channel = comboBox_chatGroup.SelectedIndex;
 
             if (message.Contains("{P:") && message.Contains("}"))
             {

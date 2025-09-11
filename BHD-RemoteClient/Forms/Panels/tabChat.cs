@@ -208,16 +208,7 @@ namespace BHD_RemoteClient.Forms.Panels
 
             int channel = 0;
 
-            switch (comboBox_chatGroup.SelectedIndex)
-            {
-                
-                case 1: channel = 1; break;
-                case 2: channel = 2; break;
-                case 3: channel = 3; break;
-                case 0: channel = 0; break;
-                default: channel = 0; break;
-
-            }
+            channel = comboBox_chatGroup.SelectedIndex;
 
             if (message.Contains("{P:") && message.Contains("}"))
             {
