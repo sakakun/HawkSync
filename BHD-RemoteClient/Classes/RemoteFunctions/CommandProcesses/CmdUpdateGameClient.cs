@@ -1,4 +1,5 @@
 ﻿using BHD_SharedResources.Classes.CoreObjects;
+using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
 
@@ -91,7 +92,6 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 }
             }
         }
-
         public static void ProcessingBanInstance(banInstance updatedBanInstance)
         {
             if (updatedBanInstance == null) return;
@@ -115,7 +115,6 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 }
             }
         }
-
         public static void ProcessingMapInstance(mapInstance updatedMapInstance)
         {
             if (updatedMapInstance == null) return;
@@ -139,7 +138,6 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 }
             }
         }
-
         public static void ProcessingAdminInstance(adminInstance updatedAdminInstance)
         {
             if (updatedAdminInstance == null) return;
@@ -163,7 +161,6 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 }
             }
         }
-
         public static void ProcessingStatInstance(statInstance updatedStatInstance)
         {
             if (updatedStatInstance == null) return;
@@ -186,6 +183,36 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                     AppDebug.Log("UpdateGameClient", $"Failed to set property '{prop.Name}': {ex.Message}");
                 }
             }
+        }
+        public static void ProcessingConsoleInstance(consoleInstance updatedConsoleInstance)
+        {
+            if (updatedConsoleInstance == null) return;
+            AppDebug.Log("updatedConsoleInstance", "Processing updatedConsoleInstance update");
+
+            var type = typeof(chatInstance);
+
+            foreach (var prop in type.GetProperties())
+            {
+                if (!prop.CanRead || !prop.CanWrite || prop.GetIndexParameters().Length > 0)
+                    continue;
+
+                // Skip properties with [JsonIgnore]
+                if (prop.GetCustomAttributes(typeof(System.Text.Json.Serialization.JsonIgnoreAttribute), true).Length > 0)
+                    continue;
+
+                try
+                {
+                    var updatedValue = prop.GetValue(updatedConsoleInstance);
+                    prop.SetValue(instanceChat, updatedValue);
+                }
+                catch (Exception ex)
+                {
+                    AppDebug.Log("updatedConsoleInstance", $"Failed to set property '{prop.Name}': {ex.Message}");
+                }
+            }
+
+            consoleInstanceManager.updateConsoleWindow(Program.theRemoteClient!.AuthToken);
+
         }
     }
 }

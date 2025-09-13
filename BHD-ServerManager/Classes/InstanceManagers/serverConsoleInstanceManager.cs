@@ -1,4 +1,4 @@
-﻿using BHD_RemoteClient.Forms;
+﻿using BHD_ServerManager.Forms;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.Instances;
@@ -8,20 +8,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BHD_RemoteClient.Classes.InstanceManagers
+namespace BHD_ServerManager.Classes.InstanceManagers
 {
-    public class remoteConsoleInstanceManager : consoleInstanceInterface
+    public class serverConsoleInstanceManager : consoleInstanceInterface
     {
         // The Instances (Data)
         private static theInstance theInstance => CommonCore.theInstance!;
         private static ServerManager thisServer => Program.ServerManagerUI!;
-        private static consoleInstance instanceConsole => CommonCore.instanceConsole!;
 
-        public void updateConsoleWindow(string AuthToken)
+        void consoleInstanceInterface.updateConsoleWindow(string AuthToken)
         {
-            instanceConsole.ClientConsole = instanceConsole.AdminConsoles[AuthToken];
+            throw new NotImplementedException();
         }
-
     }
-    
 }

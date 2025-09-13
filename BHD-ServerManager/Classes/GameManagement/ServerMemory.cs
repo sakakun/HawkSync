@@ -1550,7 +1550,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             thisInstance.instanceStatus = (InstanceStatus)instanceStatus;
 
-
         }
         // Function: ReadMemoryGameTimeLeft
         public static void ReadMemoryGameTimeLeft()
@@ -1925,8 +1924,10 @@ namespace BHD_ServerManager.Classes.GameManagement
                 0x000ADAD8, // stat_SniperKills
                 0x000ADADC, // stat_TKOTHDefenseKills
                 0x000ADAE0, // stat_TKOTHAttackKills
-                0x000ADAE4, // stat_SDADDefendKill
-                0x000ADAEC, // stat_SDADAttackKill
+                0x000ADB14, // stat_SDADDefendKill
+                0x000ADB22, // stat_SDADAttackKill
+                0x000ADB1E, // stat_SDADFriendlyZonePolicingKills
+                0x000ADB8C  // stat_SDADEnemyZoneSecuringKills
             };
 
             var stats = new int[offsets.Length];
@@ -2067,7 +2068,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 stat_TKOTHDefenseKills = stats[22],
                 stat_TKOTHAttackKills = stats[23],
                 stat_SDADDefenseKills = stats[24],
-                stat_SDADAttackKills = stats[25]
+                stat_SDADAttackKills = stats[25],
+                stat_SDADFriendlyZonePolicingKills = stats[26],
+                stat_SDADEnemyZoneSecuringKills = stats[27]
             };
         }
         // Function: ReadMemoryLastChatMessage

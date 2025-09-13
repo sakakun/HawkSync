@@ -19,6 +19,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
         private static chatInstance instanceChat = CommonCore.instanceChat!;
         private static statInstance instanceStats = CommonCore.instanceStats!;
         private static adminInstance instanceAdmin = CommonCore.instanceAdmin!;
+        private static consoleInstance instanceConsole = CommonCore.instanceConsole!;
 
         private static readonly List<AuthorizedClient> _authorizedClients = new();
         private static TcpListener? _commListener;
@@ -39,6 +40,12 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 var existing = _authorizedClients.Find(c => c.User.Username.Equals(client.User.Username, StringComparison.OrdinalIgnoreCase));
                 if (existing != null)
                 {
+                    // Transfer console window if exists
+                    var existingConsole = instanceConsole.AdminConsoles[existing.AuthorizationToken];
+                    instanceConsole.AdminConsoles.Add(client.AuthorizationToken, existingConsole);
+                    instanceConsole.AdminConsoles.Remove(existing.AuthorizationToken);
+                    
+                    // Update existing client details
                     existing.AuthorizationToken = client.AuthorizationToken;
                     existing.AuthorizationTime = client.AuthorizationTime;
                     existing.ClientId = client.ClientId;
@@ -48,6 +55,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 else
                 {
                     _authorizedClients.Add(client);
+                    instanceConsole.AdminConsoles.Add(client.AuthorizationToken, new consoleWindow());
                 }
             }
         }
@@ -354,7 +362,8 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 banInstance = instanceBans,
                 chatInstance = instanceChat,
                 statInstance = instanceStats,
-                adminInstance = instanceAdmin
+                adminInstance = instanceAdmin,
+                consoleInstance = instanceConsole
             };
 
             string json = JsonSerializer.Serialize(updateData);

@@ -5,6 +5,7 @@ namespace BHD_SharedResources.Classes.InstanceInterfaces
 {
     public interface consoleInstanceInterface
     {
+        void updateConsoleWindow(string AuthToken);
 
     }
 }

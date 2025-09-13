@@ -73,7 +73,25 @@ namespace BHD_RemoteClient.Classes.GameManagement
             windowHandle = nint.Zero;
             processHandle = nint.Zero;
         }
+        // Is Game Attached
+        // Function: ReadMemoryClientStatus
+        public static InstanceStatus ReadMemoryClientStatus()
+        {
 
+            var startingPointer = baseAddr + 0x00098334;
+            byte[] startingPointerBuffer = new byte[4];
+            int startingPointerReadBytes = 0;
+            ReadProcessMemory((int)processHandle, startingPointer, startingPointerBuffer, startingPointerBuffer.Length, ref startingPointerReadBytes);
+
+            int statusLocationPointer = BitConverter.ToInt32(startingPointerBuffer, 0);
+            byte[] statusLocation = new byte[4];
+            int statusLocationReadBytes = 0;
+            ReadProcessMemory((int)processHandle, statusLocationPointer, statusLocation, statusLocation.Length, ref statusLocationReadBytes);
+            int instanceStatus = BitConverter.ToInt32(statusLocation, 0);
+
+            return (InstanceStatus)instanceStatus;
+
+        }
         public static bool ReadMemoryIsProcessAttached()
         {
             // Check if PID and process handle are set
@@ -194,7 +212,7 @@ namespace BHD_RemoteClient.Classes.GameManagement
 
         public static void PushMessage(int msgtype, string message, int rgbColor, ushort timer)
         {
-            int maxSlots = 18; // number of chat messages visible
+            int maxSlots = 17; // number of chat messages visible
             int slotSize = 0x80;
             uint argbColor = ChatColorRgbToArgb(rgbColor);
             

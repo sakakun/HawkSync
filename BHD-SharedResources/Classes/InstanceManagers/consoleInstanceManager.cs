@@ -8,5 +8,7 @@ namespace BHD_SharedResources.Classes.InstanceManagers
     {
         public static consoleInstanceInterface Implementation { get; set; }
 
+        public static void updateConsoleWindow(string AuthToken) => Implementation.updateConsoleWindow(AuthToken);
+
     }
 }

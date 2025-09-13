@@ -128,6 +128,8 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 stat_SDADTargetsDestroyed = CurrentPlayerObject.stat_SDADTargetsDestroyed - PreviousPlayerObject.stat_SDADTargetsDestroyed,
                 stat_SDADDefenseKills = CurrentPlayerObject.stat_SDADDefenseKills - PreviousPlayerObject.stat_SDADDefenseKills,
                 stat_SDADAttackKills = CurrentPlayerObject.stat_SDADAttackKills - PreviousPlayerObject.stat_SDADAttackKills,
+                stat_SDADFriendlyZonePolicingKills = CurrentPlayerObject.stat_SDADFriendlyZonePolicingKills - PreviousPlayerObject.stat_SDADFriendlyZonePolicingKills,
+                stat_SDADEnemyZoneSecuringKills = CurrentPlayerObject.stat_SDADEnemyZoneSecuringKills - PreviousPlayerObject.stat_SDADEnemyZoneSecuringKills,
                 stat_FlagSaves = CurrentPlayerObject.stat_FlagSaves - PreviousPlayerObject.stat_FlagSaves,
                 stat_SniperKills = CurrentPlayerObject.stat_SniperKills - PreviousPlayerObject.stat_SniperKills,
                 stat_TKOTHDefenseKills = CurrentPlayerObject.stat_TKOTHDefenseKills - PreviousPlayerObject.stat_TKOTHDefenseKills,
@@ -172,6 +174,10 @@ namespace BHD_ServerManager.Classes.StatsManagement
                 stat_FBCarrierDeaths = obj.stat_FBCarrierDeaths,
                 stat_ExperiencePoints = obj.stat_ExperiencePoints,
                 stat_SDADTargetsDestroyed = obj.stat_SDADTargetsDestroyed,
+                stat_SDADDefenseKills =obj.stat_SDADDefenseKills,
+                stat_SDADAttackKills = obj.stat_SDADAttackKills,
+                stat_SDADFriendlyZonePolicingKills = obj.stat_SDADFriendlyZonePolicingKills,
+                stat_SDADEnemyZoneSecuringKills = obj.stat_SDADEnemyZoneSecuringKills,
                 stat_FlagSaves = obj.stat_FlagSaves,
                 stat_SniperKills = obj.stat_SniperKills,
                 stat_TKOTHDefenseKills = obj.stat_TKOTHDefenseKills,
@@ -263,9 +269,9 @@ namespace BHD_ServerManager.Classes.StatsManagement
             PlayerStatLine += player.stat_TKOTHDefenseKills + " ";
             PlayerStatLine += player.stat_TKOTHAttackKills + " ";
             PlayerStatLine += player.stat_SDADDefenseKills + " ";
-            PlayerStatLine += "0 "; // sdadpolicekills
+            PlayerStatLine += player.stat_SDADFriendlyZonePolicingKills + " "; 
             PlayerStatLine += player.stat_SDADAttackKills + " ";
-            PlayerStatLine += "0 "; // sdadsecurekills
+            PlayerStatLine += player.stat_SDADEnemyZoneSecuringKills + " "; 
             PlayerStatLine += player.stat_Kills > 0 ? (player.stat_TotalShotsFired / player.stat_Kills).ToString() : "0";
             PlayerStatLine += " "; // spacer for the SPK ratio
             PlayerStatLine += player.stat_ExperiencePoints + " ";

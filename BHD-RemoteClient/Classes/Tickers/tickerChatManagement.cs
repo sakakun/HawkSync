@@ -1,4 +1,5 @@
 ﻿using BHD_RemoteClient.Classes.GameManagement;
+using BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses;
 using BHD_RemoteClient.Forms;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceManagers;
@@ -15,8 +16,11 @@ namespace BHD_RemoteClient.Classes.Tickers
         private static theInstance thisInstance => CommonCore.theInstance!;
         private static chatInstance instanceChat => CommonCore.instanceChat!;
         private static ServerManager thisServer => Program.ServerManagerUI!;
+        private static consoleInstance instanceConsole => CommonCore.instanceConsole!;
 
         private static readonly object tickerLock = new();
+        private static readonly object tickerLock2 = new();
+        private static readonly object tickerLock3 = new();
         private static bool _autoMessageRecoveryDone = false;
 
         // For deduplication of chat messages
@@ -44,13 +48,6 @@ namespace BHD_RemoteClient.Classes.Tickers
             lock (tickerLock)
             {
 
-                // Only process chat when server is online or in start delay
-                if (thisInstance.instanceStatus != InstanceStatus.ONLINE &&
-                    thisInstance.instanceStatus != InstanceStatus.STARTDELAY)
-                {
-                    // return;
-                }
-
                 // Ensure the chat tab is initialized before proceeding
                 thisServer.ChatTab.ChatTickerHook();
 
@@ -59,10 +56,9 @@ namespace BHD_RemoteClient.Classes.Tickers
                 {
                     // --- Incoming Chat Messages ---
                     // Process latest chat message and update UI (non-blocking)
-                    Task.Run(ProcessChatMessages);
-
+                    Task.Run(ProcessConsoleMessages);
                     // Process auto messages (non-blocking)
-                    Task.Run(ProcessAutoMessages);
+                    Task.Run(ProcessConsoleInjection);
                     // Process Queued Messages (non-blocking)
                     Task.Run(ProcessQueuedMessages);
                 }
@@ -73,11 +69,12 @@ namespace BHD_RemoteClient.Classes.Tickers
             }
         }
 
-        public static void ProcessChatMessages()
+        public static void ProcessConsoleMessages()
         {
 
             lock (tickerLock)
             {
+
                 //var latestMessage = ClientMemory.ReadMemoryLastChatMessage();
                 var latestMessage = ClientMemory.ReadMemoryConsoleMessage();
 
@@ -91,22 +88,83 @@ namespace BHD_RemoteClient.Classes.Tickers
 
                 _lastProcessedMessageText = lastMessage;
 
-                // Send Console Message to Server for Processing
-
                 AppDebug.Log("tickerChatManagement", $"Console Message: {lastMessage}");
+
+                if (lastMessage.StartsWith("!rc ") && !lastMessage.StartsWith("!rc client "))
+                {
+                    // Remote Server Command
+                    CmdSendConsoleCommand.ProcessCommand(lastMessage);
+                    return;
+                } else {                     // Only add to chat if it's not a command
+                    if (!lastMessage.StartsWith("!rc client "))
+                    {
+                        // Handle Console Activation Commands
+                        instanceConsole.ConsoleActive = lastMessage switch
+                        {
+                            "!rc client console on" => true,
+                            "!rc client console off" => false,
+                            _ => instanceConsole.ConsoleActive
+                        };
+
+                        // Client Side Command
+                        return;
+                    }
+                }
+                
             }
 
         }
 
-        public static void ProcessAutoMessages()
+        public static void ProcessConsoleInjection()
         {
-            
+            lock (tickerLock2)
+            {
+
+                if (instanceConsole.ConsoleActive)
+                {
+                    for (int line = 0; line < 16; line++)
+                    {
+                        ClientMemory.InjectMessage(1, instanceConsole.ClientConsole.NotificationLines[line], 90, 0, line);
+                        ClientMemory.InjectMessage(0, instanceConsole.ClientConsole.ChatLines[line], 90, 0, line);
+                    }
+                }
+
+            }
         }
 
         public static void ProcessQueuedMessages()
         {
-            
-        }
+            lock (tickerLock3)
+            {
+                string AuthToken = Program.theRemoteClient!.AuthToken;
 
+                Dictionary<int, string> messagesToProcess = instanceConsole.AdminDirectMessages[AuthToken];
+                // instanceConsole.ClientDirectMessages
+                if (AuthToken == null || AuthToken == "")
+                {
+                    return;
+                }
+
+                if (messagesToProcess.Count > instanceConsole.ClientDirectMessages.Count)
+                {
+                    foreach (var kvp in messagesToProcess)
+                    {
+                        if (!instanceConsole.ClientDirectMessages.ContainsKey(kvp.Key))
+                        {
+
+                            string decoded = System.Text.Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(kvp.Value));
+
+                            // Echo the new message
+                            AppDebug.Log("ProcessQueuedMessages", $"New Direct Message [{kvp.Key}]: {decoded}");
+
+                            // Add to ClientDirectMessages
+                            instanceConsole.ClientDirectMessages[kvp.Key] = kvp.Value;
+
+                            ClientMemory.PushMessage(0, kvp.Value, 909, 2000);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
