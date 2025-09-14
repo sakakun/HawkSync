@@ -74,45 +74,37 @@ namespace BHD_RemoteClient.Classes.Tickers
 
             lock (tickerLock)
             {
-
                 //var latestMessage = ClientMemory.ReadMemoryLastChatMessage();
                 var latestMessage = ClientMemory.ReadMemoryConsoleMessage();
 
-                string lastMessage = latestMessage;
-
-                if (_lastProcessedMessageText != null || lastMessage == _lastProcessedMessageText)
+                if (_lastProcessedMessageText == null || latestMessage == _lastProcessedMessageText)
                 {
                     // Duplicate message, skip processing
+                    AppDebug.Log("tickerChatManagement", $"Null or Duplicate Console Message");
                     return;
                 }
 
-                _lastProcessedMessageText = lastMessage;
-
-                AppDebug.Log("tickerChatManagement", $"Console Message: {lastMessage}");
-
-                if (lastMessage.StartsWith("!rc ") && !lastMessage.StartsWith("!rc client "))
+                if (latestMessage.StartsWith("!rc"))
                 {
-                    // Remote Server Command
-                    CmdSendConsoleCommand.ProcessCommand(lastMessage);
-                    return;
-                } else {                     // Only add to chat if it's not a command
-                    if (!lastMessage.StartsWith("!rc client "))
+                    if (latestMessage.StartsWith("!rc client"))
                     {
-                        // Handle Console Activation Commands
-                        instanceConsole.ConsoleActive = lastMessage switch
-                        {
-                            "!rc client console on" => true,
-                            "!rc client console off" => false,
-                            _ => instanceConsole.ConsoleActive
-                        };
-
                         // Client Side Command
-                        return;
+                        RemoteClientCommands.ProcessCommand(latestMessage);
+                        AppDebug.Log("ProcessConsoleMessages", $"Latest Console Message {_lastProcessedMessageText}");
+                    } else
+                    {
+                        // Remote Server Command
+                        CmdSendConsoleCommand.ProcessCommand(latestMessage);
+                        AppDebug.Log("ProcessConsoleMessages", $"Latest Console Message {_lastProcessedMessageText}");
                     }
-                }
-                
-            }
 
+                    _lastProcessedMessageText = latestMessage;
+                    AppDebug.Log("ProcessConsoleMessages", $"Latest Console Message {_lastProcessedMessageText}");
+                } else {                     // Only add to chat if it's not a command
+                    _lastProcessedMessageText = latestMessage;
+                    AppDebug.Log("ProcessConsoleMessages", $"Latest Console Message {_lastProcessedMessageText}");
+                }  
+            }
         }
 
         public static void ProcessConsoleInjection()
@@ -138,12 +130,13 @@ namespace BHD_RemoteClient.Classes.Tickers
             {
                 string AuthToken = Program.theRemoteClient!.AuthToken;
 
-                Dictionary<int, string> messagesToProcess = instanceConsole.AdminDirectMessages[AuthToken];
-                // instanceConsole.ClientDirectMessages
-                if (AuthToken == null || AuthToken == "")
+                // If instanceConsole.AdminDirectMessages[AuthToken] is null, return.
+                if (AuthToken == null || AuthToken == "" || !instanceConsole.AdminDirectMessages.ContainsKey(AuthToken))
                 {
                     return;
                 }
+
+                Dictionary<int, string> messagesToProcess = instanceConsole.AdminDirectMessages[AuthToken];
 
                 if (messagesToProcess.Count > instanceConsole.ClientDirectMessages.Count)
                 {

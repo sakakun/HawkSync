@@ -44,7 +44,12 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                     var existingConsole = instanceConsole.AdminConsoles[existing.AuthorizationToken];
                     instanceConsole.AdminConsoles.Add(client.AuthorizationToken, existingConsole);
                     instanceConsole.AdminConsoles.Remove(existing.AuthorizationToken);
-                    
+
+                    // Transfer direct messages if exists
+                    var existingMessages = instanceConsole.AdminDirectMessages[existing.AuthorizationToken];
+                    instanceConsole.AdminDirectMessages.Add(client.AuthorizationToken, existingMessages);
+                    instanceConsole.AdminDirectMessages.Remove(existing.AuthorizationToken);
+
                     // Update existing client details
                     existing.AuthorizationToken = client.AuthorizationToken;
                     existing.AuthorizationTime = client.AuthorizationTime;
@@ -56,6 +61,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 {
                     _authorizedClients.Add(client);
                     instanceConsole.AdminConsoles.Add(client.AuthorizationToken, new consoleWindow());
+                    instanceConsole.AdminDirectMessages.Add(client.AuthorizationToken, new Dictionary<int, string>());
                 }
             }
         }
