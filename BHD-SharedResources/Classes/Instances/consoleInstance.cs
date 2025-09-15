@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BHD_SharedResources.Classes.Instances
@@ -14,11 +15,17 @@ namespace BHD_SharedResources.Classes.Instances
         public Dictionary<string, consoleWindow> AdminConsoles = new Dictionary<string, consoleWindow>();                     // All Admin's Console Windows (Handled by Server)
         public Dictionary<string, Dictionary<int, string>>  AdminDirectMessages = new Dictionary<string, Dictionary<int, string>>();    // All Admin's Direct Messages (Handled by Server)
 
+        // New: Per-client, per-type cancellation tokens
+        [JsonIgnore]
+        public Dictionary<string, CancellationTokenSource> AdminChatLineTasks = new(); // AuthToken -> CTS for ChatLines
+        [JsonIgnore]
+        public Dictionary<string, CancellationTokenSource> AdminNotificationLineTasks = new(); // AuthToken -> CTS for NotificationLines
+
         // Local Variables For Client
         [JsonIgnore]
-        public consoleWindow ClientConsole { get; set; } = new consoleWindow();                              // The Client's Console Window (Handled Locally)
+        public consoleWindow            ClientConsole { get; set; } = new consoleWindow();                              // The Client's Console Window (Handled Locally)
         [JsonIgnore]
-        public Dictionary<int, string> ClientDirectMessages { get; set; } = new Dictionary<int, string>();                       // The Client's Direct Messages (Handled Locally), once processed will be placed here.
+        public Dictionary<int, string>  ClientDirectMessages { get; set; } = new Dictionary<int, string>();                       // The Client's Direct Messages (Handled Locally), once processed will be placed here.
         [JsonIgnore]
         public bool                     ConsoleActive { get; set; } = false;                              // Show or Hide the Console (Handled Locally)
     }

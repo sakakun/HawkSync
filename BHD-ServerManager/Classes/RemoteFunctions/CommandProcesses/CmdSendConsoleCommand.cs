@@ -9,26 +9,34 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
     {
         public static CommandResponse ProcessCommand(object data)
         {
-            int channel = 0;
             string message = string.Empty;
+            string AuthToken = string.Empty;
 
             // Handle if data is a JsonElement (common with System.Text.Json)
             if (data is System.Text.Json.JsonElement jsonElement)
             {
                 if (jsonElement.TryGetProperty("Command", out var msgProp))
                     message = msgProp.GetString() ?? string.Empty;
+                if (jsonElement.TryGetProperty("AuthToken", out var authProp))
+                    AuthToken = authProp.GetString() ?? string.Empty;
             }
             // Handle if data is a Dictionary<string, object>
             else if (data is IDictionary<string, object> dict)
             {
                 if (dict.TryGetValue("Command", out var msgObj) && msgObj is string msg)
                     message = msg;
+                if (dict.TryGetValue("Command", out var authObj) && authObj is string auth)
+                    AuthToken = auth;
             }
-            // Optionally, handle anonymous object via reflection (less common, not recommended)
-            AppDebug.Log("CmdSendConsoleCommand", $"Received data: {message}");
 
-            //chatInstanceManagers.SendMessageToQueue(false, channel, message);
-            // GameManager.WriteMemorySendChatMessage(channel, message);
+            // Replace this line:
+            // ConsoleCommandProcessor.ProcessCommand(AuthToken, message.Split(' '));
+            
+            AppDebug.Log("CmdSendConsoleCommand", $"Received data: {message} Token: '{AuthToken}'");
+            
+            // With the following code to create an instance of ConsoleCommandProcessor:
+            var ConsoleCommandProcessor = new ConsoleCommandProcessor();
+            return ConsoleCommandProcessor.ProcessCommand(AuthToken, message.Split(' '));
 
             return new CommandResponse
             {

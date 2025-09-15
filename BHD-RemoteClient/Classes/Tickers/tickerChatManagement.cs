@@ -77,10 +77,10 @@ namespace BHD_RemoteClient.Classes.Tickers
                 //var latestMessage = ClientMemory.ReadMemoryLastChatMessage();
                 var latestMessage = ClientMemory.ReadMemoryConsoleMessage();
 
-                if (_lastProcessedMessageText == null || latestMessage == _lastProcessedMessageText)
+                if (latestMessage == null || latestMessage == string.Empty || latestMessage == _lastProcessedMessageText)
                 {
                     // Duplicate message, skip processing
-                    AppDebug.Log("tickerChatManagement", $"Null or Duplicate Console Message");
+                    AppDebug.Log("tickerChatManagement", $"Null or Duplicate Console Message '{_lastProcessedMessageText}':'{latestMessage}'");
                     return;
                 }
 
@@ -133,6 +133,7 @@ namespace BHD_RemoteClient.Classes.Tickers
                 // If instanceConsole.AdminDirectMessages[AuthToken] is null, return.
                 if (AuthToken == null || AuthToken == "" || !instanceConsole.AdminDirectMessages.ContainsKey(AuthToken))
                 {
+                    AppDebug.Log("ProcessQueuedMessages", $"AuthToken not found. {instanceConsole.AdminDirectMessages.Count}");
                     return;
                 }
 
@@ -140,10 +141,12 @@ namespace BHD_RemoteClient.Classes.Tickers
 
                 if (messagesToProcess.Count > instanceConsole.ClientDirectMessages.Count)
                 {
+                    AppDebug.Log("ProcessQueuedMessages", $"{messagesToProcess.Count} > {instanceConsole.ClientDirectMessages.Count}");
                     foreach (var kvp in messagesToProcess)
                     {
                         if (!instanceConsole.ClientDirectMessages.ContainsKey(kvp.Key))
                         {
+                            AppDebug.Log("ProcessQueuedMessages", $"{kvp.Key} - {messagesToProcess}");
 
                             string decoded = System.Text.Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(kvp.Value));
 

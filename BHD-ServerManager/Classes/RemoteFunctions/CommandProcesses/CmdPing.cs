@@ -1,7 +1,7 @@
 ﻿namespace BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses
 {
     [CommandHandler("CmdPing")]
-    public static class CmdPing
+    public static class ConsoleCmdPing
     {
 
         public static CommandResponse ProcessCommand(object data)

@@ -37,7 +37,7 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
         private void RegisterStaticHandlers()
         {
             // If you have legacy handlers or want to keep some manual registrations, do it here.
-            _handlers["Ping"] = (typeof(object), CmdPing.ProcessCommand);
+            _handlers["Ping"] = (typeof(object), ConsoleCmdPing.ProcessCommand);
             _handlers["ValidateUser"] = (typeof(AuthenticationPacket), data => CmdValidateUser.ProcessCommand((AuthenticationPacket)data));
 
         }

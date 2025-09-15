@@ -15,7 +15,8 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 Command = "CmdSendConsoleCommand",
                 CommandData = new
                 {
-                    Command = CommandLineText
+                    Command = CommandLineText,
+                    AuthToken = theRemoteClient.AuthToken
                 }
             };
 
