@@ -372,7 +372,18 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 consoleInstance = instanceConsole
             };
 
-            string json = JsonSerializer.Serialize(updateData);
+            AppDebug.Log("RemoteServer", $"Server-side Mailboxes: {instanceConsole.AdminDirectMessages.Count}, Consoles: {instanceConsole.AdminConsoles.Count}");
+
+            // Use JsonSerializerOptions to respect [JsonIgnore]
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault,
+                // [JsonIgnore] is respected by default, but you can be explicit:
+                IgnoreReadOnlyProperties = false,
+                WriteIndented = false
+            };
+
+            string json = JsonSerializer.Serialize(updateData, options);
             byte[] jsonBytes = System.Text.Encoding.UTF8.GetBytes(json);
 
             // Compress the data

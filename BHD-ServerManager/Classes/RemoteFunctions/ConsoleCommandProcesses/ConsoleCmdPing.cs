@@ -15,10 +15,15 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.ConsoleCommandProcesses
         {
             // !rc ping
             // Send a message to the Admin client to verify connectivity.
-            intanceConsole.AdminDirectMessages[AuthToken].Add(intanceConsole.AdminDirectMessages[AuthToken].Count, "Server Console: Pong");
 
-            AppDebug.Log("ConsoleCmdPing", "Ping Command Ran");
+            // this needs to be encoded so the message is decoded by string decoded = System.Text.Encoding.GetEncoding("Windows-1252").GetString(Convert.FromBase64String(kvp.Value));
 
+            string message = "Server Console: Pong";
+
+            string encodedMessage = Convert.ToBase64String(System.Text.Encoding.GetEncoding("Windows-1252").GetBytes(message));
+
+            intanceConsole.AdminDirectMessages[AuthToken].Add(intanceConsole.AdminDirectMessages[AuthToken].Count + 1, encodedMessage);
+            
             return new CommandResponse
             {
                 Success = true,

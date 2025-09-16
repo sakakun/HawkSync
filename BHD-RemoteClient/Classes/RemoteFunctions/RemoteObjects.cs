@@ -29,6 +29,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
         public required chatInstance chatInstance { get; set; }
         public required statInstance statInstance { get; set; }
         public required adminInstance adminInstance { get; set; }
+        public required consoleInstance consoleInstance { get; set; }
     }
 
 }

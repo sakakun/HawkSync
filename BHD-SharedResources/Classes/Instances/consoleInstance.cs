@@ -11,9 +11,12 @@ namespace BHD_SharedResources.Classes.Instances
     public class consoleInstance
     {
         // Broadcasted Variables
-        // String = AuthorizationToken for the Admin, consoleWindow = The Admin's Console Window
-        public Dictionary<string, consoleWindow> AdminConsoles = new Dictionary<string, consoleWindow>();                     // All Admin's Console Windows (Handled by Server)
-        public Dictionary<string, Dictionary<int, string>>  AdminDirectMessages = new Dictionary<string, Dictionary<int, string>>();    // All Admin's Direct Messages (Handled by Server)
+        [JsonInclude]
+        public Dictionary<string, consoleWindow> AdminConsoles = new();
+
+        [JsonInclude]
+        public Dictionary<string, Dictionary<int, string>> AdminDirectMessages = new();
+        
 
         // New: Per-client, per-type cancellation tokens
         [JsonIgnore]

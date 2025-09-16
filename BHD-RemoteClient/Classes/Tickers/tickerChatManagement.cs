@@ -130,12 +130,16 @@ namespace BHD_RemoteClient.Classes.Tickers
             {
                 string AuthToken = Program.theRemoteClient!.AuthToken;
 
+                AppDebug.Log("AdminMailBoxes", instanceConsole.AdminDirectMessages.Count.ToString());
+
                 // If instanceConsole.AdminDirectMessages[AuthToken] is null, return.
                 if (AuthToken == null || AuthToken == "" || !instanceConsole.AdminDirectMessages.ContainsKey(AuthToken))
                 {
-                    AppDebug.Log("ProcessQueuedMessages", $"AuthToken not found. {instanceConsole.AdminDirectMessages.Count}");
+                    AppDebug.Log("AdminMailBoxes", $"AuthToken not found. {AuthToken} - {instanceConsole.AdminDirectMessages.Count}");
                     return;
                 }
+
+                AppDebug.Log("AdminMailBoxes", $"{instanceConsole.AdminDirectMessages[AuthToken].Count}:{instanceConsole.ClientDirectMessages.Count}");
 
                 Dictionary<int, string> messagesToProcess = instanceConsole.AdminDirectMessages[AuthToken];
 
@@ -156,7 +160,7 @@ namespace BHD_RemoteClient.Classes.Tickers
                             // Add to ClientDirectMessages
                             instanceConsole.ClientDirectMessages[kvp.Key] = kvp.Value;
 
-                            ClientMemory.PushMessage(0, kvp.Value, 909, 2000);
+                            ClientMemory.PushMessage(0, decoded, 909, 4000);
                         }
                     }
                 }

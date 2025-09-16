@@ -14,6 +14,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static adminInstance instanceAdmin => CommonCore.instanceAdmin!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
+        private static consoleInstance instanceConsole => CommonCore.instanceConsole!;
 
         public static void ProcessUpdateData(InstanceUpdatePacket UpdateData)
         {
@@ -27,11 +28,14 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 ProcessingMapInstance(UpdateData.mapInstance);
                 ProcessingAdminInstance(UpdateData.adminInstance);
                 ProcessingStatInstance(UpdateData.statInstance);
+                ProcessingConsoleInstance(UpdateData.consoleInstance);
+                
+                AppDebug.Log("RemoteClient", $"Client-side Mailboxes: {instanceConsole.AdminDirectMessages.Count}, Consoles: {instanceConsole.AdminConsoles.Count}");
 
             }
             catch (Exception ex)
             {
-                AppDebug.Log("UpdateGameClient", "Error processing theInstance: " + ex.Message);
+                AppDebug.Log("UpdateGameClient", "Error processing: " + ex.Message);
                 return;
             }
             AppDebug.Log("UpdateGameClient", "Processing completed successfully");
@@ -189,30 +193,49 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
             if (updatedConsoleInstance == null) return;
             AppDebug.Log("updatedConsoleInstance", "Processing updatedConsoleInstance update");
 
-            var type = typeof(chatInstance);
-
-            foreach (var prop in type.GetProperties())
+            // Ensure all keys from the update exist locally, and merge entries
+            try
             {
-                if (!prop.CanRead || !prop.CanWrite || prop.GetIndexParameters().Length > 0)
-                    continue;
-
-                // Skip properties with [JsonIgnore]
-                if (prop.GetCustomAttributes(typeof(System.Text.Json.Serialization.JsonIgnoreAttribute), true).Length > 0)
-                    continue;
-
-                try
+                foreach (var kvp in updatedConsoleInstance.AdminDirectMessages)
                 {
-                    var updatedValue = prop.GetValue(updatedConsoleInstance);
-                    prop.SetValue(instanceChat, updatedValue);
-                }
-                catch (Exception ex)
-                {
-                    AppDebug.Log("updatedConsoleInstance", $"Failed to set property '{prop.Name}': {ex.Message}");
+                    if (!instanceConsole.AdminDirectMessages.ContainsKey(kvp.Key))
+                    {
+                        AppDebug.Log("updatedConsoleInstance", $"Adding Key {kvp.Key}");
+                        instanceConsole.AdminDirectMessages[kvp.Key] = new Dictionary<int, string>();
+                    }
+
+                    var currentDict = instanceConsole.AdminDirectMessages[kvp.Key];
+
+                    // FIX: Use kvp.Value (the updated data) instead of tempDict
+                    foreach (var innerKvp in kvp.Value)
+                    {
+                        AppDebug.Log("updatedConsoleInstance", $"Adding Entry for {kvp.Key} {innerKvp.Key} - {innerKvp.Value}");
+                        currentDict[innerKvp.Key] = innerKvp.Value;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                AppDebug.Log("updatedConsoleInstance", $"Error updating AdminDirectMessages: {ex.Message}");
+            }
 
-            consoleInstanceManager.updateConsoleWindow(Program.theRemoteClient!.AuthToken);
+            try
+            {
+                foreach (var kvp in updatedConsoleInstance.AdminConsoles)
+                {
+                    if (!instanceConsole.AdminConsoles.ContainsKey(kvp.Key))
+                    {
+                        instanceConsole.AdminConsoles[kvp.Key] = new consoleWindow();
+                    }
+                    instanceConsole.AdminConsoles[kvp.Key] = kvp.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("updatedConsoleInstance", $"Error updating AdminConsoles: {ex.Message}");
+            }
 
+            //consoleInstanceManager.updateConsoleWindow(Program.theRemoteClient!.AuthToken);
         }
     }
 }
