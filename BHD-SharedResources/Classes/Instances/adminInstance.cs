@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BHD_SharedResources.Classes.Instances
 {
@@ -34,4 +35,15 @@ namespace BHD_SharedResources.Classes.Instances
         Moderator = 1,
         Admin = 2
     }
+
+    public class AuthorizedClient
+    {
+        public int ClientId { get; set; }
+        public Stream? ClientStream { get; set; }
+        public Stream? UpdateStream { get; set; }
+        public required AdminAccount User { get; set; }
+        public string AuthorizationToken { get; set; } = string.Empty;
+        public DateTime AuthorizationTime { get; set; } = DateTime.MinValue;
+    }
+
 }

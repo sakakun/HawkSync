@@ -423,13 +423,5 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
 
     }
 
-    public class AuthorizedClient
-    {
-        public int ClientId { get; set; }
-        public Stream? ClientStream { get; set; }
-        public Stream? UpdateStream { get; set; }
-        public required AdminAccount User { get; set; }
-        public string AuthorizationToken { get; set; } = string.Empty;
-        public DateTime AuthorizationTime { get; set; } = DateTime.MinValue;
-    }
+
 }

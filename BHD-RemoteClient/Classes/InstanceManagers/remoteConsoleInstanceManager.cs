@@ -2,6 +2,7 @@
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceInterfaces;
 using BHD_SharedResources.Classes.Instances;
+using BHD_SharedResources.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
         public void updateConsoleWindow(string AuthToken)
         {
             instanceConsole.ClientConsole = instanceConsole.AdminConsoles[AuthToken];
+            AppDebug.Log("updateConsoleWindow", "Client Side Console Updated");
         }
 
     }

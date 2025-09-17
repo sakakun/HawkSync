@@ -1,5 +1,6 @@
 ﻿using BHD_ServerManager.Classes.RemoteFunctions.CommandProcesses;
 using BHD_SharedResources.Classes.InstanceManagers;
+using BHD_SharedResources.Classes.Instances;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,7 +100,9 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                 };
             }
 
+            // Example: !rc "ping"
             var command = commandArgs[1];
+
             if (_handlers.TryGetValue(command, out var entry))
             {
                 if (entry.handler is Func<string, string[], CommandResponse> dualHandler)
@@ -119,4 +122,5 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
             };
         }
     }
+
 }

@@ -12,10 +12,10 @@ namespace BHD_SharedResources.Classes.Instances
     {
         // Broadcasted Variables
         [JsonInclude]
-        public Dictionary<string, consoleWindow> AdminConsoles = new();
+        public Dictionary<string, consoleWindow> AdminConsoles { get; set; } = new();
 
         [JsonInclude]
-        public Dictionary<string, Dictionary<int, string>> AdminDirectMessages = new();
+        public Dictionary<string, Dictionary<int, string>> AdminDirectMessages { get; set; } = new();
         
 
         // New: Per-client, per-type cancellation tokens
@@ -45,9 +45,9 @@ namespace BHD_SharedResources.Classes.Instances
         // int = line number 0 - 17, string = text
         // Chat lines, 0 - 3 show on the screen, 0-17 appear in the chat window.
         // Notification lines, 0 - 5 show on the screen, 0-17 appear in the chat window.
-        public Dictionary<int, string> ChatLines;
-        public Dictionary<int, string> NotificationLines;
-    
+        public Dictionary<int, string> ChatLines { get; set; } = new();
+        public Dictionary<int, string> NotificationLines { get; set; } = new();
+
         public consoleWindow()
         {
             string padding = new string('_', 78); // Always safe in Windows-1252

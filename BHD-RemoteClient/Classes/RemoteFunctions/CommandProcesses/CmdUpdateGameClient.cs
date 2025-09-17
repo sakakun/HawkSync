@@ -219,6 +219,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 AppDebug.Log("updatedConsoleInstance", $"Error updating AdminDirectMessages: {ex.Message}");
             }
 
+            // Merge AdminConsoles
             try
             {
                 foreach (var kvp in updatedConsoleInstance.AdminConsoles)
@@ -227,7 +228,21 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                     {
                         instanceConsole.AdminConsoles[kvp.Key] = new consoleWindow();
                     }
-                    instanceConsole.AdminConsoles[kvp.Key] = kvp.Value;
+
+                    var localConsole = instanceConsole.AdminConsoles[kvp.Key];
+                    var updatedConsole = kvp.Value;
+
+                    // Merge ChatLines
+                    foreach (var chatLine in updatedConsole.ChatLines)
+                    {
+                        localConsole.ChatLines[chatLine.Key] = chatLine.Value;
+                    }
+
+                    // Merge NotificationLines
+                    foreach (var notifyLine in updatedConsole.NotificationLines)
+                    {
+                        localConsole.NotificationLines[notifyLine.Key] = notifyLine.Value;
+                    }
                 }
             }
             catch (Exception ex)
@@ -235,7 +250,7 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions.CommandProcesses
                 AppDebug.Log("updatedConsoleInstance", $"Error updating AdminConsoles: {ex.Message}");
             }
 
-            //consoleInstanceManager.updateConsoleWindow(Program.theRemoteClient!.AuthToken);
+            consoleInstanceManager.updateConsoleWindow(Program.theRemoteClient!.AuthToken);
         }
     }
 }
