@@ -40,6 +40,16 @@ namespace BHD_ServerManager.Classes.RemoteFunctions.ConsoleCommandProcesses
 
         private static void ShowAdminChat(string AuthToken)
         {
+            //
+            // Chat Lines
+            //
+
+
+
+            //
+            // Notification Lines
+            //
+
             var NotificationLines = new Dictionary<int, string>();
             string padding2 = new string('_', 22); // Always safe in Windows-1252
 
