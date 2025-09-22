@@ -195,7 +195,11 @@ namespace BHD_RemoteClient.Classes.RemoteFunctions
                         {
                             AuthToken = AuthToken,
                             Command = "AuthToken",
-                            CommandData = AuthToken
+                            CommandData = new
+                            {
+                                AuthToken = AuthToken,
+                                ClientVersion = Program.ApplicationVersion
+                            }
                         };
                         WriteMessage(stream, authPacket);
 

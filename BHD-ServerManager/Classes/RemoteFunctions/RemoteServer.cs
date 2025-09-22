@@ -248,6 +248,30 @@ namespace BHD_ServerManager.Classes.RemoteFunctions
                         attempts++;
                         Thread.Sleep(500);
                     }
+
+                    // After reading responsePacket in HandleUpdateClient:
+                    double clientVersion = 0;
+                    if (responsePacket.CommandData is JsonElement je && je.TryGetProperty("ClientVersion", out var versionElement))
+                    {
+                        clientVersion = versionElement.GetDouble();
+                    }
+                    else if (responsePacket.CommandData is double s)
+                    {
+                        // fallback if not using object
+                        clientVersion = s;
+                    }
+
+                    if (clientVersion != Program.ApplicationVersion)
+                    {
+                        WriteMessage(sslStream, new CommandResponse
+                        {
+                            Success = false,
+                            Message = $"Version mismatch. Server: {Program.ApplicationVersion}, Client: {clientVersion}"
+                        });
+                        return;
+                    }
+
+
                 }
 
                 if (authorizedClient == null)
