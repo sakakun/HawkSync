@@ -2,6 +2,7 @@
 using BHD_RemoteClient.Forms;
 using BHD_SharedResources.Classes.CoreObjects;
 using BHD_SharedResources.Classes.InstanceInterfaces;
+using BHD_SharedResources.Classes.InstanceManagers;
 using BHD_SharedResources.Classes.Instances;
 using BHD_SharedResources.Classes.SupportClasses;
 using System.Text;
@@ -77,6 +78,11 @@ namespace BHD_RemoteClient.Classes.InstanceManagers
             }
             else
             {
+                List<mapFileInfo> remoteMapList = mapInstanceManager.BuildCurrentMapPlaylist();
+                if (!CmdUpdateMapPlaylist.ProcessCommand(remoteMapList))
+                {
+                    MessageBox.Show("Failed to update map playlist on the server.", "Update Error");
+                }
                 return;  // No Remote Side
             }
 
