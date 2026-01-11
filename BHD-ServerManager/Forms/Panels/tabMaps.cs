@@ -1,9 +1,10 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
+﻿using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -65,7 +66,7 @@ namespace BHD_ServerManager.Forms.Panels
                 row.Cells["avail_MapFileName"].Value = map.MapFile;
                 row.Cells["avail_MapName"].Value = map.MapName;
                 row.Cells["avail_MapType"].Value = map.MapType;
-                row.Cells["avail_MapDelete"].Value = buttonCell;
+                row.Cells["avail_MapTypeShort"].Value = objectGameTypes.GetShortName(map.MapType);
             }
 
         }
@@ -88,7 +89,7 @@ namespace BHD_ServerManager.Forms.Panels
                 row.Cells["current_MapFileName"].Value = map.MapFile;
                 row.Cells["current_MapName"].Value = map.MapName;
                 row.Cells["current_MapType"].Value = map.MapType;
-
+                row.Cells["current_MapTypeShort"].Value = objectGameTypes.GetShortName(map.MapType);
                 rowIndex++;
             }
         }
@@ -107,6 +108,7 @@ namespace BHD_ServerManager.Forms.Panels
             rowNew.Cells["current_MapFileName"].Value = rowOG.Cells["avail_MapFileName"].Value;
             rowNew.Cells["current_MapName"].Value = rowOG.Cells["avail_MapName"].Value;
             rowNew.Cells["current_MapType"].Value = rowOG.Cells["avail_MapType"].Value;
+            rowNew.Cells["current_MapTypeShort"].Value = rowOG.Cells["avail_MapTypeShort"].Value;
         }
         // --- Reset Map Playlist ---
         public void functionEvent_ResetAvailableMaps()
@@ -148,9 +150,9 @@ namespace BHD_ServerManager.Forms.Panels
                                 : theInstance.gameInfoCurrentMapIndex + 1;
 
             label_currentMapName.Text = theInstance.gameInfoMapName;
-            label_currentMapType.Text = objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == theInstance.gameInfoGameType)?.Name;
+            label_currentMapType.Text = objectGameTypes.GetShortName(theInstance.gameInfoGameType);
             label_nextMapName.Text = instanceMaps.currentMapPlaylist[nextMapIndex].MapName;
-            label_nextMapType.Text = objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == instanceMaps.currentMapPlaylist[nextMapIndex].MapType)?.Name;
+            label_nextMapType.Text = objectGameTypes.GetShortName(instanceMaps.currentMapPlaylist[nextMapIndex].MapType);
             label_timeLeft.Text = theInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss");
 
         }
@@ -254,6 +256,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 GameManager.UpdateMapCycle1();
                 GameManager.UpdateMapCycle2();
+                ServerMemory.UpdateMapListCount();
                 MessageBox.Show("The server map list has been updated successfully.", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
@@ -324,55 +327,5 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        private void actionClick_filterChanged(object sender, EventArgs e)
-        {
-            int selectedIndex = combo_gameTypes.SelectedIndex;
-
-            // Show all if index is 9 or invalid
-            if (selectedIndex == 9 || selectedIndex < 0 || selectedIndex >= objectGameTypes.All.Count)
-            {
-                foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
-                {
-                    row.Visible = true;
-                }
-                return;
-            }
-
-            // Get the ShortName for the selected game type
-            string shortName = objectGameTypes.All[selectedIndex].ShortName;
-
-            // Filter rows based on ShortName
-            foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
-            {
-                string? cellValue = row.Cells["avail_MapType"].Value?.ToString();
-                row.Visible = string.Equals(cellValue, shortName, StringComparison.OrdinalIgnoreCase);
-            }
-        }
-        private void actionTextChange_MapFilter(object sender, EventArgs e)
-        {
-            string searchText = combo_gameTypes.Text.Trim();
-
-            // If the text matches a known game type by index, use the existing filter logic
-            int selectedIndex = combo_gameTypes.SelectedIndex;
-            if (selectedIndex >= 0 && selectedIndex < objectGameTypes.All.Count)
-            {
-                string shortName = objectGameTypes.All[selectedIndex].ShortName;
-                foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
-                {
-                    string? cellValue = row.Cells["avail_MapType"].Value?.ToString();
-                    row.Visible = string.Equals(cellValue, shortName, StringComparison.OrdinalIgnoreCase);
-                }
-                return;
-            }
-
-            // Otherwise, treat the text as a search for avail_MapName (case-insensitive, partial match)
-            foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
-            {
-                string? mapName = row.Cells["avail_MapName"].Value?.ToString();
-                row.Visible = !string.IsNullOrWhiteSpace(searchText) &&
-                              !string.IsNullOrWhiteSpace(mapName) &&
-                              mapName.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0;
-            }
-        }
     }
 }

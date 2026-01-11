@@ -1,8 +1,8 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
+﻿using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 using Salaros.Configuration;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -101,8 +101,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] gamePlayOptionsBytes = BitConverter.GetBytes(gamePlayOptions);
                 byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps > 0 ? 1 : 0);
 
-                byte[] gameTypeBytes = BitConverter.GetBytes(
-                    objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == mapInstance.currentMapPlaylist[0].MapType)?.DatabaseId ?? 0);
+                byte[] gameTypeBytes = BitConverter.GetBytes(mapInstance.currentMapPlaylist[0].MapType);
                 byte[] timeLimitBytes = BitConverter.GetBytes(thisInstance.gameTimeLimit);
                 byte[] respawnTimeBytes = BitConverter.GetBytes(thisInstance.gameRespawnTime);
                 byte[] allowCustomSkinsBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameCustomSkins));
@@ -120,7 +119,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] gamePortBytes = BitConverter.GetBytes(thisInstance.profileBindPort);
                 byte[] flagBallScoreBytes = BitConverter.GetBytes(thisInstance.gameScoreFlags);
                 byte[] zoneTimerBytes = BitConverter.GetBytes(thisInstance.gameScoreZoneTime);
-                byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(mapInstance.currentMapPlaylist[0].CustomMap));
+                byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(mapInstance.currentMapPlaylist[0].ModType==9?1:0));
 
                 byte[] mapListPrehandle = BitConverter.GetBytes(10621344);
                 byte[] finalAppSetup = Functions.ToByteArray("00 00 00 00 00 00 00 00 05 00 00 00 00".Replace(" ", ""));
@@ -327,7 +326,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     ms.Write(endOfMap, 0, endOfMap.Length);
 
                     ms.Seek(ms.Position + 0x1E3, SeekOrigin.Begin);
-                    byte[] customMap = BitConverter.GetBytes(Convert.ToInt32(map.CustomMap!));
+                    byte[] customMap = BitConverter.GetBytes(Convert.ToInt32(map.ModType==9?1:0));
                     ms.Write(customMap, 0, customMap.Length);
 
                     // prepare for next entry

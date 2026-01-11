@@ -1,13 +1,12 @@
 using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.RemoteFunctions;
 using BHD_ServerManager.Forms.Panels;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.StatsManagement;
-using BHD_SharedResources.Classes.SupportClasses;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.StatsManagement;
+using BHD_ServerManager.Classes.SupportClasses;
 using Microsoft.VisualBasic.Logging;
 using System.Data;
 using System.Net;
@@ -29,7 +28,6 @@ namespace BHD_ServerManager.Forms
         public tabChat    ChatTab    = null!;                   // The Chat Tab User Control
         public tabBans    BanTab     = null!;                   // The Bans Tab User Control
         public tabStats   StatsTab   = null!;                   // The Stats Tab User Control
-        public tabAdmins  AdminTab   = null!;                   // The Admins Tab User Control
 
         public ServerManager()
         {
@@ -44,10 +42,8 @@ namespace BHD_ServerManager.Forms
             theInstanceManager.CheckSettings();
             banInstanceManager.LoadSettings();
             chatInstanceManagers.LoadSettings();
-            adminInstanceManager.LoadSettings();
             theInstanceManager.InitializeTickers();
             theInstanceManager.GetServerVariables();
-            adminInstanceManager.UpdateAdminLogDialog();
         }
 
         private void functionEvent_loadPanels()
@@ -60,7 +56,6 @@ namespace BHD_ServerManager.Forms
             tabChat.Controls.Add(ChatTab = new tabChat());
             tabBans.Controls.Add(BanTab = new tabBans());
             tabStats.Controls.Add(StatsTab = new tabStats());
-            tabAdmin.Controls.Add(AdminTab = new tabAdmins());
         }
 
         // --- Server Status and Controls ---
@@ -107,14 +102,14 @@ namespace BHD_ServerManager.Forms
             {
                 winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Kills ({thisInstance.gameInfoGameType})]";
 
-                if (thisInstance.gameInfoGameType == "DM")
+                if (thisInstance.gameInfoGameType == 0)
                 {
                     topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
                     scoreTotal = topPlayer!.stat_Kills;
                     playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
                     blueScore = $"{scoreTotal}";
                     redScore = $"{playerName}";
-                } else if (thisInstance.gameInfoGameType == "KOTH")
+                } else if (thisInstance.gameInfoGameType == 4)
                 {
                     topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
                     scoreTotal = topPlayer!.ActiveZoneTime;
@@ -122,27 +117,27 @@ namespace BHD_ServerManager.Forms
                     blueScore = $"{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}";
                     redScore = $"{playerName}";
                     winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoCurrentGameWinCond*60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == "SD")
+                } else if (thisInstance.gameInfoGameType == 5)
                 {
                     blueScore = $"{thisInstance.gameInfoCurrentBlueScore}";
                     redScore = $"{thisInstance.gameInfoCurrentRedScore}";
                     winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Targets ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == "AD")
+                } else if (thisInstance.gameInfoGameType == 6)
                 {
                     blueScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue == false ? "Red Attacking" : thisInstance.gameInfoCurrentBlueScore) }";
                     redScore = $"{(thisInstance.gameInfoCurrentGameDefendingTeamBlue ? "Blue Attacking" : thisInstance.gameInfoCurrentRedScore )}";
                     winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Targets ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == "TKOTH")
+                } else if (thisInstance.gameInfoGameType == 3)
                 {
                     blueScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoCurrentBlueScore * 60):hh\\:mm\\:ss}";
                     redScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoCurrentRedScore * 60):hh\\:mm\\:ss}";
                     winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoCurrentGameWinCond * 60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == "CTF" || thisInstance.gameInfoGameType == "FB")
+                } else if (thisInstance.gameInfoGameType == 7 || thisInstance.gameInfoGameType == 8)
                 {
                     blueScore = $"{thisInstance.gameInfoCurrentBlueScore}";
                     redScore = $"{thisInstance.gameInfoCurrentRedScore}";
                     winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Captures ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == "TDM")
+                } else if (thisInstance.gameInfoGameType == 1)
                 {
                     blueScore = $"{thisInstance.gameInfoCurrentBlueScore}";
                     redScore = $"{thisInstance.gameInfoCurrentRedScore}";
@@ -187,7 +182,6 @@ namespace BHD_ServerManager.Forms
             CommonCore.Ticker?.Stop("ChatManager");
             CommonCore.Ticker?.Stop("PlayerManager");
             CommonCore.Ticker?.Stop("BanManager");
-            RemoteServer.Stop();
             theInstanceManager.SaveSettings();
             base.OnFormClosing(e);
         }

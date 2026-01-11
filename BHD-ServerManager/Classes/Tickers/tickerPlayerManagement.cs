@@ -2,10 +2,10 @@
 using BHD_ServerManager.Classes.PlayerManagementClasses;
 using BHD_ServerManager.Classes.StatsManagement;
 using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 
 namespace BHD_ServerManager.Classes.Tickers
 {

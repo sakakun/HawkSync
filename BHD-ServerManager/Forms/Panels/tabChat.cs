@@ -1,8 +1,8 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.SupportClasses;
+﻿using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

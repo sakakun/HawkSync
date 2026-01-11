@@ -1,4 +1,4 @@
-﻿using BHD_SharedResources.Classes.StatsManagement;
+﻿using BHD_ServerManager.Classes.StatsManagement;
 
 namespace BHD_ServerManager.Classes.StatsManagement
 {

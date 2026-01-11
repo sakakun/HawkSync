@@ -1,9 +1,9 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -207,7 +207,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
 
             string timer = timerSeconds.ToString();
             string date = DateTime.Now.ToString("yyyy-M-d HH:mm:ss");
-            string gametype = objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == theInstance.gameInfoGameType)?.DatabaseId.ToString() ?? "0";
+            string gametype = objectGameTypes.GetShortName(theInstance.gameInfoGameType) ?? "0";
             string dedicated = theInstance.gameDedicated ? "1" : "0";
             string servername = theInstance.gameServerName;
             string mapname = theInstance.gameInfoMapName;

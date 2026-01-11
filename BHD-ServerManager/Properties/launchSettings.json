@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ServerManager": {
+      "commandName": "Project",
+      "workingDirectory": "\\\\VM-DEV\\ServerData\\Development\\HawkSyncOld",
+      "remoteDebugEnabled": true,
+      "remoteDebugMachine": "VM-DEV",
+      "authenticationMode": "None"
+    }
+  }
+}

@@ -1,12 +1,12 @@
 ﻿using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.InstanceInterfaces;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 using System.Reflection;
 using System.Text;
+using BHD_ServerManager.Classes.InstanceInterfaces;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -52,17 +52,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     MapID = int.Parse(parts[0]),
                     MapName = parts[1],
                     MapFile = parts[2],
-                    GameModType = int.Parse(parts[3]),
-                    MapType = parts[4],
-                    MapTypes = new List<int>()
+                    ModType = int.Parse(parts[3]),
+                    MapType = int.Parse(parts[4])
                 };
-                foreach (var gameType in objectGameTypes.All)
-                {
-                    if (gameType.ShortName!.Equals(tempMapFile.MapType, StringComparison.OrdinalIgnoreCase))
-                    {
-                        tempMapFile.MapTypes.Add(gameType.Bitmap);
-                    }
-                }
+                
                 instanceMaps.availableMaps.Add(tempMapFile);
             }
         }
@@ -148,13 +141,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 MapID = instanceMaps.availableMaps.Count,
                                 MapFile = mapFile,
                                 MapName = mapName,
-                                MapType = match.ShortName ?? string.Empty,
-                                MapTypes = new List<int> { match.DatabaseId },
-                                CustomMap = true,
-                                GameModType = 0, // Set as needed
-                                MapTypeBits = new List<int> { bit }
+                                MapType = match.DatabaseId,
+                                ModType = 9,
                             };
-                            instanceMaps.availableMaps.Add(mapEntry);
+							instanceMaps.availableMaps.Add(mapEntry);
                             instanceMaps.customMaps.Add(mapEntry);
                         }
                         else
@@ -256,7 +246,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var mapItem = instanceMaps.availableMaps
                     .FirstOrDefault(m => string.Equals(m.MapFile, decodedMapFile, StringComparison.OrdinalIgnoreCase)
                                       && string.Equals(m.MapName, decodedMapName, StringComparison.OrdinalIgnoreCase)
-                                      && string.Equals(m.MapType, parts[2], StringComparison.OrdinalIgnoreCase));
+                                      && m.MapType == int.Parse(parts[2]));
 
                 if (mapItem != null)
                 {
@@ -303,16 +293,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (row.IsNewRow) continue;
 
                 string? mapName = row.Cells["current_MapName"].Value?.ToString();
-                string? gameType = row.Cells["current_MapType"].Value?.ToString();
+                int? gameType = (int) row.Cells["current_MapType"].Value;
                 string? mapFile = row.Cells["current_MapFileName"].Value?.ToString();
 
-                if (string.IsNullOrWhiteSpace(mapName) || string.IsNullOrWhiteSpace(gameType))
+                if (string.IsNullOrWhiteSpace(mapName) || !gameType.HasValue)
                     continue;
 
                 var map = instanceMaps.availableMaps
                     .FirstOrDefault(m => string.Equals(m.MapName, mapName, StringComparison.OrdinalIgnoreCase)
                                         && string.Equals(m.MapFile, mapFile, StringComparison.OrdinalIgnoreCase)    
-                                        && string.Equals(m.MapType, gameType, StringComparison.OrdinalIgnoreCase));
+                                        && m.MapType == gameType);
 
                 if (map == null)
                     continue;

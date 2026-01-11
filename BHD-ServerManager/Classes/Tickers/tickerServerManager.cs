@@ -1,11 +1,10 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.RemoteFunctions;
 using BHD_ServerManager.Classes.StatsManagement;
 using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.SupportClasses;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.SupportClasses;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -19,7 +18,6 @@ namespace BHD_ServerManager.Classes.Tickers
         private static mapInstance instanceMaps => CommonCore.instanceMaps!;
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
-        private static adminInstance instanceAdmin => CommonCore.instanceAdmin!;
         private static ServerManager? thisServer => Program.ServerManagerUI;
 
         // Lock for thread safety (if needed for shared resources)
@@ -38,9 +36,6 @@ namespace BHD_ServerManager.Classes.Tickers
         {
             if (thisServer == null)
                 return;
-
-            // Functions that run all the time, even offline
-            HandleRemoteServer();
 
             // Only run the rest if it's time for an update
             DateTime currentTime = DateTime.Now;
@@ -76,7 +71,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
                 thisServer.BanTab.BanTickerHook();                                              // Update Bans Tab
                 thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
-                thisServer.AdminTab.AdminsTickerHook();                                         // Update Admins Tab
             });
 
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
@@ -157,25 +151,6 @@ namespace BHD_ServerManager.Classes.Tickers
 
             theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);
             theInstance.instanceLastUpdateTime = currentTime;
-        }
-
-        // --- Functions that run all the time, even offline ---
-        private static void HandleRemoteServer()
-        {
-            if (thisServer == null) return;
-
-            // UI thread not required for these checks
-            if (theInstance.profileEnableRemote && !RemoteServer.IsRunning &&
-                RemoteServer.IsPortAvailable(theInstance.profileRemotePort) &&
-                RemoteServer.IsPortAvailable(theInstance.profileRemotePort + 1))
-            {
-                RemoteServer.Start(theInstance.profileRemotePort, theInstance.profileRemotePort + 1);
-            }
-
-            if (!theInstance.profileEnableRemote && RemoteServer.IsRunning)
-            {
-                RemoteServer.Stop();
-            }
         }
 
         // --- Pre-Game Processing (Loading Map) ---

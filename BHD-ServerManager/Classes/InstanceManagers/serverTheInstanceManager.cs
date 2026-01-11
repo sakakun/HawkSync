@@ -1,16 +1,16 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.Tickers;
 using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.InstanceInterfaces;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Storage;
+using BHD_ServerManager.Classes.InstanceInterfaces;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {

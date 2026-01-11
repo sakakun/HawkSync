@@ -1,10 +1,10 @@
 ﻿using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.InstanceInterfaces;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.SupportClasses;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.SupportClasses;
 using System.Text.Json;
+using BHD_ServerManager.Classes.InstanceInterfaces;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {

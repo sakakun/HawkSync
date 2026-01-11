@@ -2,10 +2,10 @@ using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.StatsManagement;
 using BHD_ServerManager.Forms;
-using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.StatsManagement;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.StatsManagement;
 using System.Reflection;
 
 namespace BHD_ServerManager
@@ -34,7 +34,6 @@ namespace BHD_ServerManager
             banInstanceManager.Implementation = new serverBanInstanceManager();
             chatInstanceManagers.Implementation = new serverChatInterfaceManager();
             mapInstanceManager.Implementation = new serverMapInstanceManager();
-            adminInstanceManager.Implementation = new serverAdminInstanceManager();
 
             StatsManager.Implementation = new serverStatsManager();
             GameManager.Implementation = new serverGameManager();

@@ -1,8 +1,8 @@
-﻿using BHD_SharedResources.Classes.CoreObjects;
-using BHD_SharedResources.Classes.InstanceManagers;
-using BHD_SharedResources.Classes.Instances;
-using BHD_SharedResources.Classes.ObjectClasses;
-using BHD_SharedResources.Classes.SupportClasses;
+﻿using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -636,7 +636,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] ServerNameBytes = Encoding.Default.GetBytes(thisInstance.gameServerName);
             int bytesWritten = 0;
             WriteProcessMemory((int)processHandle, ServerDisplayerName, ServerNameBytes, ServerNameBytes.Length, ref bytesWritten);
-            WriteProcessMemory((int)processHandle, Ptr2, ServerNameBytes, ServerNameBytes.Length, ref bytesWritten);
+            WriteProcessMemory((int)processHandle, Ptr2 + 0x4, ServerNameBytes, ServerNameBytes.Length, ref bytesWritten);
 
 
         }
@@ -907,8 +907,8 @@ namespace BHD_ServerManager.Classes.GameManagement
             bw.Write(BitConverter.GetBytes(thisInstance.gameScoreKills));
             bw.Write(new byte[256]); // adjust this padding as needed
 
-            bw.Write(BitConverter.GetBytes(firstMap.CustomMap ? 1 : 0));
-            bw.Write(new byte[24]); // adjust this padding as needed
+            bw.Write(BitConverter.GetBytes(firstMap.ModType==9 ? 1 : 0)); // Custom map flag
+			bw.Write(new byte[24]); // adjust this padding as needed
 
             // Write additional maps
             for (int i = 1; i < mapInstance.currentMapPlaylist.Count; i++)
@@ -926,7 +926,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 bw.Write(BitConverter.GetBytes(thisInstance.gameScoreKills));
                 bw.Write(new byte[256]); // adjust this padding as needed
 
-                bw.Write(BitConverter.GetBytes(map.CustomMap ? 1 : 0));
+                bw.Write(BitConverter.GetBytes(map.ModType==9 ? 1 : 0));  // Custom map flag
                 bw.Write(new byte[28]); // adjust this padding as needed
             }
 
@@ -977,7 +977,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 WriteProcessMemory((int)processHandle, mapFileIndexLocation, mapFileBytes, mapFileBytes.Length, ref mapFileBytesWritten);
                 mapFileIndexLocation += 0x20;
 
-                byte[] customMapFlag = BitConverter.GetBytes(Convert.ToInt32(mapInstance.currentMapPlaylist[i].CustomMap));
+                byte[] customMapFlag = BitConverter.GetBytes(Convert.ToInt32(mapInstance.currentMapPlaylist[i].ModType==9?1:0));
                 int customMapFlagWritten = 0;
                 WriteProcessMemory((int)processHandle, mapFileIndexLocation, customMapFlag, customMapFlag.Length, ref customMapFlagWritten);
                 mapCycleList += 0x24;
@@ -1095,8 +1095,8 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
 
             AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.currentMapPlaylist.Count + " Current Map Index: " + currentMapIndex);
-            int currentMapType = getGameTypeID(thisInstance.gameInfoGameType!);
-            int nextMapType = getGameTypeID(mapInstance.currentMapPlaylist[currentMapIndex].MapType!);
+            int currentMapType = thisInstance.gameInfoGameType;
+            int nextMapType = mapInstance.currentMapPlaylist[currentMapIndex].MapType;
 
             AppDebug.Log("ServerMemory", "Current Map Type: " + thisInstance.gameInfoMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
             AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].MapType + " - " + nextMapType);
@@ -1117,7 +1117,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
 
                 // Deal with the Players
-                theInstanceManager.changeTeamGameMode(getGameTypeID(thisInstance.gameInfoGameType), thisInstance.gameInfoNextMapGameType);
+                theInstanceManager.changeTeamGameMode(thisInstance.gameInfoGameType, thisInstance.gameInfoNextMapGameType);
                 ServerMemory.UpdatePlayerTeam();                    // Move players to their teams if applicable
 
             }
@@ -1238,14 +1238,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return;
             }
 
-
-
             var startingPtr1 = 0;
             startingPtr1 = baseAddr + 0x5F3740;
             byte[] timerBytes = BitConverter.GetBytes(10);
             int timerWritten1 = 0;
             WriteProcessMemory((int)processHandle, startingPtr1, timerBytes, timerBytes.Length, ref timerWritten1);
-
 
         }
         // Function: WriteMemorySendChatMessage
@@ -1573,16 +1570,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] buffer = new byte[4];
             ReadProcessMemory((int)processHandle, 0x009F21A4, buffer, buffer.Length, ref bytesRead);
             int GameType = BitConverter.ToInt32(buffer, 0);
-
-            foreach (var gameType in objectGameTypes.All)
-            {
-                if (GameType.Equals(gameType.DatabaseId))
-                {
-                    thisInstance.gameInfoGameType = gameType.ShortName!;
-                    break;
-                }
-            }
-
+            thisInstance.gameInfoGameType = GameType;
 
         }
         // FunctionL ReadMemoryCurrentMapIndex
@@ -2060,7 +2048,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         {
             int scoreAddress1 = 0;
             int scoreAddress2 = 0;
-            int gameTypeId = objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == thisInstance.gameInfoGameType)!.DatabaseId;
+            int gameTypeId = thisInstance.gameInfoGameType;
 
             // thisInstance.gameInfoGameType
             switch (gameTypeId)
@@ -2152,7 +2140,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             int scoreAddress1 = 0;
             int scoreAddress2 = 0;
-            int gameTypeId = objectGameTypes.All.FirstOrDefault(gt => gt.ShortName == thisInstance.gameInfoGameType)!.DatabaseId;
+            int gameTypeId = thisInstance.gameInfoGameType;
 
             switch (gameTypeId)
             {

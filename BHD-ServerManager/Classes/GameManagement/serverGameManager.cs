@@ -1,5 +1,5 @@
-﻿using BHD_SharedResources.Classes.GameManagement;
-using BHD_SharedResources.Classes.ObjectClasses;
+﻿using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.ObjectClasses;
 
 namespace BHD_ServerManager.Classes.GameManagement
 {

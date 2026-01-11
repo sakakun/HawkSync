@@ -39,13 +39,7 @@
             btn_mapsUpdate = new Button();
             btn_mapsUpload = new Button();
             tableLayoutPanel3 = new TableLayoutPanel();
-            combo_gameTypes = new ComboBox();
             dataGridView_availableMaps = new DataGridView();
-            avail_MapID = new DataGridViewTextBoxColumn();
-            avail_MapName = new DataGridViewTextBoxColumn();
-            avail_MapFileName = new DataGridViewTextBoxColumn();
-            avail_MapType = new DataGridViewTextBoxColumn();
-            avail_MapDelete = new DataGridViewButtonColumn();
             tableLayoutPanel4 = new TableLayoutPanel();
             tableLayoutPanel5 = new TableLayoutPanel();
             ib_SaveMapList = new FontAwesome.Sharp.IconButton();
@@ -55,10 +49,6 @@
             ib_importMapList = new FontAwesome.Sharp.IconButton();
             ib_clearMapList = new FontAwesome.Sharp.IconButton();
             dataGridView_currentMaps = new DataGridView();
-            current_MapID = new DataGridViewTextBoxColumn();
-            current_MapName = new DataGridViewTextBoxColumn();
-            current_MapFileName = new DataGridViewTextBoxColumn();
-            current_MapType = new DataGridViewTextBoxColumn();
             tableLayoutPanel6 = new TableLayoutPanel();
             label_mapLabel1 = new Label();
             label_currentMapName = new Label();
@@ -69,6 +59,16 @@
             label_mapLabel3 = new Label();
             label_timeLeft = new Label();
             toolTip1 = new ToolTip(components);
+            avail_MapID = new DataGridViewTextBoxColumn();
+            avail_MapName = new DataGridViewTextBoxColumn();
+            avail_MapFileName = new DataGridViewTextBoxColumn();
+            avail_MapType = new DataGridViewTextBoxColumn();
+            avail_MapTypeShort = new DataGridViewTextBoxColumn();
+            current_MapID = new DataGridViewTextBoxColumn();
+            current_MapName = new DataGridViewTextBoxColumn();
+            current_MapFileName = new DataGridViewTextBoxColumn();
+            current_MapType = new DataGridViewTextBoxColumn();
+            current_MapTypeShort = new DataGridViewTextBoxColumn();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
@@ -181,7 +181,6 @@
             // 
             tableLayoutPanel3.ColumnCount = 1;
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle());
-            tableLayoutPanel3.Controls.Add(combo_gameTypes, 0, 0);
             tableLayoutPanel3.Controls.Add(dataGridView_availableMaps, 0, 1);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(0, 0);
@@ -192,22 +191,6 @@
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel3.Size = new Size(300, 362);
             tableLayoutPanel3.TabIndex = 2;
-            // 
-            // combo_gameTypes
-            // 
-            combo_gameTypes.Dock = DockStyle.Fill;
-            combo_gameTypes.Font = new Font("Segoe UI", 10F);
-            combo_gameTypes.FormattingEnabled = true;
-            combo_gameTypes.ItemHeight = 17;
-            combo_gameTypes.Items.AddRange(new object[] { "Deathmatch", "Team Deathmatch", "Cooperative", "Team King of the Hill", "King of the Hill", "Search and Destroy", "Attack and Defend", "Capture the Flag", "Flagball", "All Game Modes" });
-            combo_gameTypes.Location = new Point(0, 0);
-            combo_gameTypes.Margin = new Padding(0);
-            combo_gameTypes.Name = "combo_gameTypes";
-            combo_gameTypes.Size = new Size(300, 25);
-            combo_gameTypes.TabIndex = 1;
-            combo_gameTypes.Text = "All Game Modes";
-            combo_gameTypes.SelectedIndexChanged += actionClick_filterChanged;
-            combo_gameTypes.TextChanged += actionTextChange_MapFilter;
             // 
             // dataGridView_availableMaps
             // 
@@ -224,7 +207,7 @@
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
             dataGridView_availableMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dataGridView_availableMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_availableMaps.Columns.AddRange(new DataGridViewColumn[] { avail_MapID, avail_MapName, avail_MapFileName, avail_MapType, avail_MapDelete });
+            dataGridView_availableMaps.Columns.AddRange(new DataGridViewColumn[] { avail_MapID, avail_MapName, avail_MapFileName, avail_MapType, avail_MapTypeShort });
             dataGridView_availableMaps.Dock = DockStyle.Fill;
             dataGridView_availableMaps.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView_availableMaps.Location = new Point(3, 29);
@@ -235,50 +218,6 @@
             dataGridView_availableMaps.Size = new Size(294, 330);
             dataGridView_availableMaps.TabIndex = 2;
             dataGridView_availableMaps.CellDoubleClick += actionClick_CurrentPlaylistAddMap;
-            // 
-            // avail_MapID
-            // 
-            avail_MapID.HeaderText = "Map ID";
-            avail_MapID.Name = "avail_MapID";
-            avail_MapID.ReadOnly = true;
-            avail_MapID.Visible = false;
-            // 
-            // avail_MapName
-            // 
-            avail_MapName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            avail_MapName.HeaderText = "Map Name";
-            avail_MapName.MaxInputLength = 64;
-            avail_MapName.Name = "avail_MapName";
-            avail_MapName.ReadOnly = true;
-            avail_MapName.Resizable = DataGridViewTriState.False;
-            // 
-            // avail_MapFileName
-            // 
-            avail_MapFileName.HeaderText = "Map File Name";
-            avail_MapFileName.Name = "avail_MapFileName";
-            avail_MapFileName.ReadOnly = true;
-            avail_MapFileName.Visible = false;
-            // 
-            // avail_MapType
-            // 
-            avail_MapType.HeaderText = "Type";
-            avail_MapType.MaxInputLength = 5;
-            avail_MapType.MinimumWidth = 60;
-            avail_MapType.Name = "avail_MapType";
-            avail_MapType.ReadOnly = true;
-            avail_MapType.Resizable = DataGridViewTriState.False;
-            avail_MapType.Width = 60;
-            // 
-            // avail_MapDelete
-            // 
-            avail_MapDelete.HeaderText = "";
-            avail_MapDelete.MinimumWidth = 32;
-            avail_MapDelete.Name = "avail_MapDelete";
-            avail_MapDelete.ReadOnly = true;
-            avail_MapDelete.Resizable = DataGridViewTriState.False;
-            avail_MapDelete.Text = "X";
-            avail_MapDelete.UseColumnTextForButtonValue = true;
-            avail_MapDelete.Width = 32;
             // 
             // tableLayoutPanel4
             // 
@@ -443,7 +382,7 @@
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             dataGridView_currentMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dataGridView_currentMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_currentMaps.Columns.AddRange(new DataGridViewColumn[] { current_MapID, current_MapName, current_MapFileName, current_MapType });
+            dataGridView_currentMaps.Columns.AddRange(new DataGridViewColumn[] { current_MapID, current_MapName, current_MapFileName, current_MapType, current_MapTypeShort });
             dataGridView_currentMaps.Dock = DockStyle.Fill;
             dataGridView_currentMaps.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView_currentMaps.Location = new Point(3, 29);
@@ -455,41 +394,6 @@
             dataGridView_currentMaps.TabIndex = 1;
             dataGridView_currentMaps.CellDoubleClick += actionClick_DeleteSelectedMap;
             dataGridView_currentMaps.KeyPress += actionKey_MoveMap;
-            // 
-            // current_MapID
-            // 
-            current_MapID.HeaderText = "ID";
-            current_MapID.MaxInputLength = 3;
-            current_MapID.MinimumWidth = 40;
-            current_MapID.Name = "current_MapID";
-            current_MapID.ReadOnly = true;
-            current_MapID.Resizable = DataGridViewTriState.False;
-            current_MapID.Width = 40;
-            // 
-            // current_MapName
-            // 
-            current_MapName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            current_MapName.HeaderText = "Map Name";
-            current_MapName.Name = "current_MapName";
-            current_MapName.ReadOnly = true;
-            current_MapName.Resizable = DataGridViewTriState.False;
-            // 
-            // current_MapFileName
-            // 
-            current_MapFileName.HeaderText = "Map File Name";
-            current_MapFileName.Name = "current_MapFileName";
-            current_MapFileName.ReadOnly = true;
-            current_MapFileName.Visible = false;
-            // 
-            // current_MapType
-            // 
-            current_MapType.HeaderText = "Type";
-            current_MapType.MaxInputLength = 5;
-            current_MapType.MinimumWidth = 60;
-            current_MapType.Name = "current_MapType";
-            current_MapType.ReadOnly = true;
-            current_MapType.Resizable = DataGridViewTriState.False;
-            current_MapType.Width = 60;
             // 
             // tableLayoutPanel6
             // 
@@ -615,6 +519,88 @@
             label_timeLeft.Text = "HH:MM:SS";
             label_timeLeft.TextAlign = ContentAlignment.MiddleCenter;
             // 
+            // avail_MapID
+            // 
+            avail_MapID.HeaderText = "Map ID";
+            avail_MapID.Name = "avail_MapID";
+            avail_MapID.ReadOnly = true;
+            avail_MapID.Visible = false;
+            // 
+            // avail_MapName
+            // 
+            avail_MapName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            avail_MapName.HeaderText = "Map Name";
+            avail_MapName.MaxInputLength = 64;
+            avail_MapName.Name = "avail_MapName";
+            avail_MapName.ReadOnly = true;
+            avail_MapName.Resizable = DataGridViewTriState.False;
+            // 
+            // avail_MapFileName
+            // 
+            avail_MapFileName.HeaderText = "Map File Name";
+            avail_MapFileName.Name = "avail_MapFileName";
+            avail_MapFileName.ReadOnly = true;
+            avail_MapFileName.Visible = false;
+            // 
+            // avail_MapType
+            // 
+            avail_MapType.HeaderText = "Type";
+            avail_MapType.MaxInputLength = 5;
+            avail_MapType.MinimumWidth = 60;
+            avail_MapType.Name = "avail_MapType";
+            avail_MapType.ReadOnly = true;
+            avail_MapType.Resizable = DataGridViewTriState.False;
+            avail_MapType.Visible = false;
+            avail_MapType.Width = 60;
+            // 
+            // avail_mapTypeShort
+            // 
+            avail_MapTypeShort.HeaderText = "Type";
+            avail_MapTypeShort.Name = "avail_MapTypeShort";
+            avail_MapTypeShort.ReadOnly = true;
+            // 
+            // current_MapID
+            // 
+            current_MapID.HeaderText = "ID";
+            current_MapID.MaxInputLength = 3;
+            current_MapID.MinimumWidth = 40;
+            current_MapID.Name = "current_MapID";
+            current_MapID.ReadOnly = true;
+            current_MapID.Resizable = DataGridViewTriState.False;
+            current_MapID.Width = 40;
+            // 
+            // current_MapName
+            // 
+            current_MapName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            current_MapName.HeaderText = "Map Name";
+            current_MapName.Name = "current_MapName";
+            current_MapName.ReadOnly = true;
+            current_MapName.Resizable = DataGridViewTriState.False;
+            // 
+            // current_MapFileName
+            // 
+            current_MapFileName.HeaderText = "Map File Name";
+            current_MapFileName.Name = "current_MapFileName";
+            current_MapFileName.ReadOnly = true;
+            current_MapFileName.Visible = false;
+            // 
+            // current_MapType
+            // 
+            current_MapType.HeaderText = "Type";
+            current_MapType.MaxInputLength = 5;
+            current_MapType.MinimumWidth = 60;
+            current_MapType.Name = "current_MapType";
+            current_MapType.ReadOnly = true;
+            current_MapType.Resizable = DataGridViewTriState.False;
+            current_MapType.Visible = false;
+            current_MapType.Width = 60;
+            // 
+            // current_mapTypeShort
+            // 
+            current_MapTypeShort.HeaderText = "Type";
+            current_MapTypeShort.Name = "current_MapTypeShort";
+            current_MapTypeShort.ReadOnly = true;
+            // 
             // tabMaps
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -644,11 +630,6 @@
         private TableLayoutPanel tableLayoutPanel4;
         private TableLayoutPanel tableLayoutPanel5;
         private ToolTip toolTip1;
-        internal ComboBox combo_gameTypes;
-        private DataGridViewTextBoxColumn current_MapID;
-        private DataGridViewTextBoxColumn current_MapName;
-        private DataGridViewTextBoxColumn current_MapFileName;
-        private DataGridViewTextBoxColumn current_MapType;
         public Button btn_mapsSkip;
         public Button btn_mapsUpload;
         public Button btn_mapsUpdate;
@@ -662,11 +643,6 @@
         public FontAwesome.Sharp.IconButton ib_SaveMapList;
         public DataGridView dataGridView_availableMaps;
         public DataGridView dataGridView_currentMaps;
-        private DataGridViewTextBoxColumn avail_MapID;
-        private DataGridViewTextBoxColumn avail_MapName;
-        private DataGridViewTextBoxColumn avail_MapFileName;
-        private DataGridViewTextBoxColumn avail_MapType;
-        private DataGridViewButtonColumn avail_MapDelete;
         private TableLayoutPanel tableLayoutPanel6;
         private Label label_mapLabel1;
         private Label label_currentMapName;
@@ -676,5 +652,15 @@
         private Label label_nextMapType;
         private Label label_mapLabel3;
         private Label label_timeLeft;
+        private DataGridViewTextBoxColumn avail_MapID;
+        private DataGridViewTextBoxColumn avail_MapName;
+        private DataGridViewTextBoxColumn avail_MapFileName;
+        private DataGridViewTextBoxColumn avail_MapType;
+        private DataGridViewTextBoxColumn avail_MapTypeShort;
+        private DataGridViewTextBoxColumn current_MapID;
+        private DataGridViewTextBoxColumn current_MapName;
+        private DataGridViewTextBoxColumn current_MapFileName;
+        private DataGridViewTextBoxColumn current_MapType;
+        private DataGridViewTextBoxColumn current_MapTypeShort;
     }
 }
