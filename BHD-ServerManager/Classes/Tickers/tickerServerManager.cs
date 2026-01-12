@@ -157,18 +157,22 @@ namespace BHD_ServerManager.Classes.Tickers
         private static void tickerEvent_preGameProcessing()
         {
             if (theInstance.instancePreGameProcRun)
-            {
-                AppDebug.Log("tickerServerManagement", "Pre-game Processing...");
-                theInstance.instancePreGameProcRun = false;               
+            {   
+                theInstance.instancePreGameProcRun = false;   
+                
+                // Resets
                 instanceChat.AutoMessageCounter = 0;
                 instanceChat.ChatLog?.Clear();
                 theInstance.playerList.Clear();
                 StatFunctions.ResetPlayerStats();
 
-                AppDebug.Log("tickerServerManagement", "Updating Maps...");
+                // Update the Global Game Type (Pinger Reasons)
                 ServerMemory.UpdateGlobalGameType();
+                // Update the Scores Required to Win the Game
+                ServerMemory.UpdateGameScores();
+                AppDebug.Log("tickerServerManagement", "Pre-game Complete");
             }
-            ServerMemory.UpdateGameScores();                                                // Update the Scores Required to Win the Game
+            
         }
 
         // --- Scoring Processing ---
@@ -178,26 +182,29 @@ namespace BHD_ServerManager.Classes.Tickers
             {
                 theInstance.instanceScoringProcRun = false;
 
-                AppDebug.Log("tickerServerManagement", "Scoring Processing...");
+                // Read Winning Team
                 ServerMemory.ReadMemoryWinningTeam();
-                AppDebug.Log("tickerServerManagement", "Sending Stats...");
-                Task.Run(() => StatFunctions.SendImportData(thisServer!));
-                ServerMemory.SetNextMapType();     // Set the Next Map Type
-                AppDebug.Log("tickerServerManagement", "Kill ScoreBoard...");
-                CommonCore.Ticker?.Start("ScoreboardTicker", 1000, () => tickerEvent_Scoreboard());
-                AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
+				// Final Stats Update
+				Task.Run(() => StatFunctions.SendImportData(thisServer!));
+                // Set the Next Map Type
+                ServerMemory.SetNextMapType();
+                // Update the Scores Required to Win the Next Game
+                ServerMemory.UpdateGameScores();
+				// Scoreboard Delay Ticker
+				int scoreboardDelay = theInstance.gameScoreBoardDelay * 1000;
+				CommonCore.Ticker?.StartOnce("ScoreboardTicker", scoreboardDelay, () => tickerEvent_Scoreboard());
+				// Log Completion
+				AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
             }
             
-            ServerMemory.UpdateGameScores();                                                // Update the Scores Required to Win the Game
+
         }
 
         // --- Scoreboard Ticker ---
         private static void tickerEvent_Scoreboard()
         {
-            Thread.Sleep(theInstance.gameScoreBoardDelay * 1000);                   // Wait for the specified delay
             ServerMemory.UpdateScoreBoardTimer();                                   // Set the scoreboard timer to 1 second.
             AppDebug.Log("tickerServerManagement", "Scoreboard Timer Complete");    // Log the completion of the scoreboard timer
-            CommonCore.Ticker?.Stop("ScoreboardTicker");                            // Stop the scoreboard ticker
             return;                                                                 // Should return to the main ticker loop
         }
 

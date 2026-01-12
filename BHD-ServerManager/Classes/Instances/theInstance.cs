@@ -25,7 +25,6 @@ namespace BHD_ServerManager.Classes.Instances
         [JsonIgnore]
         public bool instanceScoringProcRun { get; set; } = true;
         [JsonIgnore]
-        public bool instanceMapSkipped { get; set; } = false;
         public DateTime instanceLastUpdateTime { get; set; } = DateTime.Now;
         public DateTime instanceNextUpdateTime { get; set; } = DateTime.Now.AddSeconds(2.0);
 

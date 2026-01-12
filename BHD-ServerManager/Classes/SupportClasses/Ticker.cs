@@ -55,6 +55,41 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
         }
 
+        // Start a one-time ticker that executes once after the specified delay
+        public void StartOnce(string name, double delayInMilliseconds, Action action)
+        {
+            lock (_tickerLock)
+            {
+                if (_tickers.ContainsKey(name))
+                {
+                    // If ticker already exists, update interval and action, then restart
+                    var tickerItem = _tickers[name];
+                    tickerItem.Timer!.Stop();
+                    tickerItem.Timer.Interval = delayInMilliseconds;
+                    tickerItem.TickAction = action;
+                    tickerItem.Timer.AutoReset = false;
+                    tickerItem.Timer.Start();
+                }
+                else
+                {
+                    // Create a new one-time ticker if it doesn't exist
+                    var timer = new Timer(delayInMilliseconds);
+                    timer.Elapsed += (_, _) => action(); // Assign the action to call once
+                    timer.AutoReset = false; // Execute only once
+
+                    var tickerItem = new TickerItem
+                    {
+                        Timer = timer,
+                        TickAction = action
+                    };
+
+                    _tickers[name] = tickerItem;
+                    timer.Start();
+                }
+            }
+        }
+
+
         // Stop a ticker by name
         public void Stop(string name)
         {

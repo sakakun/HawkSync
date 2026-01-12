@@ -279,7 +279,6 @@ namespace BHD_ServerManager.Forms.Panels
         {
             if (theInstance!.instanceStatus != InstanceStatus.LOADINGMAP)
             {
-                theInstance!.instanceMapSkipped = true;
                 ServerMemory.WriteMemorySendConsoleCommand("resetgames");
             }
             else
