@@ -34,13 +34,14 @@ namespace BHD_ServerManager.Classes.Instances
         /// </summary>
         public string       MapName { get; set; } = string.Empty;
         /// <summary>
+        /// Custom Map Flag - Indicates if the map is a custom map.
+        /// </summary>
+        public int          ModType { get; set; }
+        /// <summary>
         /// Map Type (e.g., "Deathmatch", "Team Deathmatch") - Seen in the UI, multiple types can be associated with a map.
         /// </summary>\
         /// 
         public int          MapType { get; set; }
-        /// <summary>
-        /// Custom Map Flag - Indicates if the map is a custom map.
-        /// </summary>
-        public int          ModType { get; set; }
+
     }
 }

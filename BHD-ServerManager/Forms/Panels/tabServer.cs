@@ -560,7 +560,6 @@ namespace BHD_ServerManager.Forms.Panels
         {
             if (theInstanceManager.ValidateGameServerPath() && theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
-                theInstanceManager.SetServerVariables();
                 if (StartServer.startGame())
                 {
                     ServerMemory.ReadMemoryServerStatus();

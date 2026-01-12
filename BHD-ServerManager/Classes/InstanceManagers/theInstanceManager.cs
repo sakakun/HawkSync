@@ -167,14 +167,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             var newInstance = import && updatedInstance != null ? updatedInstance : theInstance;
             
             // Trigger "Gets" for the Tabs
-            thisServer.ProfileTab.functionEvent_GetProfileSettings(null, null!);
             thisServer.ServerTab.functionEvent_GetServerSettings((updatedInstance != null ? updatedInstance : null!));
             thisServer.StatsTab.functionEvent_GetStatSettings((updatedInstance != null ? updatedInstance : null!));
-
-        }
-        public static void SetServerVariables()
-        {
-            // TO DO: Remove the need for SetServerVariables in theInstanceManager.
 
         }
         public static void ValidateGameServerType(string serverPath)

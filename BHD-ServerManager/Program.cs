@@ -4,6 +4,8 @@ using BHD_ServerManager.Classes.StatsManagement;
 using BHD_ServerManager.Forms;
 using BHD_ServerManager.Classes.CoreObjects;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations.Schema;
+using BHD_ServerManager.Classes.SupportClasses;
 
 namespace BHD_ServerManager
 {
@@ -25,8 +27,9 @@ namespace BHD_ServerManager
 
             // Initialize the Instance of the Application
             CommonCore.InitializeCore();
+            DatabaseManager.Initialize();
 
-            ApplicationConfiguration.Initialize();
+			ApplicationConfiguration.Initialize();
             ServerManagerUI = new ServerManager();
 
             Application.Run(ServerManagerUI);

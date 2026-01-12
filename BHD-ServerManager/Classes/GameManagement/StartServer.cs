@@ -3,6 +3,7 @@ using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
+using BHD_ServerManager.Forms.Panels;
 using Salaros.Configuration;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -22,11 +23,12 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
         // Internal Variables to Program
-        private readonly static theInstance thisInstance = CommonCore.theInstance!;
+        private readonly static theInstance theInstance = CommonCore.theInstance!;
         private readonly static mapInstance mapInstance = CommonCore.instanceMaps!;
+        private readonly static tabProfile  tabProfile  = Program.ServerManagerUI!.ProfileTab;
 
-        // Function: createAutoRes
-        public static bool createAutoRes()
+		// Function: createAutoRes
+		public static bool createAutoRes()
         {
 
             try
@@ -37,8 +39,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                     return false;
                 }
 
-                string autoResPath = Path.Combine(thisInstance.profileServerPath!, "autores.bin");
-                string dfvCFGPath = Path.Combine(thisInstance.profileServerPath!, "dfv.cfg");
+                string autoResPath = Path.Combine(theInstance.profileServerPath!, "autores.bin");
+                string dfvCFGPath = Path.Combine(theInstance.profileServerPath!, "dfv.cfg");
 
                 string text = File.ReadAllText(dfvCFGPath);
                 text = text.Replace("// DISPLAY", "[Display]");
@@ -63,12 +65,12 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
 
                 MemoryStream ms = new MemoryStream();
-                int dedicatedSlots = thisInstance.gameMaxSlots + Convert.ToInt32(thisInstance.gameDedicated);
-                int loopMaps = thisInstance.gameLoopMaps;
+                int dedicatedSlots = theInstance.gameMaxSlots + Convert.ToInt32(theInstance.gameDedicated);
+                int loopMaps = theInstance.gameLoopMaps;
                 int gamePlayOptions = 0;
                 try
                 {
-                    gamePlayOptions = Functions.CalulateGameOptions(thisInstance.gameOptionAutoBalance, thisInstance.gameOptionFF, thisInstance.gameOptionFriendlyTags, thisInstance.gameOptionFFWarn, thisInstance.gameOptionShowTracers, thisInstance.gameShowTeamClays, thisInstance.gameOptionAutoRange);
+                    gamePlayOptions = Functions.CalulateGameOptions(theInstance.gameOptionAutoBalance, theInstance.gameOptionFF, theInstance.gameOptionFriendlyTags, theInstance.gameOptionFFWarn, theInstance.gameOptionShowTracers, theInstance.gameShowTeamClays, theInstance.gameOptionAutoRange);
                 }
                 catch (Exception ex)
                 {
@@ -86,39 +88,39 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] graphicsSetup_GUID = Encoding.Default.GetBytes(hw3d_guid);
                 byte[] graphicsSetupMisc_Settings = Functions.ToByteArray(_miscGraphicSettings.Replace(" ", ""));
                 byte[] applicationSettingBytes = Functions.ToByteArray(applicationSettings.Replace(" ", ""));
-                byte[] windowedModeBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameWindowedMode));
-                byte[] ServerNameBytes = Encoding.Default.GetBytes(thisInstance.gameServerName);
-                byte[] countryCodeBytes = Encoding.Default.GetBytes(thisInstance.gameCountryCode);
-                byte[] BindAddress = Encoding.Default.GetBytes(thisInstance.profileBindIP!);
+                byte[] windowedModeBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameWindowedMode));
+                byte[] ServerNameBytes = Encoding.Default.GetBytes(theInstance.gameServerName);
+                byte[] countryCodeBytes = Encoding.Default.GetBytes(theInstance.gameCountryCode);
+                byte[] BindAddress = Encoding.Default.GetBytes(theInstance.profileBindIP!);
                 byte[] firstMapFile = Encoding.Default.GetBytes(mapInstance.currentMapPlaylist[0].MapFile!);
-                byte[] maxSlotsBytes = BitConverter.GetBytes(thisInstance.gameMaxSlots);
-                byte[] dedicatedBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameDedicated));
-                byte[] GameScoreBytes = BitConverter.GetBytes(thisInstance.gameScoreKills);
-                byte[] StartDelayBytes = BitConverter.GetBytes(thisInstance.gameStartDelay);
-                byte[] serverPasswordBytes = Encoding.Default.GetBytes(thisInstance.gamePasswordLobby!);
-                byte[] redTeamPasswordBytes = Encoding.Default.GetBytes(thisInstance.gamePasswordRed!);
-                byte[] blueTeamPasswordBytes = Encoding.Default.GetBytes(thisInstance.gamePasswordBlue!);
+                byte[] maxSlotsBytes = BitConverter.GetBytes(theInstance.gameMaxSlots);
+                byte[] dedicatedBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDedicated));
+                byte[] GameScoreBytes = BitConverter.GetBytes(theInstance.gameScoreKills);
+                byte[] StartDelayBytes = BitConverter.GetBytes(theInstance.gameStartDelay);
+                byte[] serverPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordLobby!);
+                byte[] redTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordRed!);
+                byte[] blueTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordBlue!);
                 byte[] gamePlayOptionsBytes = BitConverter.GetBytes(gamePlayOptions);
                 byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps > 0 ? 1 : 0);
 
                 byte[] gameTypeBytes = BitConverter.GetBytes(mapInstance.currentMapPlaylist[0].MapType);
-                byte[] timeLimitBytes = BitConverter.GetBytes(thisInstance.gameTimeLimit);
-                byte[] respawnTimeBytes = BitConverter.GetBytes(thisInstance.gameRespawnTime);
-                byte[] allowCustomSkinsBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameCustomSkins));
-                byte[] requireNovaLoginBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameRequireNova));
-                byte[] MOTDBytes = Encoding.Default.GetBytes(thisInstance.gameMOTD);
-                byte[] sessionTypeBytes = BitConverter.GetBytes(thisInstance.gameSessionType);
+                byte[] timeLimitBytes = BitConverter.GetBytes(theInstance.gameTimeLimit);
+                byte[] respawnTimeBytes = BitConverter.GetBytes(theInstance.gameRespawnTime);
+                byte[] allowCustomSkinsBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameCustomSkins));
+                byte[] requireNovaLoginBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameRequireNova));
+                byte[] MOTDBytes = Encoding.Default.GetBytes(theInstance.gameMOTD);
+                byte[] sessionTypeBytes = BitConverter.GetBytes(theInstance.gameSessionType);
                 byte[] dedicatedSlotsBytes = BitConverter.GetBytes(dedicatedSlots);
                 byte[] graphicsHeaderSettings = BitConverter.GetBytes(-1);
                 byte[] graphicsSetting_1 = BitConverter.GetBytes(8);
-                byte[] startDelayBytes = BitConverter.GetBytes(thisInstance.gameStartDelay);
-                byte[] minPingValueBytes = BitConverter.GetBytes(thisInstance.gameMinPingValue);
-                byte[] enableMinPingBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameMinPing));
-                byte[] maxPingValueBytes = BitConverter.GetBytes(thisInstance.gameMaxPingValue);
-                byte[] enableMaxPingBytes = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameMaxPing));
-                byte[] gamePortBytes = BitConverter.GetBytes(thisInstance.profileBindPort);
-                byte[] flagBallScoreBytes = BitConverter.GetBytes(thisInstance.gameScoreFlags);
-                byte[] zoneTimerBytes = BitConverter.GetBytes(thisInstance.gameScoreZoneTime);
+                byte[] startDelayBytes = BitConverter.GetBytes(theInstance.gameStartDelay);
+                byte[] minPingValueBytes = BitConverter.GetBytes(theInstance.gameMinPingValue);
+                byte[] enableMinPingBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameMinPing));
+                byte[] maxPingValueBytes = BitConverter.GetBytes(theInstance.gameMaxPingValue);
+                byte[] enableMaxPingBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameMaxPing));
+                byte[] gamePortBytes = BitConverter.GetBytes(theInstance.profileBindPort);
+                byte[] flagBallScoreBytes = BitConverter.GetBytes(theInstance.gameScoreFlags);
+                byte[] zoneTimerBytes = BitConverter.GetBytes(theInstance.gameScoreZoneTime);
                 byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(mapInstance.currentMapPlaylist[0].ModType==9?1:0));
 
                 byte[] mapListPrehandle = BitConverter.GetBytes(10621344);
@@ -375,8 +377,8 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static bool CheckForExistingProcess()
         {
             string file_name = "dfbhd.exe";
-            string FullFileName = Path.Combine(thisInstance.profileServerPath!, file_name);
-            string windowTitle = $"BHD Server - {thisInstance.gameServerName}";
+            string FullFileName = Path.Combine(theInstance.profileServerPath!, file_name);
+            string windowTitle = $"BHD Server - {theInstance.gameServerName}";
 
             // Filter by process name first (much faster)
             foreach (var searchProcess in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file_name)))
@@ -389,8 +391,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                     if (fileMatch && titleMatch)
                     {
                         AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
-                        thisInstance.instanceAttachedPID = searchProcess.Id;
-                        thisInstance.instanceProcessHandle = searchProcess.Handle;
+                        theInstance.instanceAttachedPID = searchProcess.Id;
+                        theInstance.instanceProcessHandle = searchProcess.Handle;
 
                         SetProcessWindowTitle(searchProcess, windowTitle);
 
@@ -413,8 +415,8 @@ namespace BHD_ServerManager.Classes.GameManagement
         public static bool startGame()
         {
             string file_name = "dfbhd.exe";
-            string FullFileName = Path.Combine(thisInstance.profileServerPath!, file_name);
-            string windowTitle = $"BHD Server - {thisInstance.gameServerName}";
+            string FullFileName = Path.Combine(theInstance.profileServerPath!, file_name);
+            string windowTitle = $"BHD Server - {theInstance.gameServerName}";
 
             try
             {
@@ -425,15 +427,37 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 // Create the AutoRes File
                 createAutoRes();
+                
+                // Commandline Switches
+                string ProgramArguments = string.Empty;
+                if (theInstance.profileServerAttribute01) { ProgramArguments += tabProfile.profileServerAttribute01.Text + " "; }
+                if (theInstance.profileServerAttribute02) { ProgramArguments += tabProfile.profileServerAttribute02.Text + " "; }
+                if (theInstance.profileServerAttribute03) { ProgramArguments += tabProfile.profileServerAttribute03.Text + " "; }
+                if (theInstance.profileServerAttribute05) { ProgramArguments += tabProfile.profileServerAttribute05.Text + " "; }
+                if (theInstance.profileServerAttribute06) { ProgramArguments += tabProfile.profileServerAttribute06.Text + " "; }
+                if (theInstance.profileServerAttribute07) { ProgramArguments += tabProfile.profileServerAttribute07.Text + " "; }
+                if (theInstance.profileServerAttribute08) { ProgramArguments += tabProfile.profileServerAttribute08.Text + " "; }
+                if (theInstance.profileServerAttribute09) { ProgramArguments += tabProfile.profileServerAttribute09.Text + " "; }
+                if (theInstance.profileServerAttribute10) { ProgramArguments += tabProfile.profileServerAttribute10.Text + " "; }
+                if (theInstance.profileServerAttribute11) { ProgramArguments += tabProfile.profileServerAttribute11.Text + " "; }
+                if (theInstance.profileServerAttribute12) { ProgramArguments += tabProfile.profileServerAttribute12.Text + " "; }
+                if (theInstance.profileServerAttribute13) { ProgramArguments += tabProfile.profileServerAttribute13.Text + " "; }
+                if (theInstance.profileServerAttribute14) { ProgramArguments += tabProfile.profileServerAttribute14.Text + " "; }
+                if (theInstance.profileServerAttribute15) { ProgramArguments += tabProfile.profileServerAttribute15.Text + " "; }
+                if (theInstance.profileServerAttribute16) { ProgramArguments += tabProfile.profileServerAttribute16.Text + " "; }
+                if (theInstance.profileServerAttribute17) { ProgramArguments += tabProfile.profileServerAttribute17.Text + " "; }
+                if (theInstance.profileServerAttribute18) { ProgramArguments += tabProfile.profileServerAttribute18.Text + " "; }
+                if (theInstance.profileServerAttribute19) { ProgramArguments += tabProfile.profileServerAttribute19.Text + " "; }
+                if (theInstance.profileServerAttribute20) { ProgramArguments += tabProfile.profileServerAttribute20.Text + " "; }
+                if (theInstance.profileServerAttribute21) { ProgramArguments += tabProfile.profileServerAttribute21.Text + " "; }
+                if (theInstance.profileServerAttribute04) { ProgramArguments += tabProfile.profileServerAttribute04.Text + " " + theInstance.profileModFileName + " "; }
 
                 // Start Game
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = FullFileName,
-                    WorkingDirectory = thisInstance.profileServerPath,
-                    Arguments = (thisInstance.profileModifierList1.Count > 0 || thisInstance.profileModifierList2.Count > 0)
-                                ? string.Join(" ", thisInstance.profileModifierList1.Concat(thisInstance.profileModifierList2))
-                                : string.Empty,
+                    WorkingDirectory = theInstance.profileServerPath,
+                    Arguments = ProgramArguments,
                     // WindowStyle = ProcessWindowStyle.Minimized
                 };
                 Process? process = Process.Start(startInfo);
@@ -443,8 +467,8 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 // Set MaxWorkingSet and instanceAttachedPID directly from the started process
                 process.MaxWorkingSet = new nint(0x7fffffff);
-                thisInstance.instanceAttachedPID = process.Id;
-                thisInstance.instanceProcessHandle = process.Handle;
+                theInstance.instanceAttachedPID = process.Id;
+                theInstance.instanceProcessHandle = process.Handle;
 
                 SetProcessWindowTitle(process, windowTitle);
 
@@ -457,7 +481,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
 
             // Game Didn't Crash Yay!  Dump Data to the Instance
-            thisInstance.instanceCrashCounter = 0;
+            theInstance.instanceCrashCounter = 0;
 
             // Wait for the Game to Start, 15 seconds to prevent memory corruption.
             Thread.Sleep(5000);
@@ -476,13 +500,13 @@ namespace BHD_ServerManager.Classes.GameManagement
         {
             try
             {
-                if (thisInstance.instanceAttachedPID.HasValue)
+                if (theInstance.instanceAttachedPID.HasValue)
                 {
                     try
                     {
                         ServerMemory.DetachFromGameProcess();
 
-                        var process = Process.GetProcessById(thisInstance.instanceAttachedPID.Value);
+                        var process = Process.GetProcessById(theInstance.instanceAttachedPID.Value);
                         if (!process.HasExited)
                         {
                             process.Kill(true); // true for entire process tree (.NET 5+)
@@ -501,7 +525,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     }
                     finally
                     {
-                        thisInstance.instanceAttachedPID = null;
+                        theInstance.instanceAttachedPID = null;
                     }
                 }
                 return true;

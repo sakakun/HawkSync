@@ -35,11 +35,16 @@ namespace BHD_ServerManager.Forms
         {
             functionEvent_loadPanels();                                         // Load the User Control Tabs
 
-            theInstanceManager.CheckSettings();
+			// Old Server Settings Initialization
+			theInstanceManager.CheckSettings();
             banInstanceManager.LoadSettings();
             chatInstanceManager.LoadSettings();
             theInstanceManager.InitializeTickers();
             theInstanceManager.GetServerVariables();
+
+			// New Server Settings Initialization
+			ProfileTab.methodFunction_loadSettings();
+
         }
 
         private void functionEvent_loadPanels()

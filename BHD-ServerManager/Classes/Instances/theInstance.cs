@@ -32,15 +32,36 @@ namespace BHD_ServerManager.Classes.Instances
         public int profileServerType { get; set; }
         public string profileServerPath { get; set; } = String.Empty;
         public string profileModFileName { get; set; } = String.Empty;
-        public List<string> profileModifierList1 { get; set; } = new();
-        public List<string> profileModifierList2 { get; set; } = new();
         public string profileBindIP { get; set; } = String.Empty;
         public int profileBindPort { get; set; } = 17479;
         public bool profileEnableRemote { get; set; } = false; // Enable/Disable Remote Connections
         public int profileRemotePort { get; set; } = 8083;  // Remote IP for the server
 
-        // Game Settings
-        public int gameMatchWinner { get; set; } = 0;
+        // Profile Application Start Attributes
+        public bool profileServerAttribute01 { get; set; } = false;
+        public bool profileServerAttribute02 { get; set; } = false;
+        public bool profileServerAttribute03 { get; set; } = false;
+        public bool profileServerAttribute04 { get; set; } = false;
+        public bool profileServerAttribute05 { get; set; } = false;
+        public bool profileServerAttribute06 { get; set; } = false;
+        public bool profileServerAttribute07 { get; set; } = true;     // Windows Mode
+        public bool profileServerAttribute08 { get; set; } = true;     // Auto Restart
+		public bool profileServerAttribute09 { get; set; } = false;
+        public bool profileServerAttribute10 { get; set; } = false;
+        public bool profileServerAttribute11 { get; set; } = false;
+        public bool profileServerAttribute12 { get; set; } = false;
+        public bool profileServerAttribute13 { get; set; } = false;
+        public bool profileServerAttribute14 { get; set; } = false;
+        public bool profileServerAttribute15 { get; set; } = false;
+        public bool profileServerAttribute16 { get; set; } = false;
+        public bool profileServerAttribute17 { get; set; } = false;
+        public bool profileServerAttribute18 { get; set; } = true;      // No Sysdump
+        public bool profileServerAttribute19 { get; set; } = false;
+        public bool profileServerAttribute20 { get; set; } = false;
+        public bool profileServerAttribute21 { get; set; } = true;      // Loadbar
+
+		// Game Settings
+		public int gameMatchWinner { get; set; } = 0;
         public string gameServerName { get; set; } = "Untitled Server";
         public string gameMOTD { get; set; } = "Welcome to the server!";
         public string gameCountryCode { get; set; } = "US";

@@ -31,87 +31,16 @@ namespace BHD_ServerManager.Forms.Panels
         public tabProfile()
         {
             InitializeComponent();
+
         }
+
         // --- Form Functions ---
-        // --- Get Profile --- Allow to be triggered externally
-        public void functionEvent_GetProfileSettings(object? sender, EventArgs e)
-        {
-            // Get the data from "theInterface" object and set it to the form.
-            tb_profileServerPath.Text = theInstance!.profileServerPath;
-            tb_modFile.Text = theInstance.profileModFileName;
-            // Set checked items for cb_profileModifierList1
-            for (int i = 0; i < cb_profileModifierList1.Items.Count; i++)
-            {
-                string item = cb_profileModifierList1.Items[i].ToString()!;
-                cb_profileModifierList1.SetItemChecked(i, theInstance.profileModifierList1 != null && theInstance.profileModifierList1.Contains(item));
-            }
-
-            // Set checked items for cb_profileModifierList2
-            for (int i = 0; i < cb_profileModifierList2.Items.Count; i++)
-            {
-                string item = cb_profileModifierList2.Items[i].ToString()!;
-                cb_profileModifierList2.SetItemChecked(i, theInstance.profileModifierList2 != null && theInstance.profileModifierList2.Contains(item));
-            }
-            // if sender type is a button, open a message box to confirm the profile data has been loaded.
-            if (sender is Button)
-            {
-                MessageBox.Show("Profile data loaded successfully.", "Profile Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-        // --- Save Profile --- Allow to be triggered externally
-        public void funtionEvent_SetProfileSettings()
-        {
-            // Set the data from the form to the "theInterface" object.
-            // Trigger the save function in "theInstanceManager".
-            theInstance!.profileServerPath = tb_profileServerPath.Text;
-            theInstance.profileModFileName = tb_modFile.Text;
-            theInstance.profileModifierList1 = cb_profileModifierList1.CheckedItems.Cast<string>().ToList();
-            theInstance.profileModifierList2 = cb_profileModifierList2.CheckedItems.Cast<string>().ToList();
-            // Save the instance data
-            try
-            {
-                theInstanceManager.SaveSettings();
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log(this.Name, $"Failed to save profile settings: {ex.Message}");
-                MessageBox.Show("Failed to save profile settings. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // Show a message box to confirm the save.
-            MessageBox.Show("Profile settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-        // --- Highlight Differences --- Allow to be triggered
-        private void functionEvent_HighlightDiffFields()
-        {
-            // Profile Server Path
-            tb_profileServerPath.BackColor = tb_profileServerPath.Text != theInstance!.profileServerPath
-                ? Color.LightYellow : SystemColors.Window;
-
-            // Mod File Name
-            tb_modFile.BackColor = tb_modFile.Text != theInstance.profileModFileName
-                ? Color.LightYellow : SystemColors.Window;
-
-            // Modifier List 1
-            var checkedItems1 = cb_profileModifierList1.CheckedItems.Cast<string>().ToList();
-            bool list1Diff = !(theInstance.profileModifierList1?.Count == checkedItems1.Count &&
-                               theInstance.profileModifierList1.All(checkedItems1.Contains) &&
-                               checkedItems1.All(theInstance.profileModifierList1.Contains));
-            cb_profileModifierList1.BackColor = list1Diff ? Color.LightYellow : SystemColors.Window;
-
-            // Modifier List 2
-            var checkedItems2 = cb_profileModifierList2.CheckedItems.Cast<string>().ToList();
-            bool list2Diff = !(theInstance.profileModifierList2?.Count == checkedItems2.Count &&
-                               theInstance.profileModifierList2.All(checkedItems2.Contains) &&
-                               checkedItems2.All(theInstance.profileModifierList2.Contains));
-            cb_profileModifierList2.BackColor = list2Diff ? Color.LightYellow : SystemColors.Window;
-        }
         // --- Ticker Profile Hook --- Allow to be triggered externally by the Server Manager Ticker
         public void tickerProfileTabHook()
         {
             if (!_firstLoadComplete)
             {
-                functionEvent_GetProfileSettings(null, null!); // Initial load of profile data.
+                methodFunction_loadSettings();
                 _firstLoadComplete = true;
 
                 // If the profileServerPath is not set or does not exist, switch to the Profile tab and show a message box.
@@ -128,35 +57,31 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             bool currentState = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
-            bool isModChecked = cb_profileModifierList1.CheckedItems.Contains("/mod");
 
             // Enable/disable all profile controls (except mod fields)
-            tb_profileServerPath.Enabled = currentState;
-            cb_profileModifierList1.Enabled = currentState;
-            cb_profileModifierList2.Enabled = currentState;
             btn_profileBrowse1.Enabled = currentState;
             btn_resetProfile.Enabled = currentState;
             btn_saveProfile.Enabled = currentState;
 
             // Enable/disable mod fields based on /mod checked and OFFLINE status
-            tb_modFile.Enabled = currentState && isModChecked;
-            btn_profileBrowse2.Enabled = currentState && isModChecked;
+            btn_profileBrowse2.Enabled = currentState;
 
-            // Highlight differences
-            functionEvent_HighlightDiffFields();
         }
 
         // --- Action Click Events ---
         // --- Save Profile Button Clicked ---
         private void actionClick_SaveProfile(object sender, EventArgs e)
-        {
-            funtionEvent_SetProfileSettings();
+        {   
+            // New Save
+            methodFunction_saveSetting();
         }
         // --- Reset Profile Button Clicked ---
         private void actionClick_ResetProfile(object sender, EventArgs e)
         {
-            functionEvent_GetProfileSettings(sender, e); // Re-fetch the profile data to reset the form.
+            // New Reset
+            methodFunction_loadSettings();
         }
+
         // --- Open Profile Folder Button Clicked ---
         private void actionClick_profileOpenFolderDialog(object sender, EventArgs e)
         {
@@ -210,5 +135,70 @@ namespace BHD_ServerManager.Forms.Panels
                 MessageBox.Show("Failed to open profile file dialog. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-    }
+    
+        public void methodFunction_loadSettings()
+        {
+            // Textbox Fields
+            tb_profileServerPath.Text = theInstance!.profileServerPath = ServerSettings.Get("profileServerPath", string.Empty);
+            tb_modFile.Text = theInstance.profileModFileName = ServerSettings.Get("profileModFileName", string.Empty);
+
+			// Application Commandline Arguments
+            profileServerAttribute01.Checked = theInstance!.profileServerAttribute01 = ServerSettings.Get("profileServerAttribute01", false);
+            profileServerAttribute02.Checked = theInstance!.profileServerAttribute02 = ServerSettings.Get("profileServerAttribute02", false);
+            profileServerAttribute03.Checked = theInstance!.profileServerAttribute03 = ServerSettings.Get("profileServerAttribute03", false);
+            profileServerAttribute04.Checked = theInstance!.profileServerAttribute04 = ServerSettings.Get("profileServerAttribute04", false);
+            profileServerAttribute05.Checked = theInstance!.profileServerAttribute05 = ServerSettings.Get("profileServerAttribute05", false);
+            profileServerAttribute06.Checked = theInstance!.profileServerAttribute06 = ServerSettings.Get("profileServerAttribute06", false);
+            profileServerAttribute07.Checked = theInstance!.profileServerAttribute07 = ServerSettings.Get("profileServerAttribute07", true);
+            profileServerAttribute08.Checked = theInstance!.profileServerAttribute08 = ServerSettings.Get("profileServerAttribute08", true);
+            profileServerAttribute09.Checked = theInstance!.profileServerAttribute09 = ServerSettings.Get("profileServerAttribute09", false);
+            profileServerAttribute10.Checked = theInstance!.profileServerAttribute10 = ServerSettings.Get("profileServerAttribute10", false);
+            profileServerAttribute11.Checked = theInstance!.profileServerAttribute11 = ServerSettings.Get("profileServerAttribute11", false);
+            profileServerAttribute12.Checked = theInstance!.profileServerAttribute12 = ServerSettings.Get("profileServerAttribute12", false);
+            profileServerAttribute13.Checked = theInstance!.profileServerAttribute13 = ServerSettings.Get("profileServerAttribute13", false);
+            profileServerAttribute14.Checked = theInstance!.profileServerAttribute14 = ServerSettings.Get("profileServerAttribute14", false);
+            profileServerAttribute15.Checked = theInstance!.profileServerAttribute15 = ServerSettings.Get("profileServerAttribute15", false);
+            profileServerAttribute16.Checked = theInstance!.profileServerAttribute16 = ServerSettings.Get("profileServerAttribute16", false);
+            profileServerAttribute17.Checked = theInstance!.profileServerAttribute17 = ServerSettings.Get("profileServerAttribute17", false);
+            profileServerAttribute18.Checked = theInstance!.profileServerAttribute18 = ServerSettings.Get("profileServerAttribute18", true);
+            profileServerAttribute19.Checked = theInstance!.profileServerAttribute19 = ServerSettings.Get("profileServerAttribute19", false);
+            profileServerAttribute20.Checked = theInstance!.profileServerAttribute20 = ServerSettings.Get("profileServerAttribute20", false);
+            profileServerAttribute21.Checked = theInstance!.profileServerAttribute21 = ServerSettings.Get("profileServerAttribute21", true);
+
+
+		}
+
+        public void methodFunction_saveSetting()
+        {
+			// Textbox Fields
+            ServerSettings.Set("profileServerPath", theInstance!.profileServerPath = tb_profileServerPath.Text);
+            ServerSettings.Set("profileModFileName", theInstance.profileModFileName = tb_modFile.Text);
+
+			// Commandlin Switches
+			ServerSettings.Set("profileServerAttribute01", theInstance!.profileServerAttribute01 = profileServerAttribute01.Checked);
+            ServerSettings.Set("profileServerAttribute02", theInstance!.profileServerAttribute02 = profileServerAttribute02.Checked);
+            ServerSettings.Set("profileServerAttribute03", theInstance!.profileServerAttribute03 = profileServerAttribute03.Checked);
+            ServerSettings.Set("profileServerAttribute04", theInstance!.profileServerAttribute04 = profileServerAttribute04.Checked);
+            ServerSettings.Set("profileServerAttribute05", theInstance!.profileServerAttribute05 = profileServerAttribute05.Checked);
+            ServerSettings.Set("profileServerAttribute06", theInstance!.profileServerAttribute06 = profileServerAttribute06.Checked);
+            ServerSettings.Set("profileServerAttribute07", theInstance!.profileServerAttribute07 = profileServerAttribute07.Checked);
+            ServerSettings.Set("profileServerAttribute08", theInstance!.profileServerAttribute08 = profileServerAttribute08.Checked);
+            ServerSettings.Set("profileServerAttribute09", theInstance!.profileServerAttribute09 = profileServerAttribute09.Checked);
+            ServerSettings.Set("profileServerAttribute10", theInstance!.profileServerAttribute10 = profileServerAttribute10.Checked);
+            ServerSettings.Set("profileServerAttribute11", theInstance!.profileServerAttribute11 = profileServerAttribute11.Checked);
+            ServerSettings.Set("profileServerAttribute12", theInstance!.profileServerAttribute12 = profileServerAttribute12.Checked);
+            ServerSettings.Set("profileServerAttribute13", theInstance!.profileServerAttribute13 = profileServerAttribute13.Checked);
+            ServerSettings.Set("profileServerAttribute14", theInstance!.profileServerAttribute14 = profileServerAttribute14.Checked);
+            ServerSettings.Set("profileServerAttribute15", theInstance!.profileServerAttribute15 = profileServerAttribute15.Checked);
+            ServerSettings.Set("profileServerAttribute16", theInstance!.profileServerAttribute16 = profileServerAttribute16.Checked);
+            ServerSettings.Set("profileServerAttribute17", theInstance!.profileServerAttribute17 = profileServerAttribute17.Checked);
+            ServerSettings.Set("profileServerAttribute18", theInstance!.profileServerAttribute18 = profileServerAttribute18.Checked);
+            ServerSettings.Set("profileServerAttribute19", theInstance!.profileServerAttribute19 = profileServerAttribute19.Checked);
+            ServerSettings.Set("profileServerAttribute20", theInstance!.profileServerAttribute20 = profileServerAttribute20.Checked);
+            ServerSettings.Set("profileServerAttribute21", theInstance!.profileServerAttribute21 = profileServerAttribute21.Checked);
+
+        }
+
+
+	}
 }
