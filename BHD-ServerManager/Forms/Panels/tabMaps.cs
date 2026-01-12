@@ -1,6 +1,5 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.CoreObjects;
-using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.ObjectClasses;
@@ -23,10 +22,9 @@ namespace BHD_ServerManager.Forms.Panels
     {
 
         // --- Instance Objects ---
-        private theInstance theInstance => CommonCore.theInstance;
-        private mapInstance instanceMaps => CommonCore.instanceMaps;
-        // --- UI Objects ---
-        private ServerManager theServer => Program.ServerManagerUI!;
+        private theInstance? theInstance => CommonCore.theInstance;
+        private mapInstance? instanceMaps => CommonCore.instanceMaps;
+
         // --- Class Variables ---
         private new string Name = "MapsTab";                        // Name of the tab for logging purposes.
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
@@ -42,7 +40,7 @@ namespace BHD_ServerManager.Forms.Panels
             dataGridView_availableMaps.Rows.Clear();
 
             // Populate the DataGridView with available maps
-            foreach (var map in instanceMaps.availableMaps)
+            foreach (var map in instanceMaps!.availableMaps)
             {
                 // Button Cell for removing maps from the playlist and deleting the file.
                 DataGridViewButtonCell buttonCell = new DataGridViewButtonCell
@@ -73,7 +71,7 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Populate Current Map Playlist ---
         public void functionEvent_PopulateCurrentMapPlaylist(List<mapFileInfo> ImportedMapList = null!)
         {
-            List<mapFileInfo> MapList = ImportedMapList != null ? ImportedMapList : instanceMaps.currentMapPlaylist;
+            List<mapFileInfo> MapList = ImportedMapList != null ? ImportedMapList : instanceMaps!.currentMapPlaylist;
 
             // Clear the DataGridView
             dataGridView_currentMaps.Rows.Clear();
@@ -119,7 +117,7 @@ namespace BHD_ServerManager.Forms.Panels
         public void functionEvent_LoadCurrentMapPlaylist(bool external = false)
         {
             // Load the current map playlist from the instance manager
-            instanceMaps.currentMapPlaylist = mapInstanceManager.LoadCustomMapPlaylist(external);
+            instanceMaps!.currentMapPlaylist = mapInstanceManager.LoadCustomMapPlaylist(external);
             // Populate the DataGridView with the current map playlist
             functionEvent_PopulateCurrentMapPlaylist();
         }
@@ -127,14 +125,14 @@ namespace BHD_ServerManager.Forms.Panels
         public void functionEvent_UpdateForm()
         {
             // Enable/Disable Buttons based on Server Status
-            bool isOnline = (theInstance.instanceStatus != InstanceStatus.OFFLINE);
+            bool isOnline = (theInstance!.instanceStatus != InstanceStatus.OFFLINE);
             btn_mapsUpdate.Enabled = isOnline;
             btn_mapsScore.Enabled = isOnline;
             btn_mapsSkip.Enabled = isOnline;
             btn_mapsPlayNext.Enabled = isOnline;
 
             // Update Labels with Current Information
-            if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
+            if (theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
                 label_currentMapName.Text = "N/A";
                 label_currentMapType.Text = "N/A";
@@ -144,28 +142,28 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
 
-            int nextMapIndex = theInstance.gameInfoCurrentMapIndex >= instanceMaps.currentMapPlaylist.Count - 1
-                                || theInstance.gameInfoCurrentMapIndex < 0
+            int nextMapIndex = theInstance!.gameInfoCurrentMapIndex >= instanceMaps!.currentMapPlaylist.Count - 1
+                                || theInstance!.gameInfoCurrentMapIndex < 0
                                 ? 0
-                                : theInstance.gameInfoCurrentMapIndex + 1;
+                                : theInstance!.gameInfoCurrentMapIndex + 1;
 
-            label_currentMapName.Text = theInstance.gameInfoMapName;
+            label_currentMapName.Text = theInstance!.gameInfoMapName;
             label_currentMapType.Text = objectGameTypes.GetShortName(theInstance.gameInfoGameType);
-            label_nextMapName.Text = instanceMaps.currentMapPlaylist[nextMapIndex].MapName;
-            label_nextMapType.Text = objectGameTypes.GetShortName(instanceMaps.currentMapPlaylist[nextMapIndex].MapType);
+            label_nextMapName.Text = instanceMaps!.currentMapPlaylist[nextMapIndex].MapName;
+            label_nextMapType.Text = objectGameTypes.GetShortName(instanceMaps!.currentMapPlaylist[nextMapIndex].MapType);
             label_timeLeft.Text = theInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss");
 
         }
         public void functionEvent_CheckForMapChanges()
         {
-            if (instanceMaps.currentMapPlaylist.Count != dataGridView_currentMaps.Rows.Count)
+            if (instanceMaps!.currentMapPlaylist.Count != dataGridView_currentMaps.Rows.Count)
             {
                 ib_resetCurrentMaps.BackColor = Color.Red;
                 return;
             }
-            for (int i = 0; i < instanceMaps.currentMapPlaylist.Count; i++)
+            for (int i = 0; i < instanceMaps!.currentMapPlaylist.Count; i++)
             {
-                if (instanceMaps.currentMapPlaylist[i].MapName != dataGridView_currentMaps.Rows[i].Cells["current_MapName"].Value?.ToString())
+                if (instanceMaps!.currentMapPlaylist[i].MapName != dataGridView_currentMaps.Rows[i].Cells["current_MapName"].Value?.ToString())
                 {
                     AppDebug.Log("tickerServerManagement", "Map Playlist Name Mismatch Detected at index " + i);
                     ib_resetCurrentMaps.BackColor = Color.Red;
@@ -209,8 +207,8 @@ namespace BHD_ServerManager.Forms.Panels
 
         private void actionClick_SaveCurrentPlaylist(object sender, EventArgs e)
         {
-            instanceMaps.currentMapPlaylist = mapInstanceManager.BuildCurrentMapPlaylist();
-            mapInstanceManager.SaveCurrentMapPlaylist(instanceMaps.currentMapPlaylist, false);
+            instanceMaps!.currentMapPlaylist = mapInstanceManager.BuildCurrentMapPlaylist();
+            mapInstanceManager.SaveCurrentMapPlaylist(instanceMaps!.currentMapPlaylist, false);
             MessageBox.Show("Current map playlist has been saved.", "Save Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -252,10 +250,10 @@ namespace BHD_ServerManager.Forms.Panels
 
         private void actionClick_UpdateMapPlaylist(object sender, EventArgs e)
         {
-            if (theInstance.instanceStatus == InstanceStatus.STARTDELAY || theInstance.instanceStatus == InstanceStatus.ONLINE)
+            if (theInstance!.instanceStatus == InstanceStatus.STARTDELAY || theInstance!.instanceStatus == InstanceStatus.ONLINE)
             {
-                GameManager.UpdateMapCycle1();
-                GameManager.UpdateMapCycle2();
+                ServerMemory.UpdateMapCycle1();
+                ServerMemory.UpdateMapCycle2();
                 ServerMemory.UpdateMapListCount();
                 MessageBox.Show("The server map list has been updated successfully.", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -268,21 +266,21 @@ namespace BHD_ServerManager.Forms.Panels
         private void actionClick_PlayMapNext(object sender, EventArgs e)
         {
             int mapIndex = dataGridView_currentMaps.CurrentCell.RowIndex;
-            GameManager.UpdateNextMap(mapIndex);
+            ServerMemory.UpdateNextMap(mapIndex);
             MessageBox.Show(dataGridView_currentMaps.Rows[mapIndex].Cells["current_MapName"].Value + " has been updated to play next.", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void actionClick_ScoreMap(object sender, EventArgs e)
         {
-            GameManager.WriteMemoryScoreMap();
+            ServerMemory.WriteMemoryScoreMap();
         }
 
         private void actionClick_SkipMap(object sender, EventArgs e)
         {
-            if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP)
+            if (theInstance!.instanceStatus != InstanceStatus.LOADINGMAP)
             {
-                theInstance.instanceMapSkipped = true;
-                GameManager.WriteMemorySendConsoleCommand("resetgames");
+                theInstance!.instanceMapSkipped = true;
+                ServerMemory.WriteMemorySendConsoleCommand("resetgames");
             }
             else
             {

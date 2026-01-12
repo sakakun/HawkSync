@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerManager", "BHD-ServerManager\ServerManager.csproj", "{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HawkSyncCommon", "BHD-SharedResources\HawkSyncCommon.csproj", "{D51660F1-CF39-4EA7-B8A9-E8C337516CD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D51660F1-CF39-4EA7-B8A9-E8C337516CD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D51660F1-CF39-4EA7-B8A9-E8C337516CD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D51660F1-CF39-4EA7-B8A9-E8C337516CD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D51660F1-CF39-4EA7-B8A9-E8C337516CD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

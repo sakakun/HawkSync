@@ -21,7 +21,7 @@ namespace BHD_ServerManager.Forms.Panels
     public partial class tabProfile : UserControl
     {
         // --- Instance Objects ---
-        private theInstance theInstance => CommonCore.theInstance;
+        private theInstance? theInstance => CommonCore.theInstance;
         // --- UI Objects ---
         private ServerManager theServer => Program.ServerManagerUI!;
         // --- Class Variables ---
@@ -37,7 +37,7 @@ namespace BHD_ServerManager.Forms.Panels
         public void functionEvent_GetProfileSettings(object? sender, EventArgs e)
         {
             // Get the data from "theInterface" object and set it to the form.
-            tb_profileServerPath.Text = theInstance.profileServerPath;
+            tb_profileServerPath.Text = theInstance!.profileServerPath;
             tb_modFile.Text = theInstance.profileModFileName;
             // Set checked items for cb_profileModifierList1
             for (int i = 0; i < cb_profileModifierList1.Items.Count; i++)
@@ -63,7 +63,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             // Set the data from the form to the "theInterface" object.
             // Trigger the save function in "theInstanceManager".
-            theInstance.profileServerPath = tb_profileServerPath.Text;
+            theInstance!.profileServerPath = tb_profileServerPath.Text;
             theInstance.profileModFileName = tb_modFile.Text;
             theInstance.profileModifierList1 = cb_profileModifierList1.CheckedItems.Cast<string>().ToList();
             theInstance.profileModifierList2 = cb_profileModifierList2.CheckedItems.Cast<string>().ToList();
@@ -85,7 +85,7 @@ namespace BHD_ServerManager.Forms.Panels
         private void functionEvent_HighlightDiffFields()
         {
             // Profile Server Path
-            tb_profileServerPath.BackColor = tb_profileServerPath.Text != theInstance.profileServerPath
+            tb_profileServerPath.BackColor = tb_profileServerPath.Text != theInstance!.profileServerPath
                 ? Color.LightYellow : SystemColors.Window;
 
             // Mod File Name
@@ -115,7 +115,7 @@ namespace BHD_ServerManager.Forms.Panels
                 _firstLoadComplete = true;
 
                 // If the profileServerPath is not set or does not exist, switch to the Profile tab and show a message box.
-                if (theInstance.profileServerPath == string.Empty || !Directory.Exists(theInstance.profileServerPath))
+                if (theInstance!.profileServerPath == string.Empty || !Directory.Exists(theInstance.profileServerPath))
                 {
                     theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[0];
                     MessageBox.Show("Please set the Server Path in the Profile tab.", "Server Path Not Set", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -127,7 +127,7 @@ namespace BHD_ServerManager.Forms.Panels
 
             }
 
-            bool currentState = (theInstance.instanceStatus == InstanceStatus.OFFLINE);
+            bool currentState = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
             bool isModChecked = cb_profileModifierList1.CheckedItems.Contains("/mod");
 
             // Enable/disable all profile controls (except mod fields)

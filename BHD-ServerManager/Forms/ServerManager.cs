@@ -1,13 +1,9 @@
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Forms.Panels;
 using BHD_ServerManager.Classes.CoreObjects;
-using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.ObjectClasses;
-using BHD_ServerManager.Classes.StatsManagement;
-using BHD_ServerManager.Classes.SupportClasses;
-using Microsoft.VisualBasic.Logging;
 using System.Data;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -41,7 +37,7 @@ namespace BHD_ServerManager.Forms
 
             theInstanceManager.CheckSettings();
             banInstanceManager.LoadSettings();
-            chatInstanceManagers.LoadSettings();
+            chatInstanceManager.LoadSettings();
             theInstanceManager.InitializeTickers();
             theInstanceManager.GetServerVariables();
         }

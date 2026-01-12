@@ -18,12 +18,9 @@ namespace BHD_ServerManager.Forms.Panels
     public partial class tabChat : UserControl
     {
         // --- Instance Objects ---
-        private theInstance theInstance => CommonCore.theInstance;
-        private chatInstance instanceChat => CommonCore.instanceChat;
-        // --- UI Objects ---
-        private ServerManager theServer => Program.ServerManagerUI!;
+        private theInstance? theInstance => CommonCore.theInstance;
+
         // --- Class Variables ---
-        private new string Name = "ChatTab";                        // Name of the tab for logging purposes.
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
         private DateTime _lastGridUpdate;                           // Last time the chat messages grid was updated.
         private bool _chatGridFirstLoad;                            // Flag to determine if this is the first load of the chat grid.
@@ -37,7 +34,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
 
             dg_slapMessages.Rows.Clear();
-            foreach (var slapMsg in chatInstanceManagers.GetSlapMessages())
+            foreach (var slapMsg in chatInstanceManager.GetSlapMessages())
                 dg_slapMessages.Rows.Add(slapMsg.SlapMessageId, slapMsg.SlapMessageText);
 
         }
@@ -45,7 +42,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
 
             dg_autoMessages.Rows.Clear();
-            foreach (var autoMsg in chatInstanceManagers.GetAutoMessages())
+            foreach (var autoMsg in chatInstanceManager.GetAutoMessages())
                 dg_autoMessages.Rows.Add(autoMsg.AutoMessageId, autoMsg.AutoMessageTigger, autoMsg.AutoMessageText);
 
         }
@@ -142,7 +139,7 @@ namespace BHD_ServerManager.Forms.Panels
             functionEvent_UpdateAutoMessages();
             fuctionEvent_UpdateSlapMessages();
 
-            if (theInstance.instanceStatus == InstanceStatus.ONLINE || theInstance.instanceStatus == InstanceStatus.STARTDELAY)
+            if (theInstance?.instanceStatus == InstanceStatus.ONLINE || theInstance?.instanceStatus == InstanceStatus.STARTDELAY)
             {
                 // Update chat messages grid
                 functionEvent_UpdateChatMessagesGrid();
@@ -154,7 +151,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                chatInstanceManagers.AddSlapMessage(tb_slapMessage.Text);
+                chatInstanceManager.AddSlapMessage(tb_slapMessage.Text);
                 tb_slapMessage.Clear();
                 fuctionEvent_UpdateSlapMessages();
             }
@@ -162,12 +159,12 @@ namespace BHD_ServerManager.Forms.Panels
         private void actionClick_RemoveSlap(object sender, DataGridViewCellEventArgs e)
         {
             int slapMessageId = Convert.ToInt32(dg_slapMessages.Rows[e.RowIndex].Cells[0].Value);
-            chatInstanceManagers.RemoveSlapMessage(slapMessageId);
+            chatInstanceManager.RemoveSlapMessage(slapMessageId);
             fuctionEvent_UpdateSlapMessages();
         }
         private void actionKeyPressed_AddAutoMessage(object sender, KeyPressEventArgs e)
         {
-            chatInstanceManagers.AddAutoMessage(tb_autoMessage.Text.Trim(), (int)num_AutoMessageTrigger.Value);
+            chatInstanceManager.AddAutoMessage(tb_autoMessage.Text.Trim(), (int)num_AutoMessageTrigger.Value);
             functionEvent_UpdateAutoMessages();
             tb_autoMessage.Text = string.Empty;
             num_AutoMessageTrigger.Value = 0;
@@ -175,7 +172,7 @@ namespace BHD_ServerManager.Forms.Panels
         private void actionClick_RemoveAutoMessage(object sender, DataGridViewCellEventArgs e)
         {
             int AutoMessageId = Convert.ToInt32(dg_autoMessages.Rows[e.RowIndex].Cells[0].Value);
-            chatInstanceManagers.RemoveAutoMessage(AutoMessageId);
+            chatInstanceManager.RemoveAutoMessage(AutoMessageId);
             functionEvent_UpdateAutoMessages();
         }
         private void actionKeyPress_SubmitMessage(object sender, KeyPressEventArgs e)
@@ -186,9 +183,9 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
 
-            if (theInstance.instanceStatus == InstanceStatus.OFFLINE ||
-                theInstance.instanceStatus == InstanceStatus.LOADINGMAP ||
-                theInstance.instanceStatus == InstanceStatus.SCORING)
+            if (theInstance!.instanceStatus == InstanceStatus.OFFLINE ||
+                theInstance!.instanceStatus == InstanceStatus.LOADINGMAP ||
+                theInstance!.instanceStatus == InstanceStatus.SCORING)
             {
                 tb_chatMessage.Enabled = false;
                 return;
@@ -241,12 +238,12 @@ namespace BHD_ServerManager.Forms.Panels
                 for (int i = 0; i < message.Length; i += 59)
                 {
                     string chunk = message.Substring(i, Math.Min(59, message.Length - i));
-                    GameManager.WriteMemorySendChatMessage(channel, chunk);
+                    ServerMemory.WriteMemorySendChatMessage(channel, chunk);
                 }
             }
             else
             {
-                GameManager.WriteMemorySendChatMessage(channel, message);
+                ServerMemory.WriteMemorySendChatMessage(channel, message);
             }
 
             tb_chatMessage.Clear();

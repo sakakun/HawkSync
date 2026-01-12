@@ -14,7 +14,7 @@ namespace BHD_ServerManager.Classes.Instances
         [JsonIgnore]
         public nint instanceProcessHandle { get; set; }
         [JsonIgnore]
-        public Process instanceProcess { get; set; }
+        public Process? instanceProcess { get; set; }
         public InstanceStatus instanceStatus { get; set; } = InstanceStatus.OFFLINE;
         [JsonIgnore]
         public int instanceCrashCounter { get; set; } = 0;   /* Counter for the number of Crashes */

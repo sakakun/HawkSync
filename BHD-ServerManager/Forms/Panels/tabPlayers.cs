@@ -17,12 +17,9 @@ namespace BHD_ServerManager.Forms.Panels
 {
     public partial class tabPlayers : UserControl
     {
-        private theInstance theInstance => CommonCore.theInstance;
-        // --- UI Objects ---
-        private ServerManager theServer => Program.ServerManagerUI!;
+        private theInstance? theInstance => CommonCore.theInstance;
 
         // --- Class Variables ---
-        private new string Name = "PlayerTab";                      // Name of the tab for logging purposes.
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
 
         private PlayerCard[] playerCards = new PlayerCard[50];
@@ -47,7 +44,7 @@ namespace BHD_ServerManager.Forms.Panels
                 card.Dock = DockStyle.Fill;
                 card.Margin = new Padding(0);
                 card.Padding = new Padding(0);
-                card.ToggleSlot((i) < theInstance.gameMaxSlots ? true : false);
+                card.ToggleSlot((i) < theInstance!.gameMaxSlots ? true : false);
                 playerCards[i] = card;
 
                 // Column by column: column = i / 10, row = i % 10
@@ -72,7 +69,7 @@ namespace BHD_ServerManager.Forms.Panels
                     functionEvent_GeneratePlayerCards();
                 }
 
-                if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
+                if (theInstance!.instanceStatus == InstanceStatus.OFFLINE)
                 {
                     for (int i = 0; i < 50; i++)
                     {

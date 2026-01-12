@@ -1,12 +1,12 @@
-﻿namespace BHD_ServerManager.Classes.StatsManagement
+﻿using BHD_ServerManager.Classes.StatsManagement;
+
+namespace BHD_ServerManager.Classes.StatsManagement
 {
     public static class StatsManager
     {
-        public static StatsInterface Implementation { get; set; }
-
         public static bool TestBabstatsConnection(string WebURL)
         {
-            return Implementation.TestBabstatsConnection(WebURL);
+            return StatFunctions.TestBabstatsConnectionAsync(WebURL).GetAwaiter().GetResult();
         }
     }
 }

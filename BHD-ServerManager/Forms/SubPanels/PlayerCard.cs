@@ -25,7 +25,6 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         private playerObject? LastPlayerData = null;
         private bool LastVisible = true;
 
-        private bool IsArmed = true;
         private bool IsGod = false;
 
         public PlayerCard(int slotNum)
@@ -85,7 +84,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             command.Click += (sender, e) =>
             {
                 command.Text = "Arm Player";
-                GameManager.WriteMemoryArmPlayer(Player.PlayerSlot);
+                ServerMemory.WriteMemoryArmPlayer(Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been Armed.", "Player Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} is now Armed.");
             };
@@ -97,7 +96,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             command.Click += (sender, e) =>
             {
                 command.Text = "Disarm Player";
-                GameManager.WriteMemoryDisarmPlayer(Player.PlayerSlot);
+                ServerMemory.WriteMemoryDisarmPlayer(Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been Disarmed.", "Player Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} is now Disarmed.");
             };
@@ -120,7 +119,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 var slapItem = new ToolStripMenuItem(slapMessage.SlapMessageText);
                 slapItem.Click += (sender, e) =>
                 {
-                    GameManager.WriteMemorySendChatMessage(1, $"{Player.PlayerName}, {slapMessage.SlapMessageText}");
+                    ServerMemory.WriteMemorySendChatMessage(1, $"{Player.PlayerName}, {slapMessage.SlapMessageText}");
                     MessageBox.Show($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Debug.WriteLine($"Player {Player.PlayerName} has been slapped with message: {slapMessage.SlapMessageText}");
                 };
@@ -133,7 +132,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Kick Player");
             command.Click += (sender, e) =>
             {
-                GameManager.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
+                ServerMemory.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been kicked from the server.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} has been kicked from the server.");
             };
@@ -145,7 +144,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Kill Player");
             command.Click += (sender, e) =>
             {
-                GameManager.WriteMemoryKillPlayer(Player.PlayerSlot);
+                ServerMemory.WriteMemoryKillPlayer(Player.PlayerSlot);
                 MessageBox.Show($"Player {Player.PlayerName} has been killed.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Player {Player.PlayerName} has been killed.");
             };
@@ -194,11 +193,11 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             {
                 if (!IsGod)
                 {
-                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, GodModeHealth);
+                    ServerMemory.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, GodModeHealth);
                 }
                 else
                 {
-                    GameManager.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, NormalHealth);
+                    ServerMemory.WriteMemoryTogglePlayerGodMode(Player.PlayerSlot, NormalHealth);
                 }
                 IsGod = !IsGod;
                 command.Text = IsGod ? "Disable God Mode" : "Enable God Mode";

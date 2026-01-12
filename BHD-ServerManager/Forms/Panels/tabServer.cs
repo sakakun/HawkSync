@@ -19,9 +19,8 @@ namespace BHD_ServerManager.Forms.Panels
     public partial class tabServer : UserControl
     {
         // --- Instance Objects ---
-        private theInstance theInstance => CommonCore.theInstance;
-        // --- UI Objects ---
-        private ServerManager theServer => Program.ServerManagerUI!;
+        private theInstance? theInstance => CommonCore.theInstance;
+        
         // --- Class Variables ---
         private new string Name = "ServerTab";                      // Name of the tab for logging purposes.
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
@@ -45,7 +44,7 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Host Information (4 fields)
             {
-                tb_serverID.Text = newInstance.WebStatsProfileID;
+                tb_serverID.Text = newInstance!.WebStatsProfileID;
                 tb_serverName.Text = newInstance.gameServerName;
                 tb_hostName.Text = newInstance.gameHostName;
                 tb_serverMessage.Text = newInstance.gameMOTD;
@@ -227,7 +226,7 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Host Information (4 fields)
             {
-                theInstance.WebStatsProfileID = tb_serverID.Text;
+                theInstance!.WebStatsProfileID = tb_serverID.Text;
                 theInstance.gameServerName = tb_serverName.Text;
                 theInstance.gameHostName = tb_hostName.Text;
                 theInstance.gameMOTD = tb_serverMessage.Text;
@@ -342,7 +341,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             // Host Information
             {
-                tb_serverID.BackColor = tb_serverID.Text != theInstance.WebStatsProfileID ? Color.LightYellow : SystemColors.Window;
+                tb_serverID.BackColor = tb_serverID.Text != theInstance!.WebStatsProfileID ? Color.LightYellow : SystemColors.Window;
                 tb_serverName.BackColor = tb_serverName.Text != theInstance.gameServerName ? Color.LightYellow : SystemColors.Window;
                 tb_hostName.BackColor = tb_hostName.Text != theInstance.gameHostName ? Color.LightYellow : SystemColors.Window;
                 tb_serverMessage.BackColor = tb_serverMessage.Text != theInstance.gameMOTD ? Color.LightYellow : SystemColors.Window;
@@ -463,7 +462,7 @@ namespace BHD_ServerManager.Forms.Panels
         private void functionEvent_UpdateServerControls()
         {
             // Is the Server Running?
-            bool isOffline = (theInstance.instanceStatus == InstanceStatus.OFFLINE);
+            bool isOffline = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
 
             // Server Running? Update Text
             btn_serverControl.Text = isOffline ? "START" : "STOP";
@@ -559,18 +558,18 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Server Control Button Clicked ---
         private void actionClick_serverControl(object sender, EventArgs e)
         {
-            if (theInstanceManager.ValidateGameServerPath() && theInstance.instanceStatus == InstanceStatus.OFFLINE)
+            if (theInstanceManager.ValidateGameServerPath() && theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
                 theInstanceManager.SetServerVariables();
-                if (GameManager.startGame())
+                if (StartServer.startGame())
                 {
-                    GameManager.ReadMemoryServerStatus();
+                    ServerMemory.ReadMemoryServerStatus();
                     functionEvent_UpdateServerControls();
                 }
             }
             else
             {
-                GameManager.stopGame();
+                StartServer.stopGame();
                 functionEvent_UpdateServerControls();
             }
             
@@ -578,7 +577,7 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Update Game Server Settings ---
         private void actionClick_GameServerUpdate(object sender, EventArgs e)
         {
-            if (GameManager.ReadMemoryIsProcessAttached())
+            if (ServerMemory.ReadMemoryIsProcessAttached())
             {
                 theInstanceManager.UpdateGameServer();
                 MessageBox.Show("Saved settings have been applied to the game server.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -587,7 +586,7 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Server Lock Lobby ----
         private void actionClick_ServerLockLobby(object sender, EventArgs e)
         {
-            GameManager.WriteMemorySendConsoleCommand("lockgame");
+            ServerMemory.WriteMemorySendConsoleCommand("lockgame");
         }
     }
 }

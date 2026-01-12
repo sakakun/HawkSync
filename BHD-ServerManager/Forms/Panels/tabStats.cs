@@ -18,11 +18,7 @@ namespace BHD_ServerManager.Forms.Panels
     {
 
         // --- Instance Objects ---
-        private theInstance theInstance => CommonCore.theInstance;
-        // --- UI Objects ---
-        private ServerManager theServer => Program.ServerManagerUI!;
-        // --- Class Variables ---
-        private new string Name = "StatsTab";                        // Name of the tab for logging purposes.
+        private theInstance? theInstance => CommonCore.theInstance;
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
 
         public tabStats()
@@ -35,7 +31,7 @@ namespace BHD_ServerManager.Forms.Panels
             var newInstance = updatedInstance != null ? updatedInstance : theInstance;
 
             // Stats Settings
-            cb_enableWebStats.Checked = newInstance.WebStatsEnabled;
+            cb_enableWebStats.Checked = newInstance!.WebStatsEnabled;
             tb_webStatsServerPath.Text = newInstance.WebStatsServerPath;
             cb_enableAnnouncements.Checked = newInstance.WebStatsAnnouncements;
             num_WebStatsReport.Value = newInstance.WebStatsReportInterval;
@@ -53,7 +49,7 @@ namespace BHD_ServerManager.Forms.Panels
         public void functionEvent_SaveSettings()
         {
             // Stats Settings
-            theInstance.WebStatsEnabled = cb_enableWebStats.Checked;
+            theInstance!.WebStatsEnabled = cb_enableWebStats.Checked;
             theInstance.WebStatsServerPath = tb_webStatsServerPath.Text;
             theInstance.WebStatsAnnouncements = cb_enableAnnouncements.Checked;
             theInstance.WebStatsReportInterval = (int)num_WebStatsReport.Value;

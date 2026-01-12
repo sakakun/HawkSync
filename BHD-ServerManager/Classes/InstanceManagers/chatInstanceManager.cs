@@ -4,11 +4,10 @@ using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 using System.Text.Json;
-using BHD_ServerManager.Classes.InstanceInterfaces;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
-    public class serverChatInterfaceManager : chatInstanceInterface
+    public static class chatInstanceManager
     {
 
         private static chatInstance instanceChat = CommonCore.instanceChat!;
@@ -16,7 +15,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         private static DateTime _lastGridUpdate = DateTime.MinValue;
 
         // Function: loadChatSettings, loads the chat settings from a JSON file. If it does not exist, it initializes empty lists and saves them.
-        public void LoadSettings()
+        public static void LoadSettings()
         {
             // Load the chat settings from the JSON file
             // If the file does not exist, it will create an empty list and save it.
@@ -25,7 +24,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 instanceChat.SlapMessages = new List<SlapMessages>();
                 instanceChat.AutoMessages = new List<AutoMessages>();
-                chatInstanceManagers.SaveSettings();
+                chatInstanceManager.SaveSettings();
                 return;
             }
             try
@@ -42,7 +41,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         }
 
         // Function: saveChatSettings, saves the current chat settings to a JSON file.
-        public void SaveSettings()
+        public static void SaveSettings()
         {
             string chatSettingsPath = Path.Combine(CommonCore.AppDataPath, "ChatSettings.json");
             var chatSettings = new ChatSettingsObject
@@ -61,7 +60,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
         }
         // Function: AddSlapMessage, adds a new slap message to the list, sorts the list, updates IDs, and saves the settings.
-        public void AddSlapMessage(string messageText)
+        public static void AddSlapMessage(string messageText)
         {
             var newSlapMessage = new SlapMessages
             {
@@ -79,9 +78,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 instanceChat.SlapMessages[i].SlapMessageId = i + 1;
             }
 
-            chatInstanceManagers.SaveSettings();
+            chatInstanceManager.SaveSettings();
         }
-        public void RemoveSlapMessage(int id)
+        public static void RemoveSlapMessage(int id)
         {
             var slapMessage = instanceChat.SlapMessages.FirstOrDefault(sm => sm.SlapMessageId == id);
             if (slapMessage != null)
@@ -92,10 +91,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     instanceChat.SlapMessages[i].SlapMessageId = i + 1;
                 }
-                chatInstanceManagers.SaveSettings();
+                chatInstanceManager.SaveSettings();
             }
         }
-        public void AddAutoMessage(string messageText, int tiggerSeconds)
+        public static void AddAutoMessage(string messageText, int tiggerSeconds)
         {
             var newAutoMessage = new AutoMessages
             {
@@ -114,9 +113,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 instanceChat.AutoMessages[i].AutoMessageId = i + 1;
             }
 
-            chatInstanceManagers.SaveSettings();
+            chatInstanceManager.SaveSettings();
         }
-        public void RemoveAutoMessage(int id)
+        public static void RemoveAutoMessage(int id)
         {
             var autoMessage = instanceChat.AutoMessages.FirstOrDefault(am => am.AutoMessageId == id);
             if (autoMessage != null)
@@ -127,19 +126,19 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     instanceChat.AutoMessages[i].AutoMessageId = i + 1;
                 }
-                chatInstanceManagers.SaveSettings();
+                chatInstanceManager.SaveSettings();
             }
         }
 
-        public IReadOnlyList<SlapMessages> GetSlapMessages()
+        public static IReadOnlyList<SlapMessages> GetSlapMessages()
         {
             return instanceChat.SlapMessages.AsReadOnly();
         }
-        public IReadOnlyList<AutoMessages> GetAutoMessages()
+        public static IReadOnlyList<AutoMessages> GetAutoMessages()
         {
             return instanceChat.AutoMessages.AsReadOnly();
         }
-        public void UpdateChatMessagesGrid()
+        public static void UpdateChatMessagesGrid()
         {
             // To Do: Remove
         }

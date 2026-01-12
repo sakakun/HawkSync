@@ -13,15 +13,15 @@ namespace BHD_ServerManager.Classes.CoreObjects
 
         // Static Instance Objects
         // Object: thisInstance, Memory and Variable storage for the current instance of the application
-        public static theInstance theInstance { get; set; } = null;
-        public static mapInstance instanceMaps { get; set; } = null;
-        public static chatInstance instanceChat { get; set; } = null;
-        public static banInstance instanceBans { get; set; } = null;
-        public static statInstance instanceStats { get; set; } = null;
+        public static theInstance? theInstance { get; set; }
+        public static mapInstance? instanceMaps { get; set; }
+        public static chatInstance? instanceChat { get; set; }
+        public static banInstance? instanceBans { get; set; }
+        public static statInstance? instanceStats { get; set; }
 
 
         // Object: Ticker, Timer Constructor for periodic tasks
-        public static Ticker Ticker { get; set; }
+        public static Ticker? Ticker { get; set; }
 
         public static void InitializeCore()
         {

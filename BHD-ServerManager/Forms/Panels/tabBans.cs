@@ -18,12 +18,9 @@ namespace BHD_ServerManager.Forms.Panels
     {
 
         // --- Instance Objects ---
-        private theInstance theInstance => CommonCore.theInstance;
-        private banInstance instanceBans => CommonCore.instanceBans;
-        // --- UI Objects ---
-        private ServerManager theServer => Program.ServerManagerUI!;
+        private banInstance? instanceBans => CommonCore.instanceBans;
+
         // --- Class Variables ---
-        private new string Name = "BanTab";                        // Name of the tab for logging purposes.
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
 
         public tabBans()
@@ -33,8 +30,8 @@ namespace BHD_ServerManager.Forms.Panels
 
         private void functionEvent_RemoveBannedPlayer(int recordId)
         {
-            bool foundInNames = instanceBans.BannedPlayerNames.Any(b => b.recordId == recordId);
-            bool foundInAddresses = instanceBans.BannedPlayerAddresses.Any(b => b.recordId == recordId);
+            bool foundInNames = instanceBans!.BannedPlayerNames.Any(b => b.recordId == recordId);
+            bool foundInAddresses = instanceBans!.BannedPlayerAddresses.Any(b => b.recordId == recordId);
 
             if (!foundInNames && !foundInAddresses)
             {
@@ -127,8 +124,8 @@ namespace BHD_ServerManager.Forms.Panels
                 MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                instanceBans.BannedPlayerAddresses.Clear();
-                instanceBans.BannedPlayerNames.Clear();
+                instanceBans!.BannedPlayerAddresses.Clear();
+                instanceBans!.BannedPlayerNames.Clear();
                 banInstanceManager.UpdateBannedTables();
                 banInstanceManager.ImportSettings();
             }

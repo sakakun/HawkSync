@@ -36,7 +36,14 @@ namespace BHD_ServerManager.Forms
                         return titleAttribute.Title;
                     }
                 }
-                return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
+                // Use Assembly.Location instead of CodeBase to avoid SYSLIB0012.
+                // Use Path.GetFileNameWithoutExtension safely, handling possible nulls for CS8603.
+                string? location = Assembly.GetExecutingAssembly().Location;
+                if (!string.IsNullOrEmpty(location))
+                {
+                    return System.IO.Path.GetFileNameWithoutExtension(location);
+                }
+                return string.Empty;
             }
         }
 
@@ -44,7 +51,8 @@ namespace BHD_ServerManager.Forms
         {
             get
             {
-                return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                Version? version = Assembly.GetExecutingAssembly().GetName().Version;
+                return version?.ToString() ?? string.Empty;
             }
         }
 

@@ -10,9 +10,9 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
         private class TickerItem
         {
-            public Timer Timer { get; set; }
+            public Timer? Timer { get; set; }
             // ReSharper disable once UnusedAutoPropertyAccessor.Local
-            public Action TickAction { get; set; }
+            public Action? TickAction { get; set; }
         }
 
         // Dictionary to store multiple tickers
