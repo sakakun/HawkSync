@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_PATH: BHD-ServerManager/BHD-ServerManager.csproj
+  PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
   OUTPUT_NAME: HawkSync-ServerManager
   DOTNET_VERSION: '8.0.x'
 
