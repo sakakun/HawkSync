@@ -167,7 +167,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             var newInstance = import && updatedInstance != null ? updatedInstance : theInstance;
             
             // Trigger "Gets" for the Tabs
-            thisServer.ServerTab.functionEvent_GetServerSettings((updatedInstance != null ? updatedInstance : null!));
             thisServer.StatsTab.functionEvent_GetStatSettings((updatedInstance != null ? updatedInstance : null!));
 
         }

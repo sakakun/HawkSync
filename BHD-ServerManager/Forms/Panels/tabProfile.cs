@@ -214,10 +214,8 @@ namespace BHD_ServerManager.Forms.Panels
 			// Ping Checking
             ServerSettings.Set("gameMinPing", theInstance.gameMinPing = cb_enableMinCheck.Checked);
             ServerSettings.Set("gameMaxPing", theInstance.gameMaxPing = cb_enableMaxCheck.Checked);
-            theInstance.gameMinPingValue = (int) num_minPing.Value;
-            theInstance.gameMaxPingValue = (int) num_maxPing.Value;
-            ServerSettings.Set("gameMinPingValue", (decimal)theInstance.gameMinPingValue);
-            ServerSettings.Set("gameMaxPingValue", (decimal)theInstance.gameMaxPingValue);
+            ServerSettings.Set("gameMinPingValue", (decimal)(theInstance.gameMinPingValue = (int)num_minPing.Value));
+            ServerSettings.Set("gameMaxPingValue", (decimal)(theInstance.gameMaxPingValue = (int)num_maxPing.Value));
 
 			// Commandlin Switches
 			ServerSettings.Set("profileServerAttribute01", theInstance!.profileServerAttribute01 = profileServerAttribute01.Checked);
