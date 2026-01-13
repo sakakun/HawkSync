@@ -1,0 +1,145 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ master, main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+env:
+  PROJECT_PATH: BHD-ServerManager/BHD-ServerManager.csproj
+  OUTPUT_NAME: HawkSync-ServerManager
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+
+    - name: Build
+      run: |
+        dotnet build ${{ env.PROJECT_PATH }} `
+          --configuration Release `
+          --no-restore `
+          /p:Platform="Any CPU"
+
+    - name: Publish Self-Contained
+      run: |
+        dotnet publish ${{ env.PROJECT_PATH }} `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          --output ./publish/self-contained `
+          /p:PublishSingleFile=true `
+          /p:IncludeNativeLibrariesForSelfExtract=true `
+          /p:EnableCompressionInSingleFile=true
+
+    - name: Publish Framework-Dependent
+      run: |
+        dotnet publish ${{ env.PROJECT_PATH }} `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained false `
+          --output ./publish/framework-dependent
+
+    - name: Create version info
+      shell: pwsh
+      run: |
+        $version = if ($env:GITHUB_REF -match 'refs/tags/v(.*)') { 
+          $matches[1] 
+        } else { 
+          "dev-$(git rev-parse --short HEAD)" 
+        }
+        echo "VERSION=$version" >> $env:GITHUB_ENV
+        
+        @"
+        Build Information
+        =================
+        Version: $version
+        Build Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
+        Commit: $(git rev-parse HEAD)
+        Branch: $($env:GITHUB_REF -replace 'refs/heads/', '')
+        
+        Requirements:
+        - .NET 8.0 Runtime (for framework-dependent version)
+        - Windows 10/11 (x64)
+        "@ | Out-File -FilePath ./publish/self-contained/BUILD_INFO.txt
+        
+        Copy-Item ./publish/self-contained/BUILD_INFO.txt ./publish/framework-dependent/
+
+    - name: Copy LICENSE to output
+      shell: pwsh
+      run: |
+        if (Test-Path "LICENSE.txt") {
+          Copy-Item LICENSE.txt ./publish/self-contained/
+          Copy-Item LICENSE.txt ./publish/framework-dependent/
+        }
+
+    - name: Create ZIP archives
+      shell: pwsh
+      run: |
+        Compress-Archive -Path ./publish/self-contained/* `
+          -DestinationPath "./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}-SelfContained.zip"
+        
+        Compress-Archive -Path ./publish/framework-dependent/* `
+          -DestinationPath "./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}-FrameworkDependent.zip"
+
+    - name: Upload Self-Contained Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.OUTPUT_NAME }}-SelfContained
+        path: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}-SelfContained.zip
+        retention-days: 30
+
+    - name: Upload Framework-Dependent Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.OUTPUT_NAME }}-FrameworkDependent
+        path: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}-FrameworkDependent.zip
+        retention-days: 30
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}-SelfContained.zip
+          ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}-FrameworkDependent.zip
+        body: |
+          ## HawkSync Server Manager ${{ env.VERSION }}
+          
+          ### Downloads
+          - **Self-Contained**: Includes .NET runtime, no installation required (~100MB)
+          - **Framework-Dependent**: Requires .NET 8.0 Runtime installed (~5MB)
+          
+          ### Installation
+          1. Download your preferred version
+          2. Extract the ZIP file
+          3. Run `BHD-ServerManager.exe`
+          
+          ### Requirements
+          - Windows 10/11 (x64)
+          - .NET 8.0 Runtime (framework-dependent version only)
+          
+          ### Changes
+          See commit history for details.
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
