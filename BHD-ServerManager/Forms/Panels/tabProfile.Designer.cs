@@ -31,7 +31,36 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             profileFileManagers = new TabControl();
             tabProfilePage1 = new TabPage();
+            groupBox8 = new GroupBox();
+            tableLayoutPanel7 = new TableLayoutPanel();
+            cb_enableMaxCheck = new CheckBox();
+            cb_enableMinCheck = new CheckBox();
+            num_maxPing = new NumericUpDown();
+            num_minPing = new NumericUpDown();
+            groupBox7 = new GroupBox();
+            tableLayoutPanel6 = new TableLayoutPanel();
+            cb_serverDedicated = new CheckBox();
+            cb_requireNova = new CheckBox();
+            label3 = new Label();
+            tb_serverPassword = new TextBox();
+            label1 = new Label();
+            num_serverPort = new NumericUpDown();
+            cb_serverIP = new ComboBox();
+            groupBox6 = new GroupBox();
+            tableLayoutPanel5 = new TableLayoutPanel();
+            tb_serverMessage = new TextBox();
+            serverCountryCode = new TextBox();
+            tb_serverName = new TextBox();
+            tb_hostName = new TextBox();
             tabProfilePage2 = new TabPage();
+            groupBox1 = new GroupBox();
+            tableLayoutPanel3 = new TableLayoutPanel();
+            tb_modFile = new TextBox();
+            btn_profileBrowse2 = new Button();
+            groupBox2 = new GroupBox();
+            tableLayoutPanel2 = new TableLayoutPanel();
+            btn_profileBrowse1 = new Button();
+            tb_profileServerPath = new TextBox();
             groupBox3 = new GroupBox();
             tableAtributes = new TableLayoutPanel();
             profileServerAttribute01 = new CheckBox();
@@ -55,14 +84,6 @@
             profileServerAttribute19 = new CheckBox();
             profileServerAttribute20 = new CheckBox();
             profileServerAttribute21 = new CheckBox();
-            groupBox2 = new GroupBox();
-            tableLayoutPanel2 = new TableLayoutPanel();
-            btn_profileBrowse1 = new Button();
-            tb_profileServerPath = new TextBox();
-            groupBox1 = new GroupBox();
-            tableLayoutPanel3 = new TableLayoutPanel();
-            tb_modFile = new TextBox();
-            btn_profileBrowse2 = new Button();
             panel1 = new Panel();
             groupBox5 = new GroupBox();
             groupBox4 = new GroupBox();
@@ -73,13 +94,23 @@
             openFileDialog1 = new OpenFileDialog();
             tableLayoutPanel1.SuspendLayout();
             profileFileManagers.SuspendLayout();
+            tabProfilePage1.SuspendLayout();
+            groupBox8.SuspendLayout();
+            tableLayoutPanel7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)num_maxPing).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)num_minPing).BeginInit();
+            groupBox7.SuspendLayout();
+            tableLayoutPanel6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)num_serverPort).BeginInit();
+            groupBox6.SuspendLayout();
+            tableLayoutPanel5.SuspendLayout();
             tabProfilePage2.SuspendLayout();
-            groupBox3.SuspendLayout();
-            tableAtributes.SuspendLayout();
-            groupBox2.SuspendLayout();
-            tableLayoutPanel2.SuspendLayout();
             groupBox1.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
+            groupBox2.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
+            groupBox3.SuspendLayout();
+            tableAtributes.SuspendLayout();
             panel1.SuspendLayout();
             groupBox4.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
@@ -114,6 +145,9 @@
             // 
             // tabProfilePage1
             // 
+            tabProfilePage1.Controls.Add(groupBox8);
+            tabProfilePage1.Controls.Add(groupBox7);
+            tabProfilePage1.Controls.Add(groupBox6);
             tabProfilePage1.Location = new Point(4, 24);
             tabProfilePage1.Name = "tabProfilePage1";
             tabProfilePage1.Padding = new Padding(3);
@@ -121,6 +155,280 @@
             tabProfilePage1.TabIndex = 0;
             tabProfilePage1.Text = "Profile Information";
             tabProfilePage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox8
+            // 
+            groupBox8.Controls.Add(tableLayoutPanel7);
+            groupBox8.Dock = DockStyle.Top;
+            groupBox8.Location = new Point(3, 255);
+            groupBox8.Name = "groupBox8";
+            groupBox8.Size = new Size(437, 82);
+            groupBox8.TabIndex = 2;
+            groupBox8.TabStop = false;
+            groupBox8.Text = "Connection Ping Restrictions";
+            // 
+            // tableLayoutPanel7
+            // 
+            tableLayoutPanel7.ColumnCount = 2;
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 75.40603F));
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 24.5939674F));
+            tableLayoutPanel7.Controls.Add(cb_enableMaxCheck, 0, 1);
+            tableLayoutPanel7.Controls.Add(cb_enableMinCheck, 0, 0);
+            tableLayoutPanel7.Controls.Add(num_maxPing, 1, 1);
+            tableLayoutPanel7.Controls.Add(num_minPing, 1, 0);
+            tableLayoutPanel7.Dock = DockStyle.Fill;
+            tableLayoutPanel7.Location = new Point(3, 19);
+            tableLayoutPanel7.Name = "tableLayoutPanel7";
+            tableLayoutPanel7.RowCount = 2;
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.Size = new Size(431, 60);
+            tableLayoutPanel7.TabIndex = 0;
+            // 
+            // cb_enableMaxCheck
+            // 
+            cb_enableMaxCheck.AutoSize = true;
+            cb_enableMaxCheck.CheckAlign = ContentAlignment.MiddleRight;
+            cb_enableMaxCheck.Dock = DockStyle.Fill;
+            cb_enableMaxCheck.Location = new Point(3, 33);
+            cb_enableMaxCheck.Name = "cb_enableMaxCheck";
+            cb_enableMaxCheck.Size = new Size(318, 24);
+            cb_enableMaxCheck.TabIndex = 8;
+            cb_enableMaxCheck.Text = "Enable Required Max Ping";
+            cb_enableMaxCheck.TextAlign = ContentAlignment.MiddleRight;
+            cb_enableMaxCheck.UseVisualStyleBackColor = true;
+            // 
+            // cb_enableMinCheck
+            // 
+            cb_enableMinCheck.AutoSize = true;
+            cb_enableMinCheck.CheckAlign = ContentAlignment.MiddleRight;
+            cb_enableMinCheck.Dock = DockStyle.Fill;
+            cb_enableMinCheck.Location = new Point(3, 3);
+            cb_enableMinCheck.Name = "cb_enableMinCheck";
+            cb_enableMinCheck.Size = new Size(318, 24);
+            cb_enableMinCheck.TabIndex = 7;
+            cb_enableMinCheck.Text = "Enable Required Min Ping";
+            cb_enableMinCheck.TextAlign = ContentAlignment.MiddleRight;
+            cb_enableMinCheck.UseVisualStyleBackColor = true;
+            // 
+            // num_maxPing
+            // 
+            num_maxPing.Dock = DockStyle.Fill;
+            num_maxPing.Enabled = false;
+            num_maxPing.Location = new Point(327, 33);
+            num_maxPing.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+            num_maxPing.Name = "num_maxPing";
+            num_maxPing.Size = new Size(101, 23);
+            num_maxPing.TabIndex = 6;
+            num_maxPing.TextAlign = HorizontalAlignment.Center;
+            num_maxPing.Value = new decimal(new int[] { 9999, 0, 0, 0 });
+            // 
+            // num_minPing
+            // 
+            num_minPing.Dock = DockStyle.Fill;
+            num_minPing.Enabled = false;
+            num_minPing.Location = new Point(327, 3);
+            num_minPing.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+            num_minPing.Name = "num_minPing";
+            num_minPing.Size = new Size(101, 23);
+            num_minPing.TabIndex = 5;
+            num_minPing.TextAlign = HorizontalAlignment.Center;
+            num_minPing.Value = new decimal(new int[] { 9999, 0, 0, 0 });
+            // 
+            // groupBox7
+            // 
+            groupBox7.Controls.Add(tableLayoutPanel6);
+            groupBox7.Dock = DockStyle.Top;
+            groupBox7.Location = new Point(3, 107);
+            groupBox7.Name = "groupBox7";
+            groupBox7.Size = new Size(437, 148);
+            groupBox7.TabIndex = 1;
+            groupBox7.TabStop = false;
+            groupBox7.Text = "Server Details";
+            // 
+            // tableLayoutPanel6
+            // 
+            tableLayoutPanel6.ColumnCount = 3;
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 43.43435F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32.32323F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 24.242424F));
+            tableLayoutPanel6.Controls.Add(cb_serverDedicated, 1, 3);
+            tableLayoutPanel6.Controls.Add(cb_requireNova, 1, 2);
+            tableLayoutPanel6.Controls.Add(label3, 0, 1);
+            tableLayoutPanel6.Controls.Add(tb_serverPassword, 1, 1);
+            tableLayoutPanel6.Controls.Add(label1, 0, 0);
+            tableLayoutPanel6.Controls.Add(num_serverPort, 2, 0);
+            tableLayoutPanel6.Controls.Add(cb_serverIP, 1, 0);
+            tableLayoutPanel6.Dock = DockStyle.Fill;
+            tableLayoutPanel6.Location = new Point(3, 19);
+            tableLayoutPanel6.Name = "tableLayoutPanel6";
+            tableLayoutPanel6.RowCount = 4;
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel6.Size = new Size(431, 126);
+            tableLayoutPanel6.TabIndex = 0;
+            // 
+            // cb_serverDedicated
+            // 
+            cb_serverDedicated.AutoSize = true;
+            cb_serverDedicated.Checked = true;
+            cb_serverDedicated.CheckState = CheckState.Checked;
+            tableLayoutPanel6.SetColumnSpan(cb_serverDedicated, 2);
+            cb_serverDedicated.Dock = DockStyle.Fill;
+            cb_serverDedicated.Location = new Point(190, 96);
+            cb_serverDedicated.Name = "cb_serverDedicated";
+            cb_serverDedicated.Size = new Size(238, 27);
+            cb_serverDedicated.TabIndex = 11;
+            cb_serverDedicated.Text = "Run in Dedicated Mode";
+            cb_serverDedicated.TextAlign = ContentAlignment.MiddleRight;
+            cb_serverDedicated.UseVisualStyleBackColor = true;
+            // 
+            // cb_requireNova
+            // 
+            cb_requireNova.AutoSize = true;
+            tableLayoutPanel6.SetColumnSpan(cb_requireNova, 2);
+            cb_requireNova.Dock = DockStyle.Fill;
+            cb_requireNova.Location = new Point(190, 65);
+            cb_requireNova.Name = "cb_requireNova";
+            cb_requireNova.Size = new Size(238, 25);
+            cb_requireNova.TabIndex = 10;
+            cb_requireNova.Text = "NovaWorld Login Required";
+            cb_requireNova.TextAlign = ContentAlignment.MiddleRight;
+            cb_requireNova.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Dock = DockStyle.Fill;
+            label3.Location = new Point(3, 31);
+            label3.Name = "label3";
+            label3.Size = new Size(181, 31);
+            label3.TabIndex = 9;
+            label3.Text = "Lobby Password";
+            label3.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // tb_serverPassword
+            // 
+            tableLayoutPanel6.SetColumnSpan(tb_serverPassword, 2);
+            tb_serverPassword.Dock = DockStyle.Fill;
+            tb_serverPassword.Location = new Point(190, 34);
+            tb_serverPassword.MaxLength = 16;
+            tb_serverPassword.Name = "tb_serverPassword";
+            tb_serverPassword.PlaceholderText = "Server Password";
+            tb_serverPassword.Size = new Size(238, 23);
+            tb_serverPassword.TabIndex = 6;
+            tb_serverPassword.TextAlign = HorizontalAlignment.Center;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Dock = DockStyle.Fill;
+            label1.Location = new Point(3, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(181, 31);
+            label1.TabIndex = 5;
+            label1.Text = "Game IP Infomation";
+            label1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // num_serverPort
+            // 
+            num_serverPort.Dock = DockStyle.Fill;
+            num_serverPort.Location = new Point(329, 3);
+            num_serverPort.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
+            num_serverPort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            num_serverPort.Name = "num_serverPort";
+            num_serverPort.Size = new Size(99, 23);
+            num_serverPort.TabIndex = 2;
+            num_serverPort.TextAlign = HorizontalAlignment.Center;
+            num_serverPort.Value = new decimal(new int[] { 17479, 0, 0, 0 });
+            // 
+            // cb_serverIP
+            // 
+            cb_serverIP.Dock = DockStyle.Fill;
+            cb_serverIP.FormattingEnabled = true;
+            cb_serverIP.Items.AddRange(new object[] { "0.0.0.0" });
+            cb_serverIP.Location = new Point(190, 3);
+            cb_serverIP.Name = "cb_serverIP";
+            cb_serverIP.Size = new Size(133, 23);
+            cb_serverIP.TabIndex = 3;
+            // 
+            // groupBox6
+            // 
+            groupBox6.Controls.Add(tableLayoutPanel5);
+            groupBox6.Dock = DockStyle.Top;
+            groupBox6.Location = new Point(3, 3);
+            groupBox6.Name = "groupBox6";
+            groupBox6.Size = new Size(437, 104);
+            groupBox6.TabIndex = 0;
+            groupBox6.TabStop = false;
+            groupBox6.Text = "Host Information";
+            // 
+            // tableLayoutPanel5
+            // 
+            tableLayoutPanel5.ColumnCount = 3;
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 41.6658325F));
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 41.66583F));
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.6683331F));
+            tableLayoutPanel5.Controls.Add(tb_serverMessage, 0, 1);
+            tableLayoutPanel5.Controls.Add(serverCountryCode, 2, 0);
+            tableLayoutPanel5.Controls.Add(tb_serverName, 1, 0);
+            tableLayoutPanel5.Controls.Add(tb_hostName, 0, 0);
+            tableLayoutPanel5.Dock = DockStyle.Fill;
+            tableLayoutPanel5.Location = new Point(3, 19);
+            tableLayoutPanel5.Name = "tableLayoutPanel5";
+            tableLayoutPanel5.RowCount = 2;
+            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel5.Size = new Size(431, 82);
+            tableLayoutPanel5.TabIndex = 0;
+            // 
+            // tb_serverMessage
+            // 
+            tableLayoutPanel5.SetColumnSpan(tb_serverMessage, 3);
+            tb_serverMessage.Dock = DockStyle.Fill;
+            tb_serverMessage.Location = new Point(3, 31);
+            tb_serverMessage.MaxLength = 85;
+            tb_serverMessage.Multiline = true;
+            tb_serverMessage.Name = "tb_serverMessage";
+            tb_serverMessage.PlaceholderText = "Server Welcome Message";
+            tb_serverMessage.Size = new Size(425, 48);
+            tb_serverMessage.TabIndex = 14;
+            // 
+            // serverCountryCode
+            // 
+            serverCountryCode.Dock = DockStyle.Fill;
+            serverCountryCode.Font = new Font("Segoe UI", 8F);
+            serverCountryCode.Location = new Point(361, 3);
+            serverCountryCode.MaxLength = 2;
+            serverCountryCode.Name = "serverCountryCode";
+            serverCountryCode.PlaceholderText = "US";
+            serverCountryCode.Size = new Size(67, 22);
+            serverCountryCode.TabIndex = 13;
+            serverCountryCode.TextAlign = HorizontalAlignment.Center;
+            // 
+            // tb_serverName
+            // 
+            tb_serverName.Dock = DockStyle.Fill;
+            tb_serverName.Location = new Point(182, 3);
+            tb_serverName.MaxLength = 26;
+            tb_serverName.Name = "tb_serverName";
+            tb_serverName.PlaceholderText = "Lobby Name";
+            tb_serverName.Size = new Size(173, 23);
+            tb_serverName.TabIndex = 3;
+            tb_serverName.TextAlign = HorizontalAlignment.Center;
+            // 
+            // tb_hostName
+            // 
+            tb_hostName.Dock = DockStyle.Fill;
+            tb_hostName.Location = new Point(3, 3);
+            tb_hostName.MaxLength = 15;
+            tb_hostName.Name = "tb_hostName";
+            tb_hostName.PlaceholderText = "Host Name";
+            tb_hostName.Size = new Size(173, 23);
+            tb_hostName.TabIndex = 2;
+            tb_hostName.TextAlign = HorizontalAlignment.Center;
             // 
             // tabProfilePage2
             // 
@@ -134,6 +442,105 @@
             tabProfilePage2.TabIndex = 1;
             tabProfilePage2.Text = "Start Modifiers";
             tabProfilePage2.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(tableLayoutPanel3);
+            groupBox1.Dock = DockStyle.Fill;
+            groupBox1.Location = new Point(0, 58);
+            groupBox1.Margin = new Padding(0);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(443, 58);
+            groupBox1.TabIndex = 5;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Custom Mod File Path";
+            // 
+            // tableLayoutPanel3
+            // 
+            tableLayoutPanel3.ColumnCount = 2;
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22F));
+            tableLayoutPanel3.Controls.Add(tb_modFile, 0, 0);
+            tableLayoutPanel3.Controls.Add(btn_profileBrowse2, 1, 0);
+            tableLayoutPanel3.Dock = DockStyle.Fill;
+            tableLayoutPanel3.Location = new Point(3, 19);
+            tableLayoutPanel3.Margin = new Padding(0);
+            tableLayoutPanel3.Name = "tableLayoutPanel3";
+            tableLayoutPanel3.RowCount = 1;
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel3.Size = new Size(437, 36);
+            tableLayoutPanel3.TabIndex = 0;
+            // 
+            // tb_modFile
+            // 
+            tb_modFile.Dock = DockStyle.Fill;
+            tb_modFile.Enabled = false;
+            tb_modFile.Location = new Point(3, 3);
+            tb_modFile.Multiline = true;
+            tb_modFile.Name = "tb_modFile";
+            tb_modFile.Size = new Size(334, 30);
+            tb_modFile.TabIndex = 6;
+            // 
+            // btn_profileBrowse2
+            // 
+            btn_profileBrowse2.Dock = DockStyle.Fill;
+            btn_profileBrowse2.Enabled = false;
+            btn_profileBrowse2.FlatStyle = FlatStyle.Flat;
+            btn_profileBrowse2.Location = new Point(343, 3);
+            btn_profileBrowse2.Name = "btn_profileBrowse2";
+            btn_profileBrowse2.Size = new Size(91, 30);
+            btn_profileBrowse2.TabIndex = 5;
+            btn_profileBrowse2.Text = "Browse";
+            btn_profileBrowse2.UseVisualStyleBackColor = true;
+            btn_profileBrowse2.Click += actionClick_profileOpenFileDialog;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(tableLayoutPanel2);
+            groupBox2.Dock = DockStyle.Top;
+            groupBox2.Location = new Point(0, 0);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(443, 58);
+            groupBox2.TabIndex = 1;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Game Server Path";
+            // 
+            // tableLayoutPanel2
+            // 
+            tableLayoutPanel2.ColumnCount = 2;
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22F));
+            tableLayoutPanel2.Controls.Add(btn_profileBrowse1, 1, 0);
+            tableLayoutPanel2.Controls.Add(tb_profileServerPath, 0, 0);
+            tableLayoutPanel2.Dock = DockStyle.Fill;
+            tableLayoutPanel2.Location = new Point(3, 19);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 1;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel2.Size = new Size(437, 36);
+            tableLayoutPanel2.TabIndex = 0;
+            // 
+            // btn_profileBrowse1
+            // 
+            btn_profileBrowse1.Dock = DockStyle.Fill;
+            btn_profileBrowse1.FlatStyle = FlatStyle.Flat;
+            btn_profileBrowse1.Location = new Point(343, 3);
+            btn_profileBrowse1.Name = "btn_profileBrowse1";
+            btn_profileBrowse1.Size = new Size(91, 30);
+            btn_profileBrowse1.TabIndex = 2;
+            btn_profileBrowse1.Text = "Browse";
+            btn_profileBrowse1.UseVisualStyleBackColor = true;
+            btn_profileBrowse1.Click += actionClick_profileOpenFolderDialog;
+            // 
+            // tb_profileServerPath
+            // 
+            tb_profileServerPath.Dock = DockStyle.Fill;
+            tb_profileServerPath.Enabled = false;
+            tb_profileServerPath.Location = new Point(3, 3);
+            tb_profileServerPath.Multiline = true;
+            tb_profileServerPath.Name = "tb_profileServerPath";
+            tb_profileServerPath.Size = new Size(334, 30);
+            tb_profileServerPath.TabIndex = 0;
             // 
             // groupBox3
             // 
@@ -470,105 +877,6 @@
             profileServerAttribute21.Text = "/LOADBAR";
             profileServerAttribute21.UseVisualStyleBackColor = true;
             // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(tableLayoutPanel2);
-            groupBox2.Dock = DockStyle.Top;
-            groupBox2.Location = new Point(0, 0);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(443, 58);
-            groupBox2.TabIndex = 1;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Game Server Path";
-            // 
-            // tableLayoutPanel2
-            // 
-            tableLayoutPanel2.ColumnCount = 2;
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78F));
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22F));
-            tableLayoutPanel2.Controls.Add(btn_profileBrowse1, 1, 0);
-            tableLayoutPanel2.Controls.Add(tb_profileServerPath, 0, 0);
-            tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(3, 19);
-            tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 1;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(437, 36);
-            tableLayoutPanel2.TabIndex = 0;
-            // 
-            // btn_profileBrowse1
-            // 
-            btn_profileBrowse1.Dock = DockStyle.Fill;
-            btn_profileBrowse1.FlatStyle = FlatStyle.Flat;
-            btn_profileBrowse1.Location = new Point(343, 3);
-            btn_profileBrowse1.Name = "btn_profileBrowse1";
-            btn_profileBrowse1.Size = new Size(91, 30);
-            btn_profileBrowse1.TabIndex = 2;
-            btn_profileBrowse1.Text = "Browse";
-            btn_profileBrowse1.UseVisualStyleBackColor = true;
-            btn_profileBrowse1.Click += actionClick_profileOpenFolderDialog;
-            // 
-            // tb_profileServerPath
-            // 
-            tb_profileServerPath.Dock = DockStyle.Fill;
-            tb_profileServerPath.Enabled = false;
-            tb_profileServerPath.Location = new Point(3, 3);
-            tb_profileServerPath.Multiline = true;
-            tb_profileServerPath.Name = "tb_profileServerPath";
-            tb_profileServerPath.Size = new Size(334, 30);
-            tb_profileServerPath.TabIndex = 0;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(tableLayoutPanel3);
-            groupBox1.Dock = DockStyle.Fill;
-            groupBox1.Location = new Point(0, 58);
-            groupBox1.Margin = new Padding(0);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(443, 58);
-            groupBox1.TabIndex = 5;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Custom Mod File Path";
-            // 
-            // tableLayoutPanel3
-            // 
-            tableLayoutPanel3.ColumnCount = 2;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22F));
-            tableLayoutPanel3.Controls.Add(tb_modFile, 0, 0);
-            tableLayoutPanel3.Controls.Add(btn_profileBrowse2, 1, 0);
-            tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(3, 19);
-            tableLayoutPanel3.Margin = new Padding(0);
-            tableLayoutPanel3.Name = "tableLayoutPanel3";
-            tableLayoutPanel3.RowCount = 1;
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Size = new Size(437, 36);
-            tableLayoutPanel3.TabIndex = 0;
-            // 
-            // tb_modFile
-            // 
-            tb_modFile.Dock = DockStyle.Fill;
-            tb_modFile.Enabled = false;
-            tb_modFile.Location = new Point(3, 3);
-            tb_modFile.Multiline = true;
-            tb_modFile.Name = "tb_modFile";
-            tb_modFile.Size = new Size(334, 30);
-            tb_modFile.TabIndex = 6;
-            // 
-            // btn_profileBrowse2
-            // 
-            btn_profileBrowse2.Dock = DockStyle.Fill;
-            btn_profileBrowse2.Enabled = false;
-            btn_profileBrowse2.FlatStyle = FlatStyle.Flat;
-            btn_profileBrowse2.Location = new Point(343, 3);
-            btn_profileBrowse2.Name = "btn_profileBrowse2";
-            btn_profileBrowse2.Size = new Size(91, 30);
-            btn_profileBrowse2.TabIndex = 5;
-            btn_profileBrowse2.Text = "Browse";
-            btn_profileBrowse2.UseVisualStyleBackColor = true;
-            btn_profileBrowse2.Click += actionClick_profileOpenFileDialog;
-            // 
             // panel1
             // 
             panel1.Controls.Add(groupBox5);
@@ -657,16 +965,29 @@
             Size = new Size(902, 362);
             tableLayoutPanel1.ResumeLayout(false);
             profileFileManagers.ResumeLayout(false);
+            tabProfilePage1.ResumeLayout(false);
+            groupBox8.ResumeLayout(false);
+            tableLayoutPanel7.ResumeLayout(false);
+            tableLayoutPanel7.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)num_maxPing).EndInit();
+            ((System.ComponentModel.ISupportInitialize)num_minPing).EndInit();
+            groupBox7.ResumeLayout(false);
+            tableLayoutPanel6.ResumeLayout(false);
+            tableLayoutPanel6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)num_serverPort).EndInit();
+            groupBox6.ResumeLayout(false);
+            tableLayoutPanel5.ResumeLayout(false);
+            tableLayoutPanel5.PerformLayout();
             tabProfilePage2.ResumeLayout(false);
-            groupBox3.ResumeLayout(false);
-            tableAtributes.ResumeLayout(false);
-            tableAtributes.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            tableLayoutPanel2.ResumeLayout(false);
-            tableLayoutPanel2.PerformLayout();
             groupBox1.ResumeLayout(false);
             tableLayoutPanel3.ResumeLayout(false);
             tableLayoutPanel3.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            tableLayoutPanel2.ResumeLayout(false);
+            tableLayoutPanel2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            tableAtributes.ResumeLayout(false);
+            tableAtributes.PerformLayout();
             panel1.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
@@ -718,5 +1039,26 @@
         private GroupBox groupBox4;
         private TableLayoutPanel tableLayoutPanel4;
         private GroupBox groupBox5;
+        private GroupBox groupBox8;
+        private GroupBox groupBox7;
+        private GroupBox groupBox6;
+        private TableLayoutPanel tableLayoutPanel5;
+        public TextBox tb_hostName;
+        public TextBox tb_serverName;
+        public TextBox serverCountryCode;
+        public TextBox tb_serverMessage;
+        private TableLayoutPanel tableLayoutPanel6;
+        public NumericUpDown num_serverPort;
+        public ComboBox cb_serverIP;
+        private Label label1;
+        private Label label3;
+        public TextBox tb_serverPassword;
+        public CheckBox cb_requireNova;
+        public CheckBox cb_serverDedicated;
+        private TableLayoutPanel tableLayoutPanel7;
+        public NumericUpDown num_maxPing;
+        public CheckBox cb_enableMinCheck;
+        public CheckBox cb_enableMaxCheck;
+        public NumericUpDown num_minPing;
     }
 }

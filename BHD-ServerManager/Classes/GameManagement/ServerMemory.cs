@@ -241,7 +241,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int FlagReturnTime = BitConverter.ToInt32(FlagReturnTimeBytes, 0);
 
             int FlagReturnTimeWritten = 0;
-            byte[] FlagReturnTimeWrite = BitConverter.GetBytes(thisInstance.gameFlagReturnTime * 60);
+            byte[] FlagReturnTimeWrite = BitConverter.GetBytes(thisInstance.gameFlagReturnTime);
             WriteProcessMemory((int)processHandle, Ptr1Addr, FlagReturnTimeWrite, FlagReturnTimeWrite.Length, ref FlagReturnTimeWritten);
 
 

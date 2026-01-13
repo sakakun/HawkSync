@@ -31,7 +31,6 @@ namespace BHD_ServerManager.Forms.Panels
         public tabProfile()
         {
             InitializeComponent();
-
         }
 
         // --- Form Functions ---
@@ -138,12 +137,38 @@ namespace BHD_ServerManager.Forms.Panels
     
         public void methodFunction_loadSettings()
         {
-            // Textbox Fields
+            // File Path Textbox Fields
             tb_profileServerPath.Text = theInstance!.profileServerPath = ServerSettings.Get("profileServerPath", string.Empty);
             tb_modFile.Text = theInstance.profileModFileName = ServerSettings.Get("profileModFileName", string.Empty);
 
+            // Host Information
+            tb_hostName.Text = theInstance.gameHostName = ServerSettings.Get("gameHostName", string.Empty);
+            tb_serverName.Text = theInstance.gameServerName = ServerSettings.Get("gameServerName", string.Empty);
+            tb_serverMessage.Text = theInstance.gameMOTD = ServerSettings.Get("gameMOTD", string.Empty);
+
+            // Server Details
+            theInstance!.profileBindIP = ServerSettings.Get("profileBindIP", "0.0.0.0");
+            if (!string.IsNullOrEmpty(theInstance!.profileBindIP) && cb_serverIP.Items.Contains(theInstance.profileBindIP))
+            {
+                cb_serverIP.SelectedItem = theInstance.profileBindIP; // Select the item in cb_serverIP that matches the value of newInstance.profileBindIP,
+            }
+            else
+            {
+                cb_serverIP.SelectedIndex = 0; // or default to the first item (assumed "0.0.0.0") if not found
+            }
+            num_serverPort.Value = theInstance.profileBindPort = (int) ServerSettings.Get("profileBindPort", (decimal) 17479);
+            tb_serverPassword.Text = theInstance.gamePasswordLobby = ServerSettings.Get("gamePasswordLobby", string.Empty);
+            cb_serverDedicated.Checked = theInstance.gameDedicated = ServerSettings.Get("gameDedicated", true);
+            cb_requireNova.Checked = theInstance.gameRequireNova = ServerSettings.Get("gameRequireNova", false);
+
+            // Ping Checking
+            cb_enableMinCheck.Checked = theInstance.gameMinPing = ServerSettings.Get("gameMinPing", false);
+            cb_enableMaxCheck.Checked = theInstance.gameMaxPing = ServerSettings.Get("gameMaxPing", false);
+            num_minPing.Value = theInstance.gameMinPingValue = (int) ServerSettings.Get("gameMinPingValue", (decimal) 0);
+            num_maxPing.Value = theInstance.gameMaxPingValue = (int) ServerSettings.Get("gameMaxPingValue", (decimal) 999);
+
 			// Application Commandline Arguments
-            profileServerAttribute01.Checked = theInstance!.profileServerAttribute01 = ServerSettings.Get("profileServerAttribute01", false);
+			profileServerAttribute01.Checked = theInstance!.profileServerAttribute01 = ServerSettings.Get("profileServerAttribute01", false);
             profileServerAttribute02.Checked = theInstance!.profileServerAttribute02 = ServerSettings.Get("profileServerAttribute02", false);
             profileServerAttribute03.Checked = theInstance!.profileServerAttribute03 = ServerSettings.Get("profileServerAttribute03", false);
             profileServerAttribute04.Checked = theInstance!.profileServerAttribute04 = ServerSettings.Get("profileServerAttribute04", false);
@@ -165,7 +190,6 @@ namespace BHD_ServerManager.Forms.Panels
             profileServerAttribute20.Checked = theInstance!.profileServerAttribute20 = ServerSettings.Get("profileServerAttribute20", false);
             profileServerAttribute21.Checked = theInstance!.profileServerAttribute21 = ServerSettings.Get("profileServerAttribute21", true);
 
-
 		}
 
         public void methodFunction_saveSetting()
@@ -173,6 +197,27 @@ namespace BHD_ServerManager.Forms.Panels
 			// Textbox Fields
             ServerSettings.Set("profileServerPath", theInstance!.profileServerPath = tb_profileServerPath.Text);
             ServerSettings.Set("profileModFileName", theInstance.profileModFileName = tb_modFile.Text);
+
+            // Host Information
+            ServerSettings.Set("gameHostName", theInstance.gameHostName = tb_hostName.Text);
+            ServerSettings.Set("gameServerName", theInstance.gameServerName = tb_serverName.Text);
+            ServerSettings.Set("gameMOTD", theInstance.gameMOTD = tb_serverMessage.Text);
+
+			// Server Details
+            ServerSettings.Set("profileBindIP", theInstance!.profileBindIP = cb_serverIP.SelectedItem!.ToString()!);
+            theInstance!.profileBindPort = (int) num_serverPort.Value;
+            ServerSettings.Set("profileBindPort", (decimal)theInstance!.profileBindPort);
+            ServerSettings.Set("gamePasswordLobby", theInstance.gamePasswordLobby = tb_serverPassword.Text);
+            ServerSettings.Set("gameDedicated", theInstance.gameDedicated = cb_serverDedicated.Checked);
+            ServerSettings.Set("gameRequireNova", theInstance.gameRequireNova = cb_requireNova.Checked);
+
+			// Ping Checking
+            ServerSettings.Set("gameMinPing", theInstance.gameMinPing = cb_enableMinCheck.Checked);
+            ServerSettings.Set("gameMaxPing", theInstance.gameMaxPing = cb_enableMaxCheck.Checked);
+            theInstance.gameMinPingValue = (int) num_minPing.Value;
+            theInstance.gameMaxPingValue = (int) num_maxPing.Value;
+            ServerSettings.Set("gameMinPingValue", (decimal)theInstance.gameMinPingValue);
+            ServerSettings.Set("gameMaxPingValue", (decimal)theInstance.gameMaxPingValue);
 
 			// Commandlin Switches
 			ServerSettings.Set("profileServerAttribute01", theInstance!.profileServerAttribute01 = profileServerAttribute01.Checked);

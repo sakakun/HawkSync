@@ -71,7 +71,6 @@ namespace BHD_ServerManager.Classes.Instances
         public string gamePasswordLobby { get; set; } = "";
         public string gamePasswordBlue { get; set; } = "";
         public string gamePasswordRed { get; set; } = "";
-        public int gameSessionType { get; set; } = 0;   /* Session Type (Internet/LAN) - Currently not working. */
         public int gameMaxSlots { get; set; } = 50;  /* Max Players 50 */
         public int gameLoopMaps { get; set; } = 1;   /* 0 = Play One Map, 1 = Loop Maps, 2 = Cycle Maps */
         public bool gameRequireNova { get; set; } = false;

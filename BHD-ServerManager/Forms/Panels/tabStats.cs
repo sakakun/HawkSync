@@ -31,6 +31,7 @@ namespace BHD_ServerManager.Forms.Panels
             var newInstance = updatedInstance != null ? updatedInstance : theInstance;
 
             // Stats Settings
+            tb_serverID.Text = newInstance!.WebStatsProfileID;
             cb_enableWebStats.Checked = newInstance!.WebStatsEnabled;
             tb_webStatsServerPath.Text = newInstance.WebStatsServerPath;
             cb_enableAnnouncements.Checked = newInstance.WebStatsAnnouncements;
@@ -49,6 +50,7 @@ namespace BHD_ServerManager.Forms.Panels
         public void functionEvent_SaveSettings()
         {
             // Stats Settings
+            theInstance!.WebStatsProfileID = tb_serverID.Text;
             theInstance!.WebStatsEnabled = cb_enableWebStats.Checked;
             theInstance.WebStatsServerPath = tb_webStatsServerPath.Text;
             theInstance.WebStatsAnnouncements = cb_enableAnnouncements.Checked;

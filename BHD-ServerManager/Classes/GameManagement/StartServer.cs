@@ -109,7 +109,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] allowCustomSkinsBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameCustomSkins));
                 byte[] requireNovaLoginBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameRequireNova));
                 byte[] MOTDBytes = Encoding.Default.GetBytes(theInstance.gameMOTD);
-                byte[] sessionTypeBytes = BitConverter.GetBytes(theInstance.gameSessionType);
+                byte[] sessionTypeBytes = BitConverter.GetBytes(false);
                 byte[] dedicatedSlotsBytes = BitConverter.GetBytes(dedicatedSlots);
                 byte[] graphicsHeaderSettings = BitConverter.GetBytes(-1);
                 byte[] graphicsSetting_1 = BitConverter.GetBytes(8);
