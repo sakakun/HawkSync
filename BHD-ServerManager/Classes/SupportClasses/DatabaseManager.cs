@@ -1,9 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.ObjectClasses;
 using Microsoft.Data.Sqlite;
+using System;
+using System.Diagnostics;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BHD_ServerManager.Classes.SupportClasses
 {
@@ -283,7 +285,330 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
         }
 
+        /// <summary>
+        /// Load all slap messages from the database.
+        /// </summary>
+        public static List<SlapMessages> GetSlapMessages()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
 
+            var messages = new List<SlapMessages>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT slapMessageId, slapMessageText
+                FROM tb_chatSlapMessages
+                ORDER BY slapMessageText COLLATE NOCASE;
+            ";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                messages.Add(new SlapMessages
+                {
+                    SlapMessageId = reader.GetInt32(0),
+                    SlapMessageText = reader.GetString(1)
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {messages.Count} slap messages");
+            return messages;
+        }
+
+        /// <summary>
+        /// Add a new slap message to the database.
+        /// </summary>
+        public static int AddSlapMessage(string messageText)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            if (string.IsNullOrWhiteSpace(messageText))
+                throw new ArgumentException("Message text cannot be empty.", nameof(messageText));
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_chatSlapMessages (slapMessageText)
+                    VALUES ($messageText);
+                    SELECT last_insert_rowid();
+                ";
+                cmd.Parameters.AddWithValue("$messageText", messageText);
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Added slap message: {messageText} (ID: {newId})");
+                return (int)newId;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove a slap message from the database.
+        /// </summary>
+        public static bool RemoveSlapMessage(int slapMessageId)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_chatSlapMessages
+                    WHERE slapMessageId = $id;
+                ";
+                cmd.Parameters.AddWithValue("$id", slapMessageId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Removed slap message ID: {slapMessageId}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Load all auto messages from the database.
+        /// </summary>
+        public static List<AutoMessages> GetAutoMessages()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var messages = new List<AutoMessages>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT autoMessageId, autoMessageText, autoMessageTrigger
+                FROM tb_chatAutoMessages
+                ORDER BY autoMessageTrigger, autoMessageId;
+            ";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                messages.Add(new AutoMessages
+                {
+                    AutoMessageId = reader.GetInt32(0),
+                    AutoMessageText = reader.GetString(1),
+                    AutoMessageTigger = reader.GetInt32(2)
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {messages.Count} auto messages");
+            return messages;
+        }
+
+        /// <summary>
+        /// Add a new auto message to the database.
+        /// </summary>
+        public static int AddAutoMessage(string messageText, int triggerSeconds)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            if (string.IsNullOrWhiteSpace(messageText))
+                throw new ArgumentException("Message text cannot be empty.", nameof(messageText));
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_chatAutoMessages (autoMessageText, autoMessageTrigger)
+                    VALUES ($messageText, $trigger);
+                    SELECT last_insert_rowid();
+                ";
+                cmd.Parameters.AddWithValue("$messageText", messageText);
+                cmd.Parameters.AddWithValue("$trigger", triggerSeconds);
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Added auto message: {messageText} (Trigger: {triggerSeconds}s, ID: {newId})");
+                return (int)newId;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove an auto message from the database.
+        /// </summary>
+        public static bool RemoveAutoMessage(int autoMessageId)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_chatAutoMessages
+                    WHERE autoMessageId = $id;
+                ";
+                cmd.Parameters.AddWithValue("$id", autoMessageId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Removed auto message ID: {autoMessageId}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Save a chat log entry to the database.
+        /// </summary>
+        public static void SaveChatLog(ChatLogObject chatLog)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_chatLogs 
+                    (messageTimeStamp, playerName, messageType, messageType2, messageText)
+                    VALUES 
+                    ($timestamp, $playerName, $type, $type2, $text);
+                ";
+
+                cmd.Parameters.AddWithValue("$timestamp", chatLog.MessageTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$playerName", chatLog.PlayerName);
+                cmd.Parameters.AddWithValue("$type", chatLog.MessageType);
+                cmd.Parameters.AddWithValue("$type2", chatLog.MessageType2);
+                cmd.Parameters.AddWithValue("$text", chatLog.MessageText);
+
+                cmd.ExecuteNonQuery();
+                tx.Commit();
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Load chat logs from the database with optional date filtering.
+        /// </summary>
+        public static List<ChatLogObject> GetChatLogs(DateTime? startDate = null, DateTime? endDate = null, int limit = 1000)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var logs = new List<ChatLogObject>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+    
+            var query = new StringBuilder(@"
+                SELECT messageTimeStamp, playerName, messageType, messageType2, messageText
+                FROM tb_chatLogs
+            ");
+
+            var conditions = new List<string>();
+    
+            if (startDate.HasValue)
+            {
+                conditions.Add("messageTimeStamp >= $startDate");
+                cmd.Parameters.AddWithValue("$startDate", startDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+
+            if (endDate.HasValue)
+            {
+                conditions.Add("messageTimeStamp <= $endDate");
+                cmd.Parameters.AddWithValue("$endDate", endDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+
+            if (conditions.Count > 0)
+            {
+                query.Append(" WHERE ");
+                query.Append(string.Join(" AND ", conditions));
+            }
+
+            query.Append(" ORDER BY messageTimeStamp DESC");
+            query.Append(" LIMIT $limit;");
+    
+            cmd.Parameters.AddWithValue("$limit", limit);
+            cmd.CommandText = query.ToString();
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                logs.Add(new ChatLogObject
+                {
+                    MessageTimeStamp = DateTime.Parse(reader.GetString(0)),
+                    PlayerName = reader.GetString(1),
+                    MessageType = reader.GetInt32(2),
+                    MessageType2 = reader.GetInt32(3),
+                    MessageText = reader.GetString(4)
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {logs.Count} chat log entries");
+            return logs;
+        }
 
         /// <summary>
         /// Releases the exclusive lock and closes the internal connection.

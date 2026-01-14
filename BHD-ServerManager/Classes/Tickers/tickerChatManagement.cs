@@ -123,14 +123,18 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                 }
 
-                chatLog.Add(new ChatLogObject
+                ChatLogObject newChatLog = new ChatLogObject
                 {
                     PlayerName = playerName,
                     MessageText = playerMessage,
                     MessageType = msgType,
                     MessageType2 = teamNum,
                     MessageTimeStamp = DateTime.Now
-                });
+                };
+
+                chatLog.Add(newChatLog);
+
+                chatInstanceManager.SaveChatLogEntry(newChatLog);
 
                 // Update last processed message for deduplication
                 _lastProcessedPlayerName = playerName;

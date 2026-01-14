@@ -17,130 +17,137 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // Function: loadChatSettings, loads the chat settings from a JSON file. If it does not exist, it initializes empty lists and saves them.
         public static void LoadSettings()
         {
-            // Load the chat settings from the JSON file
-            // If the file does not exist, it will create an empty list and save it.
-            string chatSettingsPath = Path.Combine(CommonCore.AppDataPath, "ChatSettings.json");
-            if (!File.Exists(chatSettingsPath))
-            {
-                instanceChat.SlapMessages = new List<SlapMessages>();
-                instanceChat.AutoMessages = new List<AutoMessages>();
-                chatInstanceManager.SaveSettings();
-                return;
-            }
             try
             {
-                var json = File.ReadAllText(chatSettingsPath);
-                var settings = JsonSerializer.Deserialize<ChatSettingsObject>(json);
-                instanceChat.SlapMessages = settings?.SlapMessages ?? new List<SlapMessages>();
-                instanceChat.AutoMessages = settings?.AutoMessages ?? new List<AutoMessages>();
+                instanceChat.SlapMessages = DatabaseManager.GetSlapMessages();
+                instanceChat.AutoMessages = DatabaseManager.GetAutoMessages();
+
+                AppDebug.Log("ChatManager", $"Loaded {instanceChat.SlapMessages.Count} slap messages and {instanceChat.AutoMessages.Count} auto messages from database");
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
-                AppDebug.Log("ChatManager", $"Error reading chat settings file: {ex.Message}");
+                AppDebug.Log("ChatManager", $"Error loading chat settings from database: {ex.Message}");
+                
+                instanceChat.SlapMessages = new List<SlapMessages>();
+                instanceChat.AutoMessages = new List<AutoMessages>();
             }
         }
 
-        // Function: saveChatSettings, saves the current chat settings to a JSON file.
-        public static void SaveSettings()
-        {
-            string chatSettingsPath = Path.Combine(CommonCore.AppDataPath, "ChatSettings.json");
-            var chatSettings = new ChatSettingsObject
-            {
-                SlapMessages = instanceChat.SlapMessages,
-                AutoMessages = instanceChat.AutoMessages
-            };
-            try
-            {
-                var json = JsonSerializer.Serialize(chatSettings, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(chatSettingsPath, json);
-            }
-            catch (IOException ex)
-            {
-                AppDebug.Log("ChatManager", $"Error writing chat settings file: {ex.Message}");
-            }
-        }
         // Function: AddSlapMessage, adds a new slap message to the list, sorts the list, updates IDs, and saves the settings.
         public static void AddSlapMessage(string messageText)
         {
-            var newSlapMessage = new SlapMessages
+            if (string.IsNullOrWhiteSpace(messageText))
             {
-                SlapMessageText = messageText
-            };
-
-            instanceChat.SlapMessages.Add(newSlapMessage);
-
-            instanceChat.SlapMessages = instanceChat.SlapMessages
-                .OrderBy(sm => sm.SlapMessageText, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            for (int i = 0; i < instanceChat.SlapMessages.Count; i++)
-            {
-                instanceChat.SlapMessages[i].SlapMessageId = i + 1;
+                AppDebug.Log("ChatManager", "Cannot add empty slap message");
+                return;
             }
 
-            chatInstanceManager.SaveSettings();
+            try
+            {
+                DatabaseManager.AddSlapMessage(messageText);
+                instanceChat.SlapMessages = DatabaseManager.GetSlapMessages();
+                AppDebug.Log("ChatManager", $"Added slap message: {messageText}");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("ChatManager", $"Error adding slap message: {ex.Message}");
+                throw;
+            }
         }
+
         public static void RemoveSlapMessage(int id)
         {
-            var slapMessage = instanceChat.SlapMessages.FirstOrDefault(sm => sm.SlapMessageId == id);
-            if (slapMessage != null)
+            try
             {
-                instanceChat.SlapMessages.Remove(slapMessage);
-
-                for (int i = 0; i < instanceChat.SlapMessages.Count; i++)
+                bool removed = DatabaseManager.RemoveSlapMessage(id);
+                
+                if (removed)
                 {
-                    instanceChat.SlapMessages[i].SlapMessageId = i + 1;
+                    instanceChat.SlapMessages = DatabaseManager.GetSlapMessages();
+                    AppDebug.Log("ChatManager", $"Removed slap message ID: {id}");
                 }
-                chatInstanceManager.SaveSettings();
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("ChatManager", $"Error removing slap message: {ex.Message}");
+                throw;
             }
         }
-        public static void AddAutoMessage(string messageText, int tiggerSeconds)
+
+        public static void AddAutoMessage(string messageText, int triggerSeconds)
         {
-            var newAutoMessage = new AutoMessages
+            if (string.IsNullOrWhiteSpace(messageText))
             {
-                AutoMessageText = messageText,
-                AutoMessageTigger = tiggerSeconds
-            };
-
-            instanceChat.AutoMessages.Add(newAutoMessage);
-
-            instanceChat.AutoMessages = instanceChat.AutoMessages
-                .OrderBy(am => am.AutoMessageTigger)
-                .ToList();
-
-            for (int i = 0; i < instanceChat.AutoMessages.Count; i++)
-            {
-                instanceChat.AutoMessages[i].AutoMessageId = i + 1;
+                AppDebug.Log("ChatManager", "Cannot add empty auto message");
+                return;
             }
 
-            chatInstanceManager.SaveSettings();
+            try
+            {
+                DatabaseManager.AddAutoMessage(messageText, triggerSeconds);
+                instanceChat.AutoMessages = DatabaseManager.GetAutoMessages();
+                AppDebug.Log("ChatManager", $"Added auto message: {messageText} (Trigger: {triggerSeconds}s)");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("ChatManager", $"Error adding auto message: {ex.Message}");
+                throw;
+            }
         }
+
         public static void RemoveAutoMessage(int id)
         {
-            var autoMessage = instanceChat.AutoMessages.FirstOrDefault(am => am.AutoMessageId == id);
-            if (autoMessage != null)
+            try
             {
-                instanceChat.AutoMessages.Remove(autoMessage);
-
-                for (int i = 0; i < instanceChat.AutoMessages.Count; i++)
+                bool removed = DatabaseManager.RemoveAutoMessage(id);
+                
+                if (removed)
                 {
-                    instanceChat.AutoMessages[i].AutoMessageId = i + 1;
+                    instanceChat.AutoMessages = DatabaseManager.GetAutoMessages();
+                    AppDebug.Log("ChatManager", $"Removed auto message ID: {id}");
                 }
-                chatInstanceManager.SaveSettings();
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("ChatManager", $"Error removing auto message: {ex.Message}");
+                throw;
             }
         }
 
+        /// <summary>
+        /// Save a chat log entry to the database.
+        /// </summary>
+        public static void SaveChatLogEntry(ChatLogObject chatLog)
+        {
+            try
+            {
+                DatabaseManager.SaveChatLog(chatLog);
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("ChatManager", $"Error saving chat log entry: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get slap messages (read-only).
+        /// </summary>
         public static IReadOnlyList<SlapMessages> GetSlapMessages()
         {
             return instanceChat.SlapMessages.AsReadOnly();
         }
+
+        /// <summary>
+        /// Get auto messages (read-only).
+        /// </summary>
         public static IReadOnlyList<AutoMessages> GetAutoMessages()
         {
             return instanceChat.AutoMessages.AsReadOnly();
         }
+
         public static void UpdateChatMessagesGrid()
         {
-            // To Do: Remove
+            // No-op: Kept for backward compatibility
         }
 
     }

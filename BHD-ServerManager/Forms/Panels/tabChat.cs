@@ -162,12 +162,16 @@ namespace BHD_ServerManager.Forms.Panels
             chatInstanceManager.RemoveSlapMessage(slapMessageId);
             fuctionEvent_UpdateSlapMessages();
         }
-        private void actionKeyPressed_AddAutoMessage(object sender, KeyPressEventArgs e)
+        private void actionKeyPress_AddAutoMessage(object sender, KeyPressEventArgs e)
         {
-            chatInstanceManager.AddAutoMessage(tb_autoMessage.Text.Trim(), (int)num_AutoMessageTrigger.Value);
-            functionEvent_UpdateAutoMessages();
-            tb_autoMessage.Text = string.Empty;
-            num_AutoMessageTrigger.Value = 0;
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                chatInstanceManager.AddAutoMessage(tb_autoMessage.Text.Trim(), (int)num_AutoMessageTrigger.Value);
+                functionEvent_UpdateAutoMessages();
+                tb_autoMessage.Text = string.Empty;
+                num_AutoMessageTrigger.Value = 0;
+            }
+
         }
         private void actionClick_RemoveAutoMessage(object sender, DataGridViewCellEventArgs e)
         {

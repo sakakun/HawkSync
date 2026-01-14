@@ -83,6 +83,7 @@
             chat_TabControl.SelectedIndex = 0;
             chat_TabControl.Size = new Size(966, 422);
             chat_TabControl.TabIndex = 0;
+            chat_TabControl.KeyPress += actionKeyPress_AddAutoMessage;
             // 
             // tabChatMessages
             // 
@@ -285,7 +286,7 @@
             tb_autoMessage.Name = "tb_autoMessage";
             tb_autoMessage.Size = new Size(804, 23);
             tb_autoMessage.TabIndex = 4;
-            tb_autoMessage.KeyPress += actionKeyPressed_AddAutoMessage;
+            tb_autoMessage.KeyPress += actionKeyPress_AddAutoMessage;
             // 
             // num_AutoMessageTrigger
             // 
@@ -351,7 +352,7 @@
             dg_slapMessages.RowHeadersVisible = false;
             dg_slapMessages.Size = new Size(929, 384);
             dg_slapMessages.TabIndex = 1;
-            dg_slapMessages.CellContentDoubleClick += actionClick_RemoveSlap;
+            dg_slapMessages.CellDoubleClick += actionClick_RemoveSlap;
             // 
             // slapMessageID
             // 
