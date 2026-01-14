@@ -32,6 +32,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             InitializeComponent();
             functionEvent_InitializeWeaponCheckboxes();             // Initialize Weapon checkboxes
+            methodFunction_loadSettings();
         }
         // --- Form Functions ---
         // --- Get Server Settings --- Allow to be triggered externally
@@ -185,7 +186,6 @@ namespace BHD_ServerManager.Forms.Panels
             ServerSettings.Set("checkBox_selectNone", checkBox_selectNone.Checked);
 
         }
-        // --- Save Server Settings --- Allow to be triggered externally
         
         // --- Weapon Checkbox Logic ---
         private void functionEvent_InitializeWeaponCheckboxes()
@@ -219,8 +219,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 // Set the first load complete flag to true
                 _firstLoadComplete = true;
-                // Get the server settings on first load
-                methodFunction_loadSettings();
+                
             }
             // Do stuff here that needs to be done every tick
             functionEvent_UpdateServerControls();                              // Update the Server Control Button State
