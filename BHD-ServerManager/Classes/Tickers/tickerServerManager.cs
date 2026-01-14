@@ -66,7 +66,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
                 thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
                 thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
-                thisServer.BanTab.BanTickerHook();                                              // Update Bans Tab
                 thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
             });
 

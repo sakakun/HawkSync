@@ -36,9 +36,9 @@ namespace BHD_ServerManager.Forms
             functionEvent_loadPanels();                                         // Load the User Control Tabs
 
 			// Old Server Settings Initialization
-            banInstanceManager.LoadSettings();
             chatInstanceManager.LoadSettings();
-            theInstanceManager.InitializeTickers();
+            banInstanceManager.LoadSettings();
+			theInstanceManager.InitializeTickers();
             theInstanceManager.GetServerVariables();
 
 			// New Server Settings Initialization

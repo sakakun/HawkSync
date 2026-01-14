@@ -164,21 +164,21 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
             banByName.Click += (sender, e) =>
             {
-                banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!);
+                // banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!);
                 MessageBox.Show($"Player {Player.PlayerName} has been banned by name.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Ban by name command clicked for player {Player.PlayerName}.");
             };
             banByIP.Click += (sender, e) =>
             {
                 var ipAddress = IPAddress.Parse(Player.PlayerIPAddress!);
-                banInstanceManager.AddBannedPlayer(null!, ipAddress, 32);
+                // banInstanceManager.AddBannedPlayer(null!, ipAddress, 32);
                 MessageBox.Show($"Player {Player.PlayerName} has been banned by IP.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Ban by IP command clicked for player {Player.PlayerName}.");
             };
             banByNameAndIP.Click += (sender, e) =>
             {
                 var playerAddress = IPAddress.Parse(Player.PlayerIPAddress!);
-                banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!, playerAddress, 32);
+                // banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!, playerAddress, 32);
                 MessageBox.Show($"Player {Player.PlayerName} has been banned.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Debug.WriteLine($"Ban command clicked for player {Player.PlayerName}.");
             };
