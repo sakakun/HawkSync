@@ -477,7 +477,8 @@ namespace BHD_ServerManager.Classes.GameManagement
             catch (Exception e)
             {
                 AppDebug.Log("StartServer", "Error starting game: " + e.ToString());
-                return false;
+                MessageBox.Show("Error starting game: " + e.Message, "Start Game Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return false;
             }
 
             // Game Didn't Crash Yay!  Dump Data to the Instance

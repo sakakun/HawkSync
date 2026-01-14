@@ -4,17 +4,8 @@ using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Windows.Shapes;
-using System.Xaml.Schema;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -34,40 +25,186 @@ namespace BHD_ServerManager.Forms.Panels
         }
         // --- Functions ---
         // --- Populate Available Maps ---
-        public void functionEvent_PopulateAvailableMapData()
+        public void methodFunction_loadSourceMaps()
         {
-            // Clear the DataGridView
+            // Load Default Maps from Database
+            List<mapFileInfo> defaultMaps = DatabaseManager.GetDefaultMaps();
+
+            // Clear Current Available Maps
             dataGridView_availableMaps.Rows.Clear();
 
-            // Populate the DataGridView with available maps
-            foreach (var map in instanceMaps!.availableMaps)
+            // Alway load modType 0
+            foreach (mapFileInfo map in defaultMaps)
             {
-                // Button Cell for removing maps from the playlist and deleting the file.
-                DataGridViewButtonCell buttonCell = new DataGridViewButtonCell
+                // If it is a default map, list it no matter what.
+                if (map.ModType == 0)
                 {
-                    Value = map.MapFile,
-                    FlatStyle = FlatStyle.Flat,                   
-                    Style = new DataGridViewCellStyle
-                    {
-                        BackColor = SystemColors.Window,
-                        ForeColor = Color.Red,
-                        SelectionBackColor = Color.Red,
-                        SelectionForeColor = SystemColors.Window
-                    },
-                    UseColumnTextForButtonValue = true
-                };
+                    int rowIndex = dataGridView_availableMaps.Rows.Add(
+                        map.MapID,
+                        map.MapName,
+                        map.MapFile,
+                        map.ModType,
+                        map.MapType,
+                        objectGameTypes.GetShortName(map.MapType)
+                    );
+                    DataGridViewRow row = dataGridView_availableMaps.Rows[rowIndex];
 
-                int rowIndex = dataGridView_availableMaps.Rows.Add();
-                DataGridViewRow row = dataGridView_availableMaps.Rows[rowIndex];
+                    string toolTip = $"Map File: {map.MapFile}";
 
-                row.Cells["avail_MapID"].Value = map.MapID;
-                row.Cells["avail_MapFileName"].Value = map.MapFile;
-                row.Cells["avail_MapName"].Value = map.MapName;
-                row.Cells["avail_MapType"].Value = map.MapType;
-                row.Cells["avail_MapTypeShort"].Value = objectGameTypes.GetShortName(map.MapType);
+                    row.Cells[1].ToolTipText = toolTip;
+
+                }
             }
 
+            // Load Custom Maps
+            methodFunction_loadCustomMapps();
+
         }
+
+        private void methodFunction_loadCustomMapps()
+        {
+            // Get Current serverGamePath
+            string gamePath = theInstance!.profileServerPath;
+
+            DirectoryInfo d = new DirectoryInfo(gamePath);
+            List<string> badMapsList = new List<string>();
+
+            foreach (var file in d.GetFiles("*.bms"))
+            {
+                using (FileStream fsSourceDDS = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
+                using (BinaryReader binaryReader = new BinaryReader(fsSourceDDS))
+                {
+                    string first_line = string.Empty;
+                    string mapName = string.Empty;
+                    try
+                    {
+                        first_line = File.ReadLines(System.IO.Path.Combine(gamePath, file.Name), Encoding.Default).First().ToString();
+                    }
+                    catch (Exception e)
+                    {
+                        AppDebug.Log("tabMaps", "theMaps: methodFunction_loadCustomMapps: Skipping Map File: " + e.Message);
+                        continue;
+                    }
+
+                    first_line = first_line.Replace("", "|").Replace("\0\0\0", "|");
+                    string[] first_line_arr = first_line.Split("|".ToCharArray());
+                    var first_line_list = new List<string>();
+                    foreach (string f in first_line_arr)
+                    {
+                        string tmp = f.Trim().Replace("\0", "".ToString());
+                        if (!string.IsNullOrEmpty(tmp))
+                            first_line_list.Add(tmp);
+                    }
+                    try
+                    {
+                        mapName = first_line_list[1];
+                    }
+                    catch
+                    {
+                        badMapsList.Add(file.Name);
+                        continue;
+                    }
+                    string mapFile = file.Name;
+
+                    // Read BitmapBytes sum at 0x8A
+                    fsSourceDDS.Seek(0x8A, SeekOrigin.Begin);
+                    var bitmapBytesSum = binaryReader.ReadInt16();
+
+                    // Read Bitmap sum at 0x8B
+                    fsSourceDDS.Seek(0x8B, SeekOrigin.Begin);
+                    var bitmapSum = binaryReader.ReadInt16();
+
+                    // Get all possible BitmapBytes and Bitmap values (excluding 0)
+                    var bitmapBytesNumbers = objectGameTypes.All.Select(gt => gt.BitmapBytes).Where(b => b > 0).OrderByDescending(b => b).ToList();
+                    var bitmapNumbers = objectGameTypes.All.Select(gt => gt.Bitmap).Where(b => b > 0).OrderByDescending(b => b).ToList();
+
+                    // Find all game types for this map
+                    var gameTypeBits = new List<int>();
+                    CalculateGameTypeBits(bitmapBytesNumbers, bitmapBytesSum, gameTypeBits);
+                    if (gameTypeBits.Count == 0)
+                    {
+                        CalculateGameTypeBits(bitmapNumbers, bitmapSum, gameTypeBits);
+                    }
+
+                    // If still nothing, check for special case (Attack and Defend)
+                    if (gameTypeBits.Count == 0 && (bitmapBytesSum == 128 || bitmapSum == 0))
+                    {
+                        gameTypeBits.Add(0); // Attack and Defend
+                    }
+
+                    // Map to game type info and add a separate entry for each supported game type
+                    var gameTypes = new List<int>();
+                    foreach (var bit in gameTypeBits)
+                    {
+                        var match = objectGameTypes.All.FirstOrDefault(gt => gt.Bitmap == bit || gt.BitmapBytes == bit);
+
+                        if (match != null)
+                        {
+                            gameTypes.Add(match.DatabaseId);
+
+                            var mapEntry = new mapFileInfo
+                            {
+                                MapID = dataGridView_availableMaps.Rows.Count + 1,
+                                MapFile = mapFile,
+                                MapName = mapName,
+                                MapType = match.DatabaseId,
+                                ModType = 9,
+                            };
+                            int rowIndex = dataGridView_availableMaps.Rows.Add(
+                                mapEntry.MapID,
+                                mapEntry.MapName,
+                                mapEntry.MapFile,
+                                mapEntry.ModType,
+                                mapEntry.MapType,
+                                objectGameTypes.GetShortName(mapEntry.MapType)
+                            );
+                            DataGridViewRow row = dataGridView_availableMaps.Rows[rowIndex];
+
+                            string toolTip = $"Map File: {mapEntry.MapFile}";
+
+                            row.Cells[1].ToolTipText = toolTip;
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("File Name: " + mapFile + "\n" + " with Bitmap/BitmapBytes: " + bit + "\n" + "Reason: Could not find gametype for map.");
+                        }
+                    }
+                }
+            }
+
+            if (badMapsList.Count > 0)
+            {
+                string badMaps = string.Join("\n", badMapsList);
+                MessageBox.Show("Could not read map title from:\n" + badMaps + "\nThis could due to a non-converted, or a corrupted file.", "infoCurrentMapName List Error");
+            }
+        }
+        public void CalculateGameTypeBits(List<int> numbers, int target, List<int> result)
+        {
+            void Recurse(List<int> nums, int tgt, List<int> partial)
+            {
+                int sum = partial.Sum();
+                if (sum == tgt)
+                {
+                    result.AddRange(partial);
+                    return;
+                }
+                if (sum >= tgt)
+                    return;
+
+                for (int i = 0; i < nums.Count; i++)
+                {
+                    var remaining = nums.Skip(i + 1).ToList();
+                    var nextPartial = new List<int>(partial) { nums[i] };
+                    Recurse(remaining, tgt, nextPartial);
+                    if (result.Count > 0) return; // Only need the first valid combination
+                }
+            }
+            result.Clear();
+            Recurse(numbers, target, new List<int>());
+        }
+
+
         // --- Populate Current Map Playlist ---
         public void functionEvent_PopulateCurrentMapPlaylist(List<mapFileInfo> ImportedMapList = null!)
         {
@@ -111,9 +248,8 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Reset Map Playlist ---
         public void functionEvent_ResetAvailableMaps()
         {
-            mapInstanceManager.ResetAvailableMaps();                        // Reload Map Data from Game Files
-            functionEvent_PopulateAvailableMapData();                       // Repopulate the available maps
-        }
+            dataGridView_availableMaps.Rows.Clear();
+		}
         public void functionEvent_LoadCurrentMapPlaylist(bool external = false)
         {
             // Load the current map playlist from the instance manager
