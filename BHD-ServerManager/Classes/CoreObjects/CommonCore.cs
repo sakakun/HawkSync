@@ -14,7 +14,6 @@ namespace BHD_ServerManager.Classes.CoreObjects
         // Static Instance Objects
         // Object: thisInstance, Memory and Variable storage for the current instance of the application
         public static theInstance? theInstance { get; set; }
-        public static mapInstance? instanceMaps { get; set; }
         public static chatInstance? instanceChat { get; set; }
         public static banInstance? instanceBans { get; set; }
         public static statInstance? instanceStats { get; set; }
@@ -27,7 +26,6 @@ namespace BHD_ServerManager.Classes.CoreObjects
         {
             // Instances
             theInstance = new theInstance();
-            instanceMaps = new mapInstance();
             instanceChat = new chatInstance();
             instanceBans = new banInstance();
             instanceStats = new statInstance();

@@ -24,7 +24,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
         // Internal Variables to Program
         private readonly static theInstance theInstance = CommonCore.theInstance!;
-        private readonly static mapInstance mapInstance = CommonCore.instanceMaps!;
         private readonly static tabProfile  tabProfile  = Program.ServerManagerUI!.ProfileTab;
 
 		// Function: createAutoRes
@@ -33,7 +32,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             try
             {
-                if (mapInstance.currentMapPlaylist == null || mapInstance.currentMapPlaylist.Count == 0)
+                if (theInstance.MapPlaylists[theInstance.ActiveMapPlaylist] == null || theInstance.MapPlaylists[theInstance.ActiveMapPlaylist].Count == 0)
                 {
                     AppDebug.Log("StartServer", "currentMapPlaylist is empty. Cannot create autores.bin.");
                     return false;
@@ -92,7 +91,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] ServerNameBytes = Encoding.Default.GetBytes(theInstance.gameServerName);
                 byte[] countryCodeBytes = Encoding.Default.GetBytes(theInstance.gameCountryCode);
                 byte[] BindAddress = Encoding.Default.GetBytes(theInstance.profileBindIP!);
-                byte[] firstMapFile = Encoding.Default.GetBytes(mapInstance.currentMapPlaylist[0].MapFile!);
+                byte[] firstMapFile = Encoding.Default.GetBytes(theInstance.MapPlaylists[theInstance.ActiveMapPlaylist][0].MapFile!);
                 byte[] maxSlotsBytes = BitConverter.GetBytes(theInstance.gameMaxSlots);
                 byte[] dedicatedBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDedicated));
                 byte[] GameScoreBytes = BitConverter.GetBytes(theInstance.gameScoreKills);
@@ -103,7 +102,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] gamePlayOptionsBytes = BitConverter.GetBytes(gamePlayOptions);
                 byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps > 0 ? 1 : 0);
 
-                byte[] gameTypeBytes = BitConverter.GetBytes(mapInstance.currentMapPlaylist[0].MapType);
+                byte[] gameTypeBytes = BitConverter.GetBytes(theInstance.MapPlaylists[theInstance.ActiveMapPlaylist][0].MapType);
                 byte[] timeLimitBytes = BitConverter.GetBytes(theInstance.gameTimeLimit);
                 byte[] respawnTimeBytes = BitConverter.GetBytes(theInstance.gameRespawnTime);
                 byte[] allowCustomSkinsBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameCustomSkins));
@@ -121,7 +120,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] gamePortBytes = BitConverter.GetBytes(theInstance.profileBindPort);
                 byte[] flagBallScoreBytes = BitConverter.GetBytes(theInstance.gameScoreFlags);
                 byte[] zoneTimerBytes = BitConverter.GetBytes(theInstance.gameScoreZoneTime);
-                byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(mapInstance.currentMapPlaylist[0].ModType==9?1:0));
+                byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.MapPlaylists[theInstance.ActiveMapPlaylist][0].ModType==9?1:0));
 
                 byte[] mapListPrehandle = BitConverter.GetBytes(10621344);
                 byte[] finalAppSetup = Functions.ToByteArray("00 00 00 00 00 00 00 00 05 00 00 00 00".Replace(" ", ""));
@@ -314,7 +313,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 byte[] endOfMap = Functions.ToByteArray("20 B5 B6 01 00 00 00 00 53 01 00 00 00 13 00 00 00 13 00 00 00 04 00 00 00".Replace(" ", ""));
 
-                foreach (var map in mapInstance.currentMapPlaylist)
+                foreach (var map in theInstance.MapPlaylists[theInstance.ActiveMapPlaylist])
                 {
 
                     byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes(map.MapFile);
@@ -335,7 +334,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     ms.Seek(ms.Position + 0x1C, SeekOrigin.Begin);
                 }
 
-                for (int i = mapInstance.currentMapPlaylist.Count; i < 128; i++)
+                for (int i = theInstance.MapPlaylists[theInstance.ActiveMapPlaylist].Count; i < 128; i++)
                 {
                     byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes("NA.bms");
                     ms.Write(mapFile, 0, mapFile.Length);

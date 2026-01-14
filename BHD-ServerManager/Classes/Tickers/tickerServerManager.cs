@@ -15,7 +15,6 @@ namespace BHD_ServerManager.Classes.Tickers
         // The Instances (Data)
         private static theInstance theInstance => CommonCore.theInstance!;
         private static chatInstance instanceChat => CommonCore.instanceChat!;
-        private static mapInstance instanceMaps => CommonCore.instanceMaps!;
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
         private static ServerManager? thisServer => Program.ServerManagerUI;
@@ -66,7 +65,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 // --- UI Update Hooks ---
                 thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
                 thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
-                thisServer.MapsTab.tickerMapsHook();                                            // Toggle Maps Lock based on server status
                 thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
                 thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
                 thisServer.BanTab.BanTickerHook();                                              // Update Bans Tab

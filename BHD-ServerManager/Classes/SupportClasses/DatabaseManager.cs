@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.ObjectClasses;
 using Microsoft.Data.Sqlite;
 
 namespace BHD_ServerManager.Classes.SupportClasses

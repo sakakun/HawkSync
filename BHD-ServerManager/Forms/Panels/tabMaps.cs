@@ -14,17 +14,52 @@ namespace BHD_ServerManager.Forms.Panels
 
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
-        private mapInstance? instanceMaps => CommonCore.instanceMaps;
+        private Dictionary<int, List<mapFileInfo>> MapPlaylists => CommonCore.theInstance!.MapPlaylists;
 
-        // --- Class Variables ---
-        private new string Name = "MapsTab";                        // Name of the tab for logging purposes.
-        private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
+        // Playlists
+        public int MapTypeFilter;                           // Source Map Filter (9=All)
+
         public tabMaps()
         {
             InitializeComponent();
+            tabMaps_loadSettings();
         }
-        // --- Functions ---
-        // --- Populate Available Maps ---
+
+        public void methodFunction_UpdateMapControls()
+        {
+            // Disable Playnext if Active Playlist isn't selected.
+            btn_mapControl1.Enabled = (theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist && theInstance!.instanceStatus != InstanceStatus.OFFLINE);
+            btn_mapControl2.Enabled = (theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist && theInstance!.instanceStatus != InstanceStatus.OFFLINE);
+            btn_mapControl3.Enabled = (theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist && theInstance!.instanceStatus != InstanceStatus.OFFLINE);
+        }
+
+
+        public void tabMaps_loadSettings()
+        {
+            // Stage Playlists
+            MapPlaylists[0] = new List<mapFileInfo>();
+            MapPlaylists[1] = new List<mapFileInfo>();
+            MapPlaylists[2] = new List<mapFileInfo>();
+            MapPlaylists[3] = new List<mapFileInfo>();
+            MapPlaylists[4] = new List<mapFileInfo>();
+            MapPlaylists[5] = new List<mapFileInfo>();
+
+            MapTypeFilter = 9;
+
+            // Active Playlist being used by Game Server
+            theInstance!.ActiveMapPlaylist = ServerSettings.Get("ActiveMapPlaylist", 1);
+            theInstance!.SelectedMapPlaylist = ServerSettings.Get("ActiveMapPlaylist", 1);
+
+            // Load the maps
+            methodFunction_loadSourceMaps();
+
+            // Update active playlist display
+            btn_activePlaylist.Text = $"P{theInstance!.ActiveMapPlaylist}";
+
+            // Set initial UI state (this will load the playlist)
+            methodFunction_selectPlaylist(theInstance!.ActiveMapPlaylist);
+        }
+
         public void methodFunction_loadSourceMaps()
         {
             // Load Default Maps from Database
@@ -64,7 +99,11 @@ namespace BHD_ServerManager.Forms.Panels
         private void methodFunction_loadCustomMapps()
         {
             // Get Current serverGamePath
-            string gamePath = theInstance!.profileServerPath;
+            string gamePath = ServerSettings.Get("serverGamePath", string.Empty);
+            if (gamePath == string.Empty)
+            {
+                return;
+            }
 
             DirectoryInfo d = new DirectoryInfo(gamePath);
             List<string> badMapsList = new List<string>();
@@ -78,7 +117,7 @@ namespace BHD_ServerManager.Forms.Panels
                     string mapName = string.Empty;
                     try
                     {
-                        first_line = File.ReadLines(System.IO.Path.Combine(gamePath, file.Name), Encoding.Default).First().ToString();
+                        first_line = File.ReadLines(Path.Combine(gamePath, file.Name), Encoding.Default).First().ToString();
                     }
                     catch (Exception e)
                     {
@@ -203,189 +242,469 @@ namespace BHD_ServerManager.Forms.Panels
             result.Clear();
             Recurse(numbers, target, new List<int>());
         }
-
-
-        // --- Populate Current Map Playlist ---
-        public void functionEvent_PopulateCurrentMapPlaylist(List<mapFileInfo> ImportedMapList = null!)
+        private void actionClick_playlistAddMap(object sender, DataGridViewCellEventArgs e)
         {
-            List<mapFileInfo> MapList = ImportedMapList != null ? ImportedMapList : instanceMaps!.currentMapPlaylist;
-
-            // Clear the DataGridView
-            dataGridView_currentMaps.Rows.Clear();
-            // MapID for the Purpose of the Current Playlist is the "Order" in which they are played.
-            int rowIndex = 1;
-            // Populate the DataGridView with current map playlist
-            foreach (var map in MapList)
-            {
-                int rowObject = dataGridView_currentMaps.Rows.Add();
-                DataGridViewRow row = dataGridView_currentMaps.Rows[rowObject];
-
-                row.Cells["current_MapID"].Value = rowIndex;
-                row.Cells["current_MapFileName"].Value = map.MapFile;
-                row.Cells["current_MapName"].Value = map.MapName;
-                row.Cells["current_MapType"].Value = map.MapType;
-                row.Cells["current_MapTypeShort"].Value = objectGameTypes.GetShortName(map.MapType);
-                rowIndex++;
-            }
-        }
-        // --- Add Map to Current Playlist from Available Maps ---
-        public void functionEvent_AddMapToCurrentPlaylist(object sender)
-        {
-            // Get the current DataGridView of available maps
-            DataGridView dataGridView = (DataGridView)sender;
-            // Get row index of the clicked cell
-            int rowIndex = dataGridView.CurrentCell.RowIndex;
-            DataGridViewRow rowOG = dataGridView.Rows[rowIndex];
-
-            int rowObject = dataGridView_currentMaps.Rows.Add();
-            DataGridViewRow rowNew = dataGridView_currentMaps.Rows[rowObject];
-            rowNew.Cells["current_MapID"].Value = rowObject + 1;
-            rowNew.Cells["current_MapFileName"].Value = rowOG.Cells["avail_MapFileName"].Value;
-            rowNew.Cells["current_MapName"].Value = rowOG.Cells["avail_MapName"].Value;
-            rowNew.Cells["current_MapType"].Value = rowOG.Cells["avail_MapType"].Value;
-            rowNew.Cells["current_MapTypeShort"].Value = rowOG.Cells["avail_MapTypeShort"].Value;
-        }
-        // --- Reset Map Playlist ---
-        public void functionEvent_ResetAvailableMaps()
-        {
-            dataGridView_availableMaps.Rows.Clear();
-		}
-        public void functionEvent_LoadCurrentMapPlaylist(bool external = false)
-        {
-            // Load the current map playlist from the instance manager
-            instanceMaps!.currentMapPlaylist = mapInstanceManager.LoadCustomMapPlaylist(external);
-            // Populate the DataGridView with the current map playlist
-            functionEvent_PopulateCurrentMapPlaylist();
-        }
-        // --- Update Form Information and Visibility ---
-        public void functionEvent_UpdateForm()
-        {
-            // Enable/Disable Buttons based on Server Status
-            bool isOnline = (theInstance!.instanceStatus != InstanceStatus.OFFLINE);
-
-            int nextMapIndex = theInstance!.gameInfoCurrentMapIndex >= instanceMaps!.currentMapPlaylist.Count - 1
-                                || theInstance!.gameInfoCurrentMapIndex < 0
-                                ? 0
-                                : theInstance!.gameInfoCurrentMapIndex + 1;
-
-        }
-        public void functionEvent_CheckForMapChanges()
-        {
-            if (instanceMaps!.currentMapPlaylist.Count != dataGridView_currentMaps.Rows.Count)
-            {
-
+            // Ignore header or invalid rows
+            if (e.RowIndex < 0)
                 return;
-            }
-            for (int i = 0; i < instanceMaps!.currentMapPlaylist.Count; i++)
-            {
-                if (instanceMaps!.currentMapPlaylist[i].MapName != dataGridView_currentMaps.Rows[i].Cells["current_MapName"].Value?.ToString())
-                {
-                    AppDebug.Log("tickerServerManagement", "Map Playlist Name Mismatch Detected at index " + i);
-                    return;
-                }
-            }
+
+            var sourceGrid = dataGridView_availableMaps;
+            var targetGrid = dataGridView_currentMaps;
+
+            DataGridViewRow row = sourceGrid.Rows[e.RowIndex];
+
+            int newRowIndex = targetGrid.Rows.Add(
+                targetGrid.Rows.Count + 1,
+                row.Cells[1].Value,
+                row.Cells[2].Value,
+                row.Cells[3].Value,
+                row.Cells[4].Value,
+                objectGameTypes.GetShortName((int)row.Cells[4].Value)
+             );
+
+            DataGridViewRow newRow = dataGridView_currentMaps.Rows[newRowIndex];
+
+            string toolTip = $"Map File: {row.Cells[2].Value}";
+
+            newRow.Cells[1].ToolTipText = toolTip;
+
         }
-        // --- Ticker Hook for Maps Tab ---
-        public void tickerMapsHook()
+        private void actionClick_playlistRemoveMap(object sender, DataGridViewCellEventArgs e)
         {
-            // Check if the first load is complete
-            if (!_firstLoadComplete)
-            {
-                // Set the first load complete flag to true
-                _firstLoadComplete = true;
+            // Ignore header
+            if (e.RowIndex < 0)
+                return;
 
-                // Get the server settings on first load
-                functionEvent_ResetAvailableMaps();                         // Populate the available maps (First Time Only)
-                functionEvent_LoadCurrentMapPlaylist();                     // Load the current map playlist (First Time Only)
-                functionEvent_PopulateCurrentMapPlaylist();                 // Populate the current map playlist (First Time Only)
-            }
+            var targetGrid = dataGridView_currentMaps;
 
-            // Update the form information
-            functionEvent_CheckForMapChanges();                             // Check for Map Changes
-            functionEvent_UpdateForm();                                     // Update Form to Current Map States
+            targetGrid.Rows.RemoveAt(e.RowIndex);
+
+            methodFunction_renumberPlaylistOrder(targetGrid);
         }
-        // --- Action Handlers ---
-        private void actionClick_RefreshAvailableMaps(object sender, EventArgs e)
+        private void actionClick_playlistMoveRowUp(object sender, EventArgs e)
+        {
+
+            DataGridView grid = dataGridView_currentMaps;
+
+            if (grid.SelectedRows.Count == 0)
+                return;
+
+            var row = grid.SelectedRows[0];
+            int index = row.Index;
+
+            // Already at top
+            if (index == 0)
+                return;
+
+            grid.Rows.RemoveAt(index);
+            grid.Rows.Insert(index - 1, row);
+
+            grid.ClearSelection();
+            row.Selected = true;
+
+            methodFunction_renumberPlaylistOrder(grid);
+        }
+        private void actionClick_playlistMoveRowDown(object sender, EventArgs e)
+        {
+
+            DataGridView grid = dataGridView_currentMaps;
+
+            if (grid.SelectedRows.Count == 0)
+                return;
+
+            var row = grid.SelectedRows[0];
+            int index = row.Index;
+
+            // Already at bottom
+            if (index >= grid.Rows.Count - 1)
+                return;
+
+            grid.Rows.RemoveAt(index);
+            grid.Rows.Insert(index + 1, row);
+
+            grid.ClearSelection();
+            row.Selected = true;
+
+            methodFunction_renumberPlaylistOrder(grid);
+        }
+        private void methodFunction_renumberPlaylistOrder(DataGridView grid)
+        {
+            int order = 1;
+
+            foreach (DataGridViewRow row in grid.Rows)
+            {
+                if (row.IsNewRow)
+                    continue;
+
+                row.Cells[0].Value = order++;
+            }
+        }
+        private void methodFunction_loadPlaylist(int playlistNum)
+        {
+            // Refresh Available Maps
+            methodFunction_loadSourceMaps();
+
+            // Grab the Playlist from the DB
+            MapPlaylists[playlistNum] = DatabaseManager.GetPlaylistMaps(playlistNum);
+
+            // Clear the current playlist in datagrid
+            dataGridView_currentMaps.Rows.Clear();
+
+            // Set the Selected Playlist for references.
+            theInstance!.SelectedMapPlaylist = playlistNum;
+
+            // Add each record, in playlist to the datagrid
+            foreach (mapFileInfo map in MapPlaylists[playlistNum])
+            {
+                // Map Validation (Is Map Still Available)
+
+
+                // Add Map to DataGridTable
+                int rowIndex = dataGridView_currentMaps.Rows.Add(
+                    map.MapID,
+                    map.MapName,
+                    map.MapFile,
+                    map.ModType,
+                    map.MapType,
+                    objectGameTypes.GetShortName(map.MapType)
+                );
+                DataGridViewRow row = dataGridView_currentMaps.Rows[rowIndex];
+                string toolTip = $"Map File: {map.MapFile}";
+                row.Cells[1].ToolTipText = toolTip;
+            }
+        }
+        public void actionClick_saveMapPlaylist(object sender, EventArgs e)
         {
             try
             {
-                functionEvent_ResetAvailableMaps();
-                MessageBox.Show("Available maps have been refreshed.", "Refresh Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Don't allow saving empty playlists
+                if (dataGridView_currentMaps.Rows.Count == 0)
+                {
+                    MessageBox.Show("Cannot save an empty playlist. Add maps before saving.");
+                    return;
+                }
+
+                // If this is the active playlist and server is running, update the game
+                if (theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist && theInstance!.instanceStatus != InstanceStatus.OFFLINE)
+                {
+                    if (theInstance!.instanceStatus == InstanceStatus.ONLINE || theInstance!.instanceStatus == InstanceStatus.STARTDELAY)
+                    {
+                        DialogResult result = MessageBox.Show(
+                            "This is the active playlist. Updating will update the game-server too, continue?",
+                            "Update Active Playlist",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question);
+
+                        if (result == DialogResult.No)
+                        {
+                            return;
+                        }
+
+                        if (result == DialogResult.Yes)
+                        {
+                            // Backup the Active Playlist (for UpdateMapCycle1 to use as old truth)
+                            MapPlaylists[0] = MapPlaylists[theInstance!.ActiveMapPlaylist];
+
+                            // Build Playlist to Memory
+                            MapPlaylists[theInstance!.SelectedMapPlaylist] = BuildPlaylistFromGrid();
+                            // Save to Database
+                            DatabaseManager.SavePlaylist(theInstance!.SelectedMapPlaylist, MapPlaylists[theInstance!.SelectedMapPlaylist]);
+
+                            ServerMemory.UpdateMapCycle1();
+                            ServerMemory.UpdateMapCycle2();
+                            ServerMemory.UpdateMapListCount();
+
+                            // Update UI
+                            btn_activePlaylist.Text = $"P{theInstance!.SelectedMapPlaylist}";
+                            theInstance!.ActiveMapPlaylist = theInstance!.SelectedMapPlaylist;
+
+                            MessageBox.Show($"Map Playlist {theInstance!.SelectedMapPlaylist} saved and in-game rotation updated.");
+                            return;
+                        }
+                    }
+                }
+
+                // Build Playlist to Memory
+                MapPlaylists[theInstance!.SelectedMapPlaylist] = BuildPlaylistFromGrid();
+
+                // Save to Database
+                DatabaseManager.SavePlaylist(theInstance!.SelectedMapPlaylist, MapPlaylists[theInstance!.SelectedMapPlaylist]);
+
+                MessageBox.Show($"Map Playlist {theInstance!.SelectedMapPlaylist} has been saved.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log(this.Name, "actionClick_RefreshAvailableMaps: " + ex.Message.ToString() + "\nStackTrace: " + ex.StackTrace);
+                MessageBox.Show($"Map Playlist {theInstance!.SelectedMapPlaylist} failed to save.");
+                AppDebug.Log("tabMaps:", "actionClick_saveMapPlaylist: " + ex.Message);
             }
         }
 
-        private void actionClick_SaveCurrentPlaylist(object sender, EventArgs e)
+        // Builds the Maplist and stores it as an List<mapFileInfo>
+        private List<mapFileInfo> BuildPlaylistFromGrid()
         {
-            instanceMaps!.currentMapPlaylist = mapInstanceManager.BuildCurrentMapPlaylist();
-            mapInstanceManager.SaveCurrentMapPlaylist(instanceMaps!.currentMapPlaylist, false);
-            MessageBox.Show("Current map playlist has been saved.", "Save Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var list = new List<mapFileInfo>();
+
+            DataGridView grid = dataGridView_currentMaps;
+
+            foreach (DataGridViewRow row in grid.Rows)
+            {
+                if (row.IsNewRow)
+                    continue;
+
+                list.Add(new mapFileInfo
+                {
+                    MapID = (int)row.Cells[0].Value,
+                    MapName = row.Cells[1].Value?.ToString()!,
+                    MapFile = row.Cells[2].Value?.ToString()!,
+                    ModType = (int)row.Cells[3].Value,
+                    MapType = (int)row.Cells[4].Value
+                });
+            }
+
+            return list;
         }
 
-        private void actionClick_ClearCurrentPlaylist(object sender, EventArgs e)
+        private void actionClick_loadMapPlaylist1(object sender, EventArgs e)
+        {
+            methodFunction_selectPlaylist(1);
+        }
+        private void actionClick_loadMapPlaylist2(object sender, EventArgs e)
+        {
+            methodFunction_selectPlaylist(2);
+        }
+        private void actionClick_loadMapPlaylist3(object sender, EventArgs e)
+        {
+            methodFunction_selectPlaylist(3);
+        }
+        private void actionClick_loadMapPlaylist4(object sender, EventArgs e)
+        {
+            methodFunction_selectPlaylist(4);
+        }
+        private void actionClick_loadMapPlaylist5(object sender, EventArgs e)
+        {
+            methodFunction_selectPlaylist(5);
+        }
+        private void methodFunction_selectPlaylist(int playlistID)
+        {
+            Color selected = SystemColors.ActiveBorder;
+            Color notSelected = Button.DefaultBackColor;
+
+            // Set Selected Play List
+            theInstance!.SelectedMapPlaylist = playlistID;
+
+            // Change Backcolors
+            btn_loadPlaylist1.BackColor = playlistID == 1 ? selected : notSelected;
+            btn_loadPlaylist2.BackColor = playlistID == 2 ? selected : notSelected;
+            btn_loadPlaylist3.BackColor = playlistID == 3 ? selected : notSelected;
+            btn_loadPlaylist4.BackColor = playlistID == 4 ? selected : notSelected;
+            btn_loadPlaylist5.BackColor = playlistID == 5 ? selected : notSelected;
+
+            // Update active playlist display
+            btn_activePlaylist.Text = $"P{theInstance!.ActiveMapPlaylist}";
+
+            // Update Map Controls
+            methodFunction_UpdateMapControls();
+
+            // Load Playlist
+            methodFunction_loadPlaylist(playlistID);
+        }
+
+        private void actionClick_clearMapPlaylist(object sender, EventArgs e)
         {
             dataGridView_currentMaps.Rows.Clear();
         }
 
-        private void actionClick_ImportCurrentPlaylist(object sender, EventArgs e)
+        private void actionClick_setPlaylistActive(object sender, EventArgs e)
         {
-            functionEvent_LoadCurrentMapPlaylist(true);
-        }
+            if (dataGridView_currentMaps.Rows.Count == 0)
+            {
+                MessageBox.Show("No maps in the currently selected playlist. Add maps, save and try again.");
+                return;
+            }
 
-        private void actionClick_ExportCurrentPlaylist(object sender, EventArgs e)
-        {
-            List<mapFileInfo> mapList = mapInstanceManager.BuildCurrentMapPlaylist();
-            mapInstanceManager.SaveCurrentMapPlaylist(mapList, true);
-        }
+            if (theInstance!.instanceStatus != InstanceStatus.OFFLINE && theInstance!.instanceStatus == InstanceStatus.SCORING)
+            {
+                MessageBox.Show("Server is currently in the process of changing maps, please wait until the game is running to change the map list.");
+                return;
+            }
 
-        private void actionClick_ResetCurrentMapPlaylist(object sender, EventArgs e)
-        {
-            functionEvent_PopulateCurrentMapPlaylist();
-        }
+            // If already active, nothing to do
+            if (theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist)
+            {
+                MessageBox.Show($"Playlist {theInstance!.SelectedMapPlaylist} is already the active playlist.");
+                return;
+            }
 
-        private void actionClick_CurrentPlaylistAddMap(object sender, DataGridViewCellEventArgs e)
-        {
-            functionEvent_AddMapToCurrentPlaylist(sender);
-        }
+            if (theInstance!.instanceStatus == InstanceStatus.ONLINE || theInstance!.instanceStatus == InstanceStatus.STARTDELAY)
+            {
+                DialogResult result = MessageBox.Show(
+                    "Changing the playlist will update the in-game map rotation and restart from the beginning. Do you wish to continue?",
+                    "Confirm Action",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
 
-        private void actionClick_DeleteSelectedMap(object sender, DataGridViewCellEventArgs e)
-        {
-            // Get the current DataGridView of available maps
-            DataGridView dataGridView = (DataGridView)sender;
-            // Get row index of the clicked cell
-            int rowIndex = dataGridView.CurrentCell.RowIndex;
-            // Remove Row from DataGridView
-            dataGridView.Rows.RemoveAt(rowIndex);
-        }
+                if (result == DialogResult.No)
+                    return;
+            }
 
-        private void actionClick_UpdateMapPlaylist(object sender, EventArgs e)
-        {
-            if (theInstance!.instanceStatus == InstanceStatus.STARTDELAY || theInstance!.instanceStatus == InstanceStatus.ONLINE)
+            // Backup the CURRENT active playlist BEFORE changing (for UpdateMapCycle1)
+            MapPlaylists[0] = MapPlaylists[theInstance!.ActiveMapPlaylist];
+
+            // Build and save the selected playlist
+            MapPlaylists[theInstance!.SelectedMapPlaylist] = BuildPlaylistFromGrid();
+
+            // Re-validate after building
+            if (MapPlaylists[theInstance!.SelectedMapPlaylist].Count == 0)
+            {
+                MessageBox.Show("Cannot set an empty playlist as active.");
+                return;
+            }
+
+            DatabaseManager.SavePlaylist(theInstance!.SelectedMapPlaylist, MapPlaylists[theInstance!.SelectedMapPlaylist]);
+
+            // Set current playlist to active
+            theInstance!.ActiveMapPlaylist = theInstance!.SelectedMapPlaylist;
+
+            // Update UI button
+            btn_activePlaylist.Text = $"P{theInstance!.ActiveMapPlaylist}";
+
+            // Save the active playlist setting
+            ServerSettings.Set("ActiveMapPlaylist", theInstance!.ActiveMapPlaylist);
+
+            // If server is running, update the in-game rotation
+            if (theInstance!.instanceStatus == InstanceStatus.ONLINE || theInstance!.instanceStatus == InstanceStatus.STARTDELAY)
             {
                 ServerMemory.UpdateMapCycle1();
                 ServerMemory.UpdateMapCycle2();
-                ServerMemory.UpdateMapListCount();
-                MessageBox.Show("The server map list has been updated successfully.", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            MessageBox.Show($"Playlist {theInstance!.ActiveMapPlaylist} is now active.");
+        }
+
+        private void actionClick_refeshMapLists(object sender, EventArgs e)
+        {
+            // Load the maps
+            methodFunction_loadSourceMaps();
+
+            // Reapply current filter
+            methodFunction_hideSourceRows(MapTypeFilter);
+
+            // Refresh the playlist data grid
+            methodFunction_selectPlaylist(theInstance!.SelectedMapPlaylist);
+
+        }
+
+        private void methodFunction_hideSourceRows(int filterInt)
+        {
+            Color colorActive = SystemColors.ActiveBorder;
+            Color notActive = Button.DefaultBackColor;
+
+            // Set Filter Number
+            MapTypeFilter = filterInt;
+
+            btn_mapTypeALL.BackColor = filterInt == 9 ? colorActive : notActive;
+            btn_mapTypeDM.BackColor = filterInt == 0 ? colorActive : notActive;
+            btn_mapTypeTDM.BackColor = filterInt == 1 ? colorActive : notActive;
+            btn_mapTypeCOOP.BackColor = filterInt == 2 ? colorActive : notActive;
+            btn_mapTypeTKOTH.BackColor = filterInt == 3 ? colorActive : notActive;
+            btn_mapTypeKOTH.BackColor = filterInt == 4 ? colorActive : notActive;
+            btn_mapTypeSD.BackColor = filterInt == 5 ? colorActive : notActive;
+            btn_mapTypeAD.BackColor = filterInt == 6 ? colorActive : notActive;
+            btn_mapTypeCTF.BackColor = filterInt == 7 ? colorActive : notActive;
+            btn_mapTypeFB.BackColor = filterInt == 8 ? colorActive : notActive;
+
+            if (MapTypeFilter == 9)
+            {
+                foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
+                {
+                    if (row.IsNewRow) continue;
+
+                    row.Visible = true;
+                }
             }
             else
             {
-                MessageBox.Show("The Maplist saved but server is currently not ready to recieve map updates. Please wait for Status Change of Server.", "Server Busy", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
+                {
+                    if (row.IsNewRow) continue;
+                    int mapType = (int)row.Cells[4].Value;
+
+                    if (mapType == filterInt)
+                    {
+                        row.Visible = true;
+                    }
+                    else
+                    {
+                        row.Visible = false;
+                    }
+
+                }
             }
         }
 
-        private void actionClick_PlayMapNext(object sender, EventArgs e)
+        private void actionClick_filterMapType0(object sender, EventArgs e)
         {
-            int mapIndex = dataGridView_currentMaps.CurrentCell.RowIndex;
-            ServerMemory.UpdateNextMap(mapIndex);
-            MessageBox.Show(dataGridView_currentMaps.Rows[mapIndex].Cells["current_MapName"].Value + " has been updated to play next.", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            methodFunction_hideSourceRows(0);
+        }
+
+        private void actionClick_filterMapType1(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(1);
+        }
+
+        private void actionClick_filterMapType2(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(2);
+        }
+
+        private void actionClick_filterMapType3(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(3);
+        }
+
+        private void actionClick_filterMapType4(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(4);
+        }
+
+        private void actionClick_filterMapType5(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(5);
+        }
+
+        private void actionClick_filterMapType6(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(6);
+        }
+
+        private void actionClick_filterMapType7(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(7);
+        }
+
+        private void actionClick_filterMapType8(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(8);
+        }
+
+        private void actionClick_filterMapType9(object sender, EventArgs e)
+        {
+            methodFunction_hideSourceRows(9);
+        }
+
+        private void actionClick_mapPlayNext(object sender, EventArgs e)
+        {
+            DataGridView grid = dataGridView_currentMaps;
+            var row = grid.SelectedRows[0];
+            int index = row.Index;
+
+            ServerMemory.UpdateNextMap(index);
+
         }
 
         private void actionClick_ScoreMap(object sender, EventArgs e)
         {
-            ServerMemory.WriteMemoryScoreMap();
+            ServerMemory.ScoreMap();
         }
 
         private void actionClick_SkipMap(object sender, EventArgs e)
@@ -399,43 +718,5 @@ namespace BHD_ServerManager.Forms.Panels
                 MessageBox.Show("Sorry you can't skip currently, map is currently 'loading' please try again in a moment.", "Cannot Skip", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
-        private void actionKey_MoveMap(object sender, KeyPressEventArgs e)
-        {
-            DataGridView dataGridView = (DataGridView)sender;
-            int rowIndex = dataGridView.CurrentCell.RowIndex;
-
-            bool isShift = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
-
-            if (isShift && (e.KeyChar == 'W' || e.KeyChar == 'w') && rowIndex > 0)
-            {
-                // Move up
-                DataGridViewRow row = dataGridView.Rows[rowIndex];
-                dataGridView.Rows.RemoveAt(rowIndex);
-                dataGridView.Rows.Insert(rowIndex - 1, row);
-                // Update MapID
-                for (int i = 0; i < dataGridView.Rows.Count; i++)
-                {
-                    dataGridView.Rows[i].Cells["current_MapID"].Value = i + 1;
-                }
-                // Select the moved row
-                dataGridView.CurrentCell = dataGridView.Rows[rowIndex - 1].Cells[dataGridView.CurrentCell.ColumnIndex];
-            }
-            else if (isShift && (e.KeyChar == 'S' || e.KeyChar == 's') && rowIndex < dataGridView.Rows.Count - 1)
-            {
-                // Move down
-                DataGridViewRow row = dataGridView.Rows[rowIndex];
-                dataGridView.Rows.RemoveAt(rowIndex);
-                dataGridView.Rows.Insert(rowIndex + 1, row);
-                // Update MapID
-                for (int i = 0; i < dataGridView.Rows.Count; i++)
-                {
-                    dataGridView.Rows[i].Cells["current_MapID"].Value = i + 1;
-                }
-                // Select the moved row
-                dataGridView.CurrentCell = dataGridView.Rows[rowIndex + 1].Cells[dataGridView.CurrentCell.ColumnIndex];
-            }
-        }
-
     }
 }

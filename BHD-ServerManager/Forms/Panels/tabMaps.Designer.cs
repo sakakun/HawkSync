@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
             tableLayoutPanel6 = new TableLayoutPanel();
@@ -49,6 +49,7 @@
             avail_MapID = new DataGridViewTextBoxColumn();
             avail_MapName = new DataGridViewTextBoxColumn();
             avail_MapFileName = new DataGridViewTextBoxColumn();
+            ModType = new DataGridViewTextBoxColumn();
             avail_MapType = new DataGridViewTextBoxColumn();
             avail_MapTypeShort = new DataGridViewTextBoxColumn();
             tableLayoutPanel4 = new TableLayoutPanel();
@@ -56,6 +57,7 @@
             current_MapID = new DataGridViewTextBoxColumn();
             current_MapName = new DataGridViewTextBoxColumn();
             current_MapFileName = new DataGridViewTextBoxColumn();
+            current_MapModType = new DataGridViewTextBoxColumn();
             current_MapType = new DataGridViewTextBoxColumn();
             current_MapTypeShort = new DataGridViewTextBoxColumn();
             tableLayoutPanel9 = new TableLayoutPanel();
@@ -64,7 +66,7 @@
             btn_playListControlB3 = new FontAwesome.Sharp.IconButton();
             btn_playListControlB2 = new FontAwesome.Sharp.IconButton();
             btn_playListControlB1 = new FontAwesome.Sharp.IconButton();
-            button1 = new Button();
+            btn_activePlaylist = new Button();
             tableLayoutPanel2 = new TableLayoutPanel();
             btn_loadPlaylist5 = new Button();
             btn_loadPlaylist4 = new Button();
@@ -168,6 +170,7 @@
             btn_mapTypeSD.TabIndex = 6;
             btn_mapTypeSD.Text = "SD";
             btn_mapTypeSD.UseVisualStyleBackColor = false;
+            btn_mapTypeSD.Click += actionClick_filterMapType5;
             // 
             // btn_mapTypeFB
             // 
@@ -180,6 +183,7 @@
             btn_mapTypeFB.TabIndex = 5;
             btn_mapTypeFB.Text = "FB";
             btn_mapTypeFB.UseVisualStyleBackColor = false;
+            btn_mapTypeFB.Click += actionClick_filterMapType8;
             // 
             // btn_mapTypeCOOP
             // 
@@ -192,6 +196,7 @@
             btn_mapTypeCOOP.TabIndex = 4;
             btn_mapTypeCOOP.Text = "CO-OP";
             btn_mapTypeCOOP.UseVisualStyleBackColor = false;
+            btn_mapTypeCOOP.Click += actionClick_filterMapType2;
             // 
             // btn_mapTypeCTF
             // 
@@ -204,6 +209,7 @@
             btn_mapTypeCTF.TabIndex = 3;
             btn_mapTypeCTF.Text = "CTF";
             btn_mapTypeCTF.UseVisualStyleBackColor = false;
+            btn_mapTypeCTF.Click += actionClick_filterMapType7;
             // 
             // btn_mapTypeAD
             // 
@@ -216,6 +222,7 @@
             btn_mapTypeAD.TabIndex = 2;
             btn_mapTypeAD.Text = "AD";
             btn_mapTypeAD.UseVisualStyleBackColor = false;
+            btn_mapTypeAD.Click += actionClick_filterMapType6;
             // 
             // tableLayoutPanel7
             // 
@@ -251,6 +258,7 @@
             btn_mapTypeTKOTH.TabIndex = 6;
             btn_mapTypeTKOTH.Text = "TKOTH";
             btn_mapTypeTKOTH.UseVisualStyleBackColor = false;
+            btn_mapTypeTKOTH.Click += actionClick_filterMapType3;
             // 
             // btn_mapTypeKOTH
             // 
@@ -263,6 +271,7 @@
             btn_mapTypeKOTH.TabIndex = 5;
             btn_mapTypeKOTH.Text = "KOTH";
             btn_mapTypeKOTH.UseVisualStyleBackColor = false;
+            btn_mapTypeKOTH.Click += actionClick_filterMapType4;
             // 
             // btn_mapTypeALL
             // 
@@ -275,6 +284,7 @@
             btn_mapTypeALL.TabIndex = 4;
             btn_mapTypeALL.Text = "ALL";
             btn_mapTypeALL.UseVisualStyleBackColor = false;
+            btn_mapTypeALL.Click += actionClick_filterMapType9;
             // 
             // btn_mapTypeTDM
             // 
@@ -287,6 +297,7 @@
             btn_mapTypeTDM.TabIndex = 3;
             btn_mapTypeTDM.Text = "TDM";
             btn_mapTypeTDM.UseVisualStyleBackColor = false;
+            btn_mapTypeTDM.Click += actionClick_filterMapType1;
             // 
             // btn_mapTypeDM
             // 
@@ -299,6 +310,7 @@
             btn_mapTypeDM.TabIndex = 2;
             btn_mapTypeDM.Text = "DM";
             btn_mapTypeDM.UseVisualStyleBackColor = false;
+            btn_mapTypeDM.Click += actionClick_filterMapType0;
             // 
             // dataGridView_availableMaps
             // 
@@ -306,16 +318,16 @@
             dataGridView_availableMaps.AllowUserToDeleteRows = false;
             dataGridView_availableMaps.AllowUserToResizeColumns = false;
             dataGridView_availableMaps.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dataGridView_availableMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = SystemColors.Control;
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dataGridView_availableMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dataGridView_availableMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_availableMaps.Columns.AddRange(new DataGridViewColumn[] { avail_MapID, avail_MapName, avail_MapFileName, avail_MapType, avail_MapTypeShort });
+            dataGridView_availableMaps.Columns.AddRange(new DataGridViewColumn[] { avail_MapID, avail_MapName, avail_MapFileName, ModType, avail_MapType, avail_MapTypeShort });
             dataGridView_availableMaps.Dock = DockStyle.Fill;
             dataGridView_availableMaps.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView_availableMaps.Location = new Point(3, 51);
@@ -325,7 +337,7 @@
             dataGridView_availableMaps.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             dataGridView_availableMaps.Size = new Size(407, 320);
             dataGridView_availableMaps.TabIndex = 2;
-            dataGridView_availableMaps.CellDoubleClick += actionClick_CurrentPlaylistAddMap;
+            dataGridView_availableMaps.CellDoubleClick += actionClick_playlistAddMap;
             // 
             // avail_MapID
             // 
@@ -349,6 +361,13 @@
             avail_MapFileName.Name = "avail_MapFileName";
             avail_MapFileName.ReadOnly = true;
             avail_MapFileName.Visible = false;
+            // 
+            // ModType
+            // 
+            ModType.HeaderText = "Mod Type";
+            ModType.Name = "ModType";
+            ModType.ReadOnly = true;
+            ModType.Visible = false;
             // 
             // avail_MapType
             // 
@@ -392,16 +411,16 @@
             dataGridView_currentMaps.AllowUserToDeleteRows = false;
             dataGridView_currentMaps.AllowUserToResizeColumns = false;
             dataGridView_currentMaps.AllowUserToResizeRows = false;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dataGridView_currentMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = SystemColors.Control;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
+            dataGridView_currentMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             dataGridView_currentMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_currentMaps.Columns.AddRange(new DataGridViewColumn[] { current_MapID, current_MapName, current_MapFileName, current_MapType, current_MapTypeShort });
+            dataGridView_currentMaps.Columns.AddRange(new DataGridViewColumn[] { current_MapID, current_MapName, current_MapFileName, current_MapModType, current_MapType, current_MapTypeShort });
             dataGridView_currentMaps.Dock = DockStyle.Fill;
             dataGridView_currentMaps.EditMode = DataGridViewEditMode.EditProgrammatically;
             dataGridView_currentMaps.Location = new Point(3, 51);
@@ -411,8 +430,7 @@
             dataGridView_currentMaps.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             dataGridView_currentMaps.Size = new Size(407, 320);
             dataGridView_currentMaps.TabIndex = 1;
-            dataGridView_currentMaps.CellDoubleClick += actionClick_DeleteSelectedMap;
-            dataGridView_currentMaps.KeyPress += actionKey_MoveMap;
+            dataGridView_currentMaps.CellDoubleClick += actionClick_playlistRemoveMap;
             // 
             // current_MapID
             // 
@@ -438,6 +456,13 @@
             current_MapFileName.Name = "current_MapFileName";
             current_MapFileName.ReadOnly = true;
             current_MapFileName.Visible = false;
+            // 
+            // current_MapModType
+            // 
+            current_MapModType.HeaderText = "Mod Type";
+            current_MapModType.Name = "current_MapModType";
+            current_MapModType.ReadOnly = true;
+            current_MapModType.Visible = false;
             // 
             // current_MapType
             // 
@@ -470,7 +495,7 @@
             tableLayoutPanel9.Controls.Add(btn_playListControlB3, 2, 0);
             tableLayoutPanel9.Controls.Add(btn_playListControlB2, 1, 0);
             tableLayoutPanel9.Controls.Add(btn_playListControlB1, 0, 0);
-            tableLayoutPanel9.Controls.Add(button1, 5, 0);
+            tableLayoutPanel9.Controls.Add(btn_activePlaylist, 5, 0);
             tableLayoutPanel9.Dock = DockStyle.Fill;
             tableLayoutPanel9.Location = new Point(0, 374);
             tableLayoutPanel9.Margin = new Padding(0);
@@ -494,7 +519,7 @@
             btn_playListControlB5.TabIndex = 10;
             toolTip1.SetToolTip(btn_playListControlB5, "Update Map Rotation");
             btn_playListControlB5.UseVisualStyleBackColor = true;
-            btn_playListControlB5.Click += actionClick_UpdateMapPlaylist;
+            btn_playListControlB5.Click += actionClick_setPlaylistActive;
             // 
             // btn_playListControlB4
             // 
@@ -510,6 +535,7 @@
             btn_playListControlB4.TabIndex = 9;
             toolTip1.SetToolTip(btn_playListControlB4, "Move Map Up");
             btn_playListControlB4.UseVisualStyleBackColor = true;
+            btn_playListControlB4.Click += actionClick_playlistMoveRowUp;
             // 
             // btn_playListControlB3
             // 
@@ -524,6 +550,7 @@
             btn_playListControlB3.TabIndex = 8;
             toolTip1.SetToolTip(btn_playListControlB3, "Move Map Down");
             btn_playListControlB3.UseVisualStyleBackColor = true;
+            btn_playListControlB3.Click += actionClick_playlistMoveRowDown;
             // 
             // btn_playListControlB2
             // 
@@ -539,7 +566,7 @@
             btn_playListControlB2.TabIndex = 7;
             toolTip1.SetToolTip(btn_playListControlB2, "Save Maplist");
             btn_playListControlB2.UseVisualStyleBackColor = true;
-            btn_playListControlB2.Click += actionClick_SaveCurrentPlaylist;
+            btn_playListControlB2.Click += actionClick_saveMapPlaylist;
             // 
             // btn_playListControlB1
             // 
@@ -555,20 +582,20 @@
             btn_playListControlB1.TabIndex = 6;
             toolTip1.SetToolTip(btn_playListControlB1, "Erase Maplist");
             btn_playListControlB1.UseVisualStyleBackColor = true;
-            btn_playListControlB1.Click += actionClick_ClearCurrentPlaylist;
+            btn_playListControlB1.Click += actionClick_clearMapPlaylist;
             // 
-            // button1
+            // btn_activePlaylist
             // 
-            button1.BackColor = SystemColors.ActiveBorder;
-            button1.Dock = DockStyle.Fill;
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            button1.Location = new Point(343, 3);
-            button1.Name = "button1";
-            button1.Size = new Size(67, 39);
-            button1.TabIndex = 11;
-            button1.Text = "P1";
-            button1.UseVisualStyleBackColor = false;
+            btn_activePlaylist.BackColor = SystemColors.ActiveBorder;
+            btn_activePlaylist.Dock = DockStyle.Fill;
+            btn_activePlaylist.FlatStyle = FlatStyle.Flat;
+            btn_activePlaylist.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btn_activePlaylist.Location = new Point(343, 3);
+            btn_activePlaylist.Name = "btn_activePlaylist";
+            btn_activePlaylist.Size = new Size(67, 39);
+            btn_activePlaylist.TabIndex = 11;
+            btn_activePlaylist.Text = "P1";
+            btn_activePlaylist.UseVisualStyleBackColor = false;
             // 
             // tableLayoutPanel2
             // 
@@ -604,6 +631,7 @@
             btn_loadPlaylist5.TabIndex = 16;
             btn_loadPlaylist5.Text = "P5";
             btn_loadPlaylist5.UseVisualStyleBackColor = false;
+            btn_loadPlaylist5.Click += actionClick_loadMapPlaylist5;
             // 
             // btn_loadPlaylist4
             // 
@@ -617,6 +645,7 @@
             btn_loadPlaylist4.TabIndex = 15;
             btn_loadPlaylist4.Text = "P4";
             btn_loadPlaylist4.UseVisualStyleBackColor = false;
+            btn_loadPlaylist4.Click += actionClick_loadMapPlaylist4;
             // 
             // btn_loadPlaylist3
             // 
@@ -630,6 +659,7 @@
             btn_loadPlaylist3.TabIndex = 14;
             btn_loadPlaylist3.Text = "P3";
             btn_loadPlaylist3.UseVisualStyleBackColor = false;
+            btn_loadPlaylist3.Click += actionClick_loadMapPlaylist3;
             // 
             // btn_loadPlaylist2
             // 
@@ -643,6 +673,7 @@
             btn_loadPlaylist2.TabIndex = 13;
             btn_loadPlaylist2.Text = "P2";
             btn_loadPlaylist2.UseVisualStyleBackColor = false;
+            btn_loadPlaylist2.Click += actionClick_loadMapPlaylist2;
             // 
             // btn_loadPlaylist1
             // 
@@ -656,6 +687,7 @@
             btn_loadPlaylist1.TabIndex = 12;
             btn_loadPlaylist1.Text = "P1";
             btn_loadPlaylist1.UseVisualStyleBackColor = false;
+            btn_loadPlaylist1.Click += actionClick_loadMapPlaylist1;
             // 
             // tableLayoutPanel8
             // 
@@ -699,7 +731,6 @@
             btn_mapControl7.TabIndex = 7;
             toolTip1.SetToolTip(btn_mapControl7, "Export");
             btn_mapControl7.UseVisualStyleBackColor = true;
-            btn_mapControl7.Click += actionClick_ExportCurrentPlaylist;
             // 
             // btn_mapControl6
             // 
@@ -715,12 +746,11 @@
             btn_mapControl6.TabIndex = 6;
             toolTip1.SetToolTip(btn_mapControl6, "Import");
             btn_mapControl6.UseVisualStyleBackColor = true;
-            btn_mapControl6.Click += actionClick_ImportCurrentPlaylist;
             // 
             // btn_mapControl5
             // 
             btn_mapControl5.Dock = DockStyle.Fill;
-            btn_mapControl5.IconChar = FontAwesome.Sharp.IconChar.Reply;
+            btn_mapControl5.IconChar = FontAwesome.Sharp.IconChar.None;
             btn_mapControl5.IconColor = Color.Black;
             btn_mapControl5.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btn_mapControl5.IconSize = 28;
@@ -729,10 +759,9 @@
             btn_mapControl5.Padding = new Padding(0, 5, 0, 0);
             btn_mapControl5.Size = new Size(54, 44);
             btn_mapControl5.TabIndex = 5;
-            toolTip1.SetToolTip(btn_mapControl5, "Reset Map Playlist");
+            toolTip1.SetToolTip(btn_mapControl5, "None");
             btn_mapControl5.UseVisualStyleBackColor = true;
             btn_mapControl5.Visible = false;
-            btn_mapControl5.Click += actionClick_ResetCurrentMapPlaylist;
             // 
             // btn_mapControl4
             // 
@@ -748,7 +777,7 @@
             btn_mapControl4.TabIndex = 4;
             toolTip1.SetToolTip(btn_mapControl4, "Refresh Available Maps");
             btn_mapControl4.UseVisualStyleBackColor = true;
-            btn_mapControl4.Click += actionClick_RefreshAvailableMaps;
+            btn_mapControl4.Click += actionClick_refeshMapLists;
             // 
             // btn_mapControl3
             // 
@@ -796,7 +825,7 @@
             btn_mapControl1.TabIndex = 0;
             toolTip1.SetToolTip(btn_mapControl1, "Play Next");
             btn_mapControl1.UseVisualStyleBackColor = true;
-            btn_mapControl1.Click += actionClick_PlayMapNext;
+            btn_mapControl1.Click += actionClick_mapPlayNext;
             // 
             // tabMaps
             // 
@@ -826,16 +855,6 @@
         private ToolTip toolTip1;
         public DataGridView dataGridView_availableMaps;
         public DataGridView dataGridView_currentMaps;
-        private DataGridViewTextBoxColumn avail_MapID;
-        private DataGridViewTextBoxColumn avail_MapName;
-        private DataGridViewTextBoxColumn avail_MapFileName;
-        private DataGridViewTextBoxColumn avail_MapType;
-        private DataGridViewTextBoxColumn avail_MapTypeShort;
-        private DataGridViewTextBoxColumn current_MapID;
-        private DataGridViewTextBoxColumn current_MapName;
-        private DataGridViewTextBoxColumn current_MapFileName;
-        private DataGridViewTextBoxColumn current_MapType;
-        private DataGridViewTextBoxColumn current_MapTypeShort;
         private TableLayoutPanel tableLayoutPanel6;
         private Button btn_mapTypeSD;
         private Button btn_mapTypeFB;
@@ -862,12 +881,24 @@
         private FontAwesome.Sharp.IconButton btn_playListControlB3;
         private FontAwesome.Sharp.IconButton btn_playListControlB2;
         private FontAwesome.Sharp.IconButton btn_playListControlB1;
-        private Button button1;
+        private Button btn_activePlaylist;
         private TableLayoutPanel tableLayoutPanel2;
         private Button btn_loadPlaylist5;
         private Button btn_loadPlaylist4;
         private Button btn_loadPlaylist3;
         private Button btn_loadPlaylist2;
         private Button btn_loadPlaylist1;
+        private DataGridViewTextBoxColumn avail_MapID;
+        private DataGridViewTextBoxColumn avail_MapName;
+        private DataGridViewTextBoxColumn avail_MapFileName;
+        private DataGridViewTextBoxColumn ModType;
+        private DataGridViewTextBoxColumn avail_MapType;
+        private DataGridViewTextBoxColumn avail_MapTypeShort;
+        private DataGridViewTextBoxColumn current_MapID;
+        private DataGridViewTextBoxColumn current_MapName;
+        private DataGridViewTextBoxColumn current_MapFileName;
+        private DataGridViewTextBoxColumn current_MapModType;
+        private DataGridViewTextBoxColumn current_MapType;
+        private DataGridViewTextBoxColumn current_MapTypeShort;
     }
 }

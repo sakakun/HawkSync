@@ -169,7 +169,14 @@ namespace BHD_ServerManager.Classes.Instances
         public Dictionary<int, playerObject> playerList { get; set; } = new();
         public List<playerTeamObject> playerChangeTeamList { get; set; } = new();
         public List<playerTeamObject> playerPreviousTeamList { get; set; } = new();
-    }
+
+        // Map Playlist
+        public Dictionary<int, List<mapFileInfo>> MapPlaylists = new Dictionary<int, List<mapFileInfo>>();
+        public int ActiveMapPlaylist { get; set; } = 1;
+        public bool ActiveMapPlaylistChanged { get; set; } = false;
+        public int SelectedMapPlaylist { get; set; } = 1;
+
+	}
 
     public enum InstanceStatus
     {

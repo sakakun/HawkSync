@@ -18,7 +18,6 @@ namespace BHD_ServerManager.Classes.GameManagement
     {
         // Global Variables
         private readonly static theInstance thisInstance = CommonCore.theInstance!;
-        private readonly static mapInstance mapInstance = CommonCore.instanceMaps!;
 
         // START: Process Memory Variables
         // Import of Dynamic Link Libraries
@@ -148,12 +147,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, mapListLocationPtr, mapListLocationPtrBytes, mapListLocationPtrBytes.Length, ref mapListLocationBytesPtrRead);
 
             int mapListNumberOfMaps = BitConverter.ToInt32(mapListLocationPtrBytes, 0) + 0x4;
-            byte[] numberOfMaps = BitConverter.GetBytes(mapInstance.currentMapPlaylist.Count);
+            byte[] numberOfMaps = BitConverter.GetBytes(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count);
             int numberofMapsWritten = 0;
             WriteProcessMemory((int)processHandle, mapListNumberOfMaps, numberOfMaps, numberOfMaps.Length, ref numberofMapsWritten);
 
             mapListNumberOfMaps += 0x4;
-            byte[] TotalnumberOfMaps = BitConverter.GetBytes(mapInstance.currentMapPlaylist.Count);
+            byte[] TotalnumberOfMaps = BitConverter.GetBytes(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count);
             int TotalnumberofMapsWritten = 0;
             WriteProcessMemory((int)processHandle, mapListNumberOfMaps, TotalnumberOfMaps, TotalnumberOfMaps.Length, ref TotalnumberofMapsWritten);
 
@@ -822,7 +821,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Clears the current map cycle and fills it with empty maps
         public static void UpdateMapCycle1()
         {
-            if (mapInstance.currentMapPlaylist.Count > 128)
+            if (thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count > 128)
             {
                 throw new Exception("Someway, somehow, someone bypassed the maplist checks. You are NOT allowed to have more than 128 maps. #88");
             }
@@ -835,12 +834,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             int mapCycleServerAddress = BitConverter.ToInt32(ServerMapCyclePtr, 0);
 
             int mapCycleTotalAddress = mapCycleServerAddress + 0x4;
-            byte[] mapTotal = BitConverter.GetBytes(mapInstance.currentMapPlaylist.Count);
+            byte[] mapTotal = BitConverter.GetBytes(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count);
             int mapTotalWritten = 0;
             WriteProcessMemory((int)processHandle, mapCycleTotalAddress, mapTotal, mapTotal.Length, ref mapTotalWritten);
 
             int mapCycleCurrentIndex = mapCycleServerAddress + 0xC;
-            byte[] resetMapIndex = BitConverter.GetBytes(mapInstance.currentMapPlaylist.Count);
+            byte[] resetMapIndex = BitConverter.GetBytes(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count);
             int resetMapIndexWritten = 0;
             WriteProcessMemory((int)processHandle, mapCycleCurrentIndex, resetMapIndex, resetMapIndex.Length, ref resetMapIndexWritten);
 
@@ -849,7 +848,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, mapCycleServerAddress, mapCycleListAddress, mapCycleListAddress.Length, ref mapCycleListAddressRead);
             int mapCycleList = BitConverter.ToInt32(mapCycleListAddress, 0);
 
-            foreach (mapFileInfo entry in mapInstance.previousMapPlaylist)
+            foreach (mapFileInfo entry in thisInstance.MapPlaylists[0])
             {
                 int mapFileIndexLocation = mapCycleList;
 
@@ -869,7 +868,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Actually updates the memory of the game server with the current map list
         public static void UpdateMapCycle2()
         {
-            if (mapInstance.currentMapPlaylist.Count > 128)
+            if (thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count > 128)
             {
                 throw new Exception("Someway, somehow, someone bypassed the maplist checks. You are NOT allowed to have more than 128 maps. #89");
             }
@@ -894,7 +893,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
 
             // Write the first map
-            var firstMap = mapInstance.currentMapPlaylist[0];
+            var firstMap = thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][0];
             WriteFixedString(firstMap.MapFile!, 28);
             bw.Write(new byte[256]); // adjust this padding as needed
 
@@ -911,9 +910,9 @@ namespace BHD_ServerManager.Classes.GameManagement
 			bw.Write(new byte[24]); // adjust this padding as needed
 
             // Write additional maps
-            for (int i = 1; i < mapInstance.currentMapPlaylist.Count; i++)
+            for (int i = 1; i < thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count; i++)
             {
-                var map = mapInstance.currentMapPlaylist[i];
+                var map = thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][i];
                 WriteFixedString(map.MapFile!, 28);
                 bw.Write(new byte[256]); // adjust this padding as needed
 
@@ -950,13 +949,13 @@ namespace BHD_ServerManager.Classes.GameManagement
             int mapCycleServerAddress = BitConverter.ToInt32(ServerMapCyclePtr, 0);
 
             int mapCycleTotalAddress = mapCycleServerAddress + 0x4;
-            byte[] mapTotal = BitConverter.GetBytes(mapInstance.currentMapPlaylist.Count);
+            byte[] mapTotal = BitConverter.GetBytes(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count);
             int mapTotalWritten = 0;
             WriteProcessMemory((int)processHandle, mapCycleTotalAddress, mapTotal, mapTotal.Length, ref mapTotalWritten);
 
 
             int mapCycleCurrentIndex = mapCycleServerAddress + 0xC;
-            byte[] resetMapIndex = BitConverter.GetBytes(mapInstance.currentMapPlaylist.Count);
+            byte[] resetMapIndex = BitConverter.GetBytes(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count);
             int resetMapIndexWritten = 0;
             WriteProcessMemory((int)processHandle, mapCycleCurrentIndex, resetMapIndex, resetMapIndex.Length, ref resetMapIndexWritten);
 
@@ -967,17 +966,17 @@ namespace BHD_ServerManager.Classes.GameManagement
             int mapCycleList = BitConverter.ToInt32(mapCycleListAddress, 0);
 
 
-            for (int i = 0; i < mapInstance.currentMapPlaylist.Count; i++)
+            for (int i = 0; i < thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count; i++)
             {
                 int mapFileIndexLocation = mapCycleList;
                 byte[] mapFileBytes = new byte[0x20]; // 32 bytes
-                byte[] nameBytes = Encoding.ASCII.GetBytes(mapInstance.currentMapPlaylist[i].MapFile!);
+                byte[] nameBytes = Encoding.ASCII.GetBytes(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][i].MapFile!);
                 Array.Copy(nameBytes, mapFileBytes, Math.Min(nameBytes.Length, mapFileBytes.Length));
                 int mapFileBytesWritten = 0;
                 WriteProcessMemory((int)processHandle, mapFileIndexLocation, mapFileBytes, mapFileBytes.Length, ref mapFileBytesWritten);
                 mapFileIndexLocation += 0x20;
 
-                byte[] customMapFlag = BitConverter.GetBytes(Convert.ToInt32(mapInstance.currentMapPlaylist[i].ModType==9?1:0));
+                byte[] customMapFlag = BitConverter.GetBytes(Convert.ToInt32(thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][i].ModType==9?1:0));
                 int customMapFlagWritten = 0;
                 WriteProcessMemory((int)processHandle, mapFileIndexLocation, customMapFlag, customMapFlag.Length, ref customMapFlagWritten);
                 mapCycleList += 0x24;
@@ -1083,9 +1082,9 @@ namespace BHD_ServerManager.Classes.GameManagement
             int CurrentMapIndexBytesRead = 0;
             ReadProcessMemory((int)processHandle, Ptr2, CurrentMapIndexBytes, CurrentMapIndexBytes.Length, ref CurrentMapIndexBytesRead);
             int currentMapIndex = BitConverter.ToInt32(CurrentMapIndexBytes, 0);
-            AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.currentMapPlaylist.Count + " Pre-Check Current Map Index: " + currentMapIndex);
+            AppDebug.Log("ServerMemory", "Number of Maps: " + thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count + " Pre-Check Current Map Index: " + currentMapIndex);
 
-            if (currentMapIndex + 1 >= mapInstance.currentMapPlaylist.Count || mapInstance.currentMapPlaylist[currentMapIndex + 1] == null)
+            if (currentMapIndex + 1 >= thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count || thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][currentMapIndex + 1] == null)
             {
                 currentMapIndex = 0;
             }
@@ -1094,12 +1093,12 @@ namespace BHD_ServerManager.Classes.GameManagement
                 currentMapIndex++;
             }
 
-            AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.currentMapPlaylist.Count + " Current Map Index: " + currentMapIndex);
+            AppDebug.Log("ServerMemory", "Number of Maps: " + thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count + " Current Map Index: " + currentMapIndex);
             int currentMapType = thisInstance.gameInfoGameType;
-            int nextMapType = mapInstance.currentMapPlaylist[currentMapIndex].MapType;
+            int nextMapType = thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][currentMapIndex].MapType;
 
             AppDebug.Log("ServerMemory", "Current Map Type: " + thisInstance.gameInfoMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
-            AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.currentMapPlaylist[currentMapIndex].MapName + " " + mapInstance.currentMapPlaylist[currentMapIndex].MapType + " - " + nextMapType);
+            AppDebug.Log("ServerMemory", "Next Map Type: " + thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][currentMapIndex].MapName + " " + thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][currentMapIndex].MapType + " - " + nextMapType);
 
             thisInstance.gameInfoNextMapGameType = nextMapType;
 
@@ -1217,9 +1216,9 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             if (NextMapIndex - 1 == -1)
             {
-                NextMapIndex = mapInstance.currentMapPlaylist.Count;
+                NextMapIndex = thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist].Count;
             }
-            else if (mapInstance.currentMapPlaylist[NextMapIndex - 1] != null)
+            else if (thisInstance.MapPlaylists[thisInstance.ActiveMapPlaylist][NextMapIndex - 1] != null)
             {
                 NextMapIndex--;
             }
@@ -2195,6 +2194,23 @@ namespace BHD_ServerManager.Classes.GameManagement
             thisInstance.gameInfoCurrentBlueScore = blueTeamScore;
             thisInstance.gameInfoCurrentRedScore = redTeamScore;
             return;
+
+        }
+
+        
+        // Function: WriteMemoryScoreMap
+        public static void ScoreMap()
+        {
+            if (thisInstance.instanceStatus == InstanceStatus.SCORING || thisInstance.instanceStatus == InstanceStatus.LOADINGMAP)
+            {
+                return;
+            }
+
+            var startingPtr1 = 0;
+            startingPtr1 = baseAddr + 0x5F3740;
+            byte[] timerBytes = BitConverter.GetBytes(10);
+            int timerWritten1 = 0;
+            WriteProcessMemory((int)processHandle, startingPtr1, timerBytes, timerBytes.Length, ref timerWritten1);
 
         }
 
