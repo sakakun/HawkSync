@@ -203,7 +203,7 @@
             tabAutoMessages.Margin = new Padding(0);
             tabAutoMessages.Name = "tabAutoMessages";
             tabAutoMessages.Padding = new Padding(3);
-            tabAutoMessages.Size = new Size(795, 400);
+            tabAutoMessages.Size = new Size(935, 414);
             tabAutoMessages.TabIndex = 1;
             tabAutoMessages.Text = "Auto Messages";
             tabAutoMessages.UseVisualStyleBackColor = true;
@@ -221,7 +221,7 @@
             tableLayoutPanel3.RowCount = 2;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.Size = new Size(789, 394);
+            tableLayoutPanel3.Size = new Size(929, 408);
             tableLayoutPanel3.TabIndex = 0;
             // 
             // dg_autoMessages
@@ -237,7 +237,7 @@
             dg_autoMessages.Name = "dg_autoMessages";
             dg_autoMessages.ReadOnly = true;
             dg_autoMessages.RowHeadersVisible = false;
-            dg_autoMessages.Size = new Size(865, 370);
+            dg_autoMessages.Size = new Size(925, 384);
             dg_autoMessages.TabIndex = 1;
             dg_autoMessages.CellDoubleClick += actionClick_RemoveAutoMessage;
             // 
@@ -269,12 +269,12 @@
             tableLayoutPanel4.Controls.Add(tb_autoMessage, 1, 0);
             tableLayoutPanel4.Controls.Add(num_AutoMessageTrigger, 0, 0);
             tableLayoutPanel4.Dock = DockStyle.Fill;
-            tableLayoutPanel4.Location = new Point(0, 370);
+            tableLayoutPanel4.Location = new Point(0, 384);
             tableLayoutPanel4.Margin = new Padding(0);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
             tableLayoutPanel4.RowCount = 1;
             tableLayoutPanel4.RowStyles.Add(new RowStyle());
-            tableLayoutPanel4.Size = new Size(869, 24);
+            tableLayoutPanel4.Size = new Size(929, 24);
             tableLayoutPanel4.TabIndex = 2;
             // 
             // tb_autoMessage
@@ -283,7 +283,7 @@
             tb_autoMessage.Location = new Point(125, 0);
             tb_autoMessage.Margin = new Padding(0);
             tb_autoMessage.Name = "tb_autoMessage";
-            tb_autoMessage.Size = new Size(744, 23);
+            tb_autoMessage.Size = new Size(804, 23);
             tb_autoMessage.TabIndex = 4;
             tb_autoMessage.KeyPress += actionKeyPressed_AddAutoMessage;
             // 
@@ -305,7 +305,7 @@
             tabSlapMessages.Margin = new Padding(0);
             tabSlapMessages.Name = "tabSlapMessages";
             tabSlapMessages.Padding = new Padding(3);
-            tabSlapMessages.Size = new Size(795, 400);
+            tabSlapMessages.Size = new Size(935, 414);
             tabSlapMessages.TabIndex = 2;
             tabSlapMessages.Text = "Slap Messages";
             tabSlapMessages.UseVisualStyleBackColor = true;
@@ -323,16 +323,16 @@
             tableLayoutPanel5.RowCount = 2;
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel5.Size = new Size(789, 394);
+            tableLayoutPanel5.Size = new Size(929, 408);
             tableLayoutPanel5.TabIndex = 0;
             // 
             // tb_slapMessage
             // 
             tb_slapMessage.Dock = DockStyle.Fill;
-            tb_slapMessage.Location = new Point(0, 370);
+            tb_slapMessage.Location = new Point(0, 384);
             tb_slapMessage.Margin = new Padding(0);
             tb_slapMessage.Name = "tb_slapMessage";
-            tb_slapMessage.Size = new Size(865, 23);
+            tb_slapMessage.Size = new Size(929, 23);
             tb_slapMessage.TabIndex = 2;
             tb_slapMessage.KeyPress += actionKeyPress_slapAddMessage;
             // 
@@ -349,7 +349,7 @@
             dg_slapMessages.Name = "dg_slapMessages";
             dg_slapMessages.ReadOnly = true;
             dg_slapMessages.RowHeadersVisible = false;
-            dg_slapMessages.Size = new Size(865, 370);
+            dg_slapMessages.Size = new Size(929, 384);
             dg_slapMessages.TabIndex = 1;
             dg_slapMessages.CellContentDoubleClick += actionClick_RemoveSlap;
             // 
