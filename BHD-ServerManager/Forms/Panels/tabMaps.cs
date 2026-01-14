@@ -99,7 +99,7 @@ namespace BHD_ServerManager.Forms.Panels
         private void methodFunction_loadCustomMapps()
         {
             // Get Current serverGamePath
-            string gamePath = ServerSettings.Get("serverGamePath", string.Empty);
+            string gamePath = theInstance!.profileServerPath;
             if (gamePath == string.Empty)
             {
                 return;
