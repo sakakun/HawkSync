@@ -63,7 +63,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 thisServer.functionEvent_tickerServerGUI();                                     // Ticker for the Main Server GUI
 
                 // --- UI Update Hooks ---
-                thisServer.ProfileTab.tickerProfileTabHook();                                   // Toggle Profile Lock based on server status
                 thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
                 thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
                 thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab

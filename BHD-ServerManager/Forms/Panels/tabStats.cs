@@ -56,9 +56,6 @@ namespace BHD_ServerManager.Forms.Panels
             theInstance.WebStatsAnnouncements = cb_enableAnnouncements.Checked;
             theInstance.WebStatsReportInterval = (int)num_WebStatsReport.Value;
             theInstance.WebStatsUpdateInterval = (int)num_WebStatsUpdates.Value;
-
-            // Save the settings to file
-            theInstanceManager.SaveSettings();
         }
 
 

@@ -234,7 +234,6 @@
             btn_LoadSettings.Text = "LOAD";
             toolTip1.SetToolTip(btn_LoadSettings, "Load Settings from File");
             btn_LoadSettings.UseVisualStyleBackColor = true;
-            btn_LoadSettings.Click += actionClick_ImportServerSettings;
             // 
             // btn_ExportSettings
             // 
@@ -247,7 +246,6 @@
             btn_ExportSettings.Text = "EXPORT";
             toolTip1.SetToolTip(btn_ExportSettings, "Export Settings to File");
             btn_ExportSettings.UseVisualStyleBackColor = true;
-            btn_ExportSettings.Click += actionClick_ExportServerSettings;
             // 
             // btn_ResetSettings
             // 

@@ -36,7 +36,6 @@ namespace BHD_ServerManager.Forms
             functionEvent_loadPanels();                                         // Load the User Control Tabs
 
 			// Old Server Settings Initialization
-			theInstanceManager.CheckSettings();
             banInstanceManager.LoadSettings();
             chatInstanceManager.LoadSettings();
             theInstanceManager.InitializeTickers();
@@ -183,7 +182,6 @@ namespace BHD_ServerManager.Forms
             CommonCore.Ticker?.Stop("ChatManager");
             CommonCore.Ticker?.Stop("PlayerManager");
             CommonCore.Ticker?.Stop("BanManager");
-            theInstanceManager.SaveSettings();
             base.OnFormClosing(e);
         }
 

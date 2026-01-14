@@ -270,9 +270,6 @@ namespace BHD_ServerManager.Forms.Panels
         {
             methodFunction_loadSettings();
         }
-        // --- Import/Export Server Settings ---
-        private void actionClick_ImportServerSettings(object sender, EventArgs e) => theInstanceManager.ImportSettings();
-        private void actionClick_ExportServerSettings(object sender, EventArgs e) => theInstanceManager.ExportSettings();
         // --- Server Control Button Clicked ---
         private void actionClick_serverControl(object sender, EventArgs e)
         {

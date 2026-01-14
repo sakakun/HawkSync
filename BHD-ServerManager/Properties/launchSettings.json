@@ -2,7 +2,7 @@
   "profiles": {
     "ServerManager": {
       "commandName": "Project",
-      "workingDirectory": "\\\\VM-DEV\\ServerData\\Development\\HawkSyncOld",
+      "workingDirectory": "\\\\VM-DEV\\ServerData\\Development\\HawkSync",
       "remoteDebugEnabled": true,
       "remoteDebugMachine": "VM-DEV",
       "authenticationMode": "None"

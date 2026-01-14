@@ -22,132 +22,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // The Instances (Data)
         private static theInstance theInstance => CommonCore.theInstance!;
 
-        public static void CheckSettings()
-        {
-            // Ensure AppData directory exists, with verbose logging and error handling.
-            try
-            {
-                if (!Directory.Exists(CommonCore.AppDataPath))
-                {
-                    AppDebug.Log("InstanceManager", $"AppData ({CommonCore.AppDataPath}) directory does not exist, creating it now.");
-                    Directory.CreateDirectory(CommonCore.AppDataPath);
-                }
-
-                if (!File.Exists(lastKnownSettingsPath))
-                {
-                    AppDebug.Log("InstanceManager", $"Settings file not found at {lastKnownSettingsPath}. Creating a new one with default values.");
-                    theInstanceManager.SaveSettings();
-                }
-                else
-                {
-                    AppDebug.Log("InstanceManager", $"Settings file found at {lastKnownSettingsPath}. Loading settings.");
-                    theInstanceManager.LoadSettings();
-                }
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("InstanceManager", $"Error during settings check: {ex.Message}");
-                throw;
-            }
-        }
-        public static void LoadSettings(bool external = false, string? path = null)
-        {
-            string settingsPath = external && !string.IsNullOrWhiteSpace(path) ? path : lastKnownSettingsPath;
-            AppDebug.Log("InstanceManager", $"Loading settings from {(external ? "external path" : "default path")}: {settingsPath}");
-
-            if (!File.Exists(settingsPath))
-            {
-                AppDebug.Log("InstanceManager", $"Settings file not found at {settingsPath}. Using default settings.");
-                return;
-            }
-
-            try
-            {
-                var tempInstance = JsonSerializer.Deserialize<theInstance>(File.ReadAllText(settingsPath));
-                if (tempInstance == null) return;
-
-                if (!external)
-                {
-                    // Copy all properties from tempInstance to theInstance
-                    foreach (var prop in typeof(theInstance).GetProperties())
-                    {
-                        if (prop.CanRead && prop.CanWrite && prop.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).Length == 0)
-                        {
-                            var value = prop.GetValue(tempInstance);
-                            prop.SetValue(theInstance, value);
-                        }
-                    }
-                    theInstance.profileServerPath = tempInstance.profileServerPath != null ? Encoding.UTF8.GetString(Convert.FromBase64String(tempInstance.profileServerPath)) : string.Empty;
-
-                    theInstanceManager.GetServerVariables();
-                }
-                else
-                {
-                    theInstanceManager.GetServerVariables(true, tempInstance); // Get the variables from the tempInstance
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to load settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AppDebug.Log("InstanceManager", $"Failed to load settings: {ex.Message}");
-            }
-        }
-        public static void SaveSettings(bool external = false, string? path = null)
-        {
-            string settingsPath = external && !string.IsNullOrWhiteSpace(path) ? path : lastKnownSettingsPath;
-            try
-            {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                };
-                theInstance tempInstance = new theInstance();
-                foreach (var prop in typeof(theInstance).GetProperties())
-                {
-                    if (prop.CanRead && prop.CanWrite && prop.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).Length == 0)
-                    {
-                        var value = prop.GetValue(theInstance);
-                        if (value != null)
-                        {
-                            prop.SetValue(tempInstance, value);
-                        }
-                    }
-                }
-                // Only encode if not null or empty
-                if (!string.IsNullOrEmpty(tempInstance.profileServerPath))
-                {
-                    tempInstance.profileServerPath = Convert.ToBase64String(Encoding.UTF8.GetBytes(tempInstance.profileServerPath));
-                }
-                string json = JsonSerializer.Serialize(tempInstance, options);
-                File.WriteAllText(settingsPath, json);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to save settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AppDebug.Log("InstanceManager", $"Failed to save settings: {ex.Message}");
-            }
-        }
-        public static void ExportSettings()
-        {
-            // Export the settings to a JSON file using a ShowFileDialog from CoreManager
-            string savePath = CommonCore.AppDataPath;
-            string exportPath = Functions.ShowFileDialog(true, "Server Settings (*.svset)|*.svset|All files (*.*)|*.*", "Export Server Settings", savePath, "exportedServerSettings.svset")!;
-            if (!string.IsNullOrEmpty(exportPath))
-            {
-                theInstanceManager.SaveSettings(true, exportPath); // Save the settings to the specified path
-            }
-
-        }
-        public static void ImportSettings()
-        {
-            string savePath = CommonCore.AppDataPath;
-            string importPath = Functions.ShowFileDialog(true, "Server Settings (*.svset)|*.svset|All files (*.*)|*.*", "Import Server Settings", savePath, "importServerSettings.svset")!;
-            if (!string.IsNullOrEmpty(importPath))
-            {
-                theInstanceManager.LoadSettings(true, importPath);
-            }
-        }
         public static bool ValidateGameServerPath()
         {
             // Validate the profile server path
@@ -169,16 +43,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             // Trigger "Gets" for the Tabs
             thisServer.StatsTab.functionEvent_GetStatSettings((updatedInstance != null ? updatedInstance : null!));
 
-        }
-        public static void ValidateGameServerType(string serverPath)
-        {
-            // Additional checks can be added here if necessary
-            if (File.Exists(Path.Combine(serverPath, "EXP1.pff")))
-            {
-                thisInstance.profileServerType = 1; // BHDTS
-                return;
-            }
-            thisInstance.profileServerType = 0; // BHD
         }
         public static void UpdateGameServer()
         {
@@ -392,35 +256,5 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         }
 
-        public static void HighlightDifferences()
-        {
-            // TO DO: Remove the need for HighlightDifferences in theInstanceManager.
-        }
-
-        // Helper methods for highlighting
-        public static void HighlightTextBox(TextBox tb, string value)
-        {
-            tb.BackColor = tb.Text == value ? SystemColors.Window : Color.LightYellow;
-        }
-
-        public static void HighlightComboBox(ComboBox cb, string value)
-        {
-            cb.BackColor = cb.Text == value ? SystemColors.Window : Color.LightYellow;
-        }
-
-        public static void HighlightComboBoxIndex(ComboBox cb, int value)
-        {
-            cb.BackColor = cb.SelectedIndex == value ? SystemColors.Window : Color.LightYellow;
-        }
-
-        public static void HighlightNumericUpDown(NumericUpDown num, int value)
-        {
-            num.BackColor = (int)num.Value == value ? SystemColors.Window : Color.LightYellow;
-        }
-
-        public static void HighlightCheckBox(CheckBox cb, bool value)
-        {
-            cb.BackColor = cb.Checked == value ? SystemColors.Control : Color.LightYellow;
-        }
     }
 }
