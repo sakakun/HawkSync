@@ -238,9 +238,9 @@
             // 
             groupBox7.Controls.Add(tableLayoutPanel6);
             groupBox7.Dock = DockStyle.Top;
-            groupBox7.Location = new Point(3, 152);
+            groupBox7.Location = new Point(3, 118);
             groupBox7.Name = "groupBox7";
-            groupBox7.Size = new Size(428, 148);
+            groupBox7.Size = new Size(428, 137);
             groupBox7.TabIndex = 1;
             groupBox7.TabStop = false;
             groupBox7.Text = "Server Details";
@@ -266,7 +266,7 @@
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel6.Size = new Size(422, 126);
+            tableLayoutPanel6.Size = new Size(422, 115);
             tableLayoutPanel6.TabIndex = 0;
             // 
             // cb_serverDedicated
@@ -277,10 +277,10 @@
             cb_serverDedicated.CheckState = CheckState.Checked;
             tableLayoutPanel6.SetColumnSpan(cb_serverDedicated, 2);
             cb_serverDedicated.Dock = DockStyle.Fill;
-            cb_serverDedicated.Location = new Point(186, 96);
+            cb_serverDedicated.Location = new Point(186, 87);
             cb_serverDedicated.Margin = new Padding(3, 3, 10, 3);
             cb_serverDedicated.Name = "cb_serverDedicated";
-            cb_serverDedicated.Size = new Size(226, 27);
+            cb_serverDedicated.Size = new Size(226, 25);
             cb_serverDedicated.TabIndex = 11;
             cb_serverDedicated.Text = "Run in Dedicated Mode";
             cb_serverDedicated.TextAlign = ContentAlignment.MiddleRight;
@@ -292,10 +292,10 @@
             cb_requireNova.CheckAlign = ContentAlignment.MiddleRight;
             tableLayoutPanel6.SetColumnSpan(cb_requireNova, 2);
             cb_requireNova.Dock = DockStyle.Fill;
-            cb_requireNova.Location = new Point(186, 65);
+            cb_requireNova.Location = new Point(186, 59);
             cb_requireNova.Margin = new Padding(3, 3, 10, 3);
             cb_requireNova.Name = "cb_requireNova";
-            cb_requireNova.Size = new Size(226, 25);
+            cb_requireNova.Size = new Size(226, 22);
             cb_requireNova.TabIndex = 10;
             cb_requireNova.Text = "NovaWorld Login Required";
             cb_requireNova.TextAlign = ContentAlignment.MiddleRight;
@@ -305,9 +305,9 @@
             // 
             label3.AutoSize = true;
             label3.Dock = DockStyle.Fill;
-            label3.Location = new Point(3, 31);
+            label3.Location = new Point(3, 28);
             label3.Name = "label3";
-            label3.Size = new Size(177, 31);
+            label3.Size = new Size(177, 28);
             label3.TabIndex = 9;
             label3.Text = "Lobby Password";
             label3.TextAlign = ContentAlignment.MiddleRight;
@@ -316,7 +316,7 @@
             // 
             tableLayoutPanel6.SetColumnSpan(tb_serverPassword, 2);
             tb_serverPassword.Dock = DockStyle.Fill;
-            tb_serverPassword.Location = new Point(186, 34);
+            tb_serverPassword.Location = new Point(186, 31);
             tb_serverPassword.MaxLength = 16;
             tb_serverPassword.Name = "tb_serverPassword";
             tb_serverPassword.PlaceholderText = "Server Password";
@@ -330,7 +330,7 @@
             label1.Dock = DockStyle.Fill;
             label1.Location = new Point(3, 0);
             label1.Name = "label1";
-            label1.Size = new Size(177, 31);
+            label1.Size = new Size(177, 28);
             label1.TabIndex = 5;
             label1.Text = "Game IP Infomation";
             label1.TextAlign = ContentAlignment.MiddleRight;
@@ -363,7 +363,7 @@
             groupBox6.Dock = DockStyle.Top;
             groupBox6.Location = new Point(3, 3);
             groupBox6.Name = "groupBox6";
-            groupBox6.Size = new Size(428, 149);
+            groupBox6.Size = new Size(428, 115);
             groupBox6.TabIndex = 0;
             groupBox6.TabStop = false;
             groupBox6.Text = "Host Information";
@@ -384,7 +384,7 @@
             tableLayoutPanel5.RowCount = 2;
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel5.Size = new Size(422, 127);
+            tableLayoutPanel5.Size = new Size(422, 93);
             tableLayoutPanel5.TabIndex = 0;
             // 
             // tb_serverMessage
@@ -396,7 +396,7 @@
             tb_serverMessage.Multiline = true;
             tb_serverMessage.Name = "tb_serverMessage";
             tb_serverMessage.PlaceholderText = "Server Welcome Message";
-            tb_serverMessage.Size = new Size(416, 93);
+            tb_serverMessage.Size = new Size(416, 59);
             tb_serverMessage.TabIndex = 14;
             // 
             // serverCountryCode
@@ -449,11 +449,11 @@
             // groupBox1
             // 
             groupBox1.Controls.Add(tableLayoutPanel3);
-            groupBox1.Dock = DockStyle.Fill;
+            groupBox1.Dock = DockStyle.Top;
             groupBox1.Location = new Point(0, 58);
             groupBox1.Margin = new Padding(0);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(434, 112);
+            groupBox1.Size = new Size(434, 58);
             groupBox1.TabIndex = 5;
             groupBox1.TabStop = false;
             groupBox1.Text = "Custom Mod File Path";
@@ -471,7 +471,7 @@
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Size = new Size(428, 90);
+            tableLayoutPanel3.Size = new Size(428, 36);
             tableLayoutPanel3.TabIndex = 0;
             // 
             // tb_modFile
@@ -481,7 +481,7 @@
             tb_modFile.Location = new Point(3, 3);
             tb_modFile.Multiline = true;
             tb_modFile.Name = "tb_modFile";
-            tb_modFile.Size = new Size(327, 84);
+            tb_modFile.Size = new Size(327, 30);
             tb_modFile.TabIndex = 6;
             // 
             // btn_profileBrowse2
@@ -491,7 +491,7 @@
             btn_profileBrowse2.FlatStyle = FlatStyle.Flat;
             btn_profileBrowse2.Location = new Point(336, 3);
             btn_profileBrowse2.Name = "btn_profileBrowse2";
-            btn_profileBrowse2.Size = new Size(89, 84);
+            btn_profileBrowse2.Size = new Size(89, 30);
             btn_profileBrowse2.TabIndex = 5;
             btn_profileBrowse2.Text = "Browse";
             btn_profileBrowse2.UseVisualStyleBackColor = true;
@@ -549,9 +549,9 @@
             // 
             groupBox3.Controls.Add(tableAtributes);
             groupBox3.Dock = DockStyle.Bottom;
-            groupBox3.Location = new Point(0, 170);
+            groupBox3.Location = new Point(0, 176);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(434, 218);
+            groupBox3.Size = new Size(434, 212);
             groupBox3.TabIndex = 4;
             groupBox3.TabStop = false;
             groupBox3.Text = "Application Commandline Switches";
@@ -596,7 +596,7 @@
             tableAtributes.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857141F));
             tableAtributes.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857141F));
             tableAtributes.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableAtributes.Size = new Size(428, 196);
+            tableAtributes.Size = new Size(428, 190);
             tableAtributes.TabIndex = 0;
             // 
             // profileServerAttribute01
@@ -607,7 +607,7 @@
             profileServerAttribute01.Location = new Point(10, 0);
             profileServerAttribute01.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute01.Name = "profileServerAttribute01";
-            profileServerAttribute01.Size = new Size(132, 28);
+            profileServerAttribute01.Size = new Size(132, 27);
             profileServerAttribute01.TabIndex = 0;
             profileServerAttribute01.Text = "/DUMP";
             profileServerAttribute01.UseVisualStyleBackColor = true;
@@ -620,7 +620,7 @@
             profileServerAttribute02.Location = new Point(147, 0);
             profileServerAttribute02.Margin = new Padding(5, 0, 0, 0);
             profileServerAttribute02.Name = "profileServerAttribute02";
-            profileServerAttribute02.Size = new Size(137, 28);
+            profileServerAttribute02.Size = new Size(137, 27);
             profileServerAttribute02.TabIndex = 1;
             profileServerAttribute02.Text = "/WDM";
             profileServerAttribute02.UseVisualStyleBackColor = true;
@@ -633,7 +633,7 @@
             profileServerAttribute03.Location = new Point(294, 0);
             profileServerAttribute03.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute03.Name = "profileServerAttribute03";
-            profileServerAttribute03.Size = new Size(134, 28);
+            profileServerAttribute03.Size = new Size(134, 27);
             profileServerAttribute03.TabIndex = 0;
             profileServerAttribute03.Text = "/FRISK";
             profileServerAttribute03.UseVisualStyleBackColor = true;
@@ -643,10 +643,10 @@
             profileServerAttribute04.AutoSize = true;
             profileServerAttribute04.Dock = DockStyle.Fill;
             profileServerAttribute04.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute04.Location = new Point(10, 28);
+            profileServerAttribute04.Location = new Point(10, 27);
             profileServerAttribute04.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute04.Name = "profileServerAttribute04";
-            profileServerAttribute04.Size = new Size(132, 28);
+            profileServerAttribute04.Size = new Size(132, 27);
             profileServerAttribute04.TabIndex = 0;
             profileServerAttribute04.Text = "/mod";
             profileServerAttribute04.UseVisualStyleBackColor = true;
@@ -656,10 +656,10 @@
             profileServerAttribute05.AutoSize = true;
             profileServerAttribute05.Dock = DockStyle.Fill;
             profileServerAttribute05.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute05.Location = new Point(147, 28);
+            profileServerAttribute05.Location = new Point(147, 27);
             profileServerAttribute05.Margin = new Padding(5, 0, 0, 0);
             profileServerAttribute05.Name = "profileServerAttribute05";
-            profileServerAttribute05.Size = new Size(137, 28);
+            profileServerAttribute05.Size = new Size(137, 27);
             profileServerAttribute05.TabIndex = 0;
             profileServerAttribute05.Text = "/betamp";
             profileServerAttribute05.UseVisualStyleBackColor = true;
@@ -669,10 +669,10 @@
             profileServerAttribute06.AutoSize = true;
             profileServerAttribute06.Dock = DockStyle.Fill;
             profileServerAttribute06.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute06.Location = new Point(294, 28);
+            profileServerAttribute06.Location = new Point(294, 27);
             profileServerAttribute06.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute06.Name = "profileServerAttribute06";
-            profileServerAttribute06.Size = new Size(134, 28);
+            profileServerAttribute06.Size = new Size(134, 27);
             profileServerAttribute06.TabIndex = 0;
             profileServerAttribute06.Text = "/noreload";
             profileServerAttribute06.UseVisualStyleBackColor = true;
@@ -684,10 +684,10 @@
             profileServerAttribute07.CheckState = CheckState.Checked;
             profileServerAttribute07.Dock = DockStyle.Fill;
             profileServerAttribute07.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute07.Location = new Point(10, 56);
+            profileServerAttribute07.Location = new Point(10, 54);
             profileServerAttribute07.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute07.Name = "profileServerAttribute07";
-            profileServerAttribute07.Size = new Size(132, 28);
+            profileServerAttribute07.Size = new Size(132, 27);
             profileServerAttribute07.TabIndex = 0;
             profileServerAttribute07.Text = "/w";
             profileServerAttribute07.UseVisualStyleBackColor = true;
@@ -699,10 +699,10 @@
             profileServerAttribute08.CheckState = CheckState.Checked;
             profileServerAttribute08.Dock = DockStyle.Fill;
             profileServerAttribute08.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute08.Location = new Point(147, 56);
+            profileServerAttribute08.Location = new Point(147, 54);
             profileServerAttribute08.Margin = new Padding(5, 0, 0, 0);
             profileServerAttribute08.Name = "profileServerAttribute08";
-            profileServerAttribute08.Size = new Size(137, 28);
+            profileServerAttribute08.Size = new Size(137, 27);
             profileServerAttribute08.TabIndex = 0;
             profileServerAttribute08.Text = "/autorestart";
             profileServerAttribute08.UseVisualStyleBackColor = true;
@@ -712,10 +712,10 @@
             profileServerAttribute09.AutoSize = true;
             profileServerAttribute09.Dock = DockStyle.Fill;
             profileServerAttribute09.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute09.Location = new Point(294, 56);
+            profileServerAttribute09.Location = new Point(294, 54);
             profileServerAttribute09.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute09.Name = "profileServerAttribute09";
-            profileServerAttribute09.Size = new Size(134, 28);
+            profileServerAttribute09.Size = new Size(134, 27);
             profileServerAttribute09.TabIndex = 0;
             profileServerAttribute09.Text = "/L";
             profileServerAttribute09.UseVisualStyleBackColor = true;
@@ -725,10 +725,10 @@
             profileServerAttribute10.AutoSize = true;
             profileServerAttribute10.Dock = DockStyle.Fill;
             profileServerAttribute10.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute10.Location = new Point(10, 84);
+            profileServerAttribute10.Location = new Point(10, 81);
             profileServerAttribute10.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute10.Name = "profileServerAttribute10";
-            profileServerAttribute10.Size = new Size(132, 28);
+            profileServerAttribute10.Size = new Size(132, 27);
             profileServerAttribute10.TabIndex = 0;
             profileServerAttribute10.Text = "/BADPACKETS";
             profileServerAttribute10.UseVisualStyleBackColor = true;
@@ -738,10 +738,10 @@
             profileServerAttribute11.AutoSize = true;
             profileServerAttribute11.Dock = DockStyle.Fill;
             profileServerAttribute11.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute11.Location = new Point(147, 84);
+            profileServerAttribute11.Location = new Point(147, 81);
             profileServerAttribute11.Margin = new Padding(5, 0, 0, 0);
             profileServerAttribute11.Name = "profileServerAttribute11";
-            profileServerAttribute11.Size = new Size(137, 28);
+            profileServerAttribute11.Size = new Size(137, 27);
             profileServerAttribute11.TabIndex = 0;
             profileServerAttribute11.Text = "/PUNT.TXT";
             profileServerAttribute11.UseVisualStyleBackColor = true;
@@ -751,10 +751,10 @@
             profileServerAttribute12.AutoSize = true;
             profileServerAttribute12.Dock = DockStyle.Fill;
             profileServerAttribute12.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute12.Location = new Point(294, 84);
+            profileServerAttribute12.Location = new Point(294, 81);
             profileServerAttribute12.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute12.Name = "profileServerAttribute12";
-            profileServerAttribute12.Size = new Size(134, 28);
+            profileServerAttribute12.Size = new Size(134, 27);
             profileServerAttribute12.TabIndex = 0;
             profileServerAttribute12.Text = "/shadowmap";
             profileServerAttribute12.UseVisualStyleBackColor = true;
@@ -764,10 +764,10 @@
             profileServerAttribute13.AutoSize = true;
             profileServerAttribute13.Dock = DockStyle.Fill;
             profileServerAttribute13.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute13.Location = new Point(10, 112);
+            profileServerAttribute13.Location = new Point(10, 108);
             profileServerAttribute13.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute13.Name = "profileServerAttribute13";
-            profileServerAttribute13.Size = new Size(132, 28);
+            profileServerAttribute13.Size = new Size(132, 27);
             profileServerAttribute13.TabIndex = 0;
             profileServerAttribute13.Text = "/s";
             profileServerAttribute13.UseVisualStyleBackColor = true;
@@ -777,10 +777,10 @@
             profileServerAttribute14.AutoSize = true;
             profileServerAttribute14.Dock = DockStyle.Fill;
             profileServerAttribute14.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute14.Location = new Point(147, 112);
+            profileServerAttribute14.Location = new Point(147, 108);
             profileServerAttribute14.Margin = new Padding(5, 0, 0, 0);
             profileServerAttribute14.Name = "profileServerAttribute14";
-            profileServerAttribute14.Size = new Size(137, 28);
+            profileServerAttribute14.Size = new Size(137, 27);
             profileServerAttribute14.TabIndex = 0;
             profileServerAttribute14.Text = "/NOSTAT";
             profileServerAttribute14.UseVisualStyleBackColor = true;
@@ -790,10 +790,10 @@
             profileServerAttribute15.AutoSize = true;
             profileServerAttribute15.Dock = DockStyle.Fill;
             profileServerAttribute15.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute15.Location = new Point(294, 112);
+            profileServerAttribute15.Location = new Point(294, 108);
             profileServerAttribute15.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute15.Name = "profileServerAttribute15";
-            profileServerAttribute15.Size = new Size(134, 28);
+            profileServerAttribute15.Size = new Size(134, 27);
             profileServerAttribute15.TabIndex = 0;
             profileServerAttribute15.Text = "/NETLOG";
             profileServerAttribute15.UseVisualStyleBackColor = true;
@@ -803,10 +803,10 @@
             profileServerAttribute16.AutoSize = true;
             profileServerAttribute16.Dock = DockStyle.Fill;
             profileServerAttribute16.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute16.Location = new Point(10, 140);
+            profileServerAttribute16.Location = new Point(10, 135);
             profileServerAttribute16.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute16.Name = "profileServerAttribute16";
-            profileServerAttribute16.Size = new Size(132, 28);
+            profileServerAttribute16.Size = new Size(132, 27);
             profileServerAttribute16.TabIndex = 0;
             profileServerAttribute16.Text = "/NETFLOW";
             profileServerAttribute16.UseVisualStyleBackColor = true;
@@ -816,10 +816,10 @@
             profileServerAttribute17.AutoSize = true;
             profileServerAttribute17.Dock = DockStyle.Fill;
             profileServerAttribute17.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute17.Location = new Point(147, 140);
+            profileServerAttribute17.Location = new Point(147, 135);
             profileServerAttribute17.Margin = new Padding(5, 0, 0, 0);
             profileServerAttribute17.Name = "profileServerAttribute17";
-            profileServerAttribute17.Size = new Size(137, 28);
+            profileServerAttribute17.Size = new Size(137, 27);
             profileServerAttribute17.TabIndex = 0;
             profileServerAttribute17.Text = "/SYSDUMP";
             profileServerAttribute17.UseVisualStyleBackColor = true;
@@ -831,10 +831,10 @@
             profileServerAttribute18.CheckState = CheckState.Checked;
             profileServerAttribute18.Dock = DockStyle.Fill;
             profileServerAttribute18.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute18.Location = new Point(294, 140);
+            profileServerAttribute18.Location = new Point(294, 135);
             profileServerAttribute18.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute18.Name = "profileServerAttribute18";
-            profileServerAttribute18.Size = new Size(134, 28);
+            profileServerAttribute18.Size = new Size(134, 27);
             profileServerAttribute18.TabIndex = 0;
             profileServerAttribute18.Text = "/NOSYSDUMP";
             profileServerAttribute18.UseVisualStyleBackColor = true;
@@ -844,7 +844,7 @@
             profileServerAttribute19.AutoSize = true;
             profileServerAttribute19.Dock = DockStyle.Fill;
             profileServerAttribute19.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute19.Location = new Point(10, 168);
+            profileServerAttribute19.Location = new Point(10, 162);
             profileServerAttribute19.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute19.Name = "profileServerAttribute19";
             profileServerAttribute19.Size = new Size(132, 28);
@@ -857,7 +857,7 @@
             profileServerAttribute20.AutoSize = true;
             profileServerAttribute20.Dock = DockStyle.Fill;
             profileServerAttribute20.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute20.Location = new Point(147, 168);
+            profileServerAttribute20.Location = new Point(147, 162);
             profileServerAttribute20.Margin = new Padding(5, 0, 0, 0);
             profileServerAttribute20.Name = "profileServerAttribute20";
             profileServerAttribute20.Size = new Size(137, 28);
@@ -872,7 +872,7 @@
             profileServerAttribute21.CheckState = CheckState.Checked;
             profileServerAttribute21.Dock = DockStyle.Fill;
             profileServerAttribute21.Font = new Font("Segoe UI", 9F);
-            profileServerAttribute21.Location = new Point(294, 168);
+            profileServerAttribute21.Location = new Point(294, 162);
             profileServerAttribute21.Margin = new Padding(10, 0, 0, 0);
             profileServerAttribute21.Name = "profileServerAttribute21";
             profileServerAttribute21.Size = new Size(134, 28);

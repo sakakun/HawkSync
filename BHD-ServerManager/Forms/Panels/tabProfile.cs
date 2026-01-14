@@ -26,33 +26,28 @@ namespace BHD_ServerManager.Forms.Panels
         private ServerManager theServer => Program.ServerManagerUI!;
         // --- Class Variables ---
         private new string Name = "ProfileTab";                     // Name of the tab for logging purposes.
-        private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
         
         public tabProfile()
         {
             InitializeComponent();
+            tickerProfileInit();
         }
 
         // --- Form Functions ---
         // --- Ticker Profile Hook --- Allow to be triggered externally by the Server Manager Ticker
-        public void tickerProfileTabHook()
+        public void tickerProfileInit()
         {
-            if (!_firstLoadComplete)
+            methodFunction_loadSettings();
+
+            // If the profileServerPath is not set or does not exist, switch to the Profile tab and show a message box.
+            if (theInstance!.profileServerPath == string.Empty || !Directory.Exists(theInstance.profileServerPath))
             {
-                methodFunction_loadSettings();
-                _firstLoadComplete = true;
-
-                // If the profileServerPath is not set or does not exist, switch to the Profile tab and show a message box.
-                if (theInstance!.profileServerPath == string.Empty || !Directory.Exists(theInstance.profileServerPath))
-                {
-                    theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[0];
-                    MessageBox.Show("Please set the Server Path in the Profile tab.", "Server Path Not Set", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[1];
-                }
-
+                theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[0];
+                MessageBox.Show("Please set the Server Path in the Profile tab.", "Server Path Not Set", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[1];
             }
 
             bool currentState = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
@@ -160,9 +155,10 @@ namespace BHD_ServerManager.Forms.Panels
             tb_serverPassword.Text = theInstance.gamePasswordLobby = ServerSettings.Get("gamePasswordLobby", string.Empty);
             cb_serverDedicated.Checked = theInstance.gameDedicated = ServerSettings.Get("gameDedicated", true);
             cb_requireNova.Checked = theInstance.gameRequireNova = ServerSettings.Get("gameRequireNova", false);
+            serverCountryCode.Text = theInstance.gameCountryCode = ServerSettings.Get("gameCountryCode", "US");
 
-            // Ping Checking
-            cb_enableMinCheck.Checked = theInstance.gameMinPing = ServerSettings.Get("gameMinPing", false);
+			// Ping Checking
+			cb_enableMinCheck.Checked = theInstance.gameMinPing = ServerSettings.Get("gameMinPing", false);
             cb_enableMaxCheck.Checked = theInstance.gameMaxPing = ServerSettings.Get("gameMaxPing", false);
             num_minPing.Value = theInstance.gameMinPingValue = (int) ServerSettings.Get("gameMinPingValue", (decimal) 0);
             num_maxPing.Value = theInstance.gameMaxPingValue = (int) ServerSettings.Get("gameMaxPingValue", (decimal) 999);
@@ -210,9 +206,10 @@ namespace BHD_ServerManager.Forms.Panels
             ServerSettings.Set("gamePasswordLobby", theInstance.gamePasswordLobby = tb_serverPassword.Text);
             ServerSettings.Set("gameDedicated", theInstance.gameDedicated = cb_serverDedicated.Checked);
             ServerSettings.Set("gameRequireNova", theInstance.gameRequireNova = cb_requireNova.Checked);
+            ServerSettings.Set("gameCountryCode", theInstance.gameCountryCode = serverCountryCode.Text);
 
 			// Ping Checking
-            ServerSettings.Set("gameMinPing", theInstance.gameMinPing = cb_enableMinCheck.Checked);
+			ServerSettings.Set("gameMinPing", theInstance.gameMinPing = cb_enableMinCheck.Checked);
             ServerSettings.Set("gameMaxPing", theInstance.gameMaxPing = cb_enableMaxCheck.Checked);
             ServerSettings.Set("gameMinPingValue", (decimal)(theInstance.gameMinPingValue = (int)num_minPing.Value));
             ServerSettings.Set("gameMaxPingValue", (decimal)(theInstance.gameMaxPingValue = (int)num_maxPing.Value));
