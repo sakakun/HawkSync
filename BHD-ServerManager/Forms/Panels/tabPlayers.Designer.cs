@@ -53,7 +53,7 @@
             playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
             playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
             playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.Size = new Size(902, 362);
+            playerLayout.Size = new Size(966, 422);
             playerLayout.TabIndex = 0;
             // 
             // tabPlayers
@@ -61,10 +61,8 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(playerLayout);
-            MaximumSize = new Size(902, 362);
-            MinimumSize = new Size(902, 362);
             Name = "tabPlayers";
-            Size = new Size(902, 362);
+            Size = new Size(966, 422);
             ResumeLayout(false);
         }
 

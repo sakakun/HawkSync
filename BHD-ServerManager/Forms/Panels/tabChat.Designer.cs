@@ -81,7 +81,7 @@
             chat_TabControl.Multiline = true;
             chat_TabControl.Name = "chat_TabControl";
             chat_TabControl.SelectedIndex = 0;
-            chat_TabControl.Size = new Size(902, 362);
+            chat_TabControl.Size = new Size(966, 422);
             chat_TabControl.TabIndex = 0;
             // 
             // tabChatMessages
@@ -91,7 +91,7 @@
             tabChatMessages.Margin = new Padding(0);
             tabChatMessages.Name = "tabChatMessages";
             tabChatMessages.Padding = new Padding(3);
-            tabChatMessages.Size = new Size(871, 354);
+            tabChatMessages.Size = new Size(935, 414);
             tabChatMessages.TabIndex = 0;
             tabChatMessages.Text = "Chat Messages";
             tabChatMessages.UseVisualStyleBackColor = true;
@@ -109,7 +109,7 @@
             tableLayoutPanel1.RowCount = 2;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel1.Size = new Size(865, 348);
+            tableLayoutPanel1.Size = new Size(929, 408);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // dataGridView_chatMessages
@@ -126,7 +126,7 @@
             dataGridView_chatMessages.Name = "dataGridView_chatMessages";
             dataGridView_chatMessages.ReadOnly = true;
             dataGridView_chatMessages.RowHeadersVisible = false;
-            dataGridView_chatMessages.Size = new Size(865, 324);
+            dataGridView_chatMessages.Size = new Size(929, 384);
             dataGridView_chatMessages.TabIndex = 0;
             // 
             // chat_timestamp
@@ -162,12 +162,12 @@
             tableLayoutPanel2.Controls.Add(comboBox_chatGroup, 0, 0);
             tableLayoutPanel2.Controls.Add(tb_chatMessage, 1, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(0, 324);
+            tableLayoutPanel2.Location = new Point(0, 384);
             tableLayoutPanel2.Margin = new Padding(0);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle());
-            tableLayoutPanel2.Size = new Size(865, 24);
+            tableLayoutPanel2.Size = new Size(929, 24);
             tableLayoutPanel2.TabIndex = 1;
             // 
             // comboBox_chatGroup
@@ -192,7 +192,7 @@
             tb_chatMessage.Location = new Point(125, 0);
             tb_chatMessage.Margin = new Padding(0);
             tb_chatMessage.Name = "tb_chatMessage";
-            tb_chatMessage.Size = new Size(740, 23);
+            tb_chatMessage.Size = new Size(804, 23);
             tb_chatMessage.TabIndex = 1;
             tb_chatMessage.KeyPress += actionKeyPress_SubmitMessage;
             // 
@@ -203,7 +203,7 @@
             tabAutoMessages.Margin = new Padding(0);
             tabAutoMessages.Name = "tabAutoMessages";
             tabAutoMessages.Padding = new Padding(3);
-            tabAutoMessages.Size = new Size(871, 354);
+            tabAutoMessages.Size = new Size(795, 400);
             tabAutoMessages.TabIndex = 1;
             tabAutoMessages.Text = "Auto Messages";
             tabAutoMessages.UseVisualStyleBackColor = true;
@@ -221,7 +221,7 @@
             tableLayoutPanel3.RowCount = 2;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel3.Size = new Size(865, 348);
+            tableLayoutPanel3.Size = new Size(789, 394);
             tableLayoutPanel3.TabIndex = 0;
             // 
             // dg_autoMessages
@@ -237,7 +237,7 @@
             dg_autoMessages.Name = "dg_autoMessages";
             dg_autoMessages.ReadOnly = true;
             dg_autoMessages.RowHeadersVisible = false;
-            dg_autoMessages.Size = new Size(865, 324);
+            dg_autoMessages.Size = new Size(865, 370);
             dg_autoMessages.TabIndex = 1;
             dg_autoMessages.CellDoubleClick += actionClick_RemoveAutoMessage;
             // 
@@ -269,7 +269,7 @@
             tableLayoutPanel4.Controls.Add(tb_autoMessage, 1, 0);
             tableLayoutPanel4.Controls.Add(num_AutoMessageTrigger, 0, 0);
             tableLayoutPanel4.Dock = DockStyle.Fill;
-            tableLayoutPanel4.Location = new Point(0, 324);
+            tableLayoutPanel4.Location = new Point(0, 370);
             tableLayoutPanel4.Margin = new Padding(0);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
             tableLayoutPanel4.RowCount = 1;
@@ -305,7 +305,7 @@
             tabSlapMessages.Margin = new Padding(0);
             tabSlapMessages.Name = "tabSlapMessages";
             tabSlapMessages.Padding = new Padding(3);
-            tabSlapMessages.Size = new Size(871, 354);
+            tabSlapMessages.Size = new Size(795, 400);
             tabSlapMessages.TabIndex = 2;
             tabSlapMessages.Text = "Slap Messages";
             tabSlapMessages.UseVisualStyleBackColor = true;
@@ -323,13 +323,13 @@
             tableLayoutPanel5.RowCount = 2;
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
-            tableLayoutPanel5.Size = new Size(865, 348);
+            tableLayoutPanel5.Size = new Size(789, 394);
             tableLayoutPanel5.TabIndex = 0;
             // 
             // tb_slapMessage
             // 
             tb_slapMessage.Dock = DockStyle.Fill;
-            tb_slapMessage.Location = new Point(0, 324);
+            tb_slapMessage.Location = new Point(0, 370);
             tb_slapMessage.Margin = new Padding(0);
             tb_slapMessage.Name = "tb_slapMessage";
             tb_slapMessage.Size = new Size(865, 23);
@@ -349,7 +349,7 @@
             dg_slapMessages.Name = "dg_slapMessages";
             dg_slapMessages.ReadOnly = true;
             dg_slapMessages.RowHeadersVisible = false;
-            dg_slapMessages.Size = new Size(865, 324);
+            dg_slapMessages.Size = new Size(865, 370);
             dg_slapMessages.TabIndex = 1;
             dg_slapMessages.CellContentDoubleClick += actionClick_RemoveSlap;
             // 
@@ -373,10 +373,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(chat_TabControl);
             Margin = new Padding(0);
-            MaximumSize = new Size(902, 362);
-            MinimumSize = new Size(902, 362);
             Name = "tabChat";
-            Size = new Size(902, 362);
+            Size = new Size(966, 422);
             chat_TabControl.ResumeLayout(false);
             tabChatMessages.ResumeLayout(false);
             tableLayoutPanel1.ResumeLayout(false);

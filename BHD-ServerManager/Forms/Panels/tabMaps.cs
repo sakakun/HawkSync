@@ -126,39 +126,18 @@ namespace BHD_ServerManager.Forms.Panels
         {
             // Enable/Disable Buttons based on Server Status
             bool isOnline = (theInstance!.instanceStatus != InstanceStatus.OFFLINE);
-            btn_mapsUpdate.Enabled = isOnline;
-            btn_mapsScore.Enabled = isOnline;
-            btn_mapsSkip.Enabled = isOnline;
-            btn_mapsPlayNext.Enabled = isOnline;
-
-            // Update Labels with Current Information
-            if (theInstance!.instanceStatus == InstanceStatus.OFFLINE)
-            {
-                label_currentMapName.Text = "N/A";
-                label_currentMapType.Text = "N/A";
-                label_nextMapName.Text = "N/A";
-                label_nextMapType.Text = "N/A";
-                label_timeLeft.Text = "HH:MM:SS";
-                return;
-            }
 
             int nextMapIndex = theInstance!.gameInfoCurrentMapIndex >= instanceMaps!.currentMapPlaylist.Count - 1
                                 || theInstance!.gameInfoCurrentMapIndex < 0
                                 ? 0
                                 : theInstance!.gameInfoCurrentMapIndex + 1;
 
-            label_currentMapName.Text = theInstance!.gameInfoMapName;
-            label_currentMapType.Text = objectGameTypes.GetShortName(theInstance.gameInfoGameType);
-            label_nextMapName.Text = instanceMaps!.currentMapPlaylist[nextMapIndex].MapName;
-            label_nextMapType.Text = objectGameTypes.GetShortName(instanceMaps!.currentMapPlaylist[nextMapIndex].MapType);
-            label_timeLeft.Text = theInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss");
-
         }
         public void functionEvent_CheckForMapChanges()
         {
             if (instanceMaps!.currentMapPlaylist.Count != dataGridView_currentMaps.Rows.Count)
             {
-                ib_resetCurrentMaps.BackColor = Color.Red;
+
                 return;
             }
             for (int i = 0; i < instanceMaps!.currentMapPlaylist.Count; i++)
@@ -166,11 +145,9 @@ namespace BHD_ServerManager.Forms.Panels
                 if (instanceMaps!.currentMapPlaylist[i].MapName != dataGridView_currentMaps.Rows[i].Cells["current_MapName"].Value?.ToString())
                 {
                     AppDebug.Log("tickerServerManagement", "Map Playlist Name Mismatch Detected at index " + i);
-                    ib_resetCurrentMaps.BackColor = Color.Red;
                     return;
                 }
             }
-            ib_resetCurrentMaps.BackColor = Color.Transparent;
         }
         // --- Ticker Hook for Maps Tab ---
         public void tickerMapsHook()

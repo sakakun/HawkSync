@@ -59,15 +59,15 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Server Options (Left Checkboxes)
             cb_autoBalance.Checked = theInstance!.gameOptionAutoBalance = ServerSettings.Get("gameOptionAutoBalance", true);
-            cb_showTracers.Checked = theInstance!.gameOptionShowTracers = ServerSettings.Get("gameOptionShowTracers", false);
-            cb_showClays.Checked = theInstance!.gameShowTeamClays = ServerSettings.Get("gameShowTeamClays", true);
-            cb_autoRange.Checked = theInstance!.gameOptionAutoRange = ServerSettings.Get("gameOptionAutoRange", false);
             cb_customSkins.Checked = theInstance!.gameCustomSkins = ServerSettings.Get("gameCustomSkins", true);
             cb_enableDistroyBuildings.Checked = theInstance!.gameDestroyBuildings = ServerSettings.Get("gameDestroyBuildings", true);
             cb_enableFatBullets.Checked = theInstance!.gameFatBullets = ServerSettings.Get("gameFatBullets", false);
             cb_enableOneShotKills.Checked = theInstance!.gameOneShotKills = ServerSettings.Get("gameOneShotKills", false);
-            cb_enableLeftLean.Checked = theInstance!.gameAllowLeftLeaning = ServerSettings.Get("gameAllowLeftLeaning", false);
-
+            cb_enableLeftLean.Checked = theInstance!.gameAllowLeftLeaning = ServerSettings.Get("gameAllowLeftLeaning", true);
+            cb_showTracers.Checked = theInstance!.gameOptionShowTracers = ServerSettings.Get("gameOptionShowTracers", false);
+            cb_showClays.Checked = theInstance!.gameShowTeamClays = ServerSettings.Get("gameShowTeamClays", true);
+            cb_autoRange.Checked = theInstance!.gameOptionAutoRange = ServerSettings.Get("gameOptionAutoRange", false);
+            
             // Friendly Fire Killings
             cb_enableFFkills.Checked = theInstance!.gameOptionFF = ServerSettings.Get("gameOptionFF", true);
             num_maxFFKills.Value = theInstance!.gameFriendlyFireKills = (int)ServerSettings.Get("gameFriendlyFireKills", (decimal) 10); 
@@ -75,10 +75,10 @@ namespace BHD_ServerManager.Forms.Panels
             cb_showTeamTags.Checked = theInstance!.gameOptionFriendlyTags = ServerSettings.Get("gameOptionFriendlyTags", false);
 
             // Role Restrictions
-            cb_roleCQB.Checked = theInstance!.roleCQB = ServerSettings.Get("roleCQB", false);
-            cb_roleGunner.Checked = theInstance!.roleGunner = ServerSettings.Get("roleGunner", false);
-            cb_roleSniper.Checked = theInstance!.roleSniper = ServerSettings.Get("roleSniper", false);
-            cb_roleMedic.Checked = theInstance!.roleMedic = ServerSettings.Get("roleMedic", false);
+            cb_roleCQB.Checked = theInstance!.roleCQB = ServerSettings.Get("roleCQB", true);
+            cb_roleGunner.Checked = theInstance!.roleGunner = ServerSettings.Get("roleGunner", true);
+            cb_roleSniper.Checked = theInstance!.roleSniper = ServerSettings.Get("roleSniper", true);
+            cb_roleMedic.Checked = theInstance!.roleMedic = ServerSettings.Get("roleMedic", true);
 
             // Weapon Restrictions
             cb_weapColt45.Checked = theInstance!.weaponColt45 = ServerSettings.Get("weaponColt45", true);

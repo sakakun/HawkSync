@@ -46,6 +46,7 @@
             cb_enableAnnouncements = new CheckBox();
             cb_enableWebStats = new CheckBox();
             groupBox1 = new GroupBox();
+            tb_serverID = new TextBox();
             btn_validate = new Button();
             tb_webStatsServerPath = new TextBox();
             tabPlayerStats = new TabPage();
@@ -85,7 +86,6 @@
             Timer = new DataGridViewTextBoxColumn();
             Weapon_Kills = new DataGridViewTextBoxColumn();
             Weapon_Shots = new DataGridViewTextBoxColumn();
-            tb_serverID = new TextBox();
             tabControl1.SuspendLayout();
             tabBabstats.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -115,7 +115,7 @@
             tabControl1.Margin = new Padding(0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(902, 362);
+            tabControl1.Size = new Size(966, 422);
             tabControl1.TabIndex = 0;
             // 
             // tabBabstats
@@ -125,7 +125,7 @@
             tabBabstats.Margin = new Padding(0);
             tabBabstats.Name = "tabBabstats";
             tabBabstats.Padding = new Padding(3);
-            tabBabstats.Size = new Size(894, 334);
+            tabBabstats.Size = new Size(958, 394);
             tabBabstats.TabIndex = 0;
             tabBabstats.Text = "Babstats";
             tabBabstats.UseVisualStyleBackColor = true;
@@ -144,7 +144,7 @@
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(888, 328);
+            tableLayoutPanel1.Size = new Size(952, 388);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // dg_statsLog
@@ -154,11 +154,11 @@
             dg_statsLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dg_statsLog.Columns.AddRange(new DataGridViewColumn[] { statsLog_DateTime, statLog_Message });
             dg_statsLog.Dock = DockStyle.Fill;
-            dg_statsLog.Location = new Point(292, 3);
+            dg_statsLog.Location = new Point(312, 3);
             dg_statsLog.Name = "dg_statsLog";
             dg_statsLog.ReadOnly = true;
             dg_statsLog.RowHeadersVisible = false;
-            dg_statsLog.Size = new Size(593, 322);
+            dg_statsLog.Size = new Size(637, 382);
             dg_statsLog.TabIndex = 1;
             // 
             // statsLog_DateTime
@@ -184,17 +184,17 @@
             panel1.Location = new Point(0, 0);
             panel1.Margin = new Padding(0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(289, 328);
+            panel1.Size = new Size(309, 388);
             panel1.TabIndex = 2;
             // 
             // groupBox4
             // 
             groupBox4.Controls.Add(btn_SaveSettings);
             groupBox4.Dock = DockStyle.Bottom;
-            groupBox4.Location = new Point(0, 271);
+            groupBox4.Location = new Point(0, 331);
             groupBox4.Margin = new Padding(0, 3, 3, 3);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(289, 57);
+            groupBox4.Size = new Size(309, 57);
             groupBox4.TabIndex = 3;
             groupBox4.TabStop = false;
             groupBox4.Text = "Controls";
@@ -219,7 +219,7 @@
             groupBox3.Location = new Point(0, 137);
             groupBox3.Margin = new Padding(0, 3, 3, 3);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(289, 85);
+            groupBox3.Size = new Size(309, 85);
             groupBox3.TabIndex = 2;
             groupBox3.TabStop = false;
             groupBox3.Text = "Reporting Intervals (Seconds)";
@@ -274,7 +274,7 @@
             groupBox2.Location = new Point(0, 84);
             groupBox2.Margin = new Padding(0, 3, 3, 3);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(289, 53);
+            groupBox2.Size = new Size(309, 53);
             groupBox2.TabIndex = 1;
             groupBox2.TabStop = false;
             groupBox2.Text = "Options";
@@ -312,10 +312,20 @@
             groupBox1.Location = new Point(0, 0);
             groupBox1.Margin = new Padding(0, 3, 3, 3);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(289, 84);
+            groupBox1.Size = new Size(309, 84);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "Stats Web Address (HTTP/HTTPS)";
+            // 
+            // tb_serverID
+            // 
+            tb_serverID.Location = new Point(6, 51);
+            tb_serverID.MaxLength = 5;
+            tb_serverID.Name = "tb_serverID";
+            tb_serverID.PlaceholderText = "AA###";
+            tb_serverID.Size = new Size(58, 23);
+            tb_serverID.TabIndex = 5;
+            tb_serverID.TextAlign = HorizontalAlignment.Center;
             // 
             // btn_validate
             // 
@@ -342,7 +352,7 @@
             tabPlayerStats.Location = new Point(4, 24);
             tabPlayerStats.Name = "tabPlayerStats";
             tabPlayerStats.Padding = new Padding(3);
-            tabPlayerStats.Size = new Size(894, 334);
+            tabPlayerStats.Size = new Size(818, 380);
             tabPlayerStats.TabIndex = 1;
             tabPlayerStats.Text = "Player Stats";
             tabPlayerStats.UseVisualStyleBackColor = true;
@@ -360,7 +370,7 @@
             tableLayoutPanel2.RowCount = 2;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 83F));
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(888, 328);
+            tableLayoutPanel2.Size = new Size(812, 374);
             tableLayoutPanel2.TabIndex = 0;
             // 
             // dataGridViewPlayerStats
@@ -378,7 +388,7 @@
             dataGridViewPlayerStats.ReadOnly = true;
             dataGridViewPlayerStats.RowHeadersVisible = false;
             dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
-            dataGridViewPlayerStats.Size = new Size(888, 245);
+            dataGridViewPlayerStats.Size = new Size(812, 291);
             dataGridViewPlayerStats.TabIndex = 1;
             // 
             // PlayerName
@@ -589,7 +599,7 @@
             panel2.Location = new Point(0, 0);
             panel2.Margin = new Padding(0);
             panel2.Name = "panel2";
-            panel2.Size = new Size(888, 83);
+            panel2.Size = new Size(812, 83);
             panel2.TabIndex = 2;
             // 
             // label1
@@ -606,7 +616,7 @@
             tabWeaponStats.Controls.Add(dataGridViewWeaponStats);
             tabWeaponStats.Location = new Point(4, 24);
             tabWeaponStats.Name = "tabWeaponStats";
-            tabWeaponStats.Size = new Size(894, 334);
+            tabWeaponStats.Size = new Size(818, 380);
             tabWeaponStats.TabIndex = 2;
             tabWeaponStats.Text = "Weapon Stats";
             tabWeaponStats.UseVisualStyleBackColor = true;
@@ -622,7 +632,7 @@
             dataGridViewWeaponStats.Name = "dataGridViewWeaponStats";
             dataGridViewWeaponStats.ReadOnly = true;
             dataGridViewWeaponStats.RowHeadersVisible = false;
-            dataGridViewWeaponStats.Size = new Size(894, 334);
+            dataGridViewWeaponStats.Size = new Size(818, 380);
             dataGridViewWeaponStats.TabIndex = 1;
             // 
             // Weapon_PlayerName
@@ -661,25 +671,13 @@
             Weapon_Shots.Name = "Weapon_Shots";
             Weapon_Shots.ReadOnly = true;
             // 
-            // tb_serverID
-            // 
-            tb_serverID.Location = new Point(6, 51);
-            tb_serverID.MaxLength = 5;
-            tb_serverID.Name = "tb_serverID";
-            tb_serverID.PlaceholderText = "AA###";
-            tb_serverID.Size = new Size(58, 23);
-            tb_serverID.TabIndex = 5;
-            tb_serverID.TextAlign = HorizontalAlignment.Center;
-            // 
             // tabStats
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(tabControl1);
-            MaximumSize = new Size(902, 362);
-            MinimumSize = new Size(902, 362);
             Name = "tabStats";
-            Size = new Size(902, 362);
+            Size = new Size(966, 422);
             tabControl1.ResumeLayout(false);
             tabBabstats.ResumeLayout(false);
             tableLayoutPanel1.ResumeLayout(false);

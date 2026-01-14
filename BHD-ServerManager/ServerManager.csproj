@@ -19,11 +19,19 @@
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
     <PackageOutputPath>\bin\$(AssemblyName)</PackageOutputPath>
     <Platforms>AnyCPU</Platforms>
-    <Configurations>Debug;Release</Configurations>
+    <Configurations>Debug;Release;Debug Homelab</Configurations>
     <GenerateDocumentationFile>False</GenerateDocumentationFile> <!-- This line is crucial -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsPublishable>True</IsPublishable>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <DebugType>portable</DebugType>
+    <WarningLevel>8</WarningLevel>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Homelab|AnyCPU'">
     <IsPublishable>True</IsPublishable>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <DebugType>portable</DebugType>
@@ -59,9 +67,7 @@
   <ItemGroup>
     <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
     <PackageReference Include="Salaros.ConfigParser" Version="0.3.8" />
   </ItemGroup>
 

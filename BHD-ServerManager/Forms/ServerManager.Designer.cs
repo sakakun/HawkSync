@@ -59,9 +59,9 @@ namespace BHD_ServerManager.Forms
             // 
             toolStrip.Dock = DockStyle.Bottom;
             toolStrip.Items.AddRange(new ToolStripItem[] { toolStripStatus, label_TimeLeft, label_WinCondition, label_RedScore, label_BlueScore, label_PlayersOnline });
-            toolStrip.Location = new Point(0, 400);
+            toolStrip.Location = new Point(0, 460);
             toolStrip.Name = "toolStrip";
-            toolStrip.Size = new Size(920, 25);
+            toolStrip.Size = new Size(984, 25);
             toolStrip.TabIndex = 1;
             toolStrip.Text = "toolStrip";
             // 
@@ -118,7 +118,7 @@ namespace BHD_ServerManager.Forms
             mainPanel.Location = new Point(0, 0);
             mainPanel.Name = "mainPanel";
             mainPanel.Padding = new Padding(5);
-            mainPanel.Size = new Size(920, 400);
+            mainPanel.Size = new Size(984, 460);
             mainPanel.TabIndex = 2;
             // 
             // tabControl
@@ -135,14 +135,14 @@ namespace BHD_ServerManager.Forms
             tabControl.Multiline = true;
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(910, 390);
+            tabControl.Size = new Size(974, 450);
             tabControl.TabIndex = 0;
             // 
             // tabProfile
             // 
             tabProfile.Location = new Point(4, 24);
             tabProfile.Name = "tabProfile";
-            tabProfile.Size = new Size(902, 362);
+            tabProfile.Size = new Size(966, 422);
             tabProfile.TabIndex = 8;
             tabProfile.Text = "Profile";
             tabProfile.UseVisualStyleBackColor = true;
@@ -214,11 +214,13 @@ namespace BHD_ServerManager.Forms
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(920, 425);
+            ClientSize = new Size(984, 485);
             Controls.Add(mainPanel);
             Controls.Add(toolStrip);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
+            MaximumSize = new Size(1000, 524);
+            MinimumSize = new Size(1000, 500);
             Name = "ServerManager";
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
