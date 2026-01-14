@@ -267,6 +267,7 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Reset Server Settings Button Clicked ---
         private void actionClick_ResetSettings(object sender, EventArgs e)
         {
+            // Pull from Database and Reload Settings
             methodFunction_loadSettings();
         }
         // --- Server Control Button Clicked ---
@@ -292,6 +293,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             if (ServerMemory.ReadMemoryIsProcessAttached())
             {
+                methodFunction_saveSettings();
                 theInstanceManager.UpdateGameServer();
                 MessageBox.Show("Saved settings have been applied to the game server.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
