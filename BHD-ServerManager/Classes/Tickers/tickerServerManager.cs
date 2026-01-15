@@ -20,7 +20,7 @@ namespace BHD_ServerManager.Classes.Tickers
         private static ServerManager? thisServer => Program.ServerManagerUI;
 
         // Lock for thread safety (if needed for shared resources)
-        private static readonly object tickerLock = new();
+        private static int isTickerRunning = 0;
 
         // Helper for UI thread safety
         private static void SafeInvoke(Control control, Action action)
@@ -33,120 +33,134 @@ namespace BHD_ServerManager.Classes.Tickers
 
         public static void runTicker()
         {
-            if (thisServer == null)
-                return;
-
-            // Only run the rest if it's time for an update
-            DateTime currentTime = DateTime.Now;
-            if (DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) >= 0)
-                return;
-
-            // If server process is not attached, set status to offline and update UI
-            if (!ServerMemory.ReadMemoryIsProcessAttached())
+            // Skip this tick if the previous one is still running
+            if (Interlocked.CompareExchange(ref isTickerRunning, 1, 0) != 0)
             {
-                if (!StartServer.CheckForExistingProcess())
+                AppDebug.Log("tickerServerManagement", "Skipping tick - previous tick still running");
+                return;
+            }
+
+            try
+            {
+                if (thisServer == null)
+                    return;
+
+                // Only run the rest if it's time for an update
+                DateTime currentTime = DateTime.Now;
+                if (DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) >= 0)
+                    return;
+
+                // If server process is not attached, set status to offline and update UI
+                if (!ServerMemory.ReadMemoryIsProcessAttached())
                 {
-                    theInstance.instanceStatus = InstanceStatus.OFFLINE;
+                    if (!StartServer.CheckForExistingProcess())
+                    {
+                        theInstance.instanceStatus = InstanceStatus.OFFLINE;
+                    }
+                } else
+                {
+                    // --- Server is online: run status-specific logic in order ---
+                    // 1. Always update status and basic info
+                    ServerMemory.ReadMemoryServerStatus();                                  // Server Status
                 }
-            } else
-            {
-                // --- Server is online: run status-specific logic in order ---
-                // 1. Always update status and basic info
-                ServerMemory.ReadMemoryServerStatus();                                  // Server Status
-            }
 
+                // UI updates that should always run
+                SafeInvoke(thisServer, () =>
+                {
+                    // Server UI Updates
+                    thisServer.functionEvent_tickerServerGUI();                                     // Ticker for the Main Server GUI
 
-            // UI updates that should always run
-            SafeInvoke(thisServer, () =>
-            {
-                // Server UI Updates
-                thisServer.functionEvent_tickerServerGUI();                                     // Ticker for the Main Server GUI
+                    // --- UI Update Hooks ---
+                    thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
+                    thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
+                    thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
+                    thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
+                });
 
-                // --- UI Update Hooks ---
-                thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
-                thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
-                thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
-                thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
-            });
+                if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
+                {
+                    // If the server is offline, we can skip the rest of the processing
+                    theInstance.instanceNextUpdateTime = currentTime.AddSeconds(5);
+                    theInstance.instanceLastUpdateTime = currentTime;
+                    return;
+                }
 
-            if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
-            {
-                // If the server is offline, we can skip the rest of the processing
-                theInstance.instanceNextUpdateTime = currentTime.AddSeconds(5);
-                theInstance.instanceLastUpdateTime = currentTime;
-                return;
-            }
+                if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP || theInstance.instanceStatus != InstanceStatus.SCORING)
+                {
+                    // Map Ended, Wait for Updates
+                    ServerMemory.UpdateNovaID();                                        // Nova ID Update
+                    ServerMemory.ReadMemoryGameTimeLeft();                              // Time Left in the Current Game
+                    ServerMemory.ReadMemoryCurrentMissionName();                        // Get Current Mission Name
+                    ServerMemory.ReadMemoryCurrentGameType();                           // Get Current Game Type
+                    ServerMemory.ReadMemoryCurrentNumPlayers();                         // Get Current Number of Players
+                    ServerMemory.ReadMapCycleCounter();                                 // Map Cycle Counter (How Maps Have Been Played)
+                    ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
+                    // Score Reading
+                    ServerMemory.ReadMemoryCurrentGameWinConditions();                  // Read Current Game Win Conditions
+                    ServerMemory.ReadMemoryCurrentGameScores();                         // Read Current Game Scores
+                }
 
-            if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP || theInstance.instanceStatus != InstanceStatus.SCORING)
-            {
-                // Map Ended, Wait for Updates
-                ServerMemory.UpdateNovaID();                                        // Nova ID Update
-                ServerMemory.ReadMemoryGameTimeLeft();                              // Time Left in the Current Game
-                ServerMemory.ReadMemoryCurrentMissionName();                        // Get Current Mission Name
-                ServerMemory.ReadMemoryCurrentGameType();                           // Get Current Game Type
-                ServerMemory.ReadMemoryCurrentNumPlayers();                         // Get Current Number of Players
-                ServerMemory.ReadMapCycleCounter();                                 // Map Cycle Counter (How Maps Have Been Played)
-                ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
-                // Score Reading
-                ServerMemory.ReadMemoryCurrentGameWinConditions();                  // Read Current Game Win Conditions
-                ServerMemory.ReadMemoryCurrentGameScores();                         // Read Current Game Scores
-            }
+                // 2. Loading Map
+                if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
+                {
+                    theInstance.instanceScoringProcRun = true;
+                    theInstance.instanceCrashCounter = 0;                               // Reset crash counter
+                    tickerEvent_preGameProcessing();                                    // Run pre-game processing
+                    ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
+                }
+                // 3. Start Delay
+                else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
+                {
+                    theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
+                    ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
+                    ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
+                }
+                // 4. Online (game in progress)
+                else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
+                {
+                    theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
+                    ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
+                    ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
 
-            // 2. Loading Map
-            if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
-            {
-                theInstance.instanceScoringProcRun = true;
-                theInstance.instanceCrashCounter = 0;                               // Reset crash counter
-                tickerEvent_preGameProcessing();                                    // Run pre-game processing
-                ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
-            }
-            // 3. Start Delay
-            else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
-            {
-                theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
-                ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
-            }
-            // 4. Online (game in progress)
-            else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
-            {
-                theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
-                ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
-
-                // Stats update
-                StatFunctions.RunPlayerStatsUpdate();                               // Collect Player Stats
+                    // Stats update
+                    StatFunctions.RunPlayerStatsUpdate();                               // Collect Player Stats
                 
-                // WebStats Updates and Reports
-                if (theInstance.WebStatsEnabled)
-                {
-                    if (DateTime.Now > instanceStats.lastPlayerStatsUpdate.AddSeconds(theInstance.WebStatsUpdateInterval))
+                    // WebStats Updates and Reports
+                    if (theInstance.WebStatsEnabled)
                     {
-                        instanceStats.lastPlayerStatsUpdate = DateTime.Now;
-                        Task.Run(() => StatFunctions.SendUpdateData(thisServer));
-                        
-                    }
-                    if (DateTime.Now > instanceStats.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval) && theInstance.WebStatsAnnouncements)
-                    {
-                        Task.Run(async () =>
+                        if (DateTime.Now > instanceStats.lastPlayerStatsUpdate.AddSeconds(theInstance.WebStatsUpdateInterval))
                         {
-                            instanceStats.lastPlayerStatsReport = DateTime.Now;
-                            string ReportResults = await StatFunctions.SendReportData(thisServer);
-                            // handle ReportResults if needed
-                        });
+                            instanceStats.lastPlayerStatsUpdate = DateTime.Now;
+                            Task.Run(() => StatFunctions.SendUpdateData(thisServer));
                         
+                        }
+                        if (DateTime.Now > instanceStats.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval) && theInstance.WebStatsAnnouncements)
+                        {
+                            Task.Run(async () =>
+                            {
+                                instanceStats.lastPlayerStatsReport = DateTime.Now;
+                                string ReportResults = await StatFunctions.SendReportData(thisServer);
+                                // handle ReportResults if needed
+                            });
+                        
+                        }
                     }
                 }
-            }
-            // 5. Scoring
-            else if (theInstance.instanceStatus == InstanceStatus.SCORING)
-            {
-                tickerEvent_scoringGameProcessing();                                // Run scoring processing
-                ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable     
-            }
+                // 5. Scoring
+                else if (theInstance.instanceStatus == InstanceStatus.SCORING)
+                {
+                    tickerEvent_scoringGameProcessing();                                // Run scoring processing
+                    ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable     
+                }
 
-            theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);
-            theInstance.instanceLastUpdateTime = currentTime;
+                theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);
+                theInstance.instanceLastUpdateTime = currentTime;
+            } 
+            finally
+            {
+                Interlocked.Exchange(ref isTickerRunning, 0);
+			}
+			
         }
 
         // --- Pre-Game Processing (Loading Map) ---
