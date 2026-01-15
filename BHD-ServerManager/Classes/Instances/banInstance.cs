@@ -51,10 +51,10 @@ namespace BHD_ServerManager.Classes.Instances
         public bool                     IsProxy             { get; set; }
         public bool                     IsTor               { get; set; }
         public int                      RiskScore           { get; set; }            // 0-100
-        public string                   Provider            { get; set; }            // VPN provider name
-        public string                   CountryCode         { get; set; }            // Country ISO Code
-		public string                   City                { get; set; }            // City
-		public string                   Region              { get; set; }            // State/Province
+        public string?                  Provider            { get; set; }            // VPN provider name
+        public string?                  CountryCode         { get; set; }            // Country ISO Code
+		public string?                  City                { get; set; }            // City
+		public string?                  Region              { get; set; }            // State/Province
 		public DateTime                 CacheExpiry         { get; set; }
         public DateTime				    LastChecked         { get; set; }
 	}
