@@ -13,7 +13,7 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <BaseOutputPath>\\VM-DEV\ServerData\Development\HawkSync</BaseOutputPath>
+    <BaseOutputPath></BaseOutputPath>
     <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
     <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
     <EnableNETAnalyzers>False</EnableNETAnalyzers>

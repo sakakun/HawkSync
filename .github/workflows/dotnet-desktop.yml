@@ -15,7 +15,8 @@ permissions:
   packages: write
 
 env:
-  PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
+  SERVERMANAGER_PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
+  NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
   OUTPUT_NAME: HawkSync-ServerManager
   DOTNET_VERSION: '8.0.x'
 
@@ -29,17 +30,34 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup .NET
+    - name: Setup .NET 8.0
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.PROJECT_PATH }}
+    - name: Setup .NET Framework Build Tools
+      uses: microsoft/setup-msbuild@v2
 
-    - name: Build
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+
+    - name: Restore NetLimiterBridge dependencies
+      run: nuget restore ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }}
+
+    - name: Restore ServerManager dependencies
+      run: dotnet restore ${{ env.SERVERMANAGER_PROJECT_PATH }}
+
+    - name: Build NetLimiterBridge (.NET Framework 4.8.1)
       run: |
-        dotnet build ${{ env.PROJECT_PATH }} `
+        msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
+          /p:Configuration=Release `
+          /p:Platform="Any CPU" `
+          /p:OutputPath=bin/Release/ `
+          /p:PlatformTarget=x64
+
+    - name: Build ServerManager (.NET 8.0)
+      run: |
+        dotnet build ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --no-restore `
           /p:UseCommonOutputDirectory=false `
@@ -47,14 +65,25 @@ jobs:
           /p:BaseOutputPath=bin/ `
           /p:Platform="Any CPU"
 
-    - name: Publish
+    - name: Publish ServerManager
       run: |
-        dotnet publish ${{ env.PROJECT_PATH }} `
+        dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained false `
           --output ./publish `
           /p:UseCommonOutputDirectory=false
+
+    - name: Copy NetLimiterBridge to ServerManager output
+      shell: pwsh
+      run: |
+        # Create NetLimiterBridge subfolder
+        New-Item -ItemType Directory -Force -Path ./publish/NetLimiterBridge
+        
+        # Copy NetLimiterBridge binaries
+        Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
+          -Destination ./publish/NetLimiterBridge/ `
+          -Recurse -Force
 
     - name: Create version info
       shell: pwsh
@@ -74,12 +103,20 @@ jobs:
         Commit: $(git rev-parse HEAD)
         Branch: $($env:GITHUB_REF -replace 'refs/heads/', '')
         
+        Components:
+        - ServerManager (.NET 8.0)
+        - NetLimiterBridge (.NET Framework 4.8.1)
+        
         Requirements:
         - .NET 8.0 Runtime
+        - .NET Framework 4.8.1 Runtime
         - Windows 10/11 (x64)
         
         Download .NET 8.0 Runtime:
         https://dotnet.microsoft.com/download/dotnet/8.0
+        
+        Download .NET Framework 4.8.1 Runtime:
+        https://dotnet.microsoft.com/download/dotnet-framework/net481
         "@ | Out-File -FilePath ./publish/BUILD_INFO.txt
 
     - name: Copy LICENSE to output
@@ -115,12 +152,18 @@ jobs:
           ### Requirements
           - Windows 10/11 (x64)
           - [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+          - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
           
           ### Installation
           1. Install .NET 8.0 Runtime if not already installed
-          2. Download the ZIP file below
-          3. Extract to your desired location
-          4. Run `ServerManager.exe`
+          2. Install .NET Framework 4.8.1 Runtime if not already installed
+          3. Download the ZIP file below
+          4. Extract to your desired location
+          5. Run `ServerManager.exe`
+          
+          ### Components
+          - **ServerManager**: Main application (.NET 8.0)
+          - **NetLimiterBridge**: Network limiting bridge (.NET Framework 4.8.1)
           
           ### Changes
           See [commit history](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}) for details.
