@@ -5,7 +5,7 @@ VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerManager", "BHD-ServerManager\ServerManager.csproj", "{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetLimiterBridge", "..\NetProxy\NetLimiterBridge.csproj", "{461734DA-B792-4DCB-9618-BD9EE48A2D76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetLimiterBridge", "NetLimiterBridge\NetLimiterBridge.csproj", "{461734DA-B792-4DCB-9618-BD9EE48A2D76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
