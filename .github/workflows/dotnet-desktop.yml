@@ -38,22 +38,18 @@ jobs:
     - name: Setup .NET Framework Build Tools
       uses: microsoft/setup-msbuild@v2
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
-
-    - name: Restore NetLimiterBridge dependencies
-      run: nuget restore ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} -PackagesDirectory ./packages
-
     - name: Restore ServerManager dependencies
       run: dotnet restore ${{ env.SERVERMANAGER_PROJECT_PATH }}
 
-    - name: Build NetLimiterBridge (.NET Framework 4.8.1)
+    - name: Restore and Build NetLimiterBridge (.NET Framework 4.8.1)
       run: |
         msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
+          /t:Restore,Build `
           /p:Configuration=Release `
           /p:Platform="Any CPU" `
           /p:OutputPath=bin/Release/ `
-          /p:PlatformTarget=x64
+          /p:PlatformTarget=x64 `
+          /p:RestorePackagesPath=../packages
 
     - name: Build ServerManager (.NET 8.0)
       run: |
