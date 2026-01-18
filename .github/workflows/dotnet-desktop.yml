@@ -42,7 +42,7 @@ jobs:
       uses: nuget/setup-nuget@v2
 
     - name: Restore NetLimiterBridge dependencies
-      run: nuget restore ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }}
+      run: nuget restore ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} -PackagesDirectory ./packages
 
     - name: Restore ServerManager dependencies
       run: dotnet restore ${{ env.SERVERMANAGER_PROJECT_PATH }}
