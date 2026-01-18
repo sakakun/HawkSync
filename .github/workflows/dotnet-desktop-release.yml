@@ -16,7 +16,8 @@ permissions:
   packages: write
 
 env:
-  PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
+  SERVERMANAGER_PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
+  NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
   OUTPUT_NAME: HawkSync-ServerManager
   DOTNET_VERSION: '8.0.x'
 
@@ -71,12 +72,25 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.PROJECT_PATH }}
+    - name: Setup .NET Framework Build Tools
+      uses: microsoft/setup-msbuild@v2
 
-    - name: Build
+    - name: Restore ServerManager dependencies
+      run: dotnet restore ${{ env.SERVERMANAGER_PROJECT_PATH }}
+
+    - name: Restore and Build NetLimiterBridge (.NET Framework 4.8.1)
       run: |
-        dotnet build ${{ env.PROJECT_PATH }} `
+        msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
+          /t:Restore,Build `
+          /p:Configuration=Release `
+          /p:Platform="Any CPU" `
+          /p:OutputPath=bin/Release/ `
+          /p:PlatformTarget=x64 `
+          /p:RestorePackagesPath=../packages
+
+    - name: Build ServerManager (.NET 8.0)
+      run: |
+        dotnet build ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --no-restore `
           /p:UseCommonOutputDirectory=false `
@@ -93,7 +107,7 @@ jobs:
 
     - name: Publish Framework-Dependent
       run: |
-        dotnet publish ${{ env.PROJECT_PATH }} `
+        dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained false `
@@ -104,7 +118,7 @@ jobs:
 
     - name: Publish Self-Contained
       run: |
-        dotnet publish ${{ env.PROJECT_PATH }} `
+        dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained true `
@@ -115,6 +129,28 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
+
+    - name: Copy NetLimiterBridge to Framework-Dependent output
+      shell: pwsh
+      run: |
+        # Create NetLimiterBridge subfolder
+        New-Item -ItemType Directory -Force -Path ./publish/framework-dependent/NetLimiterBridge
+        
+        # Copy NetLimiterBridge binaries
+        Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
+          -Destination ./publish/framework-dependent/NetLimiterBridge/ `
+          -Recurse -Force
+
+    - name: Copy NetLimiterBridge to Self-Contained output
+      shell: pwsh
+      run: |
+        # Create NetLimiterBridge subfolder
+        New-Item -ItemType Directory -Force -Path ./publish/self-contained/NetLimiterBridge
+        
+        # Copy NetLimiterBridge binaries
+        Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
+          -Destination ./publish/self-contained/NetLimiterBridge/ `
+          -Recurse -Force
 
     - name: Create release info files
       shell: pwsh
@@ -131,16 +167,24 @@ jobs:
         Commit: $(git rev-parse HEAD)
         Branch: $(git branch --show-current)
         
+        Components
+        ----------
+        - ServerManager (.NET 8.0)
+        - NetLimiterBridge (.NET Framework 4.8.1)
+        
         Requirements
         ------------
         Framework-Dependent Edition:
         - .NET 8.0 Runtime
+        - .NET Framework 4.8.1 Runtime
         - Windows 10/11 (x64)
-        - Download: https://dotnet.microsoft.com/download/dotnet/8.0
+        - Download .NET 8.0: https://dotnet.microsoft.com/download/dotnet/8.0
+        - Download .NET Framework 4.8.1: https://dotnet.microsoft.com/download/dotnet-framework/net481
         
         Self-Contained Edition:
+        - .NET Framework 4.8.1 Runtime (for NetLimiterBridge)
         - Windows 10/11 (x64)
-        - No additional dependencies required
+        - Download .NET Framework 4.8.1: https://dotnet.microsoft.com/download/dotnet-framework/net481
         
         Installation
         ------------
@@ -232,14 +276,21 @@ jobs:
           - **Framework-Dependent** (~5MB) - Requires .NET 8.0 Runtime
           - **Self-Contained** (~100MB) - No dependencies required
           
+          ### 🔧 Components
+          
+          - **ServerManager**: Main application (.NET 8.0)
+          - **NetLimiterBridge**: Network limiting bridge (.NET Framework 4.8.1)
+          
           ### ✅ Requirements
           
           **Framework-Dependent Edition:**
           - Windows 10/11 (x64)
           - [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+          - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
           
           **Self-Contained Edition:**
           - Windows 10/11 (x64)
+          - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
           
           ### 📝 Installation
           
