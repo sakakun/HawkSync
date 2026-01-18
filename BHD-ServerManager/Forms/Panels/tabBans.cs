@@ -41,9 +41,9 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 _initialized = true;
 
-                NetLimiterClient.StartBridgeProcess();
+                // NetLimiterClient.StartBridgeProcess();
 
-                await tickerNetLimiterMonitor.InitializeAsync(Path.Combine("C:\\bhd-serv\\server-rs\\","dfbhd.exe"));
+                // await tickerNetLimiterMonitor.InitializeAsync(Path.Combine(theInstance.profileServerPath,"dfbhd.exe"));
 
 			}
         }

@@ -176,6 +176,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 
         public static void StartBridgeProcess(string hostname = "localhost", ushort port = 11111, string username = "", string password = "")
 		{
+
 		    if (_bridgeProcess != null && !_bridgeProcess.HasExited)
 		    {
 		        AppDebug.Log("NetLimiterClient", "Bridge process already running");
