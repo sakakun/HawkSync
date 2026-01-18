@@ -55,7 +55,6 @@
     <StartupObject>NetLimiterBridge.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MainClient.cs" />
     <Compile Include="Messages.cs" />
     <Compile Include="NetLimiterBridge.cs" />
     <Compile Include="Program.cs" />
@@ -65,7 +64,6 @@
     <Content Include="NLInterop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

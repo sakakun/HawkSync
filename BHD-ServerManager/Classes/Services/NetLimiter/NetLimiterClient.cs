@@ -174,6 +174,47 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
             return response.Success;
         }
 
+        public static async Task<List<string>> GetFilterIpAddressesAsync(string filterName)
+        {
+	        var command = new Command
+	        {
+		        Action = "getfilterips",
+		        Parameters = new Dictionary<string, string> { { "filterName", filterName } }
+	        };
+
+	        var response = await SendCommandAsync(command);
+	        if (response.Success && response.Data != null)
+	        {
+		        // Deserialize JsonElement to List of IP range objects
+		        var jsonElement = (JsonElement)response.Data;
+		        var ipRanges = JsonSerializer.Deserialize<List<IpRange>>(jsonElement.GetRawText(), JsonOptions);
+        
+		        // Convert to list of IP strings (for single IPs, Start == End)
+		        var ipList = new List<string>();
+		        foreach (var range in ipRanges!)
+		        {
+			        if (range.Start == range.End)
+			        {
+				        ipList.Add(range.Start);
+			        }
+			        else
+			        {
+				        ipList.Add($"{range.Start}-{range.End}");
+			        }
+		        }
+        
+		        return ipList;
+	        }
+    
+	        return new List<string>();
+        }
+
+        private class IpRange
+        {
+	        public string Start { get; set; }
+	        public string End { get; set; }
+        }
+
         public static void StartBridgeProcess(string hostname = "localhost", ushort port = 11111, string username = "", string password = "")
 		{
 
@@ -231,7 +272,24 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		        throw;
 		    }
 		}
+		public static async Task<List<string>> GetFilterNamesAsync()
+		{
+			var command = new Command
+			{
+				Action = "getfilternames",
+				Parameters = new Dictionary<string, string>()
+			};
 
+			var response = await SendCommandAsync(command);
+			if (response.Success && response.Data != null)
+			{
+				// Deserialize JsonElement to List<string>
+				var jsonElement = (JsonElement)response.Data;
+				return JsonSerializer.Deserialize<List<string>>(jsonElement.GetRawText(), JsonOptions)!;
+			}
+    
+			return new List<string>();
+		}
 		public static void StopBridgeProcess()
 		{
 		    if (_bridgeProcess != null && !_bridgeProcess.HasExited)

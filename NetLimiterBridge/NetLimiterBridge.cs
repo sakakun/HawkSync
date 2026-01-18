@@ -129,47 +129,110 @@ namespace NetLimiterBridge
 		    }
 		}
 
-        private Response ProcessCommand(Command command)
+		private Response ProcessCommand(Command command)
+		{
+			Console.WriteLine($"Processing command: {command.Action}");
+			try
+			{
+				switch (command.Action.ToLower())
+				{
+					case "getappid":
+						return GetAppId(command.Parameters["appPath"]);
+					case "getfilternames":
+						return GetFilterNames();
+					case "getconnections":
+						return GetConnections(command.Parameters["appId"]);
+
+					case "getfilterobject":
+						return GetFilterObject(command.Parameters["filterName"]);
+					case "getfilterips":
+						return GetFilterIpAddresses(command.Parameters["filterName"]);
+					case "addiptofilter":
+						return AddIpToFilter(command.Parameters["filterName"], command.Parameters["ipAddress"]);
+
+					case "removeipfromfilter":
+						return RemoveIpFromFilter(command.Parameters["filterName"], command.Parameters["ipAddress"]);
+
+					case "setconnectionlimit":
+						return SetConnectionLimit(int.Parse(command.Parameters["limit"]));
+
+					case "enableconnectionlimit":
+						return EnableConnectionLimit(bool.Parse(command.Parameters["enabled"]));
+
+					case "endprogram":
+						return EndProgram();
+
+					default:
+						return new Response { Success = false, Message = "Unknown command" };
+				}
+			}
+			catch (Exception ex)
+			{
+				return new Response { Success = false, Message = ex.Message };
+			}
+		}
+
+		private Response GetFilterNames()
         {
-            Console.WriteLine($"Processing command: {command.Action}");
 	        try
-            {
-                switch (command.Action.ToLower())
-                {
-                    case "getappid":
-                        return GetAppId(command.Parameters["appPath"]);
+	        {
+		        var filters = _client.Filters;
+		        var filterNames = filters.Select(f => f.Name).ToList();
 
-                    case "getconnections":
-                        return GetConnections(command.Parameters["appId"]);
-
-                    case "getfilterobject":
-                        return GetFilterObject(command.Parameters["filterName"]);
-
-                    case "addiptofilter":
-                        return AddIpToFilter(command.Parameters["filterName"], command.Parameters["ipAddress"]);
-
-                    case "removeipfromfilter":
-                        return RemoveIpFromFilter(command.Parameters["filterName"], command.Parameters["ipAddress"]);
-
-                    case "setconnectionlimit":
-                        return SetConnectionLimit(int.Parse(command.Parameters["limit"]));
-
-                    case "enableconnectionlimit":
-                        return EnableConnectionLimit(bool.Parse(command.Parameters["enabled"]));
-
-                    case "endprogram":
-                        return EndProgram();
-
-                    default:
-                        return new Response { Success = false, Message = "Unknown command" };
-                }
-            }
-            catch (Exception ex)
-            {
-                return new Response { Success = false, Message = ex.Message };
-            }
+		        return new Response
+		        {
+			        Success = true,
+			        Data = filterNames,
+			        Message = $"Found {filterNames.Count} filter(s)"
+		        };
+	        }
+	        catch (Exception ex)
+	        {
+		        return new Response { Success = false, Message = ex.Message };
+	        }
         }
 
+        private Response GetFilterIpAddresses(string filterName)
+        {
+	        try
+	        {
+		        var filters = _client.Filters;
+		        var filter = _client.Filters.FirstOrDefault(f => f.Name == filterName);
+
+		        if (filter != null)
+		        {
+			        var remoteAddressFilter = filter.Functions
+				        .OfType<FFRemoteAddressInRange>()
+				        .FirstOrDefault();
+
+			        if (remoteAddressFilter == null)
+			        {
+				        return new Response { Success = false, Message = "No existing 'Remote address in range' function found." };
+			        }
+
+			        var ipAddresses = remoteAddressFilter.Values
+				        .Select(range => new
+				        {
+					        Start = range.Range.Start.ToString(),
+					        End = range.Range.End.ToString()
+				        })
+				        .ToList();
+
+			        return new Response
+			        {
+				        Success = true,
+				        Data = ipAddresses,
+				        Message = $"Found {ipAddresses.Count} IP address range(s)"
+			        };
+		        }
+
+		        return new Response { Success = false, Message = "Filter not found" };
+	        }
+	        catch (Exception ex)
+	        {
+		        return new Response { Success = false, Message = ex.Message };
+	        }
+        }
         private Response GetAppId(string appPath)
         {
             try
