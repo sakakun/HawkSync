@@ -44,6 +44,16 @@ namespace BHD_ServerManager.Classes.Tickers
                     AppDebug.Log("tickerBanManagement", "Server process is not attached. Ticker Skipping.");
                 }
 
+                if (tickerNetLimiterMonitor.IsInitialized)
+                {
+	                tickerNetLimiterMonitor.runTicker();
+                }
+                else
+                {
+                    AppDebug.Log("tickerBanManagement", "NetLimiter not initialized. Ticker skipping.");
+                }
+
+
             });
         }
 

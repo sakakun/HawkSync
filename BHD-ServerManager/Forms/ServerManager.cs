@@ -8,6 +8,7 @@ using System.Data;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using BHD_ServerManager.Classes.Services.NetLimiter;
 
 namespace BHD_ServerManager.Forms
 {
@@ -177,6 +178,7 @@ namespace BHD_ServerManager.Forms
                 e.Cancel = true;
                 return;
             }
+            NetLimiterClient.StopBridgeProcess();
 
             CommonCore.Ticker?.Stop("ServerManager");
             CommonCore.Ticker?.Stop("ChatManager");

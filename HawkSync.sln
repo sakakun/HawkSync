@@ -3,18 +3,34 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerManager", "BHD-ServerManager\ServerManager.csproj", "{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerManager", "BHD-ServerManager\ServerManager.csproj", "{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetLimiterBridge", "..\NetProxy\NetLimiterBridge.csproj", "{461734DA-B792-4DCB-9618-BD9EE48A2D76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FB02FDB4-E8A8-4B60-A487-F6BEBD2139A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Debug|x86.Build.0 = Debug|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Release|x86.ActiveCfg = Release|Any CPU
+		{F274A76C-4D24-79DC-2A4E-BAAA29A987DB}.Release|x86.Build.0 = Release|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Debug|x86.Build.0 = Debug|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Release|x86.ActiveCfg = Release|Any CPU
+		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

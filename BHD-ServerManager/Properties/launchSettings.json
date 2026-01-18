@@ -5,7 +5,7 @@
       "workingDirectory": "\\\\VM-DEV\\ServerData\\Development\\HawkSync",
       "remoteDebugEnabled": true,
       "remoteDebugMachine": "VM-DEV",
-      "authenticationMode": "None"
+      "authenticationMode": "Windows"
     }
   }
 }

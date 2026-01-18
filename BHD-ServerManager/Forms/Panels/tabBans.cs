@@ -2,7 +2,9 @@
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.Services;
+using BHD_ServerManager.Classes.Services.NetLimiter;
 using BHD_ServerManager.Classes.SupportClasses;
+using BHD_ServerManager.Classes.Tickers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +23,8 @@ namespace BHD_ServerManager.Forms.Panels
 
         // --- Instance Objects ---
         private banInstance? instanceBans => CommonCore.instanceBans;
-        private bool _initialized = false;
+        private theInstance? theInstance => CommonCore.theInstance;
+		private bool _initialized = false;
 
         public tabBans()
         {
@@ -31,13 +34,17 @@ namespace BHD_ServerManager.Forms.Panels
             this.VisibleChanged += TabBans_VisibleChanged;
         }
 
-        private void TabBans_VisibleChanged(object? sender, EventArgs e)
+        private async void TabBans_VisibleChanged(object? sender, EventArgs e)
         {
             // Only initialize once when first becoming visible
             if (this.Visible && !_initialized)
             {
                 _initialized = true;
-                // NetLimiterService.InitializeNetLimiter();
+
+                NetLimiterClient.StartBridgeProcess();
+
+                await tickerNetLimiterMonitor.InitializeAsync(Path.Combine("C:\\bhd-serv\\server-rs\\","dfbhd.exe"));
+
 			}
         }
 
