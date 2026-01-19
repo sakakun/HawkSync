@@ -14,7 +14,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
     {
         private static theInstance theInstance = CommonCore.theInstance!;
         private static statInstance instanceStats = CommonCore.instanceStats!;
-        private static ServerManager thisServer => Program.ServerManagerUI!;
+        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
 
         // Throttle updates to once every 15 seconds
         private static DateTime _lastPlayerStatsUpdate = DateTime.MinValue;
@@ -326,7 +326,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
 
         // --- ASYNC NETWORK METHODS WITH UI INVOKE FIXES ---
 
-        public static async Task SendImportData(ServerManager thisServer)
+        public static async Task SendImportData(ServerManagerUI thisServer)
 
         {
             if (!theInstance.WebStatsEnabled || string.IsNullOrEmpty(theInstance.WebStatsProfileID) || string.IsNullOrEmpty(theInstance.WebStatsServerPath))
@@ -359,7 +359,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             }
         }
 
-        public static async Task SendUpdateData(ServerManager thisServer)
+        public static async Task SendUpdateData(ServerManagerUI thisServer)
         {
             string POST_URL = theInstance.WebStatsServerPath + "status_update.php";
             Dictionary<string, string> DATA = new Dictionary<string, string>
@@ -385,7 +385,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             }
         }
 
-        public static async Task<string> SendReportData(ServerManager thisServer)
+        public static async Task<string> SendReportData(ServerManagerUI thisServer)
         {
             string POST_URL = theInstance.WebStatsServerPath + "status_report.php";
             Dictionary<string, string> DATA = new Dictionary<string, string>
@@ -484,7 +484,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
 
         // --- UI THREAD-SAFE HELPERS ---
 
-        private static void AddStatsLogRowSafe(ServerManager thisServer, string dateTime, string message)
+        private static void AddStatsLogRowSafe(ServerManagerUI thisServer, string dateTime, string message)
         {
             if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
             {

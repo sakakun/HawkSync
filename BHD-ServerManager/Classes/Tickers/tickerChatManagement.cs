@@ -11,7 +11,7 @@ namespace BHD_ServerManager.Classes.Tickers
     {
         private static theInstance thisInstance => CommonCore.theInstance!;
         private static chatInstance instanceChat => CommonCore.instanceChat!;
-        private static ServerManager thisServer => Program.ServerManagerUI!;
+        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
 
         private static readonly object tickerLock = new();
         private static bool _autoMessageRecoveryDone = false;

@@ -16,7 +16,7 @@ namespace BHD_ServerManager.Forms
             InitializeComponent();
             this.Text = "About HawkSync Server Manager";
             this.labelProductName.Text = "Server Manager";
-            this.labelVersion.Text = "Version " + Program.ApplicationVersion;
+            this.labelVersion.Text = "Version ";
             this.labelCopyright.Text = "Copyright © 2025 HawkSync";
             this.labelCompanyName.Text = "HawkSync";
         }

@@ -12,7 +12,7 @@ using BHD_ServerManager.Classes.Services.NetLimiter;
 
 namespace BHD_ServerManager.Forms
 {
-    public partial class ServerManager : Form
+    public partial class ServerManagerUI : Form
     {
         // The Instances (Data)
         private static theInstance thisInstance => CommonCore.theInstance!;
@@ -26,7 +26,7 @@ namespace BHD_ServerManager.Forms
         public tabBans    BanTab     = null!;                   // The Bans Tab User Control
         public tabStats   StatsTab   = null!;                   // The Stats Tab User Control
 
-        public ServerManager()
+        public ServerManagerUI()
         {
             InitializeComponent();
             Load += PostServerManagerInitalization;

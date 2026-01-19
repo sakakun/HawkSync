@@ -13,6 +13,7 @@ namespace BHD_ServerManager.Classes.Instances
         public List<banInstancePlayerName>    ConnectionHistory     { get; set; } = new();
         public List<banInstancePlayerIP>      IPConnectionHistory   { get; set; } = new();
         public List<proxyRecord>              ProxyRecords          { get; set; } = new();
+        public List<proxyCountry>             ProxyBlockedCountries { get; set; } = new();
 	}
 
     public class banInstancePlayerName
@@ -59,12 +60,17 @@ namespace BHD_ServerManager.Classes.Instances
         public DateTime				    LastChecked         { get; set; }
 	}
 
+    public class proxyCountry
+    {
+        public required string          CountryCode         { get; set; }            // Country ISO Code
+        public required string          CountryName         { get; set; }            // Country Name
+	}
+
 	public enum banInstanceRecordType
     {
-        Information = 0,            // Just log, no action
-        Temporary = 1,              // Expires after time
-        Permanent = 2,              // Never expires
-        Whitelist = 3               // Bypass all checks
+        Information = 0,           // Just log, no action
+        Temporary = 1,             // Expires after time
+        Permanent = 2              // Never expires
     }
 
     public enum RecordCategory

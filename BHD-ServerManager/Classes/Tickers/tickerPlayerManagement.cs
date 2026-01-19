@@ -12,7 +12,7 @@ namespace BHD_ServerManager.Classes.Tickers
     public class tickerPlayerManagement
     {
         // Global Variables
-        private static ServerManager thisServer => Program.ServerManagerUI!;
+        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static theInstance thisInstance => CommonCore.theInstance!;
 
         // Helper for UI thread safety

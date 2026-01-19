@@ -1,38 +1,30 @@
-using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.StatsManagement;
-using BHD_ServerManager.Forms;
 using BHD_ServerManager.Classes.CoreObjects;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations.Schema;
 using BHD_ServerManager.Classes.SupportClasses;
+using BHD_ServerManager.Forms;
 
 namespace BHD_ServerManager
 {
-    public static class Program
-    {
+	public static class Program
+	{
 
-        // Server Manager UI Object
-        public static ServerManager? ServerManagerUI { get; private set; }
+		// Server Manager UI Object
+		public static ServerManagerUI? ServerManagerUI { get; set; } 
 
-        // Major Version Number
-        public static string ApplicationVersion = "1.1.3";
+		[STAThread]
+		static void Main()
+		{   
 
-        [STAThread]
-        static void Main()
-        {   
+			// Encoding for legacy code pages
+			System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-            // Encoding for legacy code pages
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-
-            // Initialize the Instance of the Application
-            CommonCore.InitializeCore();
-            DatabaseManager.Initialize();
+			// Initialize the Instance of the Application
+			CommonCore.InitializeCore();
+			DatabaseManager.Initialize();
 
 			ApplicationConfiguration.Initialize();
-            ServerManagerUI = new ServerManager();
+			ServerManagerUI = new ServerManagerUI();
 
-            Application.Run(ServerManagerUI);
-        }
-    }
+			Application.Run(ServerManagerUI);
+		}
+	}
 }

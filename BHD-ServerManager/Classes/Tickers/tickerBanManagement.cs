@@ -14,7 +14,7 @@ namespace BHD_ServerManager.Classes.Tickers
         // Global Variables
         private static theInstance thisInstance => CommonCore.theInstance!;
         private static banInstance banInstance => CommonCore.instanceBans!;
-        private static ServerManager thisServer => Program.ServerManagerUI!;
+        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
 
         // Helper for UI thread safety
         private static void SafeInvoke(Control control, Action action)

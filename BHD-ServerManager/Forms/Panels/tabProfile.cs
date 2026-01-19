@@ -23,7 +23,7 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
         // --- UI Objects ---
-        private ServerManager theServer => Program.ServerManagerUI!;
+        private ServerManagerUI theServer => Program.ServerManagerUI!;
         // --- Class Variables ---
         private new string Name = "ProfileTab";                     // Name of the tab for logging purposes.
         

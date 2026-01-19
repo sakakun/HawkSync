@@ -24,12 +24,12 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Instance Objects ---
         private banInstance? instanceBans => CommonCore.instanceBans;
         private theInstance? theInstance => CommonCore.theInstance;
-		private bool _initialized = false;
+        private bool _initialized = false;
 
         public tabBans()
         {
             InitializeComponent();
-            
+
             // Use VisibleChanged which fires more reliably
             this.VisibleChanged += TabBans_VisibleChanged;
         }
@@ -45,9 +45,8 @@ namespace BHD_ServerManager.Forms.Panels
 
                 // await tickerNetLimiterMonitor.InitializeAsync(Path.Combine(theInstance.profileServerPath,"dfbhd.exe"));
 
-			}
+            }
         }
 
-        
     }
 }

@@ -17,7 +17,7 @@ namespace BHD_ServerManager.Classes.Tickers
         private static chatInstance instanceChat => CommonCore.instanceChat!;
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
-        private static ServerManager? thisServer => Program.ServerManagerUI;
+        private static ServerManagerUI? thisServer => Program.ServerManagerUI;
 
         // Lock for thread safety (if needed for shared resources)
         private static int isTickerRunning = 0;

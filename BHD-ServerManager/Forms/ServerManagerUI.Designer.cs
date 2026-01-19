@@ -3,7 +3,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace BHD_ServerManager.Forms
 {
-    partial class ServerManager : Form
+    partial class ServerManagerUI : Form
     {
         /// <summary>
         ///  Required designer variable.

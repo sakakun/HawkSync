@@ -14,7 +14,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 {
     public static class theInstanceManager
     {
-        private static ServerManager thisServer => Program.ServerManagerUI!;
+        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static theInstance thisInstance => CommonCore.theInstance!;
 
         public static string lastKnownSettingsPath = Path.Combine(CommonCore.AppDataPath, "lastKnownSettings.json");

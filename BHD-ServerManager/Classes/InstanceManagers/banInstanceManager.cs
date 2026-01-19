@@ -12,7 +12,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 {
     public static class banInstanceManager
     {
-        private static ServerManager thisServer => Program.ServerManagerUI!;
+        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static theInstance theInstance => CommonCore.theInstance!;
         private static banInstance instanceBans => CommonCore.instanceBans!;
 
