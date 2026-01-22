@@ -33,9 +33,9 @@
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
-            blControlSave = new FontAwesome.Sharp.IconButton();
-            blControlReset = new FontAwesome.Sharp.IconButton();
-            blControlDelete = new FontAwesome.Sharp.IconButton();
+            blacklist_btnSave = new FontAwesome.Sharp.IconButton();
+            blacklist_btnReset = new FontAwesome.Sharp.IconButton();
+            blacklist_btnDelete = new FontAwesome.Sharp.IconButton();
             dgPlayerAddressBlacklist = new DataGridView();
             blplayerip_recordID = new DataGridViewTextBoxColumn();
             blplayerip_address = new DataGridViewTextBoxColumn();
@@ -48,23 +48,23 @@
             blControl3 = new FontAwesome.Sharp.IconButton();
             blControl2 = new FontAwesome.Sharp.IconButton();
             blControl1 = new FontAwesome.Sharp.IconButton();
-            panel1 = new Panel();
+            blacklistForm = new Panel();
             groupBox5 = new GroupBox();
-            textBox_notesBL = new TextBox();
+            blacklist_notes = new TextBox();
             groupBox4 = new GroupBox();
             tableLayoutPanel6 = new TableLayoutPanel();
-            checkBox_tempBL = new CheckBox();
-            checkBox_permBL = new CheckBox();
-            groupBox3 = new GroupBox();
+            blacklist_TempBan = new CheckBox();
+            blacklist_PermBan = new CheckBox();
+            blacklist_DateBoxes = new GroupBox();
             tableLayoutPanel5 = new TableLayoutPanel();
-            dateTimePicker_blStart = new DateTimePicker();
-            dateTimePicker_blEnd = new DateTimePicker();
-            groupBox2 = new GroupBox();
+            blacklist_DateStart = new DateTimePicker();
+            blacklist_DateEnd = new DateTimePicker();
+            blacklist_IPAddress = new GroupBox();
             tableLayoutPanel4 = new TableLayoutPanel();
-            cb_subnetBL = new ComboBox();
-            textBox_ipAddressBL = new TextBox();
-            groupBox1 = new GroupBox();
-            textBox_playerNameBL = new TextBox();
+            blacklist_IPSubnetTxt = new ComboBox();
+            blacklist_IPAddressTxt = new TextBox();
+            blacklist_PlayerName = new GroupBox();
+            blacklist_PlayerNameTxt = new TextBox();
             tabWhitelist = new TabPage();
             tableLayoutPanel7 = new TableLayoutPanel();
             tableLayoutPanel8 = new TableLayoutPanel();
@@ -110,36 +110,37 @@
             history_dateStart = new DataGridViewTextBoxColumn();
             history_dateEnd = new DataGridViewTextBoxColumn();
             tabProxyChecking = new TabPage();
-            tabNetlimiter = new TabPage();
-            toolTip1 = new ToolTip(components);
             tableLayoutPanel16 = new TableLayoutPanel();
             tableLayoutPanel17 = new TableLayoutPanel();
+            dgProxyCountryBlockList = new DataGridView();
+            proxy_countyCode = new DataGridViewTextBoxColumn();
+            proxy_countyName = new DataGridViewTextBoxColumn();
             tableLayoutPanel15 = new TableLayoutPanel();
             textBox_countryCode = new TextBox();
             textBox_countryName = new TextBox();
             btn_proxyAddCountry = new Button();
-            dgProxyCountryBlockList = new DataGridView();
-            proxy_countyCode = new DataGridViewTextBoxColumn();
-            proxy_countyName = new DataGridViewTextBoxColumn();
             tabControl1 = new TabControl();
             proxyLookup = new TabPage();
             tabPage2 = new TabPage();
             tableLayoutPanel14 = new TableLayoutPanel();
-            groupBox11 = new GroupBox();
-            tableLayoutPanel18 = new TableLayoutPanel();
-            cb_enableProxyCheck = new CheckBox();
             groupBox12 = new GroupBox();
             tableLayoutPanel19 = new TableLayoutPanel();
             cb_serviceProxyCheckIO = new CheckBox();
-            textBox1 = new TextBox();
-            label1 = new Label();
-            num_proxyCacheDays = new NumericUpDown();
             panel3 = new Panel();
+            groupBox15 = new GroupBox();
+            tableLayoutPanel22 = new TableLayoutPanel();
+            checkBox10 = new CheckBox();
+            checkBox11 = new CheckBox();
+            checkBox12 = new CheckBox();
+            groupBox14 = new GroupBox();
+            tableLayoutPanel21 = new TableLayoutPanel();
+            btn_proxyReset = new FontAwesome.Sharp.IconButton();
+            btn_proxySave = new FontAwesome.Sharp.IconButton();
             groupBox13 = new GroupBox();
             tableLayoutPanel20 = new TableLayoutPanel();
-            label2 = new Label();
-            label4 = new Label();
             label5 = new Label();
+            label4 = new Label();
+            label2 = new Label();
             label3 = new Label();
             label6 = new Label();
             label7 = new Label();
@@ -152,19 +153,19 @@
             checkBox7 = new CheckBox();
             checkBox8 = new CheckBox();
             checkBox9 = new CheckBox();
-            groupBox14 = new GroupBox();
-            tableLayoutPanel21 = new TableLayoutPanel();
-            btn_proxySave = new FontAwesome.Sharp.IconButton();
-            btn_proxyReset = new FontAwesome.Sharp.IconButton();
-            groupBox15 = new GroupBox();
-            tableLayoutPanel22 = new TableLayoutPanel();
-            checkBox10 = new CheckBox();
-            checkBox11 = new CheckBox();
-            checkBox12 = new CheckBox();
+            groupBox11 = new GroupBox();
+            tableLayoutPanel18 = new TableLayoutPanel();
+            textBox1 = new TextBox();
+            cb_enableProxyCheck = new CheckBox();
+            label1 = new Label();
+            num_proxyCacheDays = new NumericUpDown();
+            tabNetlimiter = new TabPage();
             tableLayoutPanel23 = new TableLayoutPanel();
             panel4 = new Panel();
             groupBox16 = new GroupBox();
             tableLayoutPanel24 = new TableLayoutPanel();
+            label12 = new Label();
+            label11 = new Label();
             checkBox13 = new CheckBox();
             numericUpDown1 = new NumericUpDown();
             textBox2 = new TextBox();
@@ -178,12 +179,11 @@
             checkBox14 = new CheckBox();
             numericUpDown2 = new NumericUpDown();
             label10 = new Label();
-            label11 = new Label();
-            label12 = new Label();
-            groupBox17 = new GroupBox();
             tableLayoutPanel26 = new TableLayoutPanel();
-            iconButton2 = new FontAwesome.Sharp.IconButton();
             iconButton3 = new FontAwesome.Sharp.IconButton();
+            iconButton2 = new FontAwesome.Sharp.IconButton();
+            groupBox17 = new GroupBox();
+            toolTip1 = new ToolTip(components);
             banControls.SuspendLayout();
             tabBlacklist.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -191,15 +191,15 @@
             ((System.ComponentModel.ISupportInitialize)dgPlayerAddressBlacklist).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgPlayerNamesBlacklist).BeginInit();
             tableLayoutPanel2.SuspendLayout();
-            panel1.SuspendLayout();
+            blacklistForm.SuspendLayout();
             groupBox5.SuspendLayout();
             groupBox4.SuspendLayout();
             tableLayoutPanel6.SuspendLayout();
-            groupBox3.SuspendLayout();
+            blacklist_DateBoxes.SuspendLayout();
             tableLayoutPanel5.SuspendLayout();
-            groupBox2.SuspendLayout();
+            blacklist_IPAddress.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
-            groupBox1.SuspendLayout();
+            blacklist_PlayerName.SuspendLayout();
             tabWhitelist.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
             tableLayoutPanel8.SuspendLayout();
@@ -219,26 +219,26 @@
             tableLayoutPanel13.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgPlayerHistory).BeginInit();
             tabProxyChecking.SuspendLayout();
-            tabNetlimiter.SuspendLayout();
             tableLayoutPanel16.SuspendLayout();
             tableLayoutPanel17.SuspendLayout();
-            tableLayoutPanel15.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgProxyCountryBlockList).BeginInit();
+            tableLayoutPanel15.SuspendLayout();
             tabControl1.SuspendLayout();
             tabPage2.SuspendLayout();
             tableLayoutPanel14.SuspendLayout();
-            groupBox11.SuspendLayout();
-            tableLayoutPanel18.SuspendLayout();
             groupBox12.SuspendLayout();
             tableLayoutPanel19.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)num_proxyCacheDays).BeginInit();
             panel3.SuspendLayout();
-            groupBox13.SuspendLayout();
-            tableLayoutPanel20.SuspendLayout();
-            groupBox14.SuspendLayout();
-            tableLayoutPanel21.SuspendLayout();
             groupBox15.SuspendLayout();
             tableLayoutPanel22.SuspendLayout();
+            groupBox14.SuspendLayout();
+            tableLayoutPanel21.SuspendLayout();
+            groupBox13.SuspendLayout();
+            tableLayoutPanel20.SuspendLayout();
+            groupBox11.SuspendLayout();
+            tableLayoutPanel18.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)num_proxyCacheDays).BeginInit();
+            tabNetlimiter.SuspendLayout();
             tableLayoutPanel23.SuspendLayout();
             panel4.SuspendLayout();
             groupBox16.SuspendLayout();
@@ -290,7 +290,7 @@
             tableLayoutPanel1.Controls.Add(dgPlayerAddressBlacklist, 1, 0);
             tableLayoutPanel1.Controls.Add(dgPlayerNamesBlacklist, 0, 0);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 3, 0);
-            tableLayoutPanel1.Controls.Add(panel1, 3, 1);
+            tableLayoutPanel1.Controls.Add(blacklistForm, 3, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(3, 3);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -309,9 +309,9 @@
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel3.Controls.Add(blControlSave, 4, 0);
-            tableLayoutPanel3.Controls.Add(blControlReset, 0, 0);
-            tableLayoutPanel3.Controls.Add(blControlDelete, 2, 0);
+            tableLayoutPanel3.Controls.Add(blacklist_btnSave, 4, 0);
+            tableLayoutPanel3.Controls.Add(blacklist_btnReset, 0, 0);
+            tableLayoutPanel3.Controls.Add(blacklist_btnDelete, 2, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(620, 348);
             tableLayoutPanel3.Margin = new Padding(0);
@@ -321,50 +321,52 @@
             tableLayoutPanel3.Size = new Size(312, 40);
             tableLayoutPanel3.TabIndex = 3;
             // 
-            // blControlSave
+            // blacklist_btnSave
             // 
-            blControlSave.Dock = DockStyle.Fill;
-            blControlSave.IconChar = FontAwesome.Sharp.IconChar.Save;
-            blControlSave.IconColor = Color.Black;
-            blControlSave.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blControlSave.IconSize = 32;
-            blControlSave.Location = new Point(251, 3);
-            blControlSave.Name = "blControlSave";
-            blControlSave.Padding = new Padding(0, 3, 0, 0);
-            blControlSave.Size = new Size(58, 34);
-            blControlSave.TabIndex = 2;
-            toolTip1.SetToolTip(blControlSave, "Save");
-            blControlSave.UseVisualStyleBackColor = true;
+            blacklist_btnSave.Dock = DockStyle.Fill;
+            blacklist_btnSave.IconChar = FontAwesome.Sharp.IconChar.Save;
+            blacklist_btnSave.IconColor = Color.Black;
+            blacklist_btnSave.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnSave.IconSize = 32;
+            blacklist_btnSave.Location = new Point(251, 3);
+            blacklist_btnSave.Name = "blacklist_btnSave";
+            blacklist_btnSave.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnSave.Size = new Size(58, 34);
+            blacklist_btnSave.TabIndex = 2;
+            toolTip1.SetToolTip(blacklist_btnSave, "Save");
+            blacklist_btnSave.UseVisualStyleBackColor = true;
             // 
-            // blControlReset
+            // blacklist_btnReset
             // 
-            blControlReset.Dock = DockStyle.Fill;
-            blControlReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
-            blControlReset.IconColor = Color.Black;
-            blControlReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blControlReset.IconSize = 32;
-            blControlReset.Location = new Point(3, 3);
-            blControlReset.Name = "blControlReset";
-            blControlReset.Padding = new Padding(0, 3, 0, 0);
-            blControlReset.Size = new Size(56, 34);
-            blControlReset.TabIndex = 1;
-            toolTip1.SetToolTip(blControlReset, "Reset");
-            blControlReset.UseVisualStyleBackColor = true;
+            blacklist_btnReset.Dock = DockStyle.Fill;
+            blacklist_btnReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
+            blacklist_btnReset.IconColor = Color.Black;
+            blacklist_btnReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnReset.IconSize = 32;
+            blacklist_btnReset.Location = new Point(3, 3);
+            blacklist_btnReset.Name = "blacklist_btnReset";
+            blacklist_btnReset.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnReset.Size = new Size(56, 34);
+            blacklist_btnReset.TabIndex = 1;
+            toolTip1.SetToolTip(blacklist_btnReset, "Reset");
+            blacklist_btnReset.UseVisualStyleBackColor = true;
+            blacklist_btnReset.Click += blacklist_ResetForm;
             // 
-            // blControlDelete
+            // blacklist_btnDelete
             // 
-            blControlDelete.Dock = DockStyle.Fill;
-            blControlDelete.IconChar = FontAwesome.Sharp.IconChar.Close;
-            blControlDelete.IconColor = Color.Black;
-            blControlDelete.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blControlDelete.IconSize = 32;
-            blControlDelete.Location = new Point(127, 3);
-            blControlDelete.Name = "blControlDelete";
-            blControlDelete.Padding = new Padding(0, 3, 0, 0);
-            blControlDelete.Size = new Size(56, 34);
-            blControlDelete.TabIndex = 0;
-            toolTip1.SetToolTip(blControlDelete, "Delete Record(s)");
-            blControlDelete.UseVisualStyleBackColor = true;
+            blacklist_btnDelete.Dock = DockStyle.Fill;
+            blacklist_btnDelete.IconChar = FontAwesome.Sharp.IconChar.Close;
+            blacklist_btnDelete.IconColor = Color.Black;
+            blacklist_btnDelete.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnDelete.IconSize = 32;
+            blacklist_btnDelete.Location = new Point(127, 3);
+            blacklist_btnDelete.Name = "blacklist_btnDelete";
+            blacklist_btnDelete.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnDelete.Size = new Size(56, 34);
+            blacklist_btnDelete.TabIndex = 0;
+            toolTip1.SetToolTip(blacklist_btnDelete, "Delete Record(s)");
+            blacklist_btnDelete.UseVisualStyleBackColor = true;
+            blacklist_btnDelete.Click += blacklist_SaveForm;
             // 
             // dgPlayerAddressBlacklist
             // 
@@ -474,6 +476,7 @@
             blControl3.TabIndex = 3;
             toolTip1.SetToolTip(blControl3, "New Record Both");
             blControl3.UseVisualStyleBackColor = true;
+            blControl3.Click += blacklist_newRecord3;
             // 
             // blControl2
             // 
@@ -489,6 +492,7 @@
             blControl2.TabIndex = 2;
             toolTip1.SetToolTip(blControl2, "New Address Record");
             blControl2.UseVisualStyleBackColor = true;
+            blControl2.Click += blacklist_newRecord2;
             // 
             // blControl1
             // 
@@ -504,24 +508,25 @@
             blControl1.TabIndex = 0;
             toolTip1.SetToolTip(blControl1, "New Player Name Record");
             blControl1.UseVisualStyleBackColor = true;
+            blControl1.Click += blacklist_newRecord1;
             // 
-            // panel1
+            // blacklistForm
             // 
-            panel1.Controls.Add(groupBox5);
-            panel1.Controls.Add(groupBox4);
-            panel1.Controls.Add(groupBox3);
-            panel1.Controls.Add(groupBox2);
-            panel1.Controls.Add(groupBox1);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(620, 40);
-            panel1.Margin = new Padding(0);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(312, 308);
-            panel1.TabIndex = 4;
+            blacklistForm.Controls.Add(groupBox5);
+            blacklistForm.Controls.Add(groupBox4);
+            blacklistForm.Controls.Add(blacklist_DateBoxes);
+            blacklistForm.Controls.Add(blacklist_IPAddress);
+            blacklistForm.Controls.Add(blacklist_PlayerName);
+            blacklistForm.Dock = DockStyle.Fill;
+            blacklistForm.Location = new Point(620, 40);
+            blacklistForm.Margin = new Padding(0);
+            blacklistForm.Name = "blacklistForm";
+            blacklistForm.Size = new Size(312, 308);
+            blacklistForm.TabIndex = 4;
             // 
             // groupBox5
             // 
-            groupBox5.Controls.Add(textBox_notesBL);
+            groupBox5.Controls.Add(blacklist_notes);
             groupBox5.Dock = DockStyle.Fill;
             groupBox5.Location = new Point(0, 195);
             groupBox5.Name = "groupBox5";
@@ -531,15 +536,15 @@
             groupBox5.TabStop = false;
             groupBox5.Text = "Notes";
             // 
-            // textBox_notesBL
+            // blacklist_notes
             // 
-            textBox_notesBL.Dock = DockStyle.Fill;
-            textBox_notesBL.Location = new Point(6, 19);
-            textBox_notesBL.Multiline = true;
-            textBox_notesBL.Name = "textBox_notesBL";
-            textBox_notesBL.PlaceholderText = "Notes";
-            textBox_notesBL.Size = new Size(300, 91);
-            textBox_notesBL.TabIndex = 0;
+            blacklist_notes.Dock = DockStyle.Fill;
+            blacklist_notes.Location = new Point(6, 19);
+            blacklist_notes.Multiline = true;
+            blacklist_notes.Name = "blacklist_notes";
+            blacklist_notes.PlaceholderText = "Notes";
+            blacklist_notes.Size = new Size(300, 91);
+            blacklist_notes.TabIndex = 0;
             // 
             // groupBox4
             // 
@@ -557,8 +562,8 @@
             tableLayoutPanel6.ColumnCount = 2;
             tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel6.Controls.Add(checkBox_tempBL, 0, 0);
-            tableLayoutPanel6.Controls.Add(checkBox_permBL, 1, 0);
+            tableLayoutPanel6.Controls.Add(blacklist_TempBan, 0, 0);
+            tableLayoutPanel6.Controls.Add(blacklist_PermBan, 1, 0);
             tableLayoutPanel6.Dock = DockStyle.Fill;
             tableLayoutPanel6.Location = new Point(3, 19);
             tableLayoutPanel6.Name = "tableLayoutPanel6";
@@ -568,50 +573,50 @@
             tableLayoutPanel6.Size = new Size(306, 22);
             tableLayoutPanel6.TabIndex = 0;
             // 
-            // checkBox_tempBL
+            // blacklist_TempBan
             // 
-            checkBox_tempBL.AutoSize = true;
-            checkBox_tempBL.Dock = DockStyle.Fill;
-            checkBox_tempBL.Location = new Point(3, 3);
-            checkBox_tempBL.Name = "checkBox_tempBL";
-            checkBox_tempBL.Padding = new Padding(30, 0, 20, 0);
-            checkBox_tempBL.Size = new Size(147, 19);
-            checkBox_tempBL.TabIndex = 0;
-            checkBox_tempBL.Text = "Temporary";
-            checkBox_tempBL.TextAlign = ContentAlignment.MiddleCenter;
-            checkBox_tempBL.UseVisualStyleBackColor = true;
+            blacklist_TempBan.AutoSize = true;
+            blacklist_TempBan.Dock = DockStyle.Fill;
+            blacklist_TempBan.Location = new Point(3, 3);
+            blacklist_TempBan.Name = "blacklist_TempBan";
+            blacklist_TempBan.Padding = new Padding(30, 0, 20, 0);
+            blacklist_TempBan.Size = new Size(147, 19);
+            blacklist_TempBan.TabIndex = 0;
+            blacklist_TempBan.Text = "Temporary";
+            blacklist_TempBan.TextAlign = ContentAlignment.MiddleCenter;
+            blacklist_TempBan.UseVisualStyleBackColor = true;
             // 
-            // checkBox_permBL
+            // blacklist_PermBan
             // 
-            checkBox_permBL.AutoSize = true;
-            checkBox_permBL.Dock = DockStyle.Fill;
-            checkBox_permBL.Location = new Point(156, 3);
-            checkBox_permBL.Name = "checkBox_permBL";
-            checkBox_permBL.Padding = new Padding(30, 0, 20, 0);
-            checkBox_permBL.Size = new Size(147, 19);
-            checkBox_permBL.TabIndex = 1;
-            checkBox_permBL.Text = "Permanent";
-            checkBox_permBL.TextAlign = ContentAlignment.MiddleCenter;
-            checkBox_permBL.UseVisualStyleBackColor = true;
+            blacklist_PermBan.AutoSize = true;
+            blacklist_PermBan.Dock = DockStyle.Fill;
+            blacklist_PermBan.Location = new Point(156, 3);
+            blacklist_PermBan.Name = "blacklist_PermBan";
+            blacklist_PermBan.Padding = new Padding(30, 0, 20, 0);
+            blacklist_PermBan.Size = new Size(147, 19);
+            blacklist_PermBan.TabIndex = 1;
+            blacklist_PermBan.Text = "Permanent";
+            blacklist_PermBan.TextAlign = ContentAlignment.MiddleCenter;
+            blacklist_PermBan.UseVisualStyleBackColor = true;
             // 
-            // groupBox3
+            // blacklist_DateBoxes
             // 
-            groupBox3.Controls.Add(tableLayoutPanel5);
-            groupBox3.Dock = DockStyle.Top;
-            groupBox3.Location = new Point(0, 100);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(312, 51);
-            groupBox3.TabIndex = 2;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "Ban Dates - Start && End";
+            blacklist_DateBoxes.Controls.Add(tableLayoutPanel5);
+            blacklist_DateBoxes.Dock = DockStyle.Top;
+            blacklist_DateBoxes.Location = new Point(0, 100);
+            blacklist_DateBoxes.Name = "blacklist_DateBoxes";
+            blacklist_DateBoxes.Size = new Size(312, 51);
+            blacklist_DateBoxes.TabIndex = 2;
+            blacklist_DateBoxes.TabStop = false;
+            blacklist_DateBoxes.Text = "Ban Dates - Start && End";
             // 
             // tableLayoutPanel5
             // 
             tableLayoutPanel5.ColumnCount = 2;
             tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel5.Controls.Add(dateTimePicker_blStart, 0, 0);
-            tableLayoutPanel5.Controls.Add(dateTimePicker_blEnd, 1, 0);
+            tableLayoutPanel5.Controls.Add(blacklist_DateStart, 0, 0);
+            tableLayoutPanel5.Controls.Add(blacklist_DateEnd, 1, 0);
             tableLayoutPanel5.Dock = DockStyle.Fill;
             tableLayoutPanel5.Location = new Point(3, 19);
             tableLayoutPanel5.Name = "tableLayoutPanel5";
@@ -621,44 +626,44 @@
             tableLayoutPanel5.Size = new Size(306, 29);
             tableLayoutPanel5.TabIndex = 0;
             // 
-            // dateTimePicker_blStart
+            // blacklist_DateStart
             // 
-            dateTimePicker_blStart.Location = new Point(3, 3);
-            dateTimePicker_blStart.MaxDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
-            dateTimePicker_blStart.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
-            dateTimePicker_blStart.Name = "dateTimePicker_blStart";
-            dateTimePicker_blStart.Size = new Size(147, 23);
-            dateTimePicker_blStart.TabIndex = 0;
-            dateTimePicker_blStart.Value = new DateTime(2026, 1, 18, 0, 0, 0, 0);
+            blacklist_DateStart.Location = new Point(3, 3);
+            blacklist_DateStart.MaxDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
+            blacklist_DateStart.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
+            blacklist_DateStart.Name = "blacklist_DateStart";
+            blacklist_DateStart.Size = new Size(147, 23);
+            blacklist_DateStart.TabIndex = 0;
+            blacklist_DateStart.Value = new DateTime(2026, 1, 18, 0, 0, 0, 0);
             // 
-            // dateTimePicker_blEnd
+            // blacklist_DateEnd
             // 
-            dateTimePicker_blEnd.Checked = false;
-            dateTimePicker_blEnd.Location = new Point(156, 3);
-            dateTimePicker_blEnd.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
-            dateTimePicker_blEnd.Name = "dateTimePicker_blEnd";
-            dateTimePicker_blEnd.Size = new Size(147, 23);
-            dateTimePicker_blEnd.TabIndex = 1;
-            dateTimePicker_blEnd.Value = new DateTime(2026, 1, 18, 15, 43, 49, 0);
+            blacklist_DateEnd.Checked = false;
+            blacklist_DateEnd.Location = new Point(156, 3);
+            blacklist_DateEnd.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
+            blacklist_DateEnd.Name = "blacklist_DateEnd";
+            blacklist_DateEnd.Size = new Size(147, 23);
+            blacklist_DateEnd.TabIndex = 1;
+            blacklist_DateEnd.Value = new DateTime(2026, 1, 18, 15, 43, 49, 0);
             // 
-            // groupBox2
+            // blacklist_IPAddress
             // 
-            groupBox2.Controls.Add(tableLayoutPanel4);
-            groupBox2.Dock = DockStyle.Top;
-            groupBox2.Location = new Point(0, 49);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(312, 51);
-            groupBox2.TabIndex = 1;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "IP Address";
+            blacklist_IPAddress.Controls.Add(tableLayoutPanel4);
+            blacklist_IPAddress.Dock = DockStyle.Top;
+            blacklist_IPAddress.Location = new Point(0, 49);
+            blacklist_IPAddress.Name = "blacklist_IPAddress";
+            blacklist_IPAddress.Size = new Size(312, 51);
+            blacklist_IPAddress.TabIndex = 1;
+            blacklist_IPAddress.TabStop = false;
+            blacklist_IPAddress.Text = "IP Address";
             // 
             // tableLayoutPanel4
             // 
             tableLayoutPanel4.ColumnCount = 2;
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 76.47059F));
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 23.5294113F));
-            tableLayoutPanel4.Controls.Add(cb_subnetBL, 1, 0);
-            tableLayoutPanel4.Controls.Add(textBox_ipAddressBL, 0, 0);
+            tableLayoutPanel4.Controls.Add(blacklist_IPSubnetTxt, 1, 0);
+            tableLayoutPanel4.Controls.Add(blacklist_IPAddressTxt, 0, 0);
             tableLayoutPanel4.Dock = DockStyle.Fill;
             tableLayoutPanel4.Location = new Point(3, 19);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
@@ -668,50 +673,50 @@
             tableLayoutPanel4.Size = new Size(306, 29);
             tableLayoutPanel4.TabIndex = 0;
             // 
-            // cb_subnetBL
+            // blacklist_IPSubnetTxt
             // 
-            cb_subnetBL.DisplayMember = "32";
-            cb_subnetBL.FormattingEnabled = true;
-            cb_subnetBL.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32" });
-            cb_subnetBL.Location = new Point(237, 3);
-            cb_subnetBL.Name = "cb_subnetBL";
-            cb_subnetBL.Size = new Size(66, 23);
-            cb_subnetBL.TabIndex = 0;
-            cb_subnetBL.ValueMember = "32";
+            blacklist_IPSubnetTxt.DisplayMember = "32";
+            blacklist_IPSubnetTxt.FormattingEnabled = true;
+            blacklist_IPSubnetTxt.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32" });
+            blacklist_IPSubnetTxt.Location = new Point(237, 3);
+            blacklist_IPSubnetTxt.Name = "blacklist_IPSubnetTxt";
+            blacklist_IPSubnetTxt.Size = new Size(66, 23);
+            blacklist_IPSubnetTxt.TabIndex = 0;
+            blacklist_IPSubnetTxt.ValueMember = "32";
             // 
-            // textBox_ipAddressBL
+            // blacklist_IPAddressTxt
             // 
-            textBox_ipAddressBL.Dock = DockStyle.Fill;
-            textBox_ipAddressBL.Location = new Point(3, 3);
-            textBox_ipAddressBL.MaxLength = 15;
-            textBox_ipAddressBL.Name = "textBox_ipAddressBL";
-            textBox_ipAddressBL.PlaceholderText = "000.000.000.000";
-            textBox_ipAddressBL.Size = new Size(228, 23);
-            textBox_ipAddressBL.TabIndex = 1;
-            textBox_ipAddressBL.TextAlign = HorizontalAlignment.Center;
+            blacklist_IPAddressTxt.Dock = DockStyle.Fill;
+            blacklist_IPAddressTxt.Location = new Point(3, 3);
+            blacklist_IPAddressTxt.MaxLength = 15;
+            blacklist_IPAddressTxt.Name = "blacklist_IPAddressTxt";
+            blacklist_IPAddressTxt.PlaceholderText = "000.000.000.000";
+            blacklist_IPAddressTxt.Size = new Size(228, 23);
+            blacklist_IPAddressTxt.TabIndex = 1;
+            blacklist_IPAddressTxt.TextAlign = HorizontalAlignment.Center;
             // 
-            // groupBox1
+            // blacklist_PlayerName
             // 
-            groupBox1.Controls.Add(textBox_playerNameBL);
-            groupBox1.Dock = DockStyle.Top;
-            groupBox1.Location = new Point(0, 0);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Padding = new Padding(6, 3, 6, 3);
-            groupBox1.Size = new Size(312, 49);
-            groupBox1.TabIndex = 0;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Player Name";
+            blacklist_PlayerName.Controls.Add(blacklist_PlayerNameTxt);
+            blacklist_PlayerName.Dock = DockStyle.Top;
+            blacklist_PlayerName.Location = new Point(0, 0);
+            blacklist_PlayerName.Name = "blacklist_PlayerName";
+            blacklist_PlayerName.Padding = new Padding(6, 3, 6, 3);
+            blacklist_PlayerName.Size = new Size(312, 49);
+            blacklist_PlayerName.TabIndex = 0;
+            blacklist_PlayerName.TabStop = false;
+            blacklist_PlayerName.Text = "Player Name";
             // 
-            // textBox_playerNameBL
+            // blacklist_PlayerNameTxt
             // 
-            textBox_playerNameBL.Dock = DockStyle.Fill;
-            textBox_playerNameBL.Location = new Point(6, 19);
-            textBox_playerNameBL.MaxLength = 16;
-            textBox_playerNameBL.Name = "textBox_playerNameBL";
-            textBox_playerNameBL.PlaceholderText = "Player Name";
-            textBox_playerNameBL.Size = new Size(300, 23);
-            textBox_playerNameBL.TabIndex = 0;
-            textBox_playerNameBL.TextAlign = HorizontalAlignment.Center;
+            blacklist_PlayerNameTxt.Dock = DockStyle.Fill;
+            blacklist_PlayerNameTxt.Location = new Point(6, 19);
+            blacklist_PlayerNameTxt.MaxLength = 16;
+            blacklist_PlayerNameTxt.Name = "blacklist_PlayerNameTxt";
+            blacklist_PlayerNameTxt.PlaceholderText = "Player Name";
+            blacklist_PlayerNameTxt.Size = new Size(300, 23);
+            blacklist_PlayerNameTxt.TabIndex = 0;
+            blacklist_PlayerNameTxt.TextAlign = HorizontalAlignment.Center;
             // 
             // tabWhitelist
             // 
@@ -1260,16 +1265,6 @@
             tabProxyChecking.Text = "Proxy Checking";
             tabProxyChecking.UseVisualStyleBackColor = true;
             // 
-            // tabNetlimiter
-            // 
-            tabNetlimiter.Controls.Add(tableLayoutPanel23);
-            tabNetlimiter.Location = new Point(4, 24);
-            tabNetlimiter.Name = "tabNetlimiter";
-            tabNetlimiter.Size = new Size(958, 394);
-            tabNetlimiter.TabIndex = 4;
-            tabNetlimiter.Text = "Netlimiter";
-            tabNetlimiter.UseVisualStyleBackColor = true;
-            // 
             // tableLayoutPanel16
             // 
             tableLayoutPanel16.ColumnCount = 3;
@@ -1302,6 +1297,39 @@
             tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             tableLayoutPanel17.Size = new Size(250, 388);
             tableLayoutPanel17.TabIndex = 0;
+            // 
+            // dgProxyCountryBlockList
+            // 
+            dgProxyCountryBlockList.AllowUserToAddRows = false;
+            dgProxyCountryBlockList.AllowUserToDeleteRows = false;
+            dgProxyCountryBlockList.AllowUserToResizeColumns = false;
+            dgProxyCountryBlockList.AllowUserToResizeRows = false;
+            dgProxyCountryBlockList.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
+            dgProxyCountryBlockList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgProxyCountryBlockList.Columns.AddRange(new DataGridViewColumn[] { proxy_countyCode, proxy_countyName });
+            dgProxyCountryBlockList.Dock = DockStyle.Fill;
+            dgProxyCountryBlockList.Enabled = false;
+            dgProxyCountryBlockList.Location = new Point(3, 3);
+            dgProxyCountryBlockList.Name = "dgProxyCountryBlockList";
+            dgProxyCountryBlockList.ReadOnly = true;
+            dgProxyCountryBlockList.RowHeadersVisible = false;
+            dgProxyCountryBlockList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgProxyCountryBlockList.Size = new Size(244, 352);
+            dgProxyCountryBlockList.TabIndex = 5;
+            // 
+            // proxy_countyCode
+            // 
+            proxy_countyCode.HeaderText = "Code";
+            proxy_countyCode.Name = "proxy_countyCode";
+            proxy_countyCode.ReadOnly = true;
+            proxy_countyCode.Width = 50;
+            // 
+            // proxy_countyName
+            // 
+            proxy_countyName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            proxy_countyName.HeaderText = "Country Name";
+            proxy_countyName.Name = "proxy_countyName";
+            proxy_countyName.ReadOnly = true;
             // 
             // tableLayoutPanel15
             // 
@@ -1352,39 +1380,6 @@
             btn_proxyAddCountry.TabIndex = 2;
             btn_proxyAddCountry.Text = "Add";
             btn_proxyAddCountry.UseVisualStyleBackColor = true;
-            // 
-            // dgProxyCountryBlockList
-            // 
-            dgProxyCountryBlockList.AllowUserToAddRows = false;
-            dgProxyCountryBlockList.AllowUserToDeleteRows = false;
-            dgProxyCountryBlockList.AllowUserToResizeColumns = false;
-            dgProxyCountryBlockList.AllowUserToResizeRows = false;
-            dgProxyCountryBlockList.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
-            dgProxyCountryBlockList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgProxyCountryBlockList.Columns.AddRange(new DataGridViewColumn[] { proxy_countyCode, proxy_countyName });
-            dgProxyCountryBlockList.Dock = DockStyle.Fill;
-            dgProxyCountryBlockList.Enabled = false;
-            dgProxyCountryBlockList.Location = new Point(3, 3);
-            dgProxyCountryBlockList.Name = "dgProxyCountryBlockList";
-            dgProxyCountryBlockList.ReadOnly = true;
-            dgProxyCountryBlockList.RowHeadersVisible = false;
-            dgProxyCountryBlockList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgProxyCountryBlockList.Size = new Size(244, 352);
-            dgProxyCountryBlockList.TabIndex = 5;
-            // 
-            // proxy_countyCode
-            // 
-            proxy_countyCode.HeaderText = "Code";
-            proxy_countyCode.Name = "proxy_countyCode";
-            proxy_countyCode.ReadOnly = true;
-            proxy_countyCode.Width = 50;
-            // 
-            // proxy_countyName
-            // 
-            proxy_countyName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            proxy_countyName.HeaderText = "Country Name";
-            proxy_countyName.Name = "proxy_countyName";
-            proxy_countyName.ReadOnly = true;
             // 
             // tabControl1
             // 
@@ -1438,54 +1433,6 @@
             tableLayoutPanel14.Size = new Size(672, 348);
             tableLayoutPanel14.TabIndex = 0;
             // 
-            // groupBox11
-            // 
-            groupBox11.Controls.Add(tableLayoutPanel18);
-            groupBox11.Dock = DockStyle.Top;
-            groupBox11.Location = new Point(0, 0);
-            groupBox11.Name = "groupBox11";
-            groupBox11.Size = new Size(250, 108);
-            groupBox11.TabIndex = 0;
-            groupBox11.TabStop = false;
-            groupBox11.Text = "General";
-            // 
-            // tableLayoutPanel18
-            // 
-            tableLayoutPanel18.ColumnCount = 3;
-            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel18.Controls.Add(textBox1, 0, 1);
-            tableLayoutPanel18.Controls.Add(cb_enableProxyCheck, 0, 0);
-            tableLayoutPanel18.Controls.Add(label1, 0, 2);
-            tableLayoutPanel18.Controls.Add(num_proxyCacheDays, 2, 2);
-            tableLayoutPanel18.Dock = DockStyle.Fill;
-            tableLayoutPanel18.ImeMode = ImeMode.NoControl;
-            tableLayoutPanel18.Location = new Point(3, 19);
-            tableLayoutPanel18.Name = "tableLayoutPanel18";
-            tableLayoutPanel18.RowCount = 3;
-            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel18.Size = new Size(244, 86);
-            tableLayoutPanel18.TabIndex = 0;
-            // 
-            // cb_enableProxyCheck
-            // 
-            cb_enableProxyCheck.AutoSize = true;
-            cb_enableProxyCheck.CheckAlign = ContentAlignment.MiddleRight;
-            tableLayoutPanel18.SetColumnSpan(cb_enableProxyCheck, 3);
-            cb_enableProxyCheck.Dock = DockStyle.Fill;
-            cb_enableProxyCheck.Location = new Point(3, 6);
-            cb_enableProxyCheck.Margin = new Padding(3, 6, 3, 3);
-            cb_enableProxyCheck.Name = "cb_enableProxyCheck";
-            cb_enableProxyCheck.Padding = new Padding(15, 0, 5, 0);
-            cb_enableProxyCheck.Size = new Size(238, 19);
-            cb_enableProxyCheck.TabIndex = 0;
-            cb_enableProxyCheck.Text = "Enable Proxy Checking";
-            cb_enableProxyCheck.TextAlign = ContentAlignment.MiddleRight;
-            cb_enableProxyCheck.UseVisualStyleBackColor = true;
-            // 
             // groupBox12
             // 
             groupBox12.Controls.Add(tableLayoutPanel19);
@@ -1532,42 +1479,6 @@
             cb_serviceProxyCheckIO.TextAlign = ContentAlignment.MiddleRight;
             cb_serviceProxyCheckIO.UseVisualStyleBackColor = true;
             // 
-            // textBox1
-            // 
-            tableLayoutPanel18.SetColumnSpan(textBox1, 3);
-            textBox1.Dock = DockStyle.Fill;
-            textBox1.Location = new Point(4, 31);
-            textBox1.Margin = new Padding(4, 3, 4, 3);
-            textBox1.Name = "textBox1";
-            textBox1.PlaceholderText = "API KEY";
-            textBox1.Size = new Size(236, 23);
-            textBox1.TabIndex = 2;
-            textBox1.TextAlign = HorizontalAlignment.Center;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            tableLayoutPanel18.SetColumnSpan(label1, 2);
-            label1.Dock = DockStyle.Fill;
-            label1.Location = new Point(3, 56);
-            label1.Name = "label1";
-            label1.Padding = new Padding(0, 0, 0, 3);
-            label1.Size = new Size(156, 30);
-            label1.TabIndex = 4;
-            label1.Text = "Cache IP (Days)";
-            label1.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // num_proxyCacheDays
-            // 
-            num_proxyCacheDays.Location = new Point(165, 59);
-            num_proxyCacheDays.Maximum = new decimal(new int[] { 365, 0, 0, 0 });
-            num_proxyCacheDays.Name = "num_proxyCacheDays";
-            num_proxyCacheDays.Size = new Size(74, 23);
-            num_proxyCacheDays.TabIndex = 3;
-            num_proxyCacheDays.TextAlign = HorizontalAlignment.Center;
-            toolTip1.SetToolTip(num_proxyCacheDays, "Days");
-            num_proxyCacheDays.Value = new decimal(new int[] { 30, 0, 0, 0 });
-            // 
             // panel3
             // 
             panel3.Controls.Add(groupBox15);
@@ -1580,6 +1491,133 @@
             panel3.Name = "panel3";
             panel3.Size = new Size(250, 348);
             panel3.TabIndex = 2;
+            // 
+            // groupBox15
+            // 
+            groupBox15.Controls.Add(tableLayoutPanel22);
+            groupBox15.Dock = DockStyle.Fill;
+            groupBox15.Location = new Point(0, 232);
+            groupBox15.Name = "groupBox15";
+            groupBox15.Size = new Size(250, 54);
+            groupBox15.TabIndex = 3;
+            groupBox15.TabStop = false;
+            groupBox15.Text = "Geo Blocking Mode";
+            // 
+            // tableLayoutPanel22
+            // 
+            tableLayoutPanel22.ColumnCount = 3;
+            tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 90F));
+            tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+            tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel22.Controls.Add(checkBox10, 0, 0);
+            tableLayoutPanel22.Controls.Add(checkBox11, 1, 0);
+            tableLayoutPanel22.Controls.Add(checkBox12, 2, 0);
+            tableLayoutPanel22.Dock = DockStyle.Fill;
+            tableLayoutPanel22.Location = new Point(3, 19);
+            tableLayoutPanel22.Name = "tableLayoutPanel22";
+            tableLayoutPanel22.RowCount = 1;
+            tableLayoutPanel22.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel22.Size = new Size(244, 32);
+            tableLayoutPanel22.TabIndex = 0;
+            // 
+            // checkBox10
+            // 
+            checkBox10.AutoSize = true;
+            checkBox10.Dock = DockStyle.Fill;
+            checkBox10.Location = new Point(3, 3);
+            checkBox10.Name = "checkBox10";
+            checkBox10.Padding = new Padding(5, 3, 5, 0);
+            checkBox10.Size = new Size(84, 26);
+            checkBox10.TabIndex = 0;
+            checkBox10.Text = "Allow";
+            checkBox10.TextAlign = ContentAlignment.MiddleRight;
+            checkBox10.UseVisualStyleBackColor = true;
+            // 
+            // checkBox11
+            // 
+            checkBox11.AutoSize = true;
+            checkBox11.Dock = DockStyle.Fill;
+            checkBox11.Location = new Point(93, 3);
+            checkBox11.Name = "checkBox11";
+            checkBox11.Padding = new Padding(5, 3, 5, 0);
+            checkBox11.Size = new Size(74, 26);
+            checkBox11.TabIndex = 1;
+            checkBox11.Text = "Block";
+            checkBox11.TextAlign = ContentAlignment.MiddleRight;
+            checkBox11.UseVisualStyleBackColor = true;
+            // 
+            // checkBox12
+            // 
+            checkBox12.AutoSize = true;
+            checkBox12.Dock = DockStyle.Fill;
+            checkBox12.Location = new Point(173, 3);
+            checkBox12.Name = "checkBox12";
+            checkBox12.Padding = new Padding(5, 3, 5, 0);
+            checkBox12.Size = new Size(68, 26);
+            checkBox12.TabIndex = 2;
+            checkBox12.Text = "Off";
+            checkBox12.TextAlign = ContentAlignment.MiddleRight;
+            checkBox12.UseVisualStyleBackColor = true;
+            // 
+            // groupBox14
+            // 
+            groupBox14.Controls.Add(tableLayoutPanel21);
+            groupBox14.Dock = DockStyle.Bottom;
+            groupBox14.Location = new Point(0, 286);
+            groupBox14.Name = "groupBox14";
+            groupBox14.Size = new Size(250, 62);
+            groupBox14.TabIndex = 2;
+            groupBox14.TabStop = false;
+            groupBox14.Text = "Controls";
+            // 
+            // tableLayoutPanel21
+            // 
+            tableLayoutPanel21.ColumnCount = 5;
+            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel21.Controls.Add(btn_proxyReset, 0, 0);
+            tableLayoutPanel21.Controls.Add(btn_proxySave, 2, 0);
+            tableLayoutPanel21.Dock = DockStyle.Fill;
+            tableLayoutPanel21.Location = new Point(3, 19);
+            tableLayoutPanel21.Name = "tableLayoutPanel21";
+            tableLayoutPanel21.RowCount = 1;
+            tableLayoutPanel21.RowStyles.Add(new RowStyle());
+            tableLayoutPanel21.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel21.Size = new Size(244, 40);
+            tableLayoutPanel21.TabIndex = 0;
+            // 
+            // btn_proxyReset
+            // 
+            btn_proxyReset.Dock = DockStyle.Fill;
+            btn_proxyReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
+            btn_proxyReset.IconColor = Color.Black;
+            btn_proxyReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btn_proxyReset.IconSize = 28;
+            btn_proxyReset.Location = new Point(3, 3);
+            btn_proxyReset.Name = "btn_proxyReset";
+            btn_proxyReset.Padding = new Padding(0, 3, 0, 0);
+            btn_proxyReset.Size = new Size(42, 34);
+            btn_proxyReset.TabIndex = 1;
+            toolTip1.SetToolTip(btn_proxyReset, "Reset");
+            btn_proxyReset.UseVisualStyleBackColor = true;
+            // 
+            // btn_proxySave
+            // 
+            btn_proxySave.Dock = DockStyle.Fill;
+            btn_proxySave.IconChar = FontAwesome.Sharp.IconChar.Save;
+            btn_proxySave.IconColor = Color.Black;
+            btn_proxySave.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btn_proxySave.IconSize = 28;
+            btn_proxySave.Location = new Point(99, 3);
+            btn_proxySave.Name = "btn_proxySave";
+            btn_proxySave.Padding = new Padding(0, 3, 0, 0);
+            btn_proxySave.Size = new Size(42, 34);
+            btn_proxySave.TabIndex = 0;
+            toolTip1.SetToolTip(btn_proxySave, "Save");
+            btn_proxySave.UseVisualStyleBackColor = true;
             // 
             // groupBox13
             // 
@@ -1625,16 +1663,16 @@
             tableLayoutPanel20.Size = new Size(244, 102);
             tableLayoutPanel20.TabIndex = 0;
             // 
-            // label2
+            // label5
             // 
-            label2.AutoSize = true;
-            label2.Dock = DockStyle.Fill;
-            label2.Location = new Point(100, 0);
-            label2.Name = "label2";
-            label2.Size = new Size(42, 30);
-            label2.TabIndex = 0;
-            label2.Text = "Proxy";
-            label2.TextAlign = ContentAlignment.MiddleCenter;
+            label5.AutoSize = true;
+            label5.Dock = DockStyle.Fill;
+            label5.Location = new Point(196, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(45, 30);
+            label5.TabIndex = 3;
+            label5.Text = "TOR";
+            label5.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // label4
             // 
@@ -1647,16 +1685,16 @@
             label4.Text = "VPN";
             label4.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // label5
+            // label2
             // 
-            label5.AutoSize = true;
-            label5.Dock = DockStyle.Fill;
-            label5.Location = new Point(196, 0);
-            label5.Name = "label5";
-            label5.Size = new Size(45, 30);
-            label5.TabIndex = 3;
-            label5.Text = "TOR";
-            label5.TextAlign = ContentAlignment.MiddleCenter;
+            label2.AutoSize = true;
+            label2.Dock = DockStyle.Fill;
+            label2.Location = new Point(100, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(42, 30);
+            label2.TabIndex = 0;
+            label2.Text = "Proxy";
+            label2.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // label3
             // 
@@ -1790,132 +1828,99 @@
             checkBox9.TabIndex = 15;
             checkBox9.UseVisualStyleBackColor = true;
             // 
-            // groupBox14
+            // groupBox11
             // 
-            groupBox14.Controls.Add(tableLayoutPanel21);
-            groupBox14.Dock = DockStyle.Bottom;
-            groupBox14.Location = new Point(0, 286);
-            groupBox14.Name = "groupBox14";
-            groupBox14.Size = new Size(250, 62);
-            groupBox14.TabIndex = 2;
-            groupBox14.TabStop = false;
-            groupBox14.Text = "Controls";
+            groupBox11.Controls.Add(tableLayoutPanel18);
+            groupBox11.Dock = DockStyle.Top;
+            groupBox11.Location = new Point(0, 0);
+            groupBox11.Name = "groupBox11";
+            groupBox11.Size = new Size(250, 108);
+            groupBox11.TabIndex = 0;
+            groupBox11.TabStop = false;
+            groupBox11.Text = "General";
             // 
-            // tableLayoutPanel21
+            // tableLayoutPanel18
             // 
-            tableLayoutPanel21.ColumnCount = 5;
-            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel21.Controls.Add(btn_proxyReset, 0, 0);
-            tableLayoutPanel21.Controls.Add(btn_proxySave, 2, 0);
-            tableLayoutPanel21.Dock = DockStyle.Fill;
-            tableLayoutPanel21.Location = new Point(3, 19);
-            tableLayoutPanel21.Name = "tableLayoutPanel21";
-            tableLayoutPanel21.RowCount = 1;
-            tableLayoutPanel21.RowStyles.Add(new RowStyle());
-            tableLayoutPanel21.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel21.Size = new Size(244, 40);
-            tableLayoutPanel21.TabIndex = 0;
+            tableLayoutPanel18.ColumnCount = 3;
+            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel18.Controls.Add(textBox1, 0, 1);
+            tableLayoutPanel18.Controls.Add(cb_enableProxyCheck, 0, 0);
+            tableLayoutPanel18.Controls.Add(label1, 0, 2);
+            tableLayoutPanel18.Controls.Add(num_proxyCacheDays, 2, 2);
+            tableLayoutPanel18.Dock = DockStyle.Fill;
+            tableLayoutPanel18.ImeMode = ImeMode.NoControl;
+            tableLayoutPanel18.Location = new Point(3, 19);
+            tableLayoutPanel18.Name = "tableLayoutPanel18";
+            tableLayoutPanel18.RowCount = 3;
+            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel18.Size = new Size(244, 86);
+            tableLayoutPanel18.TabIndex = 0;
             // 
-            // btn_proxySave
+            // textBox1
             // 
-            btn_proxySave.Dock = DockStyle.Fill;
-            btn_proxySave.IconChar = FontAwesome.Sharp.IconChar.Save;
-            btn_proxySave.IconColor = Color.Black;
-            btn_proxySave.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btn_proxySave.IconSize = 28;
-            btn_proxySave.Location = new Point(99, 3);
-            btn_proxySave.Name = "btn_proxySave";
-            btn_proxySave.Padding = new Padding(0, 3, 0, 0);
-            btn_proxySave.Size = new Size(42, 34);
-            btn_proxySave.TabIndex = 0;
-            toolTip1.SetToolTip(btn_proxySave, "Save");
-            btn_proxySave.UseVisualStyleBackColor = true;
+            tableLayoutPanel18.SetColumnSpan(textBox1, 3);
+            textBox1.Dock = DockStyle.Fill;
+            textBox1.Location = new Point(4, 31);
+            textBox1.Margin = new Padding(4, 3, 4, 3);
+            textBox1.Name = "textBox1";
+            textBox1.PlaceholderText = "API KEY";
+            textBox1.Size = new Size(236, 23);
+            textBox1.TabIndex = 2;
+            textBox1.TextAlign = HorizontalAlignment.Center;
             // 
-            // btn_proxyReset
+            // cb_enableProxyCheck
             // 
-            btn_proxyReset.Dock = DockStyle.Fill;
-            btn_proxyReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
-            btn_proxyReset.IconColor = Color.Black;
-            btn_proxyReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btn_proxyReset.IconSize = 28;
-            btn_proxyReset.Location = new Point(3, 3);
-            btn_proxyReset.Name = "btn_proxyReset";
-            btn_proxyReset.Padding = new Padding(0, 3, 0, 0);
-            btn_proxyReset.Size = new Size(42, 34);
-            btn_proxyReset.TabIndex = 1;
-            toolTip1.SetToolTip(btn_proxyReset, "Reset");
-            btn_proxyReset.UseVisualStyleBackColor = true;
+            cb_enableProxyCheck.AutoSize = true;
+            cb_enableProxyCheck.CheckAlign = ContentAlignment.MiddleRight;
+            tableLayoutPanel18.SetColumnSpan(cb_enableProxyCheck, 3);
+            cb_enableProxyCheck.Dock = DockStyle.Fill;
+            cb_enableProxyCheck.Location = new Point(3, 6);
+            cb_enableProxyCheck.Margin = new Padding(3, 6, 3, 3);
+            cb_enableProxyCheck.Name = "cb_enableProxyCheck";
+            cb_enableProxyCheck.Padding = new Padding(15, 0, 5, 0);
+            cb_enableProxyCheck.Size = new Size(238, 19);
+            cb_enableProxyCheck.TabIndex = 0;
+            cb_enableProxyCheck.Text = "Enable Proxy Checking";
+            cb_enableProxyCheck.TextAlign = ContentAlignment.MiddleRight;
+            cb_enableProxyCheck.UseVisualStyleBackColor = true;
             // 
-            // groupBox15
+            // label1
             // 
-            groupBox15.Controls.Add(tableLayoutPanel22);
-            groupBox15.Dock = DockStyle.Fill;
-            groupBox15.Location = new Point(0, 232);
-            groupBox15.Name = "groupBox15";
-            groupBox15.Size = new Size(250, 54);
-            groupBox15.TabIndex = 3;
-            groupBox15.TabStop = false;
-            groupBox15.Text = "Geo Blocking Mode";
+            label1.AutoSize = true;
+            tableLayoutPanel18.SetColumnSpan(label1, 2);
+            label1.Dock = DockStyle.Fill;
+            label1.Location = new Point(3, 56);
+            label1.Name = "label1";
+            label1.Padding = new Padding(0, 0, 0, 3);
+            label1.Size = new Size(156, 30);
+            label1.TabIndex = 4;
+            label1.Text = "Cache IP (Days)";
+            label1.TextAlign = ContentAlignment.MiddleRight;
             // 
-            // tableLayoutPanel22
+            // num_proxyCacheDays
             // 
-            tableLayoutPanel22.ColumnCount = 3;
-            tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 90F));
-            tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel22.Controls.Add(checkBox10, 0, 0);
-            tableLayoutPanel22.Controls.Add(checkBox11, 1, 0);
-            tableLayoutPanel22.Controls.Add(checkBox12, 2, 0);
-            tableLayoutPanel22.Dock = DockStyle.Fill;
-            tableLayoutPanel22.Location = new Point(3, 19);
-            tableLayoutPanel22.Name = "tableLayoutPanel22";
-            tableLayoutPanel22.RowCount = 1;
-            tableLayoutPanel22.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel22.Size = new Size(244, 32);
-            tableLayoutPanel22.TabIndex = 0;
+            num_proxyCacheDays.Location = new Point(165, 59);
+            num_proxyCacheDays.Maximum = new decimal(new int[] { 365, 0, 0, 0 });
+            num_proxyCacheDays.Name = "num_proxyCacheDays";
+            num_proxyCacheDays.Size = new Size(74, 23);
+            num_proxyCacheDays.TabIndex = 3;
+            num_proxyCacheDays.TextAlign = HorizontalAlignment.Center;
+            toolTip1.SetToolTip(num_proxyCacheDays, "Days");
+            num_proxyCacheDays.Value = new decimal(new int[] { 30, 0, 0, 0 });
             // 
-            // checkBox10
+            // tabNetlimiter
             // 
-            checkBox10.AutoSize = true;
-            checkBox10.Dock = DockStyle.Fill;
-            checkBox10.Location = new Point(3, 3);
-            checkBox10.Name = "checkBox10";
-            checkBox10.Padding = new Padding(5, 3, 5, 0);
-            checkBox10.Size = new Size(84, 26);
-            checkBox10.TabIndex = 0;
-            checkBox10.Text = "Allow";
-            checkBox10.TextAlign = ContentAlignment.MiddleRight;
-            checkBox10.UseVisualStyleBackColor = true;
-            // 
-            // checkBox11
-            // 
-            checkBox11.AutoSize = true;
-            checkBox11.Dock = DockStyle.Fill;
-            checkBox11.Location = new Point(93, 3);
-            checkBox11.Name = "checkBox11";
-            checkBox11.Padding = new Padding(5, 3, 5, 0);
-            checkBox11.Size = new Size(74, 26);
-            checkBox11.TabIndex = 1;
-            checkBox11.Text = "Block";
-            checkBox11.TextAlign = ContentAlignment.MiddleRight;
-            checkBox11.UseVisualStyleBackColor = true;
-            // 
-            // checkBox12
-            // 
-            checkBox12.AutoSize = true;
-            checkBox12.Dock = DockStyle.Fill;
-            checkBox12.Location = new Point(173, 3);
-            checkBox12.Name = "checkBox12";
-            checkBox12.Padding = new Padding(5, 3, 5, 0);
-            checkBox12.Size = new Size(68, 26);
-            checkBox12.TabIndex = 2;
-            checkBox12.Text = "Off";
-            checkBox12.TextAlign = ContentAlignment.MiddleRight;
-            checkBox12.UseVisualStyleBackColor = true;
+            tabNetlimiter.Controls.Add(tableLayoutPanel23);
+            tabNetlimiter.Location = new Point(4, 24);
+            tabNetlimiter.Name = "tabNetlimiter";
+            tabNetlimiter.Size = new Size(958, 394);
+            tabNetlimiter.TabIndex = 4;
+            tabNetlimiter.Text = "Netlimiter";
+            tabNetlimiter.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel23
             // 
@@ -1938,10 +1943,9 @@
             // 
             panel4.Controls.Add(groupBox16);
             panel4.Dock = DockStyle.Fill;
-            panel4.Location = new Point(688, 0);
-            panel4.Margin = new Padding(0);
+            panel4.Location = new Point(691, 3);
             panel4.Name = "panel4";
-            panel4.Size = new Size(250, 394);
+            panel4.Size = new Size(244, 394);
             panel4.TabIndex = 0;
             // 
             // groupBox16
@@ -1950,7 +1954,7 @@
             groupBox16.Dock = DockStyle.Fill;
             groupBox16.Location = new Point(0, 0);
             groupBox16.Name = "groupBox16";
-            groupBox16.Size = new Size(250, 394);
+            groupBox16.Size = new Size(244, 394);
             groupBox16.TabIndex = 0;
             groupBox16.TabStop = false;
             groupBox16.Text = "Settings";
@@ -1992,8 +1996,36 @@
             tableLayoutPanel24.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel24.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             tableLayoutPanel24.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel24.Size = new Size(244, 372);
+            tableLayoutPanel24.Size = new Size(238, 372);
             tableLayoutPanel24.TabIndex = 0;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            tableLayoutPanel24.SetColumnSpan(label12, 2);
+            label12.Dock = DockStyle.Fill;
+            label12.Font = new Font("Segoe UI", 9F);
+            label12.Location = new Point(3, 150);
+            label12.Name = "label12";
+            label12.Padding = new Padding(0, 0, 0, 3);
+            label12.Size = new Size(232, 20);
+            label12.TabIndex = 12;
+            label12.Text = "Credentials Not Required for Local Host";
+            label12.TextAlign = ContentAlignment.TopCenter;
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            tableLayoutPanel24.SetColumnSpan(label11, 2);
+            label11.Dock = DockStyle.Fill;
+            label11.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            label11.Location = new Point(3, 220);
+            label11.Name = "label11";
+            label11.Padding = new Padding(0, 0, 0, 3);
+            label11.Size = new Size(232, 20);
+            label11.TabIndex = 11;
+            label11.Text = "Additional Checks";
+            label11.TextAlign = ContentAlignment.BottomCenter;
             // 
             // checkBox13
             // 
@@ -2004,7 +2036,7 @@
             checkBox13.Location = new Point(3, 3);
             checkBox13.Name = "checkBox13";
             checkBox13.Padding = new Padding(0, 3, 5, 0);
-            checkBox13.Size = new Size(238, 24);
+            checkBox13.Size = new Size(232, 24);
             checkBox13.TabIndex = 0;
             checkBox13.Text = "Enable NetLimiter";
             checkBox13.TextAlign = ContentAlignment.MiddleRight;
@@ -2013,11 +2045,11 @@
             // numericUpDown1
             // 
             numericUpDown1.Dock = DockStyle.Fill;
-            numericUpDown1.Location = new Point(125, 63);
+            numericUpDown1.Location = new Point(122, 63);
             numericUpDown1.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
             numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(116, 23);
+            numericUpDown1.Size = new Size(113, 23);
             numericUpDown1.TabIndex = 1;
             numericUpDown1.TextAlign = HorizontalAlignment.Center;
             numericUpDown1.Value = new decimal(new int[] { 9298, 0, 0, 0 });
@@ -2029,7 +2061,7 @@
             textBox2.MaxLength = 15;
             textBox2.Name = "textBox2";
             textBox2.PlaceholderText = "127.0.0.1";
-            textBox2.Size = new Size(116, 23);
+            textBox2.Size = new Size(113, 23);
             textBox2.TabIndex = 2;
             textBox2.TextAlign = HorizontalAlignment.Center;
             // 
@@ -2042,7 +2074,7 @@
             label8.Location = new Point(3, 30);
             label8.Name = "label8";
             label8.Padding = new Padding(0, 0, 0, 3);
-            label8.Size = new Size(238, 30);
+            label8.Size = new Size(232, 30);
             label8.TabIndex = 3;
             label8.Text = "NetLimiter Information";
             label8.TextAlign = ContentAlignment.BottomCenter;
@@ -2054,7 +2086,7 @@
             textBox3.Location = new Point(3, 93);
             textBox3.Name = "textBox3";
             textBox3.PlaceholderText = "Username";
-            textBox3.Size = new Size(238, 23);
+            textBox3.Size = new Size(232, 23);
             textBox3.TabIndex = 4;
             textBox3.TextAlign = HorizontalAlignment.Center;
             // 
@@ -2065,7 +2097,7 @@
             textBox4.Location = new Point(3, 123);
             textBox4.Name = "textBox4";
             textBox4.PlaceholderText = "Password";
-            textBox4.Size = new Size(238, 23);
+            textBox4.Size = new Size(232, 23);
             textBox4.TabIndex = 5;
             textBox4.TextAlign = HorizontalAlignment.Center;
             textBox4.UseSystemPasswordChar = true;
@@ -2085,7 +2117,7 @@
             tableLayoutPanel25.RowCount = 1;
             tableLayoutPanel25.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel25.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel25.Size = new Size(244, 30);
+            tableLayoutPanel25.Size = new Size(238, 30);
             tableLayoutPanel25.TabIndex = 6;
             // 
             // comboBox1
@@ -2095,7 +2127,7 @@
             comboBox1.Location = new Point(3, 4);
             comboBox1.Margin = new Padding(3, 4, 3, 3);
             comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(189, 23);
+            comboBox1.Size = new Size(184, 23);
             comboBox1.TabIndex = 0;
             // 
             // iconButton1
@@ -2105,11 +2137,11 @@
             iconButton1.IconColor = Color.Black;
             iconButton1.IconFont = FontAwesome.Sharp.IconFont.Auto;
             iconButton1.IconSize = 24;
-            iconButton1.Location = new Point(195, 0);
+            iconButton1.Location = new Point(190, 0);
             iconButton1.Margin = new Padding(0);
             iconButton1.Name = "iconButton1";
             iconButton1.Padding = new Padding(0, 3, 0, 0);
-            iconButton1.Size = new Size(49, 30);
+            iconButton1.Size = new Size(48, 30);
             iconButton1.TabIndex = 1;
             iconButton1.UseVisualStyleBackColor = true;
             // 
@@ -2122,7 +2154,7 @@
             label9.Location = new Point(3, 170);
             label9.Name = "label9";
             label9.Padding = new Padding(0, 0, 0, 3);
-            label9.Size = new Size(238, 20);
+            label9.Size = new Size(232, 20);
             label9.TabIndex = 7;
             label9.Text = "NetLimiter Filters";
             label9.TextAlign = ContentAlignment.BottomCenter;
@@ -2136,7 +2168,7 @@
             checkBox14.Location = new Point(3, 243);
             checkBox14.Name = "checkBox14";
             checkBox14.Padding = new Padding(0, 3, 5, 0);
-            checkBox14.Size = new Size(238, 24);
+            checkBox14.Size = new Size(232, 24);
             checkBox14.TabIndex = 8;
             checkBox14.Text = "Enable Connection Abuse Banning";
             checkBox14.TextAlign = ContentAlignment.MiddleRight;
@@ -2145,10 +2177,10 @@
             // numericUpDown2
             // 
             numericUpDown2.Dock = DockStyle.Fill;
-            numericUpDown2.Location = new Point(125, 273);
+            numericUpDown2.Location = new Point(122, 273);
             numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown2.Name = "numericUpDown2";
-            numericUpDown2.Size = new Size(116, 23);
+            numericUpDown2.Size = new Size(113, 23);
             numericUpDown2.TabIndex = 9;
             numericUpDown2.TextAlign = HorizontalAlignment.Center;
             numericUpDown2.Value = new decimal(new int[] { 10, 0, 0, 0 });
@@ -2159,48 +2191,10 @@
             label10.Dock = DockStyle.Fill;
             label10.Location = new Point(3, 270);
             label10.Name = "label10";
-            label10.Size = new Size(116, 30);
+            label10.Size = new Size(113, 30);
             label10.TabIndex = 10;
             label10.Text = "Threshold";
             label10.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            tableLayoutPanel24.SetColumnSpan(label11, 2);
-            label11.Dock = DockStyle.Fill;
-            label11.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label11.Location = new Point(3, 220);
-            label11.Name = "label11";
-            label11.Padding = new Padding(0, 0, 0, 3);
-            label11.Size = new Size(238, 20);
-            label11.TabIndex = 11;
-            label11.Text = "Additional Checks";
-            label11.TextAlign = ContentAlignment.BottomCenter;
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            tableLayoutPanel24.SetColumnSpan(label12, 2);
-            label12.Dock = DockStyle.Fill;
-            label12.Font = new Font("Segoe UI", 9F);
-            label12.Location = new Point(3, 150);
-            label12.Name = "label12";
-            label12.Padding = new Padding(0, 0, 0, 3);
-            label12.Size = new Size(238, 20);
-            label12.TabIndex = 12;
-            label12.Text = "Credentials Not Required for Local Host";
-            label12.TextAlign = ContentAlignment.TopCenter;
-            // 
-            // groupBox17
-            // 
-            groupBox17.Dock = DockStyle.Fill;
-            groupBox17.Location = new Point(3, 3);
-            groupBox17.Name = "groupBox17";
-            groupBox17.Size = new Size(662, 388);
-            groupBox17.TabIndex = 1;
-            groupBox17.TabStop = false;
-            groupBox17.Text = "NetLimiter Active Connections";
             // 
             // tableLayoutPanel26
             // 
@@ -2219,24 +2213,8 @@
             tableLayoutPanel26.Name = "tableLayoutPanel26";
             tableLayoutPanel26.RowCount = 1;
             tableLayoutPanel26.RowStyles.Add(new RowStyle());
-            tableLayoutPanel26.Size = new Size(244, 40);
+            tableLayoutPanel26.Size = new Size(238, 40);
             tableLayoutPanel26.TabIndex = 13;
-            // 
-            // iconButton2
-            // 
-            iconButton2.Dock = DockStyle.Fill;
-            iconButton2.IconChar = FontAwesome.Sharp.IconChar.Save;
-            iconButton2.IconColor = Color.Black;
-            iconButton2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            iconButton2.IconSize = 32;
-            iconButton2.Location = new Point(96, 0);
-            iconButton2.Margin = new Padding(0);
-            iconButton2.Name = "iconButton2";
-            iconButton2.Padding = new Padding(0, 3, 0, 0);
-            iconButton2.Size = new Size(48, 40);
-            iconButton2.TabIndex = 0;
-            toolTip1.SetToolTip(iconButton2, "Save");
-            iconButton2.UseVisualStyleBackColor = true;
             // 
             // iconButton3
             // 
@@ -2249,10 +2227,36 @@
             iconButton3.Margin = new Padding(0);
             iconButton3.Name = "iconButton3";
             iconButton3.Padding = new Padding(0, 3, 0, 0);
-            iconButton3.Size = new Size(48, 40);
+            iconButton3.Size = new Size(47, 40);
             iconButton3.TabIndex = 1;
             toolTip1.SetToolTip(iconButton3, "Reset");
             iconButton3.UseVisualStyleBackColor = true;
+            // 
+            // iconButton2
+            // 
+            iconButton2.Dock = DockStyle.Fill;
+            iconButton2.IconChar = FontAwesome.Sharp.IconChar.Save;
+            iconButton2.IconColor = Color.Black;
+            iconButton2.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            iconButton2.IconSize = 32;
+            iconButton2.Location = new Point(94, 0);
+            iconButton2.Margin = new Padding(0);
+            iconButton2.Name = "iconButton2";
+            iconButton2.Padding = new Padding(0, 3, 0, 0);
+            iconButton2.Size = new Size(47, 40);
+            iconButton2.TabIndex = 0;
+            toolTip1.SetToolTip(iconButton2, "Save");
+            iconButton2.UseVisualStyleBackColor = true;
+            // 
+            // groupBox17
+            // 
+            groupBox17.Dock = DockStyle.Fill;
+            groupBox17.Location = new Point(3, 3);
+            groupBox17.Name = "groupBox17";
+            groupBox17.Size = new Size(662, 394);
+            groupBox17.TabIndex = 1;
+            groupBox17.TabStop = false;
+            groupBox17.Text = "NetLimiter Active Connections";
             // 
             // tabBans
             // 
@@ -2268,19 +2272,19 @@
             ((System.ComponentModel.ISupportInitialize)dgPlayerAddressBlacklist).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgPlayerNamesBlacklist).EndInit();
             tableLayoutPanel2.ResumeLayout(false);
-            panel1.ResumeLayout(false);
+            blacklistForm.ResumeLayout(false);
             groupBox5.ResumeLayout(false);
             groupBox5.PerformLayout();
             groupBox4.ResumeLayout(false);
             tableLayoutPanel6.ResumeLayout(false);
             tableLayoutPanel6.PerformLayout();
-            groupBox3.ResumeLayout(false);
+            blacklist_DateBoxes.ResumeLayout(false);
             tableLayoutPanel5.ResumeLayout(false);
-            groupBox2.ResumeLayout(false);
+            blacklist_IPAddress.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
             tableLayoutPanel4.PerformLayout();
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
+            blacklist_PlayerName.ResumeLayout(false);
+            blacklist_PlayerName.PerformLayout();
             tabWhitelist.ResumeLayout(false);
             tableLayoutPanel7.ResumeLayout(false);
             tableLayoutPanel8.ResumeLayout(false);
@@ -2304,31 +2308,31 @@
             tableLayoutPanel13.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgPlayerHistory).EndInit();
             tabProxyChecking.ResumeLayout(false);
-            tabNetlimiter.ResumeLayout(false);
             tableLayoutPanel16.ResumeLayout(false);
             tableLayoutPanel17.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgProxyCountryBlockList).EndInit();
             tableLayoutPanel15.ResumeLayout(false);
             tableLayoutPanel15.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dgProxyCountryBlockList).EndInit();
             tabControl1.ResumeLayout(false);
             tabPage2.ResumeLayout(false);
             tableLayoutPanel14.ResumeLayout(false);
-            groupBox11.ResumeLayout(false);
-            tableLayoutPanel18.ResumeLayout(false);
-            tableLayoutPanel18.PerformLayout();
             groupBox12.ResumeLayout(false);
             tableLayoutPanel19.ResumeLayout(false);
             tableLayoutPanel19.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)num_proxyCacheDays).EndInit();
             panel3.ResumeLayout(false);
-            groupBox13.ResumeLayout(false);
-            tableLayoutPanel20.ResumeLayout(false);
-            tableLayoutPanel20.PerformLayout();
-            groupBox14.ResumeLayout(false);
-            tableLayoutPanel21.ResumeLayout(false);
             groupBox15.ResumeLayout(false);
             tableLayoutPanel22.ResumeLayout(false);
             tableLayoutPanel22.PerformLayout();
+            groupBox14.ResumeLayout(false);
+            tableLayoutPanel21.ResumeLayout(false);
+            groupBox13.ResumeLayout(false);
+            tableLayoutPanel20.ResumeLayout(false);
+            tableLayoutPanel20.PerformLayout();
+            groupBox11.ResumeLayout(false);
+            tableLayoutPanel18.ResumeLayout(false);
+            tableLayoutPanel18.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)num_proxyCacheDays).EndInit();
+            tabNetlimiter.ResumeLayout(false);
             tableLayoutPanel23.ResumeLayout(false);
             panel4.ResumeLayout(false);
             groupBox16.ResumeLayout(false);
@@ -2360,23 +2364,23 @@
         private DataGridViewTextBoxColumn blplayername_datetime;
         private TableLayoutPanel tableLayoutPanel3;
         private TableLayoutPanel tableLayoutPanel2;
-        private Panel panel1;
-        private GroupBox groupBox2;
+        private Panel blacklistForm;
+        private GroupBox blacklist_IPAddress;
         private TableLayoutPanel tableLayoutPanel4;
-        private GroupBox groupBox1;
-        private TextBox textBox_playerNameBL;
-        private ComboBox cb_subnetBL;
-        private TextBox textBox_ipAddressBL;
-        private GroupBox groupBox3;
+        private GroupBox blacklist_PlayerName;
+        private TextBox blacklist_PlayerNameTxt;
+        private ComboBox blacklist_IPSubnetTxt;
+        private TextBox blacklist_IPAddressTxt;
+        private GroupBox blacklist_DateBoxes;
         private TableLayoutPanel tableLayoutPanel5;
-        private DateTimePicker dateTimePicker_blStart;
-        private DateTimePicker dateTimePicker_blEnd;
+        private DateTimePicker blacklist_DateStart;
+        private DateTimePicker blacklist_DateEnd;
         private GroupBox groupBox4;
         private TableLayoutPanel tableLayoutPanel6;
-        private CheckBox checkBox_tempBL;
-        private CheckBox checkBox_permBL;
+        private CheckBox blacklist_TempBan;
+        private CheckBox blacklist_PermBan;
         private GroupBox groupBox5;
-        private TextBox textBox_notesBL;
+        private TextBox blacklist_notes;
         private FontAwesome.Sharp.IconButton blControl1;
         private FontAwesome.Sharp.IconButton blControl3;
         private FontAwesome.Sharp.IconButton blControl2;
@@ -2412,9 +2416,8 @@
         private TextBox textBox_addressWL;
         private GroupBox groupBox10;
         private TextBox textBox_playerNameWL;
-        private FontAwesome.Sharp.IconButton blControlDelete;
-        private FontAwesome.Sharp.IconButton blControlSave;
-        private FontAwesome.Sharp.IconButton blControlReset;
+        private FontAwesome.Sharp.IconButton blacklist_btnSave;
+        private FontAwesome.Sharp.IconButton blacklist_btnReset;
         private FontAwesome.Sharp.IconButton wlControlSave;
         private FontAwesome.Sharp.IconButton wlControlDelete;
         private FontAwesome.Sharp.IconButton wlControlReset;
@@ -2493,6 +2496,7 @@
         private NumericUpDown numericUpDown2;
         private Label label10;
         private Label label11;
+        private FontAwesome.Sharp.IconButton blacklist_btnDelete;
         private Label label12;
         private GroupBox groupBox17;
         private TableLayoutPanel tableLayoutPanel26;

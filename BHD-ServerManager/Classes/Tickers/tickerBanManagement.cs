@@ -53,7 +53,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     AppDebug.Log("tickerBanManagement", "NetLimiter not initialized. Ticker skipping.");
                 }
 
-
             });
         }
 
