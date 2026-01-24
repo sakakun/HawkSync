@@ -34,7 +34,8 @@ namespace BHD_ServerManager.Forms
 
         private void PostServerManagerInitalization(object? sender, EventArgs e)
         {
-            functionEvent_loadPanels();                                         // Load the User Control Tabs
+            // Load the Panels
+            functionEvent_loadPanels();            
 
 			// Old Server Settings Initialization
             chatInstanceManager.LoadSettings();

@@ -18,8 +18,9 @@ namespace BHD_ServerManager
 			System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
 			// Initialize the Instance of the Application
-			CommonCore.InitializeCore();
 			DatabaseManager.Initialize();
+			CommonCore.InitializeCore();
+			
 
 			ApplicationConfiguration.Initialize();
 			ServerManagerUI = new ServerManagerUI();

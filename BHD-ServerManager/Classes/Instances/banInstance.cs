@@ -23,7 +23,7 @@ namespace BHD_ServerManager.Classes.Instances
         public required string          PlayerName          { get; set; }
 		public DateTime 			    Date                { get; set; }
         public DateTime?                ExpireDate		    { get; set; }
-        public int                      AssociatedIP        { get; set; }
+        public int?                     AssociatedIP        { get; set; }
         public required banInstanceRecordType    RecordType { get; set; }
         public required int             RecordCategory      { get; set; }
 		public string 			        Notes               { get; set; } = string.Empty;    
@@ -38,7 +38,7 @@ namespace BHD_ServerManager.Classes.Instances
         public required int			    SubnetMask          { get; set; }
 		public DateTime 			    Date                { get; set; }
         public DateTime?                ExpireDate		    { get; set; }
-        public int                      AssociatedName      { get; set; }
+        public int?                     AssociatedName      { get; set; }
         public required banInstanceRecordType    RecordType { get; set; }
         public required int             RecordCategory      { get; set; }
 		public string 			        Notes               { get; set; } = string.Empty;

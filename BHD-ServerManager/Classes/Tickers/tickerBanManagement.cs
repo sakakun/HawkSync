@@ -36,21 +36,14 @@ namespace BHD_ServerManager.Classes.Tickers
                     // Only check and punt bans if server is ONLINE
                     if (thisInstance.instanceStatus == InstanceStatus.ONLINE)
                     {
-						// Server Running - Check for Bans
-					}
-				}
+                        // Check NetLimiter Connections for banned IPs
+
+                        // Check in-game players for banned Names or IPs
+                    }
+                }
                 else
                 {
                     AppDebug.Log("tickerBanManagement", "Server process is not attached. Ticker Skipping.");
-                }
-
-                if (tickerNetLimiterMonitor.IsInitialized)
-                {
-	                tickerNetLimiterMonitor.runTicker();
-                }
-                else
-                {
-                    AppDebug.Log("tickerBanManagement", "NetLimiter not initialized. Ticker skipping.");
                 }
 
             });

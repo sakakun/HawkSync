@@ -33,9 +33,9 @@
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
+            blacklist_btnDelete = new FontAwesome.Sharp.IconButton();
             blacklist_btnSave = new FontAwesome.Sharp.IconButton();
             blacklist_btnReset = new FontAwesome.Sharp.IconButton();
-            blacklist_btnDelete = new FontAwesome.Sharp.IconButton();
             dgPlayerAddressBlacklist = new DataGridView();
             blplayerip_recordID = new DataGridViewTextBoxColumn();
             blplayerip_address = new DataGridViewTextBoxColumn();
@@ -45,6 +45,8 @@
             blplayername_name = new DataGridViewTextBoxColumn();
             blplayername_datetime = new DataGridViewTextBoxColumn();
             tableLayoutPanel2 = new TableLayoutPanel();
+            blacklist_btnClose = new FontAwesome.Sharp.IconButton();
+            blControlRefresh = new FontAwesome.Sharp.IconButton();
             blControl3 = new FontAwesome.Sharp.IconButton();
             blControl2 = new FontAwesome.Sharp.IconButton();
             blControl1 = new FontAwesome.Sharp.IconButton();
@@ -68,8 +70,8 @@
             tabWhitelist = new TabPage();
             tableLayoutPanel7 = new TableLayoutPanel();
             tableLayoutPanel8 = new TableLayoutPanel();
-            wlControlSave = new FontAwesome.Sharp.IconButton();
             wlControlDelete = new FontAwesome.Sharp.IconButton();
+            wlControlSave = new FontAwesome.Sharp.IconButton();
             wlControlReset = new FontAwesome.Sharp.IconButton();
             dgPlayerAddressWhitelist = new DataGridView();
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
@@ -80,6 +82,8 @@
             dataGridViewTextBoxColumn5 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
             tableLayoutPanel9 = new TableLayoutPanel();
+            wlControlClose = new FontAwesome.Sharp.IconButton();
+            wlControlRefresh = new FontAwesome.Sharp.IconButton();
             wlControl3 = new FontAwesome.Sharp.IconButton();
             wlControl2 = new FontAwesome.Sharp.IconButton();
             wlControl1 = new FontAwesome.Sharp.IconButton();
@@ -309,17 +313,34 @@
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel3.Controls.Add(blacklist_btnDelete, 2, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnSave, 4, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnReset, 0, 0);
-            tableLayoutPanel3.Controls.Add(blacklist_btnDelete, 2, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(620, 348);
             tableLayoutPanel3.Margin = new Padding(0);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle());
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel3.Size = new Size(312, 40);
             tableLayoutPanel3.TabIndex = 3;
+            // 
+            // blacklist_btnDelete
+            // 
+            blacklist_btnDelete.Dock = DockStyle.Fill;
+            blacklist_btnDelete.IconChar = FontAwesome.Sharp.IconChar.TrashAlt;
+            blacklist_btnDelete.IconColor = Color.Black;
+            blacklist_btnDelete.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnDelete.IconSize = 26;
+            blacklist_btnDelete.Location = new Point(127, 3);
+            blacklist_btnDelete.Name = "blacklist_btnDelete";
+            blacklist_btnDelete.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnDelete.Size = new Size(56, 34);
+            blacklist_btnDelete.TabIndex = 9;
+            toolTip1.SetToolTip(blacklist_btnDelete, "Delete Record(s)");
+            blacklist_btnDelete.UseVisualStyleBackColor = true;
+            blacklist_btnDelete.Click += Blacklist_Delete_Click;
             // 
             // blacklist_btnSave
             // 
@@ -332,9 +353,10 @@
             blacklist_btnSave.Name = "blacklist_btnSave";
             blacklist_btnSave.Padding = new Padding(0, 3, 0, 0);
             blacklist_btnSave.Size = new Size(58, 34);
-            blacklist_btnSave.TabIndex = 2;
+            blacklist_btnSave.TabIndex = 8;
             toolTip1.SetToolTip(blacklist_btnSave, "Save");
             blacklist_btnSave.UseVisualStyleBackColor = true;
+            blacklist_btnSave.Click += Blacklist_Save_Click;
             // 
             // blacklist_btnReset
             // 
@@ -347,26 +369,10 @@
             blacklist_btnReset.Name = "blacklist_btnReset";
             blacklist_btnReset.Padding = new Padding(0, 3, 0, 0);
             blacklist_btnReset.Size = new Size(56, 34);
-            blacklist_btnReset.TabIndex = 1;
+            blacklist_btnReset.TabIndex = 10;
             toolTip1.SetToolTip(blacklist_btnReset, "Reset");
             blacklist_btnReset.UseVisualStyleBackColor = true;
-            blacklist_btnReset.Click += blacklist_ResetForm;
-            // 
-            // blacklist_btnDelete
-            // 
-            blacklist_btnDelete.Dock = DockStyle.Fill;
-            blacklist_btnDelete.IconChar = FontAwesome.Sharp.IconChar.Close;
-            blacklist_btnDelete.IconColor = Color.Black;
-            blacklist_btnDelete.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blacklist_btnDelete.IconSize = 32;
-            blacklist_btnDelete.Location = new Point(127, 3);
-            blacklist_btnDelete.Name = "blacklist_btnDelete";
-            blacklist_btnDelete.Padding = new Padding(0, 3, 0, 0);
-            blacklist_btnDelete.Size = new Size(56, 34);
-            blacklist_btnDelete.TabIndex = 0;
-            toolTip1.SetToolTip(blacklist_btnDelete, "Delete Record(s)");
-            blacklist_btnDelete.UseVisualStyleBackColor = true;
-            blacklist_btnDelete.Click += blacklist_SaveForm;
+            blacklist_btnReset.Click += Blacklist_Reset_Click;
             // 
             // dgPlayerAddressBlacklist
             // 
@@ -386,6 +392,7 @@
             dgPlayerAddressBlacklist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerAddressBlacklist.Size = new Size(294, 382);
             dgPlayerAddressBlacklist.TabIndex = 1;
+            dgPlayerAddressBlacklist.CellDoubleClick += Blacklist_IPGrid_CellDoubleClick;
             // 
             // blplayerip_recordID
             // 
@@ -423,6 +430,7 @@
             dgPlayerNamesBlacklist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerNamesBlacklist.Size = new Size(294, 382);
             dgPlayerNamesBlacklist.TabIndex = 0;
+            dgPlayerNamesBlacklist.CellDoubleClick += Blacklist_NameGrid_CellDoubleClick;
             // 
             // blplayername_recordID
             // 
@@ -450,6 +458,8 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel2.Controls.Add(blacklist_btnClose, 4, 0);
+            tableLayoutPanel2.Controls.Add(blControlRefresh, 0, 0);
             tableLayoutPanel2.Controls.Add(blControl3, 3, 0);
             tableLayoutPanel2.Controls.Add(blControl2, 2, 0);
             tableLayoutPanel2.Controls.Add(blControl1, 1, 0);
@@ -459,8 +469,50 @@
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle());
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel2.Size = new Size(312, 40);
             tableLayoutPanel2.TabIndex = 2;
+            // 
+            // blacklist_btnClose
+            // 
+            blacklist_btnClose.Dock = DockStyle.Fill;
+            blacklist_btnClose.IconChar = FontAwesome.Sharp.IconChar.Close;
+            blacklist_btnClose.IconColor = Color.Black;
+            blacklist_btnClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnClose.IconSize = 32;
+            blacklist_btnClose.Location = new Point(251, 3);
+            blacklist_btnClose.Name = "blacklist_btnClose";
+            blacklist_btnClose.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnClose.Size = new Size(58, 34);
+            blacklist_btnClose.TabIndex = 11;
+            toolTip1.SetToolTip(blacklist_btnClose, "Close Record");
+            blacklist_btnClose.UseVisualStyleBackColor = true;
+            blacklist_btnClose.Click += Blacklist_Close_Click;
+            // 
+            // blControlRefresh
+            // 
+            blControlRefresh.Dock = DockStyle.Fill;
+            blControlRefresh.IconChar = FontAwesome.Sharp.IconChar.Refresh;
+            blControlRefresh.IconColor = Color.Black;
+            blControlRefresh.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blControlRefresh.IconSize = 32;
+            blControlRefresh.Location = new Point(3, 3);
+            blControlRefresh.Name = "blControlRefresh";
+            blControlRefresh.Padding = new Padding(4, 3, 0, 0);
+            blControlRefresh.Size = new Size(56, 34);
+            blControlRefresh.TabIndex = 0;
+            toolTip1.SetToolTip(blControlRefresh, "Blacklist Refresh");
+            blControlRefresh.UseVisualStyleBackColor = true;
+            blControlRefresh.Click += Blacklist_Refresh_Click;
             // 
             // blControl3
             // 
@@ -473,10 +525,10 @@
             blControl3.Name = "blControl3";
             blControl3.Padding = new Padding(0, 3, 0, 0);
             blControl3.Size = new Size(56, 34);
-            blControl3.TabIndex = 3;
+            blControl3.TabIndex = 0;
             toolTip1.SetToolTip(blControl3, "New Record Both");
             blControl3.UseVisualStyleBackColor = true;
-            blControl3.Click += blacklist_newRecord3;
+            blControl3.Click += Blacklist_AddBoth_Click;
             // 
             // blControl2
             // 
@@ -489,10 +541,10 @@
             blControl2.Name = "blControl2";
             blControl2.Padding = new Padding(0, 3, 0, 0);
             blControl2.Size = new Size(56, 34);
-            blControl2.TabIndex = 2;
+            blControl2.TabIndex = 0;
             toolTip1.SetToolTip(blControl2, "New Address Record");
             blControl2.UseVisualStyleBackColor = true;
-            blControl2.Click += blacklist_newRecord2;
+            blControl2.Click += Blacklist_AddIPOnly_Click;
             // 
             // blControl1
             // 
@@ -508,7 +560,7 @@
             blControl1.TabIndex = 0;
             toolTip1.SetToolTip(blControl1, "New Player Name Record");
             blControl1.UseVisualStyleBackColor = true;
-            blControl1.Click += blacklist_newRecord1;
+            blControl1.Click += Blacklist_AddNameOnly_Click;
             // 
             // blacklistForm
             // 
@@ -544,7 +596,7 @@
             blacklist_notes.Name = "blacklist_notes";
             blacklist_notes.PlaceholderText = "Notes";
             blacklist_notes.Size = new Size(300, 91);
-            blacklist_notes.TabIndex = 0;
+            blacklist_notes.TabIndex = 7;
             // 
             // groupBox4
             // 
@@ -581,10 +633,11 @@
             blacklist_TempBan.Name = "blacklist_TempBan";
             blacklist_TempBan.Padding = new Padding(30, 0, 20, 0);
             blacklist_TempBan.Size = new Size(147, 19);
-            blacklist_TempBan.TabIndex = 0;
+            blacklist_TempBan.TabIndex = 5;
             blacklist_TempBan.Text = "Temporary";
             blacklist_TempBan.TextAlign = ContentAlignment.MiddleCenter;
             blacklist_TempBan.UseVisualStyleBackColor = true;
+            blacklist_TempBan.Click += Blacklist_BanTypeToggle_Click;
             // 
             // blacklist_PermBan
             // 
@@ -594,10 +647,11 @@
             blacklist_PermBan.Name = "blacklist_PermBan";
             blacklist_PermBan.Padding = new Padding(30, 0, 20, 0);
             blacklist_PermBan.Size = new Size(147, 19);
-            blacklist_PermBan.TabIndex = 1;
+            blacklist_PermBan.TabIndex = 6;
             blacklist_PermBan.Text = "Permanent";
             blacklist_PermBan.TextAlign = ContentAlignment.MiddleCenter;
             blacklist_PermBan.UseVisualStyleBackColor = true;
+            blacklist_PermBan.Click += Blacklist_BanTypeToggle_Click;
             // 
             // blacklist_DateBoxes
             // 
@@ -629,11 +683,11 @@
             // blacklist_DateStart
             // 
             blacklist_DateStart.Location = new Point(3, 3);
-            blacklist_DateStart.MaxDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
+            blacklist_DateStart.MaxDate = new DateTime(3026, 1, 18, 0, 0, 0, 0);
             blacklist_DateStart.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
             blacklist_DateStart.Name = "blacklist_DateStart";
             blacklist_DateStart.Size = new Size(147, 23);
-            blacklist_DateStart.TabIndex = 0;
+            blacklist_DateStart.TabIndex = 3;
             blacklist_DateStart.Value = new DateTime(2026, 1, 18, 0, 0, 0, 0);
             // 
             // blacklist_DateEnd
@@ -643,7 +697,7 @@
             blacklist_DateEnd.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
             blacklist_DateEnd.Name = "blacklist_DateEnd";
             blacklist_DateEnd.Size = new Size(147, 23);
-            blacklist_DateEnd.TabIndex = 1;
+            blacklist_DateEnd.TabIndex = 4;
             blacklist_DateEnd.Value = new DateTime(2026, 1, 18, 15, 43, 49, 0);
             // 
             // blacklist_IPAddress
@@ -681,7 +735,7 @@
             blacklist_IPSubnetTxt.Location = new Point(237, 3);
             blacklist_IPSubnetTxt.Name = "blacklist_IPSubnetTxt";
             blacklist_IPSubnetTxt.Size = new Size(66, 23);
-            blacklist_IPSubnetTxt.TabIndex = 0;
+            blacklist_IPSubnetTxt.TabIndex = 2;
             blacklist_IPSubnetTxt.ValueMember = "32";
             // 
             // blacklist_IPAddressTxt
@@ -762,8 +816,8 @@
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel8.Controls.Add(wlControlSave, 4, 0);
             tableLayoutPanel8.Controls.Add(wlControlDelete, 2, 0);
+            tableLayoutPanel8.Controls.Add(wlControlSave, 4, 0);
             tableLayoutPanel8.Controls.Add(wlControlReset, 0, 0);
             tableLayoutPanel8.Dock = DockStyle.Fill;
             tableLayoutPanel8.Location = new Point(620, 348);
@@ -773,6 +827,22 @@
             tableLayoutPanel8.RowStyles.Add(new RowStyle());
             tableLayoutPanel8.Size = new Size(312, 40);
             tableLayoutPanel8.TabIndex = 3;
+            // 
+            // wlControlDelete
+            // 
+            wlControlDelete.Dock = DockStyle.Fill;
+            wlControlDelete.IconChar = FontAwesome.Sharp.IconChar.TrashAlt;
+            wlControlDelete.IconColor = Color.Black;
+            wlControlDelete.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlDelete.IconSize = 26;
+            wlControlDelete.Location = new Point(127, 3);
+            wlControlDelete.Name = "wlControlDelete";
+            wlControlDelete.Padding = new Padding(0, 3, 0, 0);
+            wlControlDelete.Size = new Size(56, 34);
+            wlControlDelete.TabIndex = 10;
+            toolTip1.SetToolTip(wlControlDelete, "Delete Record(s)");
+            wlControlDelete.UseVisualStyleBackColor = true;
+            wlControlDelete.Click += Whitelist_Delete_Click;
             // 
             // wlControlSave
             // 
@@ -785,24 +855,10 @@
             wlControlSave.Name = "wlControlSave";
             wlControlSave.Padding = new Padding(0, 3, 0, 0);
             wlControlSave.Size = new Size(58, 34);
-            wlControlSave.TabIndex = 4;
+            wlControlSave.TabIndex = 9;
             toolTip1.SetToolTip(wlControlSave, "Save");
             wlControlSave.UseVisualStyleBackColor = true;
-            // 
-            // wlControlDelete
-            // 
-            wlControlDelete.Dock = DockStyle.Fill;
-            wlControlDelete.IconChar = FontAwesome.Sharp.IconChar.Close;
-            wlControlDelete.IconColor = Color.Black;
-            wlControlDelete.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            wlControlDelete.IconSize = 32;
-            wlControlDelete.Location = new Point(127, 3);
-            wlControlDelete.Name = "wlControlDelete";
-            wlControlDelete.Padding = new Padding(0, 3, 0, 0);
-            wlControlDelete.Size = new Size(56, 34);
-            wlControlDelete.TabIndex = 3;
-            toolTip1.SetToolTip(wlControlDelete, "Delete Record(s)");
-            wlControlDelete.UseVisualStyleBackColor = true;
+            wlControlSave.Click += Whitelist_Save_Click;
             // 
             // wlControlReset
             // 
@@ -815,9 +871,10 @@
             wlControlReset.Name = "wlControlReset";
             wlControlReset.Padding = new Padding(0, 3, 0, 0);
             wlControlReset.Size = new Size(56, 34);
-            wlControlReset.TabIndex = 2;
+            wlControlReset.TabIndex = 11;
             toolTip1.SetToolTip(wlControlReset, "Reset");
             wlControlReset.UseVisualStyleBackColor = true;
+            wlControlReset.Click += Whitelist_Reset_Click;
             // 
             // dgPlayerAddressWhitelist
             // 
@@ -837,6 +894,7 @@
             dgPlayerAddressWhitelist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerAddressWhitelist.Size = new Size(294, 382);
             dgPlayerAddressWhitelist.TabIndex = 1;
+            dgPlayerAddressWhitelist.CellDoubleClick += Whitelist_IPGrid_CellDoubleClick;
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -874,6 +932,7 @@
             dgPlayerNamesWhitelist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerNamesWhitelist.Size = new Size(294, 382);
             dgPlayerNamesWhitelist.TabIndex = 0;
+            dgPlayerNamesWhitelist.CellDoubleClick += Whitelist_NameGrid_CellDoubleClick;
             // 
             // dataGridViewTextBoxColumn4
             // 
@@ -901,6 +960,8 @@
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel9.Controls.Add(wlControlClose, 4, 0);
+            tableLayoutPanel9.Controls.Add(wlControlRefresh, 0, 0);
             tableLayoutPanel9.Controls.Add(wlControl3, 3, 0);
             tableLayoutPanel9.Controls.Add(wlControl2, 2, 0);
             tableLayoutPanel9.Controls.Add(wlControl1, 1, 0);
@@ -913,6 +974,38 @@
             tableLayoutPanel9.Size = new Size(312, 40);
             tableLayoutPanel9.TabIndex = 2;
             // 
+            // wlControlClose
+            // 
+            wlControlClose.Dock = DockStyle.Fill;
+            wlControlClose.IconChar = FontAwesome.Sharp.IconChar.Close;
+            wlControlClose.IconColor = Color.Black;
+            wlControlClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlClose.IconSize = 32;
+            wlControlClose.Location = new Point(251, 3);
+            wlControlClose.Name = "wlControlClose";
+            wlControlClose.Padding = new Padding(0, 3, 0, 0);
+            wlControlClose.Size = new Size(58, 34);
+            wlControlClose.TabIndex = 12;
+            toolTip1.SetToolTip(wlControlClose, "Close Record");
+            wlControlClose.UseVisualStyleBackColor = true;
+            wlControlClose.Click += Whitelist_Close_Click;
+            // 
+            // wlControlRefresh
+            // 
+            wlControlRefresh.Dock = DockStyle.Fill;
+            wlControlRefresh.IconChar = FontAwesome.Sharp.IconChar.Refresh;
+            wlControlRefresh.IconColor = Color.Black;
+            wlControlRefresh.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlRefresh.IconSize = 32;
+            wlControlRefresh.Location = new Point(3, 3);
+            wlControlRefresh.Name = "wlControlRefresh";
+            wlControlRefresh.Padding = new Padding(4, 3, 0, 0);
+            wlControlRefresh.Size = new Size(56, 34);
+            wlControlRefresh.TabIndex = 0;
+            toolTip1.SetToolTip(wlControlRefresh, "Whitelist Refresh");
+            wlControlRefresh.UseVisualStyleBackColor = true;
+            wlControlRefresh.Click += Whitelist_Refresh_Click;
+            // 
             // wlControl3
             // 
             wlControl3.Dock = DockStyle.Fill;
@@ -924,9 +1017,10 @@
             wlControl3.Name = "wlControl3";
             wlControl3.Padding = new Padding(0, 3, 0, 0);
             wlControl3.Size = new Size(56, 34);
-            wlControl3.TabIndex = 3;
+            wlControl3.TabIndex = 0;
             toolTip1.SetToolTip(wlControl3, "New Record Both");
             wlControl3.UseVisualStyleBackColor = true;
+            wlControl3.Click += Whitelist_AddBoth_Click;
             // 
             // wlControl2
             // 
@@ -939,9 +1033,10 @@
             wlControl2.Name = "wlControl2";
             wlControl2.Padding = new Padding(0, 3, 0, 0);
             wlControl2.Size = new Size(56, 34);
-            wlControl2.TabIndex = 2;
+            wlControl2.TabIndex = 0;
             toolTip1.SetToolTip(wlControl2, "New Address Record");
             wlControl2.UseVisualStyleBackColor = true;
+            wlControl2.Click += Whitelist_AddIPOnly_Click;
             // 
             // wlControl1
             // 
@@ -957,6 +1052,7 @@
             wlControl1.TabIndex = 0;
             toolTip1.SetToolTip(wlControl1, "New Player Name Record");
             wlControl1.UseVisualStyleBackColor = true;
+            wlControl1.Click += Whitelist_AddNameOnly_Click;
             // 
             // panel2
             // 
@@ -992,7 +1088,7 @@
             textBox_notesWL.Name = "textBox_notesWL";
             textBox_notesWL.PlaceholderText = "Notes";
             textBox_notesWL.Size = new Size(300, 91);
-            textBox_notesWL.TabIndex = 0;
+            textBox_notesWL.TabIndex = 8;
             // 
             // groupBox7
             // 
@@ -1029,10 +1125,11 @@
             checkBox_tempWL.Name = "checkBox_tempWL";
             checkBox_tempWL.Padding = new Padding(30, 0, 20, 0);
             checkBox_tempWL.Size = new Size(147, 19);
-            checkBox_tempWL.TabIndex = 0;
+            checkBox_tempWL.TabIndex = 6;
             checkBox_tempWL.Text = "Temporary";
             checkBox_tempWL.TextAlign = ContentAlignment.MiddleCenter;
             checkBox_tempWL.UseVisualStyleBackColor = true;
+            checkBox_tempWL.Click += Whitelist_ExemptTypeToggle_Click;
             // 
             // checkBox_permWL
             // 
@@ -1042,10 +1139,11 @@
             checkBox_permWL.Name = "checkBox_permWL";
             checkBox_permWL.Padding = new Padding(30, 0, 20, 0);
             checkBox_permWL.Size = new Size(147, 19);
-            checkBox_permWL.TabIndex = 1;
+            checkBox_permWL.TabIndex = 7;
             checkBox_permWL.Text = "Permanent";
             checkBox_permWL.TextAlign = ContentAlignment.MiddleCenter;
             checkBox_permWL.UseVisualStyleBackColor = true;
+            checkBox_permWL.Click += Whitelist_ExemptTypeToggle_Click;
             // 
             // groupBox8
             // 
@@ -1081,7 +1179,7 @@
             dateTimePicker_WLstart.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
             dateTimePicker_WLstart.Name = "dateTimePicker_WLstart";
             dateTimePicker_WLstart.Size = new Size(147, 23);
-            dateTimePicker_WLstart.TabIndex = 0;
+            dateTimePicker_WLstart.TabIndex = 4;
             dateTimePicker_WLstart.Value = new DateTime(2026, 1, 18, 0, 0, 0, 0);
             // 
             // dateTimePicker_WLend
@@ -1091,7 +1189,7 @@
             dateTimePicker_WLend.MinDate = new DateTime(2026, 1, 18, 0, 0, 0, 0);
             dateTimePicker_WLend.Name = "dateTimePicker_WLend";
             dateTimePicker_WLend.Size = new Size(147, 23);
-            dateTimePicker_WLend.TabIndex = 1;
+            dateTimePicker_WLend.TabIndex = 5;
             dateTimePicker_WLend.Value = new DateTime(2026, 1, 18, 15, 43, 49, 0);
             // 
             // groupBox9
@@ -1129,7 +1227,7 @@
             cb_subnetWL.Location = new Point(237, 3);
             cb_subnetWL.Name = "cb_subnetWL";
             cb_subnetWL.Size = new Size(66, 23);
-            cb_subnetWL.TabIndex = 0;
+            cb_subnetWL.TabIndex = 3;
             cb_subnetWL.ValueMember = "32";
             // 
             // textBox_addressWL
@@ -1140,7 +1238,7 @@
             textBox_addressWL.Name = "textBox_addressWL";
             textBox_addressWL.PlaceholderText = "000.000.000.000";
             textBox_addressWL.Size = new Size(228, 23);
-            textBox_addressWL.TabIndex = 1;
+            textBox_addressWL.TabIndex = 2;
             textBox_addressWL.TextAlign = HorizontalAlignment.Center;
             // 
             // groupBox10
@@ -1163,7 +1261,7 @@
             textBox_playerNameWL.Name = "textBox_playerNameWL";
             textBox_playerNameWL.PlaceholderText = "Player Name";
             textBox_playerNameWL.Size = new Size(300, 23);
-            textBox_playerNameWL.TabIndex = 0;
+            textBox_playerNameWL.TabIndex = 1;
             textBox_playerNameWL.TextAlign = HorizontalAlignment.Center;
             // 
             // tabPlayerHistory
@@ -2419,7 +2517,6 @@
         private FontAwesome.Sharp.IconButton blacklist_btnSave;
         private FontAwesome.Sharp.IconButton blacklist_btnReset;
         private FontAwesome.Sharp.IconButton wlControlSave;
-        private FontAwesome.Sharp.IconButton wlControlDelete;
         private FontAwesome.Sharp.IconButton wlControlReset;
         private TableLayoutPanel tableLayoutPanel13;
         private DataGridView dgPlayerHistory;
@@ -2496,11 +2593,16 @@
         private NumericUpDown numericUpDown2;
         private Label label10;
         private Label label11;
-        private FontAwesome.Sharp.IconButton blacklist_btnDelete;
         private Label label12;
         private GroupBox groupBox17;
         private TableLayoutPanel tableLayoutPanel26;
         private FontAwesome.Sharp.IconButton iconButton3;
         private FontAwesome.Sharp.IconButton iconButton2;
+        private FontAwesome.Sharp.IconButton blControlRefresh;
+        private FontAwesome.Sharp.IconButton wlControlRefresh;
+        private FontAwesome.Sharp.IconButton blacklist_btnClose;
+        private FontAwesome.Sharp.IconButton blacklist_btnDelete;
+        private FontAwesome.Sharp.IconButton wlControlDelete;
+        private FontAwesome.Sharp.IconButton wlControlClose;
     }
 }

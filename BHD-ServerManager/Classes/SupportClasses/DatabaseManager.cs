@@ -3,6 +3,7 @@ using BHD_ServerManager.Classes.ObjectClasses;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -608,6 +609,464 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             AppDebug.Log("DatabaseManager", $"Loaded {logs.Count} chat log entries");
             return logs;
+        }
+
+        /// <summary>
+        /// Load all ban instance data from the database.
+        /// </summary>
+        public static banInstance LoadBanInstance()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var instance = new banInstance
+            {
+                BannedPlayerNames = GetPlayerNameRecords(RecordCategory.Ban),
+                BannedPlayerIPs = GetPlayerIPRecords(RecordCategory.Ban),
+                WhitelistedNames = GetPlayerNameRecords(RecordCategory.Whitelist),
+                WhitelistedIPs = GetPlayerIPRecords(RecordCategory.Whitelist),
+                ConnectionHistory = GetPlayerNameRecords(RecordCategory.ConnectionHistory),
+                IPConnectionHistory = GetPlayerIPRecords(RecordCategory.ConnectionHistory),
+                ProxyRecords = GetProxyRecords(),
+                ProxyBlockedCountries = GetProxyBlockedCountries()
+            };
+
+            AppDebug.Log("DatabaseManager", 
+                $"Loaded ban instance: {instance.BannedPlayerNames.Count} banned names, " +
+                $"{instance.BannedPlayerIPs.Count} banned IPs, " +
+                $"{instance.WhitelistedNames.Count} whitelisted names, " +
+                $"{instance.WhitelistedIPs.Count} whitelisted IPs");
+
+            return instance;
+        }
+
+        /// <summary>
+        /// Load all proxy records from the database.
+        /// </summary>
+        public static List<proxyRecord> GetProxyRecords()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var records = new List<proxyRecord>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT RecordID, IPAddress, IsVpn, IsProxy, IsTor, RiskScore, 
+                       Provider, CountryCode, City, Region, CacheExpiry, LastChecked
+                FROM tb_proxyRecords
+                ORDER BY RecordID;
+            ";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                records.Add(new proxyRecord
+                {
+                    RecordID = reader.GetInt32(0),
+                    IPAddress = IPAddress.Parse(reader.GetString(1)),
+                    IsVpn = reader.GetInt32(2) == 1,
+                    IsProxy = reader.GetInt32(3) == 1,
+                    IsTor = reader.GetInt32(4) == 1,
+                    RiskScore = reader.GetInt32(5),
+                    Provider = reader.IsDBNull(6) ? null : reader.GetString(6),
+                    CountryCode = reader.IsDBNull(7) ? null : reader.GetString(7),
+                    City = reader.IsDBNull(8) ? null : reader.GetString(8),
+                    Region = reader.IsDBNull(9) ? null : reader.GetString(9),
+                    CacheExpiry = DateTime.Parse(reader.GetString(10)),
+                    LastChecked = DateTime.Parse(reader.GetString(11))
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {records.Count} proxy records");
+            return records;
+        }
+
+        /// <summary>
+        /// Load all proxy blocked countries from the database.
+        /// </summary>
+        public static List<proxyCountry> GetProxyBlockedCountries()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var countries = new List<proxyCountry>();
+
+            // Note: This table doesn't exist in your schema yet
+            // You may need to create tb_proxyBlockedCountries table
+            // For now, returning empty list
+    
+            AppDebug.Log("DatabaseManager", $"Loaded {countries.Count} blocked countries");
+            return countries;
+        }
+
+        /// <summary>
+        /// Load all player name records for a specific category.
+        /// </summary>
+        public static List<banInstancePlayerName> GetPlayerNameRecords(RecordCategory category)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var records = new List<banInstancePlayerName>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT RecordID, MatchID, PlayerName, Date, ExpireDate, AssociatedIP, RecordType, RecordCategory, Notes
+                FROM tb_playerNameRecords
+                WHERE RecordCategory = $category
+                ORDER BY RecordID;
+            ";
+            cmd.Parameters.AddWithValue("$category", (int)category);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                records.Add(new banInstancePlayerName
+                {
+                    RecordID = reader.GetInt32(0),
+                    MatchID = reader.GetInt32(1),
+                    PlayerName = reader.GetString(2),
+                    Date = DateTime.Parse(reader.GetString(3)),
+                    ExpireDate = reader.IsDBNull(4) ? null : DateTime.Parse(reader.GetString(4)),
+                    AssociatedIP = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                    RecordType = (banInstanceRecordType)reader.GetInt32(6),
+                    RecordCategory = reader.GetInt32(7),
+                    Notes = reader.GetString(8)
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {records.Count} player name records for category {category}");
+            return records;
+        }
+
+        /// <summary>
+        /// Load all player IP records for a specific category.
+        /// </summary>
+        public static List<banInstancePlayerIP> GetPlayerIPRecords(RecordCategory category)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var records = new List<banInstancePlayerIP>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT RecordID, MatchID, PlayerIP, SubnetMask, Date, ExpireDate, AssociatedName, RecordType, RecordCategory, Notes
+                FROM tb_playerIPRecords
+                WHERE RecordCategory = $category
+                ORDER BY RecordID;
+            ";
+            cmd.Parameters.AddWithValue("$category", (int)category);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                records.Add(new banInstancePlayerIP
+                {
+                    RecordID = reader.GetInt32(0),
+                    MatchID = reader.GetInt32(1),
+                    PlayerIP = IPAddress.Parse(reader.GetString(2)),
+                    SubnetMask = reader.GetInt32(3),
+                    Date = DateTime.Parse(reader.GetString(4)),
+                    ExpireDate = reader.IsDBNull(5) ? null : DateTime.Parse(reader.GetString(5)),
+                    AssociatedName = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
+                    RecordType = (banInstanceRecordType)reader.GetInt32(7),
+                    RecordCategory = reader.GetInt32(8),
+                    Notes = reader.GetString(9)
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {records.Count} player IP records for category {category}");
+            return records;
+        }
+
+        /// <summary>
+        /// Add a new player name record to the database.
+        /// </summary>
+        public static int AddPlayerNameRecord(banInstancePlayerName record)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_playerNameRecords 
+                    (MatchID, PlayerName, Date, ExpireDate, AssociatedIP, RecordType, RecordCategory, Notes)
+                    VALUES 
+                    ($matchId, $playerName, $date, $expireDate, $associatedIP, $recordType, $recordCategory, $notes);
+                    SELECT last_insert_rowid();
+                ";
+
+                cmd.Parameters.AddWithValue("$matchId", record.MatchID);
+                cmd.Parameters.AddWithValue("$playerName", record.PlayerName);
+                cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
+                // Convert 0 to NULL for foreign key
+                cmd.Parameters.AddWithValue("$associatedIP", record.AssociatedIP > 0 ? (object)record.AssociatedIP : DBNull.Value);
+                cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
+                cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
+                cmd.Parameters.AddWithValue("$notes", record.Notes);
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Added player name record: {record.PlayerName} (ID: {newId})");
+                return (int)newId;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Add a new player IP record to the database.
+        /// </summary>
+        public static int AddPlayerIPRecord(banInstancePlayerIP record)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_playerIPRecords 
+                    (MatchID, PlayerIP, SubnetMask, Date, ExpireDate, AssociatedName, RecordType, RecordCategory, Notes)
+                    VALUES 
+                    ($matchId, $playerIP, $subnetMask, $date, $expireDate, $associatedName, $recordType, $recordCategory, $notes);
+                    SELECT last_insert_rowid();
+                ";
+
+                cmd.Parameters.AddWithValue("$matchId", record.MatchID);
+                cmd.Parameters.AddWithValue("$playerIP", record.PlayerIP.ToString());
+                cmd.Parameters.AddWithValue("$subnetMask", record.SubnetMask);
+                cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
+                // Convert 0 to NULL for foreign key
+                cmd.Parameters.AddWithValue("$associatedName", record.AssociatedName > 0 ? (object)record.AssociatedName : DBNull.Value);
+                cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
+                cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
+                cmd.Parameters.AddWithValue("$notes", record.Notes);
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Added player IP record: {record.PlayerIP}/{record.SubnetMask} (ID: {newId})");
+                return (int)newId;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update an existing player name record.
+        /// </summary>
+        public static bool UpdatePlayerNameRecord(banInstancePlayerName record)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_playerNameRecords 
+                    SET MatchID = $matchId,
+                        PlayerName = $playerName,
+                        Date = $date,
+                        ExpireDate = $expireDate,
+                        AssociatedIP = $associatedIP,
+                        RecordType = $recordType,
+                        RecordCategory = $recordCategory,
+                        Notes = $notes
+                    WHERE RecordID = $recordId;
+                ";
+
+                cmd.Parameters.AddWithValue("$recordId", record.RecordID);
+                cmd.Parameters.AddWithValue("$matchId", record.MatchID);
+                cmd.Parameters.AddWithValue("$playerName", record.PlayerName);
+                cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
+                // Convert 0 to NULL for foreign key
+                cmd.Parameters.AddWithValue("$associatedIP", record.AssociatedIP > 0 ? (object)record.AssociatedIP : DBNull.Value);
+                cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
+                cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
+                cmd.Parameters.AddWithValue("$notes", record.Notes);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Updated player name record ID: {record.RecordID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update an existing player IP record.
+        /// </summary>
+        public static bool UpdatePlayerIPRecord(banInstancePlayerIP record)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_playerIPRecords 
+                    SET MatchID = $matchId,
+                        PlayerIP = $playerIP,
+                        SubnetMask = $subnetMask,
+                        Date = $date,
+                        ExpireDate = $expireDate,
+                        AssociatedName = $associatedName,
+                        RecordType = $recordType,
+                        RecordCategory = $recordCategory,
+                        Notes = $notes
+                    WHERE RecordID = $recordId;
+                ";
+
+                cmd.Parameters.AddWithValue("$recordId", record.RecordID);
+                cmd.Parameters.AddWithValue("$matchId", record.MatchID);
+                cmd.Parameters.AddWithValue("$playerIP", record.PlayerIP.ToString());
+                cmd.Parameters.AddWithValue("$subnetMask", record.SubnetMask);
+                cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
+                // Convert 0 to NULL for foreign key
+                cmd.Parameters.AddWithValue("$associatedName", record.AssociatedName > 0 ? (object)record.AssociatedName : DBNull.Value);
+                cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
+                cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
+                cmd.Parameters.AddWithValue("$notes", record.Notes);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Updated player IP record ID: {record.RecordID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove a player name record from the database.
+        /// </summary>
+        public static bool RemovePlayerNameRecord(int recordId)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_playerNameRecords
+                    WHERE RecordID = $recordId;
+                ";
+                cmd.Parameters.AddWithValue("$recordId", recordId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Removed player name record ID: {recordId}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove a player IP record from the database.
+        /// </summary>
+        public static bool RemovePlayerIPRecord(int recordId)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_playerIPRecords
+                    WHERE RecordID = $recordId;
+                ";
+                cmd.Parameters.AddWithValue("$recordId", recordId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Removed player IP record ID: {recordId}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
         }
 
         /// <summary>

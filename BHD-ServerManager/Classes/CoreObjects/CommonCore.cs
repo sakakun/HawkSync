@@ -27,8 +27,10 @@ namespace BHD_ServerManager.Classes.CoreObjects
             // Instances
             theInstance = new theInstance();
             instanceChat = new chatInstance();
-            instanceBans = new banInstance();
             instanceStats = new statInstance();
+
+            // Initialize Ban Instance
+            CommonCore.instanceBans = DatabaseManager.LoadBanInstance();
 
             // Initialize the Ticker
             Ticker = new Ticker();

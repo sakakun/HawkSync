@@ -15,10 +15,10 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
         private const string PipeName = "NetLimiterPipe";
         private const int Timeout = 5000;
 
-        private static NamedPipeClientStream _pipeClient;
+        private static NamedPipeClientStream? _pipeClient;
         private static SemaphoreSlim _pipeLock = new SemaphoreSlim(1, 1);
 
-        private static Process _bridgeProcess;
+        private static Process? _bridgeProcess;
 
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
@@ -51,7 +51,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		        // Receive response
 		        using (var reader = new StreamReader(_pipeClient, Encoding.UTF8, false, 1024, true))
 		        {
-			        string responseJson = await reader.ReadLineAsync();
+			        string? responseJson = await reader.ReadLineAsync();
 			        if (string.IsNullOrEmpty(responseJson))
 			        {
 				        throw new InvalidOperationException("No response received from server");
@@ -195,7 +195,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		        {
 			        if (range.Start == range.End)
 			        {
-				        ipList.Add(range.Start);
+				        ipList.Add(range.Start!);
 			        }
 			        else
 			        {
@@ -211,8 +211,8 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 
         private class IpRange
         {
-	        public string Start { get; set; }
-	        public string End { get; set; }
+	        public string? Start { get; set; }
+	        public string? End { get; set; }
         }
 
         public static void StartBridgeProcess(string hostname = "localhost", ushort port = 11111, string username = "", string password = "")
@@ -247,7 +247,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		        _bridgeProcess = Process.Start(startInfo);
 		        
 		        // Optional: Capture output for debugging
-		        _bridgeProcess.OutputDataReceived += (sender, e) => 
+		        _bridgeProcess!.OutputDataReceived += (sender, e) => 
 		        {
 		            if (!string.IsNullOrEmpty(e.Data))
 		                AppDebug.Log("NetLimiterBridge", e.Data);
