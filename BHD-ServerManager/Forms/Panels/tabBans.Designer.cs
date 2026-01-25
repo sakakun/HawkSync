@@ -121,6 +121,7 @@
             tableLayoutPanel14 = new TableLayoutPanel();
             groupBox12 = new GroupBox();
             tableLayoutPanel19 = new TableLayoutPanel();
+            cb_serviceIP2LocationIO = new CheckBox();
             cb_serviceProxyCheckIO = new CheckBox();
             panel3 = new Panel();
             groupBox15 = new GroupBox();
@@ -1458,6 +1459,7 @@
             // 
             tableLayoutPanel19.ColumnCount = 1;
             tableLayoutPanel19.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel19.Controls.Add(cb_serviceIP2LocationIO, 0, 1);
             tableLayoutPanel19.Controls.Add(cb_serviceProxyCheckIO, 0, 0);
             tableLayoutPanel19.Dock = DockStyle.Fill;
             tableLayoutPanel19.Location = new Point(0, 16);
@@ -1474,6 +1476,20 @@
             tableLayoutPanel19.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel19.Size = new Size(194, 326);
             tableLayoutPanel19.TabIndex = 0;
+            // 
+            // cb_serviceIP2LocationIO
+            // 
+            cb_serviceIP2LocationIO.AutoSize = true;
+            cb_serviceIP2LocationIO.Dock = DockStyle.Fill;
+            cb_serviceIP2LocationIO.Location = new Point(3, 33);
+            cb_serviceIP2LocationIO.Name = "cb_serviceIP2LocationIO";
+            cb_serviceIP2LocationIO.Padding = new Padding(15, 3, 10, 0);
+            cb_serviceIP2LocationIO.Size = new Size(188, 24);
+            cb_serviceIP2LocationIO.TabIndex = 1;
+            cb_serviceIP2LocationIO.Text = "IP2Location.io";
+            cb_serviceIP2LocationIO.TextAlign = ContentAlignment.MiddleRight;
+            cb_serviceIP2LocationIO.UseVisualStyleBackColor = true;
+            cb_serviceIP2LocationIO.Click += ProxyCheck_CBServicesChanged;
             // 
             // cb_serviceProxyCheckIO
             // 
@@ -1619,6 +1635,7 @@
             btn_proxyTest.TabIndex = 2;
             toolTip1.SetToolTip(btn_proxyTest, "Validate and Test");
             btn_proxyTest.UseVisualStyleBackColor = true;
+            btn_proxyTest.Click += ProxyCheck_TestService_Click;
             // 
             // btn_proxyReset
             // 
@@ -2544,5 +2561,6 @@
         private DataGridViewTextBoxColumn geo_recordID;
         private DataGridViewTextBoxColumn proxy_countyCode;
         private DataGridViewTextBoxColumn proxy_countyName;
+        private CheckBox cb_serviceIP2LocationIO;
     }
 }

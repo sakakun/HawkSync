@@ -1812,6 +1812,7 @@ namespace BHD_ServerManager.Forms.Panels
             
             // Proxy Checking Service Providers
             cb_serviceProxyCheckIO.Checked = (ServerSettings.Get("proxyCheckServiceProvider", 0) == 1 ? true : false);
+            cb_serviceIP2LocationIO.Checked = (ServerSettings.Get("proxyCheckServiceProvider", 0) == 2 ? true : false);
         }
 
         private void ProxyCheck_SaveSettings(object sender, EventArgs e)
@@ -1836,6 +1837,7 @@ namespace BHD_ServerManager.Forms.Panels
             // Proxy Checking Service Providers
             ServerSettings.Set("proxyCheckServiceProvider", 0);
             if (cb_serviceProxyCheckIO.Checked) { ServerSettings.Set("proxyCheckServiceProvider", 1); }
+            if (cb_serviceIP2LocationIO.Checked) { ServerSettings.Set("proxyCheckServiceProvider", 2); }
 
         }
 
@@ -1843,6 +1845,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             var clicked = (CheckBox)sender;
             cb_serviceProxyCheckIO.Checked = clicked == cb_serviceProxyCheckIO;
+            cb_serviceIP2LocationIO.Checked = clicked == cb_serviceIP2LocationIO;
         }
 
 
@@ -2036,6 +2039,139 @@ namespace BHD_ServerManager.Forms.Panels
 
             AppDebug.Log("tabBans", $"Loaded {instanceBans.ProxyBlockedCountries.Count} blocked countries");
         }
+        /// <summary>
+        /// Test the selected proxy check service with a sample IP address
+        /// </summary>
+        private async void ProxyCheck_TestService_Click(object sender, EventArgs e)
+        {
+            // Validate service selection
+            if (!cb_serviceProxyCheckIO.Checked && !cb_serviceIP2LocationIO.Checked)
+            {
+                MessageBox.Show("Please select a proxy check service provider.",
+                    "Service Not Selected",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
 
+            // Validate API key
+            string apiKey = textBox_ProxyAPIKey.Text.Trim();
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                MessageBox.Show("Please enter an API key.",
+                    "API Key Required",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Disable button during test
+            var button = sender as Button;
+            if (button != null)
+            {
+                button.Enabled = false;
+                button.Text = "Testing...";
+            }
+
+            try
+            {
+                // Create the appropriate service
+                IProxyCheckService? proxyService = null;
+                string serviceName = "";
+
+                if (cb_serviceProxyCheckIO.Checked)
+                {
+                    proxyService = new ProxyCheckIoService(apiKey);
+                    serviceName = "ProxyCheck.io";
+                }
+                else if (cb_serviceIP2LocationIO.Checked)
+                {
+                    proxyService = new IP2LocationService(apiKey);
+                    serviceName = "IP2Location.io";
+                }
+
+                if (proxyService == null)
+                {
+                    MessageBox.Show("Failed to initialize proxy service.",
+                        "Initialization Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Test with a known IP address (Google DNS - should not be a proxy/VPN)
+                var testIP = IPAddress.Parse("8.8.8.8");
+        
+                AppDebug.Log("tabBans", $"Testing {serviceName} with IP: {testIP}");
+
+                // Make the API call
+                var result = await proxyService.CheckIPAsync(testIP);
+
+                // Display results
+                if (result.Success)
+                {
+                    var resultMessage = new StringBuilder();
+                    resultMessage.AppendLine($"Service: {serviceName}");
+                    resultMessage.AppendLine($"Test IP: {testIP}");
+                    resultMessage.AppendLine($"");
+                    resultMessage.AppendLine($"Results:");
+                    resultMessage.AppendLine($"  • VPN: {(result.IsVpn ? "Yes" : "No")}");
+                    resultMessage.AppendLine($"  • Proxy: {(result.IsProxy ? "Yes" : "No")}");
+                    resultMessage.AppendLine($"  • Tor: {(result.IsTor ? "Yes" : "No")}");
+                    resultMessage.AppendLine($"  • Risk Score: {result.RiskScore}/100");
+            
+                    if (!string.IsNullOrEmpty(result.CountryName))
+                    {
+                        resultMessage.AppendLine($"");
+                        resultMessage.AppendLine($"Location:");
+                        resultMessage.AppendLine($"  • Country: {result.CountryName} ({result.CountryCode})");
+                        if (!string.IsNullOrEmpty(result.Region))
+                            resultMessage.AppendLine($"  • Region: {result.Region}");
+                        if (!string.IsNullOrEmpty(result.City))
+                            resultMessage.AppendLine($"  • City: {result.City}");
+                    }
+            
+                    if (!string.IsNullOrEmpty(result.Provider))
+                    {
+                        resultMessage.AppendLine($"");
+                        resultMessage.AppendLine($"Provider: {result.Provider}");
+                    }
+
+                    MessageBox.Show(resultMessage.ToString(),
+                        "Service Test Successful",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    AppDebug.Log("tabBans", $"{serviceName} test successful");
+                }
+                else
+                {
+                    MessageBox.Show($"Service: {serviceName}\nError: {result.ErrorMessage}",
+                        "Service Test Failed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+
+                    AppDebug.Log("tabBans", $"{serviceName} test failed: {result.ErrorMessage}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred during the test:\n\n{ex.Message}",
+                    "Test Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                AppDebug.Log("tabBans", $"Proxy service test error: {ex}");
+            }
+            finally
+            {
+                // Re-enable button
+                if (button != null)
+                {
+                    button.Enabled = true;
+                    button.Text = "Test Service";
+                }
+            }
+        }
     }
 }

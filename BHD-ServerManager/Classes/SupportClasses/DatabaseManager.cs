@@ -1173,6 +1173,201 @@ namespace BHD_ServerManager.Classes.SupportClasses
         }
 
         /// <summary>
+        /// Add a new proxy record to the database.
+        /// </summary>
+        public static int AddProxyRecord(proxyRecord record)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_proxyRecords 
+                    (IPAddress, IsVpn, IsProxy, IsTor, RiskScore, Provider, CountryCode, City, Region, CacheExpiry, LastChecked)
+                    VALUES 
+                    ($ipAddress, $isVpn, $isProxy, $isTor, $riskScore, $provider, $countryCode, $city, $region, $cacheExpiry, $lastChecked);
+                    SELECT last_insert_rowid();
+                ";
+
+                cmd.Parameters.AddWithValue("$ipAddress", record.IPAddress.ToString());
+                cmd.Parameters.AddWithValue("$isVpn", record.IsVpn ? 1 : 0);
+                cmd.Parameters.AddWithValue("$isProxy", record.IsProxy ? 1 : 0);
+                cmd.Parameters.AddWithValue("$isTor", record.IsTor ? 1 : 0);
+                cmd.Parameters.AddWithValue("$riskScore", record.RiskScore);
+                cmd.Parameters.AddWithValue("$provider", record.Provider ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$countryCode", record.CountryCode ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$city", record.City ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$region", record.Region ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$cacheExpiry", record.CacheExpiry.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$lastChecked", record.LastChecked.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Added proxy record: {record.IPAddress} (ID: {newId})");
+                return (int)newId;
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint
+            {
+                tx.Rollback();
+                AppDebug.Log("DatabaseManager", $"Proxy record for {record.IPAddress} already exists");
+                return -1;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update an existing proxy record.
+        /// </summary>
+        public static bool UpdateProxyRecord(proxyRecord record)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_proxyRecords 
+                    SET IPAddress = $ipAddress,
+                        IsVpn = $isVpn,
+                        IsProxy = $isProxy,
+                        IsTor = $isTor,
+                        RiskScore = $riskScore,
+                        Provider = $provider,
+                        CountryCode = $countryCode,
+                        City = $city,
+                        Region = $region,
+                        CacheExpiry = $cacheExpiry,
+                        LastChecked = $lastChecked
+                    WHERE RecordID = $recordId;
+                ";
+
+                cmd.Parameters.AddWithValue("$recordId", record.RecordID);
+                cmd.Parameters.AddWithValue("$ipAddress", record.IPAddress.ToString());
+                cmd.Parameters.AddWithValue("$isVpn", record.IsVpn ? 1 : 0);
+                cmd.Parameters.AddWithValue("$isProxy", record.IsProxy ? 1 : 0);
+                cmd.Parameters.AddWithValue("$isTor", record.IsTor ? 1 : 0);
+                cmd.Parameters.AddWithValue("$riskScore", record.RiskScore);
+                cmd.Parameters.AddWithValue("$provider", record.Provider ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$countryCode", record.CountryCode ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$city", record.City ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$region", record.Region ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$cacheExpiry", record.CacheExpiry.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$lastChecked", record.LastChecked.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Updated proxy record ID: {record.RecordID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove a proxy record from the database by RecordID.
+        /// </summary>
+        public static bool RemoveProxyRecord(int recordId)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_proxyRecords
+                    WHERE RecordID = $recordId;
+                ";
+                cmd.Parameters.AddWithValue("$recordId", recordId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Removed proxy record ID: {recordId}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Find a proxy record by IP address.
+        /// </summary>
+        public static proxyRecord? GetProxyRecordByIP(IPAddress ipAddress)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT RecordID, IPAddress, IsVpn, IsProxy, IsTor, RiskScore, 
+                       Provider, CountryCode, City, Region, CacheExpiry, LastChecked
+                FROM tb_proxyRecords
+                WHERE IPAddress = $ipAddress
+                LIMIT 1;
+            ";
+            cmd.Parameters.AddWithValue("$ipAddress", ipAddress.ToString());
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new proxyRecord
+                {
+                    RecordID = reader.GetInt32(0),
+                    IPAddress = IPAddress.Parse(reader.GetString(1)),
+                    IsVpn = reader.GetInt32(2) == 1,
+                    IsProxy = reader.GetInt32(3) == 1,
+                    IsTor = reader.GetInt32(4) == 1,
+                    RiskScore = reader.GetInt32(5),
+                    Provider = reader.IsDBNull(6) ? null : reader.GetString(6),
+                    CountryCode = reader.IsDBNull(7) ? null : reader.GetString(7),
+                    City = reader.IsDBNull(8) ? null : reader.GetString(8),
+                    Region = reader.IsDBNull(9) ? null : reader.GetString(9),
+                    CacheExpiry = DateTime.Parse(reader.GetString(10)),
+                    LastChecked = DateTime.Parse(reader.GetString(11))
+                };
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Releases the exclusive lock and closes the internal connection.
         /// Call this at application shutdown.
         /// </summary>
