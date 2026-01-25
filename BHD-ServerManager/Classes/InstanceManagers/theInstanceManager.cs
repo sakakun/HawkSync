@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Storage;
+using System.Diagnostics;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -252,6 +253,41 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 theInstance.playerPreviousTeamList.Clear();
             }
 
+        }
+
+        /// <summary>
+        /// Generates a new match ID in the format YYYYMMDD### where ### is the match number (001-999).
+        /// Automatically increments the match number or resets to 001 when the day changes.
+        /// </summary>
+        /// <returns>The generated match ID as an integer</returns>
+        public static void GenerateMatchID()
+        {
+            // Format: YYMMDD### (e.g., 26012401 for Jan 24, 2026, Match 001)
+            int currentDate = int.Parse(DateTime.Now.ToString("yyMMdd"));
+            int currentMatchID = theInstance.gameMatchID;
+
+            if (currentMatchID == 0)
+            {
+                theInstance.gameMatchID = currentDate * 1000 + 1;
+                AppDebug.Log("GenerateMatchID", $"Match ID: {theInstance.gameMatchID}");
+                ServerSettings.Set("gameMatchID", theInstance.gameMatchID);
+                return;
+            }
+
+            int lastDate = currentMatchID / 1000;
+            int lastMatchNumber = currentMatchID % 1000;
+
+            if (lastDate == currentDate)
+            {
+                theInstance.gameMatchID = currentDate * 1000 + (lastMatchNumber + 1);
+            }
+            else
+            {
+                theInstance.gameMatchID = currentDate * 1000 + 1;
+            }
+    
+            AppDebug.Log("GenerateMatchID", $"Match ID: {theInstance.gameMatchID}");
+            ServerSettings.Set("gameMatchID", theInstance.gameMatchID);
         }
 
     }

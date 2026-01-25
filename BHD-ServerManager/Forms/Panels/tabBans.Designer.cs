@@ -104,19 +104,11 @@
             textBox_addressWL = new TextBox();
             groupBox10 = new GroupBox();
             textBox_playerNameWL = new TextBox();
-            tabPlayerHistory = new TabPage();
-            tableLayoutPanel13 = new TableLayoutPanel();
-            dgPlayerHistory = new DataGridView();
-            history_playerRecordID = new DataGridViewTextBoxColumn();
-            history_playerName = new DataGridViewTextBoxColumn();
-            history_addressRecordID = new DataGridViewTextBoxColumn();
-            history_playerAddress = new DataGridViewTextBoxColumn();
-            history_dateStart = new DataGridViewTextBoxColumn();
-            history_dateEnd = new DataGridViewTextBoxColumn();
             tabProxyChecking = new TabPage();
             tableLayoutPanel16 = new TableLayoutPanel();
             tableLayoutPanel17 = new TableLayoutPanel();
             dgProxyCountryBlockList = new DataGridView();
+            geo_recordID = new DataGridViewTextBoxColumn();
             proxy_countyCode = new DataGridViewTextBoxColumn();
             proxy_countyName = new DataGridViewTextBoxColumn();
             tableLayoutPanel15 = new TableLayoutPanel();
@@ -133,11 +125,12 @@
             panel3 = new Panel();
             groupBox15 = new GroupBox();
             tableLayoutPanel22 = new TableLayoutPanel();
-            checkBox10 = new CheckBox();
-            checkBox11 = new CheckBox();
-            checkBox12 = new CheckBox();
+            checkBox_GeoAllow = new CheckBox();
+            checkBox_GeoBlock = new CheckBox();
+            checkBox_GeoOff = new CheckBox();
             groupBox14 = new GroupBox();
             tableLayoutPanel21 = new TableLayoutPanel();
+            btn_proxyTest = new FontAwesome.Sharp.IconButton();
             btn_proxyReset = new FontAwesome.Sharp.IconButton();
             btn_proxySave = new FontAwesome.Sharp.IconButton();
             groupBox13 = new GroupBox();
@@ -148,18 +141,18 @@
             label3 = new Label();
             label6 = new Label();
             label7 = new Label();
-            checkBox1 = new CheckBox();
-            checkBox2 = new CheckBox();
-            checkBox3 = new CheckBox();
-            checkBox4 = new CheckBox();
-            checkBox5 = new CheckBox();
-            checkBox6 = new CheckBox();
-            checkBox7 = new CheckBox();
-            checkBox8 = new CheckBox();
-            checkBox9 = new CheckBox();
+            checkBox_proxyBlock = new CheckBox();
+            checkBox_vpnBlock = new CheckBox();
+            checkBox_torBlock = new CheckBox();
+            checkBox_proxyKick = new CheckBox();
+            checkBox_vpnKick = new CheckBox();
+            checkBox_torKick = new CheckBox();
+            checkBox_proxyNone = new CheckBox();
+            checkBox_vpnNone = new CheckBox();
+            checkBox_torNone = new CheckBox();
             groupBox11 = new GroupBox();
             tableLayoutPanel18 = new TableLayoutPanel();
-            textBox1 = new TextBox();
+            textBox_ProxyAPIKey = new TextBox();
             cb_enableProxyCheck = new CheckBox();
             label1 = new Label();
             num_proxyCacheDays = new NumericUpDown();
@@ -219,9 +212,6 @@
             groupBox9.SuspendLayout();
             tableLayoutPanel12.SuspendLayout();
             groupBox10.SuspendLayout();
-            tabPlayerHistory.SuspendLayout();
-            tableLayoutPanel13.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgPlayerHistory).BeginInit();
             tabProxyChecking.SuspendLayout();
             tableLayoutPanel16.SuspendLayout();
             tableLayoutPanel17.SuspendLayout();
@@ -257,7 +247,6 @@
             // 
             banControls.Controls.Add(tabBlacklist);
             banControls.Controls.Add(tabWhitelist);
-            banControls.Controls.Add(tabPlayerHistory);
             banControls.Controls.Add(tabProxyChecking);
             banControls.Controls.Add(tabNetlimiter);
             banControls.Dock = DockStyle.Fill;
@@ -1264,94 +1253,6 @@
             textBox_playerNameWL.TabIndex = 1;
             textBox_playerNameWL.TextAlign = HorizontalAlignment.Center;
             // 
-            // tabPlayerHistory
-            // 
-            tabPlayerHistory.Controls.Add(tableLayoutPanel13);
-            tabPlayerHistory.Location = new Point(4, 24);
-            tabPlayerHistory.Name = "tabPlayerHistory";
-            tabPlayerHistory.Padding = new Padding(3);
-            tabPlayerHistory.Size = new Size(958, 394);
-            tabPlayerHistory.TabIndex = 3;
-            tabPlayerHistory.Text = "Player History";
-            tabPlayerHistory.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel13
-            // 
-            tableLayoutPanel13.ColumnCount = 4;
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 500F));
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel13.Controls.Add(dgPlayerHistory, 0, 0);
-            tableLayoutPanel13.Dock = DockStyle.Fill;
-            tableLayoutPanel13.Location = new Point(3, 3);
-            tableLayoutPanel13.Name = "tableLayoutPanel13";
-            tableLayoutPanel13.RowCount = 3;
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-            tableLayoutPanel13.Size = new Size(952, 388);
-            tableLayoutPanel13.TabIndex = 0;
-            // 
-            // dgPlayerHistory
-            // 
-            dgPlayerHistory.AllowUserToAddRows = false;
-            dgPlayerHistory.AllowUserToDeleteRows = false;
-            dgPlayerHistory.AllowUserToResizeColumns = false;
-            dgPlayerHistory.AllowUserToResizeRows = false;
-            dgPlayerHistory.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
-            dgPlayerHistory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgPlayerHistory.Columns.AddRange(new DataGridViewColumn[] { history_playerRecordID, history_playerName, history_addressRecordID, history_playerAddress, history_dateStart, history_dateEnd });
-            dgPlayerHistory.Dock = DockStyle.Fill;
-            dgPlayerHistory.EditMode = DataGridViewEditMode.EditProgrammatically;
-            dgPlayerHistory.Location = new Point(3, 3);
-            dgPlayerHistory.Name = "dgPlayerHistory";
-            dgPlayerHistory.ReadOnly = true;
-            dgPlayerHistory.RowHeadersVisible = false;
-            tableLayoutPanel13.SetRowSpan(dgPlayerHistory, 3);
-            dgPlayerHistory.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgPlayerHistory.Size = new Size(494, 382);
-            dgPlayerHistory.TabIndex = 0;
-            // 
-            // history_playerRecordID
-            // 
-            history_playerRecordID.HeaderText = "Player Name Record ID";
-            history_playerRecordID.Name = "history_playerRecordID";
-            history_playerRecordID.ReadOnly = true;
-            history_playerRecordID.Visible = false;
-            // 
-            // history_playerName
-            // 
-            history_playerName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            history_playerName.HeaderText = "Player Name";
-            history_playerName.Name = "history_playerName";
-            history_playerName.ReadOnly = true;
-            // 
-            // history_addressRecordID
-            // 
-            history_addressRecordID.HeaderText = "IP Address Record ID";
-            history_addressRecordID.Name = "history_addressRecordID";
-            history_addressRecordID.ReadOnly = true;
-            history_addressRecordID.Visible = false;
-            // 
-            // history_playerAddress
-            // 
-            history_playerAddress.HeaderText = "IP Address";
-            history_playerAddress.Name = "history_playerAddress";
-            history_playerAddress.ReadOnly = true;
-            // 
-            // history_dateStart
-            // 
-            history_dateStart.HeaderText = "Start Time";
-            history_dateStart.Name = "history_dateStart";
-            history_dateStart.ReadOnly = true;
-            // 
-            // history_dateEnd
-            // 
-            history_dateEnd.HeaderText = "End Time";
-            history_dateEnd.Name = "history_dateEnd";
-            history_dateEnd.ReadOnly = true;
-            // 
             // tabProxyChecking
             // 
             tabProxyChecking.Controls.Add(tableLayoutPanel16);
@@ -1404,16 +1305,25 @@
             dgProxyCountryBlockList.AllowUserToResizeRows = false;
             dgProxyCountryBlockList.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
             dgProxyCountryBlockList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgProxyCountryBlockList.Columns.AddRange(new DataGridViewColumn[] { proxy_countyCode, proxy_countyName });
+            dgProxyCountryBlockList.Columns.AddRange(new DataGridViewColumn[] { geo_recordID, proxy_countyCode, proxy_countyName });
             dgProxyCountryBlockList.Dock = DockStyle.Fill;
-            dgProxyCountryBlockList.Enabled = false;
+            dgProxyCountryBlockList.EditMode = DataGridViewEditMode.EditProgrammatically;
             dgProxyCountryBlockList.Location = new Point(3, 3);
             dgProxyCountryBlockList.Name = "dgProxyCountryBlockList";
             dgProxyCountryBlockList.ReadOnly = true;
             dgProxyCountryBlockList.RowHeadersVisible = false;
+            dgProxyCountryBlockList.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             dgProxyCountryBlockList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgProxyCountryBlockList.Size = new Size(244, 352);
             dgProxyCountryBlockList.TabIndex = 5;
+            dgProxyCountryBlockList.CellDoubleClick += ProxyCheck_CountryGrid_CellDoubleClick;
+            // 
+            // geo_recordID
+            // 
+            geo_recordID.HeaderText = "Record ID";
+            geo_recordID.Name = "geo_recordID";
+            geo_recordID.ReadOnly = true;
+            geo_recordID.Visible = false;
             // 
             // proxy_countyCode
             // 
@@ -1478,6 +1388,7 @@
             btn_proxyAddCountry.TabIndex = 2;
             btn_proxyAddCountry.Text = "Add";
             btn_proxyAddCountry.UseVisualStyleBackColor = true;
+            btn_proxyAddCountry.Click += ProxyCheck_AddCountry_Click;
             // 
             // tabControl1
             // 
@@ -1576,6 +1487,7 @@
             cb_serviceProxyCheckIO.Text = "ProxyCheck.io";
             cb_serviceProxyCheckIO.TextAlign = ContentAlignment.MiddleRight;
             cb_serviceProxyCheckIO.UseVisualStyleBackColor = true;
+            cb_serviceProxyCheckIO.Click += ProxyCheck_CBServicesChanged;
             // 
             // panel3
             // 
@@ -1607,9 +1519,9 @@
             tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 90F));
             tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             tableLayoutPanel22.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel22.Controls.Add(checkBox10, 0, 0);
-            tableLayoutPanel22.Controls.Add(checkBox11, 1, 0);
-            tableLayoutPanel22.Controls.Add(checkBox12, 2, 0);
+            tableLayoutPanel22.Controls.Add(checkBox_GeoAllow, 0, 0);
+            tableLayoutPanel22.Controls.Add(checkBox_GeoBlock, 1, 0);
+            tableLayoutPanel22.Controls.Add(checkBox_GeoOff, 2, 0);
             tableLayoutPanel22.Dock = DockStyle.Fill;
             tableLayoutPanel22.Location = new Point(3, 19);
             tableLayoutPanel22.Name = "tableLayoutPanel22";
@@ -1618,44 +1530,49 @@
             tableLayoutPanel22.Size = new Size(244, 32);
             tableLayoutPanel22.TabIndex = 0;
             // 
-            // checkBox10
+            // checkBox_GeoAllow
             // 
-            checkBox10.AutoSize = true;
-            checkBox10.Dock = DockStyle.Fill;
-            checkBox10.Location = new Point(3, 3);
-            checkBox10.Name = "checkBox10";
-            checkBox10.Padding = new Padding(5, 3, 5, 0);
-            checkBox10.Size = new Size(84, 26);
-            checkBox10.TabIndex = 0;
-            checkBox10.Text = "Allow";
-            checkBox10.TextAlign = ContentAlignment.MiddleRight;
-            checkBox10.UseVisualStyleBackColor = true;
+            checkBox_GeoAllow.AutoSize = true;
+            checkBox_GeoAllow.Dock = DockStyle.Fill;
+            checkBox_GeoAllow.Location = new Point(3, 3);
+            checkBox_GeoAllow.Name = "checkBox_GeoAllow";
+            checkBox_GeoAllow.Padding = new Padding(5, 3, 5, 0);
+            checkBox_GeoAllow.Size = new Size(84, 26);
+            checkBox_GeoAllow.TabIndex = 0;
+            checkBox_GeoAllow.Text = "Allow";
+            checkBox_GeoAllow.TextAlign = ContentAlignment.MiddleRight;
+            checkBox_GeoAllow.UseVisualStyleBackColor = true;
+            checkBox_GeoAllow.Click += ProxyCheck_CBGEOChange;
             // 
-            // checkBox11
+            // checkBox_GeoBlock
             // 
-            checkBox11.AutoSize = true;
-            checkBox11.Dock = DockStyle.Fill;
-            checkBox11.Location = new Point(93, 3);
-            checkBox11.Name = "checkBox11";
-            checkBox11.Padding = new Padding(5, 3, 5, 0);
-            checkBox11.Size = new Size(74, 26);
-            checkBox11.TabIndex = 1;
-            checkBox11.Text = "Block";
-            checkBox11.TextAlign = ContentAlignment.MiddleRight;
-            checkBox11.UseVisualStyleBackColor = true;
+            checkBox_GeoBlock.AutoSize = true;
+            checkBox_GeoBlock.Dock = DockStyle.Fill;
+            checkBox_GeoBlock.Location = new Point(93, 3);
+            checkBox_GeoBlock.Name = "checkBox_GeoBlock";
+            checkBox_GeoBlock.Padding = new Padding(5, 3, 5, 0);
+            checkBox_GeoBlock.Size = new Size(74, 26);
+            checkBox_GeoBlock.TabIndex = 1;
+            checkBox_GeoBlock.Text = "Block";
+            checkBox_GeoBlock.TextAlign = ContentAlignment.MiddleRight;
+            checkBox_GeoBlock.UseVisualStyleBackColor = true;
+            checkBox_GeoBlock.Click += ProxyCheck_CBGEOChange;
             // 
-            // checkBox12
+            // checkBox_GeoOff
             // 
-            checkBox12.AutoSize = true;
-            checkBox12.Dock = DockStyle.Fill;
-            checkBox12.Location = new Point(173, 3);
-            checkBox12.Name = "checkBox12";
-            checkBox12.Padding = new Padding(5, 3, 5, 0);
-            checkBox12.Size = new Size(68, 26);
-            checkBox12.TabIndex = 2;
-            checkBox12.Text = "Off";
-            checkBox12.TextAlign = ContentAlignment.MiddleRight;
-            checkBox12.UseVisualStyleBackColor = true;
+            checkBox_GeoOff.AutoSize = true;
+            checkBox_GeoOff.Checked = true;
+            checkBox_GeoOff.CheckState = CheckState.Checked;
+            checkBox_GeoOff.Dock = DockStyle.Fill;
+            checkBox_GeoOff.Location = new Point(173, 3);
+            checkBox_GeoOff.Name = "checkBox_GeoOff";
+            checkBox_GeoOff.Padding = new Padding(5, 3, 5, 0);
+            checkBox_GeoOff.Size = new Size(68, 26);
+            checkBox_GeoOff.TabIndex = 2;
+            checkBox_GeoOff.Text = "Off";
+            checkBox_GeoOff.TextAlign = ContentAlignment.MiddleRight;
+            checkBox_GeoOff.UseVisualStyleBackColor = true;
+            checkBox_GeoOff.Click += ProxyCheck_CBGEOChange;
             // 
             // groupBox14
             // 
@@ -1676,6 +1593,7 @@
             tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel21.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel21.Controls.Add(btn_proxyTest, 4, 0);
             tableLayoutPanel21.Controls.Add(btn_proxyReset, 0, 0);
             tableLayoutPanel21.Controls.Add(btn_proxySave, 2, 0);
             tableLayoutPanel21.Dock = DockStyle.Fill;
@@ -1686,6 +1604,21 @@
             tableLayoutPanel21.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel21.Size = new Size(244, 40);
             tableLayoutPanel21.TabIndex = 0;
+            // 
+            // btn_proxyTest
+            // 
+            btn_proxyTest.Dock = DockStyle.Fill;
+            btn_proxyTest.IconChar = FontAwesome.Sharp.IconChar.SatelliteDish;
+            btn_proxyTest.IconColor = Color.Black;
+            btn_proxyTest.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btn_proxyTest.IconSize = 28;
+            btn_proxyTest.Location = new Point(195, 3);
+            btn_proxyTest.Name = "btn_proxyTest";
+            btn_proxyTest.Padding = new Padding(0, 3, 0, 0);
+            btn_proxyTest.Size = new Size(46, 34);
+            btn_proxyTest.TabIndex = 2;
+            toolTip1.SetToolTip(btn_proxyTest, "Validate and Test");
+            btn_proxyTest.UseVisualStyleBackColor = true;
             // 
             // btn_proxyReset
             // 
@@ -1701,6 +1634,7 @@
             btn_proxyReset.TabIndex = 1;
             toolTip1.SetToolTip(btn_proxyReset, "Reset");
             btn_proxyReset.UseVisualStyleBackColor = true;
+            btn_proxyReset.Click += ProxyCheck_LoadSettings;
             // 
             // btn_proxySave
             // 
@@ -1716,6 +1650,7 @@
             btn_proxySave.TabIndex = 0;
             toolTip1.SetToolTip(btn_proxySave, "Save");
             btn_proxySave.UseVisualStyleBackColor = true;
+            btn_proxySave.Click += ProxyCheck_SaveSettings;
             // 
             // groupBox13
             // 
@@ -1741,15 +1676,15 @@
             tableLayoutPanel20.Controls.Add(label3, 0, 1);
             tableLayoutPanel20.Controls.Add(label6, 0, 2);
             tableLayoutPanel20.Controls.Add(label7, 0, 3);
-            tableLayoutPanel20.Controls.Add(checkBox1, 1, 1);
-            tableLayoutPanel20.Controls.Add(checkBox2, 2, 1);
-            tableLayoutPanel20.Controls.Add(checkBox3, 3, 1);
-            tableLayoutPanel20.Controls.Add(checkBox4, 1, 2);
-            tableLayoutPanel20.Controls.Add(checkBox5, 2, 2);
-            tableLayoutPanel20.Controls.Add(checkBox6, 3, 2);
-            tableLayoutPanel20.Controls.Add(checkBox7, 1, 3);
-            tableLayoutPanel20.Controls.Add(checkBox8, 2, 3);
-            tableLayoutPanel20.Controls.Add(checkBox9, 3, 3);
+            tableLayoutPanel20.Controls.Add(checkBox_proxyBlock, 1, 1);
+            tableLayoutPanel20.Controls.Add(checkBox_vpnBlock, 2, 1);
+            tableLayoutPanel20.Controls.Add(checkBox_torBlock, 3, 1);
+            tableLayoutPanel20.Controls.Add(checkBox_proxyKick, 1, 2);
+            tableLayoutPanel20.Controls.Add(checkBox_vpnKick, 2, 2);
+            tableLayoutPanel20.Controls.Add(checkBox_torKick, 3, 2);
+            tableLayoutPanel20.Controls.Add(checkBox_proxyNone, 1, 3);
+            tableLayoutPanel20.Controls.Add(checkBox_vpnNone, 2, 3);
+            tableLayoutPanel20.Controls.Add(checkBox_torNone, 3, 3);
             tableLayoutPanel20.Dock = DockStyle.Fill;
             tableLayoutPanel20.Location = new Point(3, 19);
             tableLayoutPanel20.Name = "tableLayoutPanel20";
@@ -1827,104 +1762,119 @@
             label7.Text = "Nothing";
             label7.TextAlign = ContentAlignment.MiddleRight;
             // 
-            // checkBox1
+            // checkBox_proxyBlock
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox1.Dock = DockStyle.Fill;
-            checkBox1.Location = new Point(100, 33);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(42, 17);
-            checkBox1.TabIndex = 7;
-            checkBox1.UseVisualStyleBackColor = true;
+            checkBox_proxyBlock.AutoSize = true;
+            checkBox_proxyBlock.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_proxyBlock.Dock = DockStyle.Fill;
+            checkBox_proxyBlock.Location = new Point(100, 33);
+            checkBox_proxyBlock.Name = "checkBox_proxyBlock";
+            checkBox_proxyBlock.Size = new Size(42, 17);
+            checkBox_proxyBlock.TabIndex = 7;
+            checkBox_proxyBlock.UseVisualStyleBackColor = true;
+            checkBox_proxyBlock.Click += ProxyCheck_CBProxyChange;
             // 
-            // checkBox2
+            // checkBox_vpnBlock
             // 
-            checkBox2.AutoSize = true;
-            checkBox2.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox2.Dock = DockStyle.Fill;
-            checkBox2.Location = new Point(148, 33);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(42, 17);
-            checkBox2.TabIndex = 8;
-            checkBox2.UseVisualStyleBackColor = true;
+            checkBox_vpnBlock.AutoSize = true;
+            checkBox_vpnBlock.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_vpnBlock.Dock = DockStyle.Fill;
+            checkBox_vpnBlock.Location = new Point(148, 33);
+            checkBox_vpnBlock.Name = "checkBox_vpnBlock";
+            checkBox_vpnBlock.Size = new Size(42, 17);
+            checkBox_vpnBlock.TabIndex = 8;
+            checkBox_vpnBlock.UseVisualStyleBackColor = true;
+            checkBox_vpnBlock.Click += ProxyCheck_CBVPNChange;
             // 
-            // checkBox3
+            // checkBox_torBlock
             // 
-            checkBox3.AutoSize = true;
-            checkBox3.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox3.Dock = DockStyle.Fill;
-            checkBox3.Location = new Point(196, 33);
-            checkBox3.Name = "checkBox3";
-            checkBox3.Size = new Size(45, 17);
-            checkBox3.TabIndex = 9;
-            checkBox3.UseVisualStyleBackColor = true;
+            checkBox_torBlock.AutoSize = true;
+            checkBox_torBlock.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_torBlock.Dock = DockStyle.Fill;
+            checkBox_torBlock.Location = new Point(196, 33);
+            checkBox_torBlock.Name = "checkBox_torBlock";
+            checkBox_torBlock.Size = new Size(45, 17);
+            checkBox_torBlock.TabIndex = 9;
+            checkBox_torBlock.UseVisualStyleBackColor = true;
+            checkBox_torBlock.Click += ProxyCheck_CBTORChange;
             // 
-            // checkBox4
+            // checkBox_proxyKick
             // 
-            checkBox4.AutoSize = true;
-            checkBox4.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox4.Dock = DockStyle.Fill;
-            checkBox4.Location = new Point(100, 56);
-            checkBox4.Name = "checkBox4";
-            checkBox4.Size = new Size(42, 17);
-            checkBox4.TabIndex = 10;
-            checkBox4.UseVisualStyleBackColor = true;
+            checkBox_proxyKick.AutoSize = true;
+            checkBox_proxyKick.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_proxyKick.Dock = DockStyle.Fill;
+            checkBox_proxyKick.Location = new Point(100, 56);
+            checkBox_proxyKick.Name = "checkBox_proxyKick";
+            checkBox_proxyKick.Size = new Size(42, 17);
+            checkBox_proxyKick.TabIndex = 10;
+            checkBox_proxyKick.UseVisualStyleBackColor = true;
+            checkBox_proxyKick.Click += ProxyCheck_CBProxyChange;
             // 
-            // checkBox5
+            // checkBox_vpnKick
             // 
-            checkBox5.AutoSize = true;
-            checkBox5.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox5.Dock = DockStyle.Fill;
-            checkBox5.Location = new Point(148, 56);
-            checkBox5.Name = "checkBox5";
-            checkBox5.Size = new Size(42, 17);
-            checkBox5.TabIndex = 11;
-            checkBox5.UseVisualStyleBackColor = true;
+            checkBox_vpnKick.AutoSize = true;
+            checkBox_vpnKick.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_vpnKick.Dock = DockStyle.Fill;
+            checkBox_vpnKick.Location = new Point(148, 56);
+            checkBox_vpnKick.Name = "checkBox_vpnKick";
+            checkBox_vpnKick.Size = new Size(42, 17);
+            checkBox_vpnKick.TabIndex = 11;
+            checkBox_vpnKick.UseVisualStyleBackColor = true;
+            checkBox_vpnKick.Click += ProxyCheck_CBVPNChange;
             // 
-            // checkBox6
+            // checkBox_torKick
             // 
-            checkBox6.AutoSize = true;
-            checkBox6.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox6.Dock = DockStyle.Fill;
-            checkBox6.Location = new Point(196, 56);
-            checkBox6.Name = "checkBox6";
-            checkBox6.Size = new Size(45, 17);
-            checkBox6.TabIndex = 12;
-            checkBox6.UseVisualStyleBackColor = true;
+            checkBox_torKick.AutoSize = true;
+            checkBox_torKick.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_torKick.Dock = DockStyle.Fill;
+            checkBox_torKick.Location = new Point(196, 56);
+            checkBox_torKick.Name = "checkBox_torKick";
+            checkBox_torKick.Size = new Size(45, 17);
+            checkBox_torKick.TabIndex = 12;
+            checkBox_torKick.UseVisualStyleBackColor = true;
+            checkBox_torKick.Click += ProxyCheck_CBTORChange;
             // 
-            // checkBox7
+            // checkBox_proxyNone
             // 
-            checkBox7.AutoSize = true;
-            checkBox7.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox7.Dock = DockStyle.Fill;
-            checkBox7.Location = new Point(100, 79);
-            checkBox7.Name = "checkBox7";
-            checkBox7.Size = new Size(42, 20);
-            checkBox7.TabIndex = 13;
-            checkBox7.UseVisualStyleBackColor = true;
+            checkBox_proxyNone.AutoSize = true;
+            checkBox_proxyNone.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_proxyNone.Checked = true;
+            checkBox_proxyNone.CheckState = CheckState.Checked;
+            checkBox_proxyNone.Dock = DockStyle.Fill;
+            checkBox_proxyNone.Location = new Point(100, 79);
+            checkBox_proxyNone.Name = "checkBox_proxyNone";
+            checkBox_proxyNone.Size = new Size(42, 20);
+            checkBox_proxyNone.TabIndex = 13;
+            checkBox_proxyNone.UseVisualStyleBackColor = true;
+            checkBox_proxyNone.Click += ProxyCheck_CBProxyChange;
             // 
-            // checkBox8
+            // checkBox_vpnNone
             // 
-            checkBox8.AutoSize = true;
-            checkBox8.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox8.Dock = DockStyle.Fill;
-            checkBox8.Location = new Point(148, 79);
-            checkBox8.Name = "checkBox8";
-            checkBox8.Size = new Size(42, 20);
-            checkBox8.TabIndex = 14;
-            checkBox8.UseVisualStyleBackColor = true;
+            checkBox_vpnNone.AutoSize = true;
+            checkBox_vpnNone.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_vpnNone.Checked = true;
+            checkBox_vpnNone.CheckState = CheckState.Checked;
+            checkBox_vpnNone.Dock = DockStyle.Fill;
+            checkBox_vpnNone.Location = new Point(148, 79);
+            checkBox_vpnNone.Name = "checkBox_vpnNone";
+            checkBox_vpnNone.Size = new Size(42, 20);
+            checkBox_vpnNone.TabIndex = 14;
+            checkBox_vpnNone.UseVisualStyleBackColor = true;
+            checkBox_vpnNone.Click += ProxyCheck_CBVPNChange;
             // 
-            // checkBox9
+            // checkBox_torNone
             // 
-            checkBox9.AutoSize = true;
-            checkBox9.CheckAlign = ContentAlignment.MiddleCenter;
-            checkBox9.Dock = DockStyle.Fill;
-            checkBox9.Location = new Point(196, 79);
-            checkBox9.Name = "checkBox9";
-            checkBox9.Size = new Size(45, 20);
-            checkBox9.TabIndex = 15;
-            checkBox9.UseVisualStyleBackColor = true;
+            checkBox_torNone.AutoSize = true;
+            checkBox_torNone.CheckAlign = ContentAlignment.MiddleCenter;
+            checkBox_torNone.Checked = true;
+            checkBox_torNone.CheckState = CheckState.Checked;
+            checkBox_torNone.Dock = DockStyle.Fill;
+            checkBox_torNone.Location = new Point(196, 79);
+            checkBox_torNone.Name = "checkBox_torNone";
+            checkBox_torNone.Size = new Size(45, 20);
+            checkBox_torNone.TabIndex = 15;
+            checkBox_torNone.UseVisualStyleBackColor = true;
+            checkBox_torNone.Click += ProxyCheck_CBTORChange;
             // 
             // groupBox11
             // 
@@ -1943,7 +1893,7 @@
             tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
             tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
             tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel18.Controls.Add(textBox1, 0, 1);
+            tableLayoutPanel18.Controls.Add(textBox_ProxyAPIKey, 0, 1);
             tableLayoutPanel18.Controls.Add(cb_enableProxyCheck, 0, 0);
             tableLayoutPanel18.Controls.Add(label1, 0, 2);
             tableLayoutPanel18.Controls.Add(num_proxyCacheDays, 2, 2);
@@ -1958,17 +1908,17 @@
             tableLayoutPanel18.Size = new Size(244, 86);
             tableLayoutPanel18.TabIndex = 0;
             // 
-            // textBox1
+            // textBox_ProxyAPIKey
             // 
-            tableLayoutPanel18.SetColumnSpan(textBox1, 3);
-            textBox1.Dock = DockStyle.Fill;
-            textBox1.Location = new Point(4, 31);
-            textBox1.Margin = new Padding(4, 3, 4, 3);
-            textBox1.Name = "textBox1";
-            textBox1.PlaceholderText = "API KEY";
-            textBox1.Size = new Size(236, 23);
-            textBox1.TabIndex = 2;
-            textBox1.TextAlign = HorizontalAlignment.Center;
+            tableLayoutPanel18.SetColumnSpan(textBox_ProxyAPIKey, 3);
+            textBox_ProxyAPIKey.Dock = DockStyle.Fill;
+            textBox_ProxyAPIKey.Location = new Point(4, 31);
+            textBox_ProxyAPIKey.Margin = new Padding(4, 3, 4, 3);
+            textBox_ProxyAPIKey.Name = "textBox_ProxyAPIKey";
+            textBox_ProxyAPIKey.PlaceholderText = "API KEY";
+            textBox_ProxyAPIKey.Size = new Size(236, 23);
+            textBox_ProxyAPIKey.TabIndex = 2;
+            textBox_ProxyAPIKey.TextAlign = HorizontalAlignment.Center;
             // 
             // cb_enableProxyCheck
             // 
@@ -2402,9 +2352,6 @@
             tableLayoutPanel12.PerformLayout();
             groupBox10.ResumeLayout(false);
             groupBox10.PerformLayout();
-            tabPlayerHistory.ResumeLayout(false);
-            tableLayoutPanel13.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgPlayerHistory).EndInit();
             tabProxyChecking.ResumeLayout(false);
             tableLayoutPanel16.ResumeLayout(false);
             tableLayoutPanel17.ResumeLayout(false);
@@ -2448,7 +2395,6 @@
         private TabControl banControls;
         private TabPage tabBlacklist;
         private TabPage tabWhitelist;
-        private TabPage tabPlayerHistory;
         private TabPage tabProxyChecking;
         private TabPage tabNetlimiter;
         private TableLayoutPanel tableLayoutPanel1;
@@ -2518,20 +2464,10 @@
         private FontAwesome.Sharp.IconButton blacklist_btnReset;
         private FontAwesome.Sharp.IconButton wlControlSave;
         private FontAwesome.Sharp.IconButton wlControlReset;
-        private TableLayoutPanel tableLayoutPanel13;
-        private DataGridView dgPlayerHistory;
-        private DataGridViewTextBoxColumn history_playerRecordID;
-        private DataGridViewTextBoxColumn history_playerName;
-        private DataGridViewTextBoxColumn history_addressRecordID;
-        private DataGridViewTextBoxColumn history_playerAddress;
-        private DataGridViewTextBoxColumn history_dateStart;
-        private DataGridViewTextBoxColumn history_dateEnd;
         private Label label1;
         private TableLayoutPanel tableLayoutPanel16;
         private TableLayoutPanel tableLayoutPanel17;
         private DataGridView dgProxyCountryBlockList;
-        private DataGridViewTextBoxColumn proxy_countyCode;
-        private DataGridViewTextBoxColumn proxy_countyName;
         private TableLayoutPanel tableLayoutPanel15;
         private TextBox textBox_countryCode;
         private TextBox textBox_countryName;
@@ -2546,7 +2482,7 @@
         private GroupBox groupBox12;
         private TableLayoutPanel tableLayoutPanel19;
         private CheckBox cb_serviceProxyCheckIO;
-        private TextBox textBox1;
+        private TextBox textBox_ProxyAPIKey;
         private NumericUpDown num_proxyCacheDays;
         private Panel panel3;
         private GroupBox groupBox13;
@@ -2557,24 +2493,24 @@
         private Label label3;
         private Label label6;
         private Label label7;
-        private CheckBox checkBox1;
-        private CheckBox checkBox2;
-        private CheckBox checkBox3;
-        private CheckBox checkBox4;
-        private CheckBox checkBox5;
-        private CheckBox checkBox6;
-        private CheckBox checkBox7;
-        private CheckBox checkBox8;
-        private CheckBox checkBox9;
+        private CheckBox checkBox_proxyBlock;
+        private CheckBox checkBox_vpnBlock;
+        private CheckBox checkBox_torBlock;
+        private CheckBox checkBox_proxyKick;
+        private CheckBox checkBox_vpnKick;
+        private CheckBox checkBox_torKick;
+        private CheckBox checkBox_proxyNone;
+        private CheckBox checkBox_vpnNone;
+        private CheckBox checkBox_torNone;
         private GroupBox groupBox14;
         private TableLayoutPanel tableLayoutPanel21;
         private FontAwesome.Sharp.IconButton btn_proxyReset;
         private FontAwesome.Sharp.IconButton btn_proxySave;
         private GroupBox groupBox15;
         private TableLayoutPanel tableLayoutPanel22;
-        private CheckBox checkBox10;
-        private CheckBox checkBox11;
-        private CheckBox checkBox12;
+        private CheckBox checkBox_GeoAllow;
+        private CheckBox checkBox_GeoBlock;
+        private CheckBox checkBox_GeoOff;
         private TableLayoutPanel tableLayoutPanel23;
         private Panel panel4;
         private GroupBox groupBox16;
@@ -2604,5 +2540,9 @@
         private FontAwesome.Sharp.IconButton blacklist_btnDelete;
         private FontAwesome.Sharp.IconButton wlControlDelete;
         private FontAwesome.Sharp.IconButton wlControlClose;
+        private FontAwesome.Sharp.IconButton btn_proxyTest;
+        private DataGridViewTextBoxColumn geo_recordID;
+        private DataGridViewTextBoxColumn proxy_countyCode;
+        private DataGridViewTextBoxColumn proxy_countyName;
     }
 }

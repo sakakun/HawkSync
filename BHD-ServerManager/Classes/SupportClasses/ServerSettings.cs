@@ -47,7 +47,8 @@ namespace BHD_ServerManager.Classes.SupportClasses
             {
                 bool b   => b.ToString().ToLowerInvariant(),
                 int i    => i.ToString(),
-                decimal d => d.ToString(),
+                long l   => l.ToString(),
+				decimal d => d.ToString(),
                 string s => s,
                 _ => throw new NotSupportedException(
                     $"Type {typeof(T)} is not supported"
@@ -66,6 +67,10 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 if (typeof(T) == typeof(int) &&
                     int.TryParse(value, out var i))
                     return (T)(object)i;
+                
+                if (typeof(T) == typeof(long) &&
+                    long.TryParse(value, out var l))
+                    return (T)(object)l;
 
                 if (typeof(T) == typeof(decimal) &&
                     decimal.TryParse(value, out var d))

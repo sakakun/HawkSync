@@ -686,24 +686,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
         }
 
         /// <summary>
-        /// Load all proxy blocked countries from the database.
-        /// </summary>
-        public static List<proxyCountry> GetProxyBlockedCountries()
-        {
-            if (!IsInitialized)
-                throw new InvalidOperationException("DatabaseManager is not initialized.");
-
-            var countries = new List<proxyCountry>();
-
-            // Note: This table doesn't exist in your schema yet
-            // You may need to create tb_proxyBlockedCountries table
-            // For now, returning empty list
-    
-            AppDebug.Log("DatabaseManager", $"Loaded {countries.Count} blocked countries");
-            return countries;
-        }
-
-        /// <summary>
         /// Load all player name records for a specific category.
         /// </summary>
         public static List<banInstancePlayerName> GetPlayerNameRecords(RecordCategory category)
@@ -1060,6 +1042,127 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 tx.Commit();
 
                 AppDebug.Log("DatabaseManager", $"Removed player IP record ID: {recordId}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Load all proxy blocked countries from the database.
+        /// </summary>
+        public static List<proxyCountry> GetProxyBlockedCountries()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var countries = new List<proxyCountry>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT RecordID, CountryCode, CountryName
+                FROM tb_proxyBlockedCountries
+                ORDER BY CountryName COLLATE NOCASE;
+            ";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                countries.Add(new proxyCountry
+                {
+                    RecordID = reader.GetInt32(0),
+                    CountryCode = reader.GetString(1),
+                    CountryName = reader.GetString(2)
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {countries.Count} blocked countries");
+            return countries;
+        }
+
+        /// <summary>
+        /// Add a new blocked country to the database.
+        /// </summary>
+        public static int AddProxyBlockedCountry(string countryCode, string countryName)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length != 2)
+                throw new ArgumentException("Country code must be exactly 2 characters.", nameof(countryCode));
+
+            if (string.IsNullOrWhiteSpace(countryName))
+                throw new ArgumentException("Country name cannot be empty.", nameof(countryName));
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_proxyBlockedCountries (CountryCode, CountryName)
+                    VALUES ($countryCode, $countryName);
+                    SELECT last_insert_rowid();
+                ";
+                cmd.Parameters.AddWithValue("$countryCode", countryCode.ToUpper());
+                cmd.Parameters.AddWithValue("$countryName", countryName);
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Added blocked country: {countryCode} - {countryName} (ID: {newId})");
+                return (int)newId;
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint
+            {
+                tx.Rollback();
+                AppDebug.Log("DatabaseManager", $"Country code {countryCode} already exists");
+                return -1;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove a blocked country from the database by RecordID.
+        /// </summary>
+        public static bool RemoveProxyBlockedCountry(int recordId)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_proxyBlockedCountries
+                    WHERE RecordID = $recordId;
+                ";
+                cmd.Parameters.AddWithValue("$recordId", recordId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Removed blocked country ID: {recordId}");
                 return rowsAffected > 0;
             }
             catch

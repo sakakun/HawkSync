@@ -396,7 +396,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                         SetProcessWindowTitle(searchProcess, windowTitle);
 
                         ServerMemory.AttachToGameProcess();
-
+                        // New MatchID just incase...
+                        theInstanceManager.GenerateMatchID();
                         return true;
                     }
                 }

@@ -176,6 +176,9 @@ namespace BHD_ServerManager.Classes.Tickers
                 theInstance.playerList.Clear();
                 StatFunctions.ResetPlayerStats();
 
+                // New MatchID
+                theInstanceManager.GenerateMatchID();
+
                 // Update the Global Game Type (Pinger Reasons)
                 ServerMemory.UpdateGlobalGameType();
                 // Update the Scores Required to Win the Game

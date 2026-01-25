@@ -62,6 +62,7 @@ namespace BHD_ServerManager.Classes.Instances
 
     public class proxyCountry
     {
+        public required int             RecordID            { get; set; }
         public required string          CountryCode         { get; set; }            // Country ISO Code
         public required string          CountryName         { get; set; }            // Country Name
 	}

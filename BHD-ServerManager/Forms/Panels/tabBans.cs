@@ -30,6 +30,10 @@ namespace BHD_ServerManager.Forms.Panels
             // Load Data into DataGridViews
             LoadBlacklistGrids();
             LoadWhitelistGrids();
+            LoadProxyBlockedCountries();
+
+            // Load Settings
+            ProxyCheck_LoadSettings(null!, null!);
 
             // Initialize Form Controls
             BlacklistForm_Initialize();
@@ -1777,6 +1781,260 @@ namespace BHD_ServerManager.Forms.Panels
             wlControlDelete.Visible = true;
             wlControlSave.Visible = true;
             wlControlReset.Visible = true;
+        }
+
+        // ================================================================================
+        // PROXY CHECKING FUNCTIONALITY
+        // ================================================================================
+
+        /// <summary>
+        /// Load and display proxy check settings
+        /// </summary>
+        private void ProxyCheck_LoadSettings(object sender, EventArgs e)
+        {
+            // General API Information and Overall Enablement
+            cb_enableProxyCheck.Checked = ServerSettings.Get("proxyCheckEnabled", false);
+            textBox_ProxyAPIKey.Text    = ServerSettings.Get("proxyCheckAPIKey", string.Empty);
+            num_proxyCacheDays.Value    = ServerSettings.Get("proxyCheckCacheTime", 30);
+            
+            // Proxy Checkboxes
+            checkBox_proxyNone.Checked  = (ServerSettings.Get("proxyCheckProxyAction", 0) == 0? true : false);
+            checkBox_proxyKick.Checked  = (ServerSettings.Get("proxyCheckProxyAction", 0) == 1? true : false);
+            checkBox_proxyBlock.Checked = (ServerSettings.Get("proxyCheckProxyAction", 0) == 2? true : false);
+            // VPN Checkboxes
+            checkBox_vpnNone.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 0? true : false);
+            checkBox_vpnKick.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 1? true : false);
+            checkBox_vpnBlock.Checked = (ServerSettings.Get("proxyCheckVPNAction", 0) == 2? true : false);
+            // TOR Checkboxes
+            checkBox_torNone.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 0? true : false);
+            checkBox_torKick.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 1? true : false);
+            checkBox_torBlock.Checked = (ServerSettings.Get("proxyCheckVPNAction", 0) == 2? true : false);
+            
+            // Proxy Checking Service Providers
+            cb_serviceProxyCheckIO.Checked = (ServerSettings.Get("proxyCheckServiceProvider", 0) == 1 ? true : false);
+        }
+
+        private void ProxyCheck_SaveSettings(object sender, EventArgs e)
+        {
+            // General API Information and Overall Enablement
+            ServerSettings.Set("proxyCheckEnabled", cb_enableProxyCheck.Checked);
+            ServerSettings.Set("proxyCheckAPIKey", textBox_ProxyAPIKey.Text);
+            ServerSettings.Set("proxyCheckCacheTime", (int)num_proxyCacheDays.Value);
+    
+            // Proxy Checkboxes
+            int proxyAction = checkBox_proxyBlock.Checked ? 2 : (checkBox_proxyKick.Checked ? 1 : 0);
+            ServerSettings.Set("proxyCheckProxyAction", proxyAction);
+    
+            // VPN Checkboxes
+            int vpnAction = checkBox_vpnBlock.Checked ? 2 : (checkBox_vpnKick.Checked ? 1 : 0);
+            ServerSettings.Set("proxyCheckVPNAction", vpnAction);
+    
+            // TOR Checkboxes
+            int torAction = checkBox_torBlock.Checked ? 2 : (checkBox_torKick.Checked ? 1 : 0);
+            ServerSettings.Set("proxyCheckTORAction", torAction);
+
+            // Proxy Checking Service Providers
+            ServerSettings.Set("proxyCheckServiceProvider", 0);
+            if (cb_serviceProxyCheckIO.Checked) { ServerSettings.Set("proxyCheckServiceProvider", 1); }
+
+        }
+
+        private void ProxyCheck_CBServicesChanged(object sender, EventArgs e)
+        {
+            var clicked = (CheckBox)sender;
+            cb_serviceProxyCheckIO.Checked = clicked == cb_serviceProxyCheckIO;
+        }
+
+
+        private void ProxyCheck_CBProxyChange(object sender, EventArgs e)
+        {
+            var clicked = (CheckBox)sender;
+            checkBox_proxyNone.Checked = clicked == checkBox_proxyNone;
+            checkBox_proxyKick.Checked = clicked == checkBox_proxyKick;
+            checkBox_proxyBlock.Checked = clicked == checkBox_proxyBlock;
+        }
+
+        private void ProxyCheck_CBVPNChange(object sender, EventArgs e)
+        {
+            var clicked = (CheckBox)sender;
+            checkBox_vpnNone.Checked = clicked == checkBox_vpnNone;
+            checkBox_vpnKick.Checked = clicked == checkBox_vpnKick;
+            checkBox_vpnBlock.Checked = clicked == checkBox_vpnBlock;
+        }
+
+        private void ProxyCheck_CBTORChange(object sender, EventArgs e)
+        {
+            var clicked = (CheckBox)sender;
+            checkBox_torNone.Checked = clicked == checkBox_torNone;
+            checkBox_torKick.Checked = clicked == checkBox_torKick;
+            checkBox_torBlock.Checked = clicked == checkBox_torBlock;
+        }
+
+        private void ProxyCheck_CBGEOChange(object sender, EventArgs e)
+        {
+            var clicked = (CheckBox)sender;
+            checkBox_GeoAllow.Checked = clicked == checkBox_GeoAllow;
+            checkBox_GeoBlock.Checked = clicked == checkBox_GeoBlock;
+            checkBox_GeoOff.Checked = clicked == checkBox_GeoOff;
+        }
+
+        /// <summary>
+        /// Handle adding a blocked country
+        /// </summary>
+        private void ProxyCheck_AddCountry_Click(object sender, EventArgs e)
+        {
+            if (instanceBans == null)
+                return;
+
+            string countryCode = textBox_countryCode.Text.Trim().ToUpper();
+            string countryName = textBox_countryName.Text.Trim();
+
+            // Validate country code
+            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length != 2)
+            {
+                MessageBox.Show("Country code must be exactly 2 characters (e.g., US, CN, RU).",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Validate country name
+            if (string.IsNullOrWhiteSpace(countryName))
+            {
+                MessageBox.Show("Country name cannot be empty.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Check if already exists
+            if (instanceBans.ProxyBlockedCountries.Any(c => c.CountryCode.Equals(countryCode, StringComparison.OrdinalIgnoreCase)))
+            {
+                MessageBox.Show($"Country code '{countryCode}' is already in the blocked list.",
+                    "Duplicate Entry",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                // Add to database
+                int newRecordId = DatabaseManager.AddProxyBlockedCountry(countryCode, countryName);
+        
+                if (newRecordId > 0)
+                {
+                    // Add to in-memory list
+                    var newCountry = new proxyCountry
+                    {
+                        RecordID = newRecordId,
+                        CountryCode = countryCode,
+                        CountryName = countryName
+                    };
+                    instanceBans.ProxyBlockedCountries.Add(newCountry);
+
+                    // Add to DataGridView with RecordID in first column (hidden)
+                    dgProxyCountryBlockList.Rows.Add(newRecordId, countryCode, countryName);
+
+                    // Clear input fields
+                    textBox_countryCode.Text = string.Empty;
+                    textBox_countryName.Text = string.Empty;
+
+                    AppDebug.Log("tabBans", $"Added blocked country: {countryCode} - {countryName} (ID: {newRecordId})");
+                }
+                else
+                {
+                    MessageBox.Show($"Failed to add country '{countryCode}'. It may already exist.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding blocked country: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                AppDebug.Log("tabBans", $"Error adding blocked country: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Handle double-click on blocked countries grid to delete
+        /// </summary>
+        private void ProxyCheck_CountryGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || instanceBans == null)
+                return;
+
+            int recordId = (int)dgProxyCountryBlockList.Rows[e.RowIndex].Cells[0].Value;
+            string countryCode = dgProxyCountryBlockList.Rows[e.RowIndex].Cells[1].Value?.ToString() ?? "";
+            string countryName = dgProxyCountryBlockList.Rows[e.RowIndex].Cells[2].Value?.ToString() ?? "";
+
+            var result = MessageBox.Show(
+                $"Are you sure you want to remove '{countryName}' ({countryCode}) from the blocked countries list?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result != DialogResult.Yes)
+                return;
+
+            try
+            {
+                // Remove from database
+                if (DatabaseManager.RemoveProxyBlockedCountry(recordId))
+                {
+                    // Remove from in-memory list
+                    var country = instanceBans.ProxyBlockedCountries.FirstOrDefault(c => c.RecordID == recordId);
+                    if (country != null)
+                    {
+                        instanceBans.ProxyBlockedCountries.Remove(country);
+                    }
+
+                    // Remove from DataGridView
+                    dgProxyCountryBlockList.Rows.RemoveAt(e.RowIndex);
+
+                    AppDebug.Log("tabBans", $"Removed blocked country: {countryCode} - {countryName} (ID: {recordId})");
+                }
+                else
+                {
+                    MessageBox.Show($"Failed to remove country '{countryCode}'.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error removing blocked country: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                AppDebug.Log("tabBans", $"Error removing blocked country: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Load blocked countries into DataGridView
+        /// </summary>
+        private void LoadProxyBlockedCountries()
+        {
+            if (instanceBans == null)
+                return;
+
+            dgProxyCountryBlockList.Rows.Clear();
+
+            foreach (var country in instanceBans.ProxyBlockedCountries.OrderBy(c => c.CountryName))
+            {
+                // Add RecordID as first column (typically hidden in designer)
+                dgProxyCountryBlockList.Rows.Add(country.RecordID, country.CountryCode, country.CountryName);
+            }
+
+            AppDebug.Log("tabBans", $"Loaded {instanceBans.ProxyBlockedCountries.Count} blocked countries");
         }
 
     }

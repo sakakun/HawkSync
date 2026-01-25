@@ -1,4 +1,6 @@
-﻿using BHD_ServerManager.Classes.ObjectClasses;
+﻿using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -61,6 +63,7 @@ namespace BHD_ServerManager.Classes.Instances
         public bool profileServerAttribute21 { get; set; } = true;      // Loadbar
 
 		// Game Settings
+        public int gameMatchID { get; set; } = ServerSettings.Get("gameMatchID", 0);
 		public int gameMatchWinner { get; set; } = 0;
         public string gameServerName { get; set; } = "Untitled Server";
         public string gameMOTD { get; set; } = "Welcome to the server!";
@@ -164,7 +167,6 @@ namespace BHD_ServerManager.Classes.Instances
         // Instance Update Statements
         public bool banInstanceUpdated { get; set; } = false;
 
-
         // Player Team Information
         public Dictionary<int, playerObject> playerList { get; set; } = new();
         public List<playerTeamObject> playerChangeTeamList { get; set; } = new();
@@ -176,7 +178,17 @@ namespace BHD_ServerManager.Classes.Instances
         public bool ActiveMapPlaylistChanged { get; set; } = false;
         public int SelectedMapPlaylist { get; set; } = 1;
 
-	}
+        // Proxy Checking Settings
+        public bool         proxyCheckEnabled           { get; set; } = false;
+        public string       proxyCheckAPIKey            { get; set; } = string.Empty;
+        public decimal      proxyCheckCacheTime         { get; set; } = 60; // In Days
+        public int          proxyCheckProxyAction       { get; set; } = 0; // 0 = Nothing, 1 = Kick, 2 = Ban
+        public int          proxyCheckVPNAction         { get; set; } = 0;   // 0 = Nothing, 1 = Kick, 2 = Ban
+        public int          proxyCheckTORAction         { get; set; } = 0;   // 0 = Nothing, 1 = Kick, 2 = Ban
+        public int          proxyCheckGeoMode           { get; set; } = 0;   // 0 = Nothing, 1 = Block, 2 = Allow
+        public int          proxyCheckServiceProvider   { get; set; } = 0;   // 0 = None, 1 = ProxyCheck.io
+
+    }
 
     public enum InstanceStatus
     {
