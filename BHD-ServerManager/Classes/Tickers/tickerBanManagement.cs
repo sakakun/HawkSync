@@ -152,6 +152,9 @@ namespace BHD_ServerManager.Classes.Tickers
                         // Basic Ban Checks (Ignore Whitelist)
                         CheckAndPuntBannedPlayers();
 
+                        // Proxy/VPN/TOR and Geo-Blocking Checks
+                        CheckAndPuntProxyViolations();
+
                     }
                 }
                 else
@@ -744,5 +747,194 @@ namespace BHD_ServerManager.Classes.Tickers
     
             return comments.Count > 0 ? string.Join(" | ", comments) : "OK";
         }
+
+                // Check active players against proxy/VPN/TOR rules and geo-blocking
+        public static void CheckAndPuntProxyViolations()
+        {
+            // Only run if proxy checking is enabled
+            if (!theInstance.proxyCheckEnabled)
+                return;
+
+            DateTime now = DateTime.Now;
+
+            // Cycle through all players in the player list
+            foreach (var kvp in theInstance.playerList)
+            {
+                int slotNum = kvp.Key;
+                playerObject player = kvp.Value;
+
+                // Only check players who were seen in the last 4 seconds (active players)
+                if ((now - player.PlayerLastSeen).TotalSeconds > 4)
+                    continue;
+
+                // Skip if player IP is not available
+                if (string.IsNullOrEmpty(player.PlayerIPAddress))
+                    continue;
+
+                if (!IPAddress.TryParse(player.PlayerIPAddress, out IPAddress? playerIP))
+                    continue;
+
+                // Check if player is whitelisted (skip proxy checks for whitelisted players)
+                bool isWhitelisted = false;
+
+                // Check name whitelist
+                foreach (var whitelistedName in banInstance.WhitelistedNames)
+                {
+                    if (whitelistedName.RecordType == banInstanceRecordType.Information)
+                        continue;
+
+                    if (whitelistedName.RecordType == banInstanceRecordType.Temporary &&
+                        whitelistedName.ExpireDate.HasValue &&
+                        now > whitelistedName.ExpireDate.Value)
+                        continue;
+
+                    if (player.PlayerName.Equals(whitelistedName.PlayerName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        isWhitelisted = true;
+                        break;
+                    }
+                }
+
+                // Check IP whitelist
+                if (!isWhitelisted)
+                {
+                    foreach (var whitelistedIP in banInstance.WhitelistedIPs)
+                    {
+                        if (whitelistedIP.RecordType == banInstanceRecordType.Information)
+                            continue;
+
+                        if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
+                            whitelistedIP.ExpireDate.HasValue &&
+                            now > whitelistedIP.ExpireDate.Value)
+                            continue;
+
+                        if (IsIPMatch(playerIP, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask))
+                        {
+                            isWhitelisted = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Skip whitelisted players
+                if (isWhitelisted)
+                    continue;
+
+                // Find proxy record for this player's IP
+                var proxyRecord = banInstance.ProxyRecords
+                    .FirstOrDefault(p => p.IPAddress.Equals(playerIP));
+
+                // If no proxy record exists or cache expired, trigger a check and skip for now
+                if (proxyRecord == null || now > proxyRecord.CacheExpiry)
+                {
+                    CheckIP(playerIP);
+                    continue;
+                }
+
+                bool shouldPunt = false;
+                bool shouldBan = false;
+                string puntReason = string.Empty;
+
+                // Check Proxy
+                if (proxyRecord.IsProxy && theInstance.proxyCheckProxyAction > 0)
+                {
+                    shouldPunt = true;
+                    shouldBan = theInstance.proxyCheckProxyAction == 2;
+                    puntReason = $"Proxy detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
+                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a PROXY. Action: {(shouldBan ? "Ban" : "Kick")}");
+                }
+
+                // Check VPN
+                if (!shouldPunt && proxyRecord.IsVpn && theInstance.proxyCheckVPNAction > 0)
+                {
+                    shouldPunt = true;
+                    shouldBan = theInstance.proxyCheckVPNAction == 2;
+                    puntReason = $"VPN detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
+                    if (!string.IsNullOrEmpty(proxyRecord.Provider))
+                        puntReason += $" - {proxyRecord.Provider}";
+                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a VPN. Action: {(shouldBan ? "Ban" : "Kick")}");
+                }
+
+                // Check TOR
+                if (!shouldPunt && proxyRecord.IsTor && theInstance.proxyCheckTORAction > 0)
+                {
+                    shouldPunt = true;
+                    shouldBan = theInstance.proxyCheckTORAction == 2;
+                    puntReason = $"TOR detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
+                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using TOR. Action: {(shouldBan ? "Ban" : "Kick")}");
+                }
+
+                // Check Geo-Blocking
+                if (!shouldPunt && theInstance.proxyCheckGeoMode > 0 && !string.IsNullOrEmpty(proxyRecord.CountryCode))
+                {
+                    bool countryInList = banInstance.ProxyBlockedCountries
+                        .Any(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
+
+                    // Mode 1 = Block listed countries
+                    // Mode 2 = Allow only listed countries
+                    bool shouldBlockCountry = theInstance.proxyCheckGeoMode == 1 ? countryInList : !countryInList;
+
+                    if (shouldBlockCountry)
+                    {
+                        shouldPunt = true;
+                        shouldBan = false; // Geo-blocking only kicks, doesn't auto-ban
+                        var country = banInstance.ProxyBlockedCountries
+                            .FirstOrDefault(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
+                        string countryName = country?.CountryName ?? proxyRecord.CountryCode;
+                        puntReason = $"Geo-blocked: {countryName} ({proxyRecord.CountryCode})";
+                        AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) from blocked country: {countryName}. Action: Kick");
+                    }
+                }
+
+                // Execute action
+                if (shouldPunt)
+                {
+                    if (shouldBan)
+                    {
+                        // Create ban record
+                        var banRecord = new banInstancePlayerIP
+                        {
+                            RecordID = 0, // Will be set by database
+                            MatchID = theInstance.gameMatchID,
+                            PlayerIP = playerIP,
+                            SubnetMask = 32, // Exact IP match
+                            Date = now,
+                            ExpireDate = null, // Permanent ban
+                            AssociatedName = null,
+                            RecordType = banInstanceRecordType.Permanent,
+                            RecordCategory = 0, // Ban
+                            Notes = puntReason
+                        };
+
+                        try
+                        {
+                            // Add to database
+                            int recordId = DatabaseManager.AddPlayerIPRecord(banRecord);
+                            banRecord.RecordID = recordId;
+
+                            // Add to in-memory ban list
+                            banInstance.BannedPlayerIPs.Add(banRecord);
+
+                            AppDebug.Log("tickerBanManagement", $"Auto-banned IP {player.PlayerIPAddress}: {puntReason}");
+
+                            // Add to NetLimiter filter if enabled
+                            if (!string.IsNullOrEmpty(theInstance.netLimiterFilterName))
+                            {
+                                _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, player.PlayerIPAddress, 32);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            AppDebug.Log("tickerBanManagement", $"Error adding auto-ban record for IP {player.PlayerIPAddress}: {ex.Message}");
+                        }
+                    }
+
+                    // Punt the player
+                    ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                    AppDebug.Log("tickerBanManagement", $"Punting player '{player.PlayerName}' (Slot {slotNum}). Reason: {puntReason}");
+                }
+            }
+        }
+
     }
 }
