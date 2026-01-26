@@ -3,6 +3,8 @@ using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.ObjectClasses;
+using BHD_ServerManager.Classes.Services.NetLimiter;
+using BHD_ServerManager.Classes.SupportClasses;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -18,6 +20,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
         private static theInstance ThisInstance = CommonCore.theInstance!;
         private static chatInstance ChatInstance = CommonCore.instanceChat!;
+        private static banInstance BanInstance = CommonCore.instanceBans!;
         private playerObject Player { get; set; } = new playerObject();
         private int SlotNumber = 0;
         private ContextMenuStrip ContextMenu;
@@ -162,25 +165,163 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             command.DropDownItems.Add(banByIP);
             command.DropDownItems.Add(banByNameAndIP);
 
-            banByName.Click += (sender, e) =>
+            banByName.Click += async (sender, e) =>
             {
-                // banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!);
-                MessageBox.Show($"Player {Player.PlayerName} has been banned by name.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Ban by name command clicked for player {Player.PlayerName}.");
+                try
+                {
+                    // Create name ban record
+                    var nameRecord = new banInstancePlayerName
+                    {
+                        RecordID = 0,
+                        MatchID = 0,
+                        PlayerName = Player.PlayerNameBase64!,
+                        Date = DateTime.Now,
+                        ExpireDate = null,
+                        AssociatedIP = 0,
+                        RecordType = banInstanceRecordType.Permanent,
+                        RecordCategory = (int)RecordCategory.Ban,
+                        Notes = $"Banned from PlayerCard context menu"
+                    };
+
+                    // Add to database
+                    int recordID = DatabaseManager.AddPlayerNameRecord(nameRecord);
+                    nameRecord.RecordID = recordID;
+
+                    // Add to in-memory list
+                    BanInstance.BannedPlayerNames.Add(nameRecord);
+
+                    // Kick the player
+                    ServerMemory.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
+
+                    MessageBox.Show($"Player {Player.PlayerName} has been banned by name and kicked from the server.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Debug.WriteLine($"Ban by name command executed for player {Player.PlayerName} (RecordID: {recordID})");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error banning player by name: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    AppDebug.Log("PlayerCard", $"Error banning player by name: {ex}");
+                }
             };
-            banByIP.Click += (sender, e) =>
+
+            banByIP.Click += async (sender, e) =>
             {
-                var ipAddress = IPAddress.Parse(Player.PlayerIPAddress!);
-                // banInstanceManager.AddBannedPlayer(null!, ipAddress, 32);
-                MessageBox.Show($"Player {Player.PlayerName} has been banned by IP.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Ban by IP command clicked for player {Player.PlayerName}.");
+                try
+                {
+                    var ipAddress = IPAddress.Parse(Player.PlayerIPAddress!);
+
+                    // Create IP ban record
+                    var ipRecord = new banInstancePlayerIP
+                    {
+                        RecordID = 0,
+                        MatchID = 0,
+                        PlayerIP = ipAddress,
+                        SubnetMask = 32,
+                        Date = DateTime.Now,
+                        ExpireDate = null,
+                        AssociatedName = 0,
+                        RecordType = banInstanceRecordType.Permanent,
+                        RecordCategory = (int)RecordCategory.Ban,
+                        Notes = $"Banned from PlayerCard context menu"
+                    };
+
+                    // Add to database
+                    int recordID = DatabaseManager.AddPlayerIPRecord(ipRecord);
+                    ipRecord.RecordID = recordID;
+
+                    // Add to in-memory list
+                    BanInstance.BannedPlayerIPs.Add(ipRecord);
+
+                    // Add to NetLimiter filter if enabled
+                    if (ThisInstance.netLimiterEnabled && !string.IsNullOrEmpty(ThisInstance.netLimiterFilterName))
+                    {
+                        await NetLimiterClient.AddIpToFilterAsync(ThisInstance.netLimiterFilterName, ipAddress.ToString(), 32);
+                        Debug.WriteLine($"Added IP {ipAddress} to NetLimiter filter '{ThisInstance.netLimiterFilterName}'");
+                    }
+
+                    // Kick the player
+                    ServerMemory.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
+
+                    MessageBox.Show($"Player {Player.PlayerName} has been banned by IP and kicked from the server.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Debug.WriteLine($"Ban by IP command executed for player {Player.PlayerName} (RecordID: {recordID})");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error banning player by IP: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    AppDebug.Log("PlayerCard", $"Error banning player by IP: {ex}");
+                }
             };
-            banByNameAndIP.Click += (sender, e) =>
+
+            banByNameAndIP.Click += async (sender, e) =>
             {
-                var playerAddress = IPAddress.Parse(Player.PlayerIPAddress!);
-                // banInstanceManager.AddBannedPlayer(Player.PlayerNameBase64!, playerAddress, 32);
-                MessageBox.Show($"Player {Player.PlayerName} has been banned.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Debug.WriteLine($"Ban command clicked for player {Player.PlayerName}.");
+                try
+                {
+                    var ipAddress = IPAddress.Parse(Player.PlayerIPAddress!);
+                    int nameRecordID = 0;
+                    int ipRecordID = 0;
+
+                    // Create name ban record
+                    var nameRecord = new banInstancePlayerName
+                    {
+                        RecordID = 0,
+                        MatchID = 0,
+                        PlayerName = Player.PlayerNameBase64!,
+                        Date = DateTime.Now,
+                        ExpireDate = null,
+                        AssociatedIP = 0,
+                        RecordType = banInstanceRecordType.Permanent,
+                        RecordCategory = (int)RecordCategory.Ban,
+                        Notes = $"Banned from PlayerCard context menu"
+                    };
+
+                    // Add name to database
+                    nameRecordID = DatabaseManager.AddPlayerNameRecord(nameRecord);
+                    nameRecord.RecordID = nameRecordID;
+
+                    // Create IP ban record
+                    var ipRecord = new banInstancePlayerIP
+                    {
+                        RecordID = 0,
+                        MatchID = 0,
+                        PlayerIP = ipAddress,
+                        SubnetMask = 32,
+                        Date = DateTime.Now,
+                        ExpireDate = null,
+                        AssociatedName = nameRecordID,
+                        RecordType = banInstanceRecordType.Permanent,
+                        RecordCategory = (int)RecordCategory.Ban,
+                        Notes = $"Banned from PlayerCard context menu"
+                    };
+
+                    // Add IP to database
+                    ipRecordID = DatabaseManager.AddPlayerIPRecord(ipRecord);
+                    ipRecord.RecordID = ipRecordID;
+
+                    // Update name record with associated IP
+                    nameRecord.AssociatedIP = ipRecordID;
+                    DatabaseManager.UpdatePlayerNameRecord(nameRecord);
+
+                    // Add to in-memory lists
+                    BanInstance.BannedPlayerNames.Add(nameRecord);
+                    BanInstance.BannedPlayerIPs.Add(ipRecord);
+
+                    // Add to NetLimiter filter if enabled
+                    if (ThisInstance.netLimiterEnabled && !string.IsNullOrEmpty(ThisInstance.netLimiterFilterName))
+                    {
+                        await NetLimiterClient.AddIpToFilterAsync(ThisInstance.netLimiterFilterName, ipAddress.ToString(), 32);
+                        Debug.WriteLine($"Added IP {ipAddress} to NetLimiter filter '{ThisInstance.netLimiterFilterName}'");
+                    }
+
+                    // Kick the player
+                    ServerMemory.WriteMemorySendConsoleCommand("punt " + Player.PlayerSlot);
+
+                    MessageBox.Show($"Player {Player.PlayerName} has been banned by name and IP, then kicked from the server.", "Player Action", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Debug.WriteLine($"Ban by name and IP command executed for player {Player.PlayerName} (Name RecordID: {nameRecordID}, IP RecordID: {ipRecordID})");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error banning player: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    AppDebug.Log("PlayerCard", $"Error banning player by name and IP: {ex}");
+                }
             };
 
             return command;
