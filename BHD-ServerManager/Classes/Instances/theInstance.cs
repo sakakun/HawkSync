@@ -188,6 +188,16 @@ namespace BHD_ServerManager.Classes.Instances
         public int          proxyCheckGeoMode           { get; set; } = 0;   // 0 = Nothing, 1 = Block, 2 = Allow
         public int          proxyCheckServiceProvider   { get; set; } = 0;   // 0 = None, 1 = ProxyCheck.io
 
+        // NetLimiter Settings
+        public bool         netLimiterEnabled           { get; set; } = false;
+        public string       netLimiterHost              { get; set; } = string.Empty;
+        public int          netLimiterPort              { get; set; } = 9098;
+        public string       netLimiterUsername          { get; set; } = string.Empty;
+        public string       netLimiterPassword          { get; set; } = string.Empty;
+        public string       netLimiterFilterName        { get; set; } = string.Empty;
+        public bool         netLimiterEnableConLimit    { get; set; } = false;
+        public decimal      netLimiterConThreshold      { get; set; } = 10; // Number of Connections
+
     }
 
     public enum InstanceStatus

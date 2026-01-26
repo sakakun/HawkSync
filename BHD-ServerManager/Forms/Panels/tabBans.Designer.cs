@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
             banControls = new TabControl();
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -164,23 +167,30 @@
             tableLayoutPanel24 = new TableLayoutPanel();
             label12 = new Label();
             label11 = new Label();
-            checkBox13 = new CheckBox();
-            numericUpDown1 = new NumericUpDown();
-            textBox2 = new TextBox();
+            checkBox_EnableNetLimiter = new CheckBox();
+            num_NetLimiterPort = new NumericUpDown();
+            textBox_NetLimiterHost = new TextBox();
             label8 = new Label();
-            textBox3 = new TextBox();
-            textBox4 = new TextBox();
+            textBox_NetLimiterUsername = new TextBox();
+            textBox_NetLimiterPassword = new TextBox();
             tableLayoutPanel25 = new TableLayoutPanel();
-            comboBox1 = new ComboBox();
-            iconButton1 = new FontAwesome.Sharp.IconButton();
+            comboBox_NetLimiterFilterName = new ComboBox();
+            btn_netLimiterRefresh = new FontAwesome.Sharp.IconButton();
             label9 = new Label();
-            checkBox14 = new CheckBox();
-            numericUpDown2 = new NumericUpDown();
+            checkBox_NetLimiterEnableConLimit = new CheckBox();
+            num_NetLimiterConThreshold = new NumericUpDown();
             label10 = new Label();
             tableLayoutPanel26 = new TableLayoutPanel();
             iconButton3 = new FontAwesome.Sharp.IconButton();
-            iconButton2 = new FontAwesome.Sharp.IconButton();
+            btn_netLimiterSave = new FontAwesome.Sharp.IconButton();
             groupBox17 = new GroupBox();
+            tableLayoutPanel13 = new TableLayoutPanel();
+            dg_NetlimiterConnectionLog = new DataGridView();
+            NL_rowID = new DataGridViewTextBoxColumn();
+            NL_ipAddress = new DataGridViewTextBoxColumn();
+            NL_numCons = new DataGridViewTextBoxColumn();
+            NL_vpnStatus = new DataGridViewTextBoxColumn();
+            NL_notes = new DataGridViewTextBoxColumn();
             toolTip1 = new ToolTip(components);
             banControls.SuspendLayout();
             tabBlacklist.SuspendLayout();
@@ -238,10 +248,13 @@
             panel4.SuspendLayout();
             groupBox16.SuspendLayout();
             tableLayoutPanel24.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)num_NetLimiterPort).BeginInit();
             tableLayoutPanel25.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)num_NetLimiterConThreshold).BeginInit();
             tableLayoutPanel26.SuspendLayout();
+            groupBox17.SuspendLayout();
+            tableLayoutPanel13.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dg_NetlimiterConnectionLog).BeginInit();
             SuspendLayout();
             // 
             // banControls
@@ -2031,16 +2044,16 @@
             tableLayoutPanel24.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel24.Controls.Add(label12, 0, 5);
             tableLayoutPanel24.Controls.Add(label11, 0, 8);
-            tableLayoutPanel24.Controls.Add(checkBox13, 0, 0);
-            tableLayoutPanel24.Controls.Add(numericUpDown1, 1, 2);
-            tableLayoutPanel24.Controls.Add(textBox2, 0, 2);
+            tableLayoutPanel24.Controls.Add(checkBox_EnableNetLimiter, 0, 0);
+            tableLayoutPanel24.Controls.Add(num_NetLimiterPort, 1, 2);
+            tableLayoutPanel24.Controls.Add(textBox_NetLimiterHost, 0, 2);
             tableLayoutPanel24.Controls.Add(label8, 0, 1);
-            tableLayoutPanel24.Controls.Add(textBox3, 0, 3);
-            tableLayoutPanel24.Controls.Add(textBox4, 0, 4);
+            tableLayoutPanel24.Controls.Add(textBox_NetLimiterUsername, 0, 3);
+            tableLayoutPanel24.Controls.Add(textBox_NetLimiterPassword, 0, 4);
             tableLayoutPanel24.Controls.Add(tableLayoutPanel25, 0, 7);
             tableLayoutPanel24.Controls.Add(label9, 0, 6);
-            tableLayoutPanel24.Controls.Add(checkBox14, 0, 9);
-            tableLayoutPanel24.Controls.Add(numericUpDown2, 1, 10);
+            tableLayoutPanel24.Controls.Add(checkBox_NetLimiterEnableConLimit, 0, 9);
+            tableLayoutPanel24.Controls.Add(num_NetLimiterConThreshold, 1, 10);
             tableLayoutPanel24.Controls.Add(label10, 0, 10);
             tableLayoutPanel24.Controls.Add(tableLayoutPanel26, 0, 12);
             tableLayoutPanel24.Dock = DockStyle.Fill;
@@ -2092,43 +2105,43 @@
             label11.Text = "Additional Checks";
             label11.TextAlign = ContentAlignment.BottomCenter;
             // 
-            // checkBox13
+            // checkBox_EnableNetLimiter
             // 
-            checkBox13.AutoSize = true;
-            checkBox13.CheckAlign = ContentAlignment.MiddleRight;
-            tableLayoutPanel24.SetColumnSpan(checkBox13, 2);
-            checkBox13.Dock = DockStyle.Fill;
-            checkBox13.Location = new Point(3, 3);
-            checkBox13.Name = "checkBox13";
-            checkBox13.Padding = new Padding(0, 3, 5, 0);
-            checkBox13.Size = new Size(232, 24);
-            checkBox13.TabIndex = 0;
-            checkBox13.Text = "Enable NetLimiter";
-            checkBox13.TextAlign = ContentAlignment.MiddleRight;
-            checkBox13.UseVisualStyleBackColor = true;
+            checkBox_EnableNetLimiter.AutoSize = true;
+            checkBox_EnableNetLimiter.CheckAlign = ContentAlignment.MiddleRight;
+            tableLayoutPanel24.SetColumnSpan(checkBox_EnableNetLimiter, 2);
+            checkBox_EnableNetLimiter.Dock = DockStyle.Fill;
+            checkBox_EnableNetLimiter.Location = new Point(3, 3);
+            checkBox_EnableNetLimiter.Name = "checkBox_EnableNetLimiter";
+            checkBox_EnableNetLimiter.Padding = new Padding(0, 3, 5, 0);
+            checkBox_EnableNetLimiter.Size = new Size(232, 24);
+            checkBox_EnableNetLimiter.TabIndex = 0;
+            checkBox_EnableNetLimiter.Text = "Enable NetLimiter";
+            checkBox_EnableNetLimiter.TextAlign = ContentAlignment.MiddleRight;
+            checkBox_EnableNetLimiter.UseVisualStyleBackColor = true;
             // 
-            // numericUpDown1
+            // num_NetLimiterPort
             // 
-            numericUpDown1.Dock = DockStyle.Fill;
-            numericUpDown1.Location = new Point(122, 63);
-            numericUpDown1.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
-            numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(113, 23);
-            numericUpDown1.TabIndex = 1;
-            numericUpDown1.TextAlign = HorizontalAlignment.Center;
-            numericUpDown1.Value = new decimal(new int[] { 9298, 0, 0, 0 });
+            num_NetLimiterPort.Dock = DockStyle.Fill;
+            num_NetLimiterPort.Location = new Point(122, 63);
+            num_NetLimiterPort.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
+            num_NetLimiterPort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            num_NetLimiterPort.Name = "num_NetLimiterPort";
+            num_NetLimiterPort.Size = new Size(113, 23);
+            num_NetLimiterPort.TabIndex = 1;
+            num_NetLimiterPort.TextAlign = HorizontalAlignment.Center;
+            num_NetLimiterPort.Value = new decimal(new int[] { 9298, 0, 0, 0 });
             // 
-            // textBox2
+            // textBox_NetLimiterHost
             // 
-            textBox2.Dock = DockStyle.Fill;
-            textBox2.Location = new Point(3, 63);
-            textBox2.MaxLength = 15;
-            textBox2.Name = "textBox2";
-            textBox2.PlaceholderText = "127.0.0.1";
-            textBox2.Size = new Size(113, 23);
-            textBox2.TabIndex = 2;
-            textBox2.TextAlign = HorizontalAlignment.Center;
+            textBox_NetLimiterHost.Dock = DockStyle.Fill;
+            textBox_NetLimiterHost.Location = new Point(3, 63);
+            textBox_NetLimiterHost.MaxLength = 15;
+            textBox_NetLimiterHost.Name = "textBox_NetLimiterHost";
+            textBox_NetLimiterHost.PlaceholderText = "127.0.0.1";
+            textBox_NetLimiterHost.Size = new Size(113, 23);
+            textBox_NetLimiterHost.TabIndex = 2;
+            textBox_NetLimiterHost.TextAlign = HorizontalAlignment.Center;
             // 
             // label8
             // 
@@ -2144,28 +2157,28 @@
             label8.Text = "NetLimiter Information";
             label8.TextAlign = ContentAlignment.BottomCenter;
             // 
-            // textBox3
+            // textBox_NetLimiterUsername
             // 
-            tableLayoutPanel24.SetColumnSpan(textBox3, 2);
-            textBox3.Dock = DockStyle.Fill;
-            textBox3.Location = new Point(3, 93);
-            textBox3.Name = "textBox3";
-            textBox3.PlaceholderText = "Username";
-            textBox3.Size = new Size(232, 23);
-            textBox3.TabIndex = 4;
-            textBox3.TextAlign = HorizontalAlignment.Center;
+            tableLayoutPanel24.SetColumnSpan(textBox_NetLimiterUsername, 2);
+            textBox_NetLimiterUsername.Dock = DockStyle.Fill;
+            textBox_NetLimiterUsername.Location = new Point(3, 93);
+            textBox_NetLimiterUsername.Name = "textBox_NetLimiterUsername";
+            textBox_NetLimiterUsername.PlaceholderText = "Username";
+            textBox_NetLimiterUsername.Size = new Size(232, 23);
+            textBox_NetLimiterUsername.TabIndex = 4;
+            textBox_NetLimiterUsername.TextAlign = HorizontalAlignment.Center;
             // 
-            // textBox4
+            // textBox_NetLimiterPassword
             // 
-            tableLayoutPanel24.SetColumnSpan(textBox4, 2);
-            textBox4.Dock = DockStyle.Fill;
-            textBox4.Location = new Point(3, 123);
-            textBox4.Name = "textBox4";
-            textBox4.PlaceholderText = "Password";
-            textBox4.Size = new Size(232, 23);
-            textBox4.TabIndex = 5;
-            textBox4.TextAlign = HorizontalAlignment.Center;
-            textBox4.UseSystemPasswordChar = true;
+            tableLayoutPanel24.SetColumnSpan(textBox_NetLimiterPassword, 2);
+            textBox_NetLimiterPassword.Dock = DockStyle.Fill;
+            textBox_NetLimiterPassword.Location = new Point(3, 123);
+            textBox_NetLimiterPassword.Name = "textBox_NetLimiterPassword";
+            textBox_NetLimiterPassword.PlaceholderText = "Password";
+            textBox_NetLimiterPassword.Size = new Size(232, 23);
+            textBox_NetLimiterPassword.TabIndex = 5;
+            textBox_NetLimiterPassword.TextAlign = HorizontalAlignment.Center;
+            textBox_NetLimiterPassword.UseSystemPasswordChar = true;
             // 
             // tableLayoutPanel25
             // 
@@ -2173,8 +2186,8 @@
             tableLayoutPanel24.SetColumnSpan(tableLayoutPanel25, 2);
             tableLayoutPanel25.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80F));
             tableLayoutPanel25.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel25.Controls.Add(comboBox1, 0, 0);
-            tableLayoutPanel25.Controls.Add(iconButton1, 1, 0);
+            tableLayoutPanel25.Controls.Add(comboBox_NetLimiterFilterName, 0, 0);
+            tableLayoutPanel25.Controls.Add(btn_netLimiterRefresh, 1, 0);
             tableLayoutPanel25.Dock = DockStyle.Fill;
             tableLayoutPanel25.Location = new Point(0, 190);
             tableLayoutPanel25.Margin = new Padding(0);
@@ -2185,30 +2198,31 @@
             tableLayoutPanel25.Size = new Size(238, 30);
             tableLayoutPanel25.TabIndex = 6;
             // 
-            // comboBox1
+            // comboBox_NetLimiterFilterName
             // 
-            comboBox1.Dock = DockStyle.Fill;
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(3, 4);
-            comboBox1.Margin = new Padding(3, 4, 3, 3);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(184, 23);
-            comboBox1.TabIndex = 0;
+            comboBox_NetLimiterFilterName.Dock = DockStyle.Fill;
+            comboBox_NetLimiterFilterName.FormattingEnabled = true;
+            comboBox_NetLimiterFilterName.Location = new Point(3, 4);
+            comboBox_NetLimiterFilterName.Margin = new Padding(3, 4, 3, 3);
+            comboBox_NetLimiterFilterName.Name = "comboBox_NetLimiterFilterName";
+            comboBox_NetLimiterFilterName.Size = new Size(184, 23);
+            comboBox_NetLimiterFilterName.TabIndex = 0;
             // 
-            // iconButton1
+            // btn_netLimiterRefresh
             // 
-            iconButton1.Dock = DockStyle.Fill;
-            iconButton1.IconChar = FontAwesome.Sharp.IconChar.Refresh;
-            iconButton1.IconColor = Color.Black;
-            iconButton1.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            iconButton1.IconSize = 24;
-            iconButton1.Location = new Point(190, 0);
-            iconButton1.Margin = new Padding(0);
-            iconButton1.Name = "iconButton1";
-            iconButton1.Padding = new Padding(0, 3, 0, 0);
-            iconButton1.Size = new Size(48, 30);
-            iconButton1.TabIndex = 1;
-            iconButton1.UseVisualStyleBackColor = true;
+            btn_netLimiterRefresh.Dock = DockStyle.Fill;
+            btn_netLimiterRefresh.IconChar = FontAwesome.Sharp.IconChar.Refresh;
+            btn_netLimiterRefresh.IconColor = Color.Black;
+            btn_netLimiterRefresh.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btn_netLimiterRefresh.IconSize = 24;
+            btn_netLimiterRefresh.Location = new Point(190, 0);
+            btn_netLimiterRefresh.Margin = new Padding(0);
+            btn_netLimiterRefresh.Name = "btn_netLimiterRefresh";
+            btn_netLimiterRefresh.Padding = new Padding(0, 3, 0, 0);
+            btn_netLimiterRefresh.Size = new Size(48, 30);
+            btn_netLimiterRefresh.TabIndex = 1;
+            btn_netLimiterRefresh.UseVisualStyleBackColor = true;
+            btn_netLimiterRefresh.Click += NetLimiter_RefreshFilters;
             // 
             // label9
             // 
@@ -2224,31 +2238,31 @@
             label9.Text = "NetLimiter Filters";
             label9.TextAlign = ContentAlignment.BottomCenter;
             // 
-            // checkBox14
+            // checkBox_NetLimiterEnableConLimit
             // 
-            checkBox14.AutoSize = true;
-            checkBox14.CheckAlign = ContentAlignment.MiddleRight;
-            tableLayoutPanel24.SetColumnSpan(checkBox14, 2);
-            checkBox14.Dock = DockStyle.Fill;
-            checkBox14.Location = new Point(3, 243);
-            checkBox14.Name = "checkBox14";
-            checkBox14.Padding = new Padding(0, 3, 5, 0);
-            checkBox14.Size = new Size(232, 24);
-            checkBox14.TabIndex = 8;
-            checkBox14.Text = "Enable Connection Abuse Banning";
-            checkBox14.TextAlign = ContentAlignment.MiddleRight;
-            checkBox14.UseVisualStyleBackColor = true;
+            checkBox_NetLimiterEnableConLimit.AutoSize = true;
+            checkBox_NetLimiterEnableConLimit.CheckAlign = ContentAlignment.MiddleRight;
+            tableLayoutPanel24.SetColumnSpan(checkBox_NetLimiterEnableConLimit, 2);
+            checkBox_NetLimiterEnableConLimit.Dock = DockStyle.Fill;
+            checkBox_NetLimiterEnableConLimit.Location = new Point(3, 243);
+            checkBox_NetLimiterEnableConLimit.Name = "checkBox_NetLimiterEnableConLimit";
+            checkBox_NetLimiterEnableConLimit.Padding = new Padding(0, 3, 5, 0);
+            checkBox_NetLimiterEnableConLimit.Size = new Size(232, 24);
+            checkBox_NetLimiterEnableConLimit.TabIndex = 8;
+            checkBox_NetLimiterEnableConLimit.Text = "Enable Connection Abuse Banning";
+            checkBox_NetLimiterEnableConLimit.TextAlign = ContentAlignment.MiddleRight;
+            checkBox_NetLimiterEnableConLimit.UseVisualStyleBackColor = true;
             // 
-            // numericUpDown2
+            // num_NetLimiterConThreshold
             // 
-            numericUpDown2.Dock = DockStyle.Fill;
-            numericUpDown2.Location = new Point(122, 273);
-            numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown2.Name = "numericUpDown2";
-            numericUpDown2.Size = new Size(113, 23);
-            numericUpDown2.TabIndex = 9;
-            numericUpDown2.TextAlign = HorizontalAlignment.Center;
-            numericUpDown2.Value = new decimal(new int[] { 10, 0, 0, 0 });
+            num_NetLimiterConThreshold.Dock = DockStyle.Fill;
+            num_NetLimiterConThreshold.Location = new Point(122, 273);
+            num_NetLimiterConThreshold.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            num_NetLimiterConThreshold.Name = "num_NetLimiterConThreshold";
+            num_NetLimiterConThreshold.Size = new Size(113, 23);
+            num_NetLimiterConThreshold.TabIndex = 9;
+            num_NetLimiterConThreshold.TextAlign = HorizontalAlignment.Center;
+            num_NetLimiterConThreshold.Value = new decimal(new int[] { 10, 0, 0, 0 });
             // 
             // label10
             // 
@@ -2271,7 +2285,7 @@
             tableLayoutPanel26.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel26.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel26.Controls.Add(iconButton3, 0, 0);
-            tableLayoutPanel26.Controls.Add(iconButton2, 2, 0);
+            tableLayoutPanel26.Controls.Add(btn_netLimiterSave, 2, 0);
             tableLayoutPanel26.Dock = DockStyle.Fill;
             tableLayoutPanel26.Location = new Point(0, 320);
             tableLayoutPanel26.Margin = new Padding(0);
@@ -2296,25 +2310,28 @@
             iconButton3.TabIndex = 1;
             toolTip1.SetToolTip(iconButton3, "Reset");
             iconButton3.UseVisualStyleBackColor = true;
+            iconButton3.Click += NetLimiter_LoadSettings;
             // 
-            // iconButton2
+            // btn_netLimiterSave
             // 
-            iconButton2.Dock = DockStyle.Fill;
-            iconButton2.IconChar = FontAwesome.Sharp.IconChar.Save;
-            iconButton2.IconColor = Color.Black;
-            iconButton2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            iconButton2.IconSize = 32;
-            iconButton2.Location = new Point(94, 0);
-            iconButton2.Margin = new Padding(0);
-            iconButton2.Name = "iconButton2";
-            iconButton2.Padding = new Padding(0, 3, 0, 0);
-            iconButton2.Size = new Size(47, 40);
-            iconButton2.TabIndex = 0;
-            toolTip1.SetToolTip(iconButton2, "Save");
-            iconButton2.UseVisualStyleBackColor = true;
+            btn_netLimiterSave.Dock = DockStyle.Fill;
+            btn_netLimiterSave.IconChar = FontAwesome.Sharp.IconChar.Save;
+            btn_netLimiterSave.IconColor = Color.Black;
+            btn_netLimiterSave.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btn_netLimiterSave.IconSize = 32;
+            btn_netLimiterSave.Location = new Point(94, 0);
+            btn_netLimiterSave.Margin = new Padding(0);
+            btn_netLimiterSave.Name = "btn_netLimiterSave";
+            btn_netLimiterSave.Padding = new Padding(0, 3, 0, 0);
+            btn_netLimiterSave.Size = new Size(47, 40);
+            btn_netLimiterSave.TabIndex = 0;
+            toolTip1.SetToolTip(btn_netLimiterSave, "Save");
+            btn_netLimiterSave.UseVisualStyleBackColor = true;
+            btn_netLimiterSave.Click += NetLimiter_SaveSettings;
             // 
             // groupBox17
             // 
+            groupBox17.Controls.Add(tableLayoutPanel13);
             groupBox17.Dock = DockStyle.Fill;
             groupBox17.Location = new Point(3, 3);
             groupBox17.Name = "groupBox17";
@@ -2322,6 +2339,84 @@
             groupBox17.TabIndex = 1;
             groupBox17.TabStop = false;
             groupBox17.Text = "NetLimiter Active Connections";
+            // 
+            // tableLayoutPanel13
+            // 
+            tableLayoutPanel13.ColumnCount = 3;
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel13.Controls.Add(dg_NetlimiterConnectionLog, 0, 0);
+            tableLayoutPanel13.Dock = DockStyle.Fill;
+            tableLayoutPanel13.Location = new Point(3, 19);
+            tableLayoutPanel13.Name = "tableLayoutPanel13";
+            tableLayoutPanel13.RowCount = 3;
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel13.Size = new Size(656, 372);
+            tableLayoutPanel13.TabIndex = 0;
+            // 
+            // dg_NetlimiterConnectionLog
+            // 
+            dg_NetlimiterConnectionLog.AllowUserToAddRows = false;
+            dg_NetlimiterConnectionLog.AllowUserToDeleteRows = false;
+            dg_NetlimiterConnectionLog.AllowUserToResizeColumns = false;
+            dg_NetlimiterConnectionLog.AllowUserToResizeRows = false;
+            dg_NetlimiterConnectionLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dg_NetlimiterConnectionLog.Columns.AddRange(new DataGridViewColumn[] { NL_rowID, NL_ipAddress, NL_numCons, NL_vpnStatus, NL_notes });
+            tableLayoutPanel13.SetColumnSpan(dg_NetlimiterConnectionLog, 3);
+            dg_NetlimiterConnectionLog.Dock = DockStyle.Fill;
+            dg_NetlimiterConnectionLog.EditMode = DataGridViewEditMode.EditProgrammatically;
+            dg_NetlimiterConnectionLog.Location = new Point(3, 3);
+            dg_NetlimiterConnectionLog.Name = "dg_NetlimiterConnectionLog";
+            dg_NetlimiterConnectionLog.ReadOnly = true;
+            dg_NetlimiterConnectionLog.RowHeadersVisible = false;
+            tableLayoutPanel13.SetRowSpan(dg_NetlimiterConnectionLog, 3);
+            dg_NetlimiterConnectionLog.Size = new Size(650, 366);
+            dg_NetlimiterConnectionLog.TabIndex = 0;
+            // 
+            // NL_rowID
+            // 
+            NL_rowID.HeaderText = "Row";
+            NL_rowID.Name = "NL_rowID";
+            NL_rowID.ReadOnly = true;
+            NL_rowID.Visible = false;
+            // 
+            // NL_ipAddress
+            // 
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_ipAddress.DefaultCellStyle = dataGridViewCellStyle7;
+            NL_ipAddress.HeaderText = "IP Address";
+            NL_ipAddress.Name = "NL_ipAddress";
+            NL_ipAddress.ReadOnly = true;
+            // 
+            // NL_numCons
+            // 
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_numCons.DefaultCellStyle = dataGridViewCellStyle8;
+            NL_numCons.HeaderText = "# Cons";
+            NL_numCons.Name = "NL_numCons";
+            NL_numCons.ReadOnly = true;
+            NL_numCons.Width = 50;
+            // 
+            // NL_vpnStatus
+            // 
+            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_vpnStatus.DefaultCellStyle = dataGridViewCellStyle9;
+            NL_vpnStatus.HeaderText = "Status";
+            NL_vpnStatus.Name = "NL_vpnStatus";
+            NL_vpnStatus.ReadOnly = true;
+            // 
+            // NL_notes
+            // 
+            NL_notes.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            NL_notes.HeaderText = "Notes";
+            NL_notes.Name = "NL_notes";
+            NL_notes.ReadOnly = true;
             // 
             // tabBans
             // 
@@ -2400,10 +2495,13 @@
             groupBox16.ResumeLayout(false);
             tableLayoutPanel24.ResumeLayout(false);
             tableLayoutPanel24.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)num_NetLimiterPort).EndInit();
             tableLayoutPanel25.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)num_NetLimiterConThreshold).EndInit();
             tableLayoutPanel26.ResumeLayout(false);
+            groupBox17.ResumeLayout(false);
+            tableLayoutPanel13.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dg_NetlimiterConnectionLog).EndInit();
             ResumeLayout(false);
         }
 
@@ -2532,25 +2630,24 @@
         private Panel panel4;
         private GroupBox groupBox16;
         private TableLayoutPanel tableLayoutPanel24;
-        private CheckBox checkBox13;
-        private NumericUpDown numericUpDown1;
-        private TextBox textBox2;
+        private NumericUpDown num_NetLimiterPort;
+        private TextBox textBox_NetLimiterHost;
         private Label label8;
-        private TextBox textBox3;
-        private TextBox textBox4;
+        private TextBox textBox_NetLimiterUsername;
+        private TextBox textBox_NetLimiterPassword;
         private TableLayoutPanel tableLayoutPanel25;
-        private ComboBox comboBox1;
-        private FontAwesome.Sharp.IconButton iconButton1;
+        private ComboBox comboBox_NetLimiterFilterName;
+        private FontAwesome.Sharp.IconButton btn_netLimiterRefresh;
         private Label label9;
-        private CheckBox checkBox14;
-        private NumericUpDown numericUpDown2;
+        private CheckBox checkBox_NetLimiterEnableConLimit;
+        private NumericUpDown num_NetLimiterConThreshold;
         private Label label10;
         private Label label11;
         private Label label12;
         private GroupBox groupBox17;
         private TableLayoutPanel tableLayoutPanel26;
         private FontAwesome.Sharp.IconButton iconButton3;
-        private FontAwesome.Sharp.IconButton iconButton2;
+        private FontAwesome.Sharp.IconButton btn_netLimiterSave;
         private FontAwesome.Sharp.IconButton blControlRefresh;
         private FontAwesome.Sharp.IconButton wlControlRefresh;
         private FontAwesome.Sharp.IconButton blacklist_btnClose;
@@ -2562,5 +2659,13 @@
         private DataGridViewTextBoxColumn proxy_countyCode;
         private DataGridViewTextBoxColumn proxy_countyName;
         private CheckBox cb_serviceIP2LocationIO;
+        public CheckBox checkBox_EnableNetLimiter;
+        private TableLayoutPanel tableLayoutPanel13;
+        public DataGridView dg_NetlimiterConnectionLog;
+        private DataGridViewTextBoxColumn NL_rowID;
+        private DataGridViewTextBoxColumn NL_ipAddress;
+        private DataGridViewTextBoxColumn NL_numCons;
+        private DataGridViewTextBoxColumn NL_vpnStatus;
+        private DataGridViewTextBoxColumn NL_notes;
     }
 }

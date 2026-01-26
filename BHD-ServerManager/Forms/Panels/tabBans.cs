@@ -22,11 +22,12 @@ namespace BHD_ServerManager.Forms.Panels
     {
         // --- Instance Objects ---
         private banInstance? instanceBans => CommonCore.instanceBans;
+        private theInstance? theInstance => CommonCore.theInstance;
 
         public tabBans()
         {
             InitializeComponent();
-            
+
             // Load Data into DataGridViews
             LoadBlacklistGrids();
             LoadWhitelistGrids();
@@ -34,6 +35,7 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Load Settings
             ProxyCheck_LoadSettings(null!, null!);
+            NetLimiter_LoadSettings(null!, null!);
 
             // Initialize Form Controls
             BlacklistForm_Initialize();
@@ -41,6 +43,31 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Wire up tab change event
             banControls.SelectedIndexChanged += BanControls_SelectedIndexChanged;
+        }
+
+        public void tickerUpdate()
+        {
+            AppDebug.Log("tabBans", "Ticker update - checking NetLimiter settings lockdown");          
+            // NetLimiter Settings Lockdown
+            bool netLimiterProcessAttached = (NetLimiterClient._bridgeProcess != null);
+            bool shouldBeEnabled = !netLimiterProcessAttached;
+    
+            // Only update if the state has changed
+            if (textBox_NetLimiterHost.Enabled != shouldBeEnabled)
+            {
+                textBox_NetLimiterHost.Enabled = shouldBeEnabled;
+                num_NetLimiterPort.Enabled = shouldBeEnabled;
+                textBox_NetLimiterUsername.Enabled = shouldBeEnabled;
+                textBox_NetLimiterPassword.Enabled = shouldBeEnabled;
+            }
+
+            if (theInstance!.proxyCheckEnabled && ProxyCheckManager.IsInitialized == false)
+            {
+                // Initialize Proxy Services
+                var proxyService = new ProxyCheckIoService(theInstance!.proxyCheckAPIKey);
+                ProxyCheckManager.Initialize(proxyService, cacheExpirationDays: (int) theInstance.proxyCheckCacheTime);
+            }
+
         }
 
         /// <summary>
@@ -63,8 +90,8 @@ namespace BHD_ServerManager.Forms.Panels
         // ================================================================================
         // BLACKLIST FUNCTIONALITY
         // ================================================================================
-        private int  _blacklistSelectedRecordIDName = -1;
-        private int  _blacklistSelectedRecordIDIP   = -1;
+        private int _blacklistSelectedRecordIDName = -1;
+        private int _blacklistSelectedRecordIDIP = -1;
 
         /// <summary>
         /// Load blacklist data from instanceBans into DataGridViews
@@ -98,7 +125,7 @@ namespace BHD_ServerManager.Forms.Panels
                 );
             }
 
-            AppDebug.Log("tabBans", 
+            AppDebug.Log("tabBans",
                 $"Loaded {instanceBans.BannedPlayerNames.Count} name bans and " +
                 $"{instanceBans.BannedPlayerIPs.Count} IP bans");
         }
@@ -248,13 +275,13 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
 
             // Determine ban type
-            var recordType = blacklist_PermBan.Checked 
-                ? banInstanceRecordType.Permanent 
+            var recordType = blacklist_PermBan.Checked
+                ? banInstanceRecordType.Permanent
                 : banInstanceRecordType.Temporary;
 
             // Temp Ban Expiration Date
-            DateTime? expireDate = recordType == banInstanceRecordType.Temporary 
-                ? blacklist_DateEnd.Value 
+            DateTime? expireDate = recordType == banInstanceRecordType.Temporary
+                ? blacklist_DateEnd.Value
                 : null;
 
             // Validate temporary ban has future end date
@@ -262,9 +289,9 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 if (expireDate.Value <= DateTime.Now)
                 {
-                    MessageBox.Show("Temporary ban end date must be greater than the current date and time.", 
-                        "Validation Error", 
-                        MessageBoxButtons.OK, 
+                    MessageBox.Show("Temporary ban end date must be greater than the current date and time.",
+                        "Validation Error",
+                        MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return;
                 }
@@ -287,7 +314,7 @@ namespace BHD_ServerManager.Forms.Panels
                 if (blacklist_PlayerName.Visible && !string.IsNullOrWhiteSpace(blacklist_PlayerNameTxt.Text))
                 {
                     string playerName = blacklist_PlayerNameTxt.Text.Trim();
-    
+
                     if (_blacklistSelectedRecordIDName == -1)
                     {
                         // Create new record
@@ -310,7 +337,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                         // Add to in-memory list
                         instanceBans.BannedPlayerNames.Add(nameRecord);
-        
+
                         // Add to DataGridView
                         dgPlayerNamesBlacklist.Rows.Add(
                             nameRecord.RecordID,
@@ -358,8 +385,8 @@ namespace BHD_ServerManager.Forms.Panels
                 {
                     if (IPAddress.TryParse(blacklist_IPAddressTxt.Text.Trim(), out IPAddress? ipAddress))
                     {
-                        int subnetMask = int.TryParse(blacklist_IPSubnetTxt.Text, out int subnet) 
-                            ? subnet 
+                        int subnetMask = int.TryParse(blacklist_IPSubnetTxt.Text, out int subnet)
+                            ? subnet
                             : 32;
 
                         if (_blacklistSelectedRecordIDIP == -1)
@@ -426,7 +453,7 @@ namespace BHD_ServerManager.Forms.Panels
                     }
                     else
                     {
-                        MessageBox.Show("Invalid IP Address format.", "Validation Error", 
+                        MessageBox.Show("Invalid IP Address format.", "Validation Error",
                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
@@ -446,12 +473,12 @@ namespace BHD_ServerManager.Forms.Panels
                 Blacklist_Reset_Click(sender, e);
                 blacklistForm.Visible = false;
 
-                MessageBox.Show("Ban record saved successfully.", "Success", 
+                MessageBox.Show("Ban record saved successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving ban record: {ex.Message}", "Error", 
+                MessageBox.Show($"Error saving ban record: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 AppDebug.Log("tabBans", $"Error saving ban: {ex}");
             }
@@ -488,13 +515,13 @@ namespace BHD_ServerManager.Forms.Panels
             _blacklistSelectedRecordIDIP = -1;
             // Reset and Hide
             Blacklist_Reset_Click(sender, e);
-            
+
             // Control Buttons
             blacklist_btnClose.Visible = false;
             blacklist_btnSave.Visible = false;
             blacklist_btnDelete.Visible = false;
             blacklist_btnReset.Visible = false;
-            
+
             blacklistForm.Visible = false;
 
         }
@@ -519,11 +546,11 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             // Find the records
-            banInstancePlayerName? nameRecord = hasNameRecord 
+            banInstancePlayerName? nameRecord = hasNameRecord
                 ? instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDName)
                 : null;
-    
-            banInstancePlayerIP? ipRecord = hasIPRecord 
+
+            banInstancePlayerIP? ipRecord = hasIPRecord
                 ? instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDIP)
                 : null;
 
@@ -531,7 +558,7 @@ namespace BHD_ServerManager.Forms.Panels
             int associatedIPID = nameRecord?.AssociatedIP ?? 0;
             int associatedNameID = ipRecord?.AssociatedName ?? 0;
 
-            bool hasAssociation = (associatedIPID > 0 && hasNameRecord) || 
+            bool hasAssociation = (associatedIPID > 0 && hasNameRecord) ||
                                  (associatedNameID > 0 && hasIPRecord);
 
             RecordDeleteAction deleteAction;
@@ -539,8 +566,8 @@ namespace BHD_ServerManager.Forms.Panels
             if (hasAssociation)
             {
                 // Show dialog with options
-                deleteAction = Blacklist_ShowDeleteConfirmationDialog(hasNameRecord, hasIPRecord, 
-                    nameRecord?.PlayerName ?? "", 
+                deleteAction = Blacklist_ShowDeleteConfirmationDialog(hasNameRecord, hasIPRecord,
+                    nameRecord?.PlayerName ?? "",
                     ipRecord != null ? $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}" : "");
             }
             else
@@ -548,7 +575,7 @@ namespace BHD_ServerManager.Forms.Panels
                 // Simple confirmation
                 string recordType = hasNameRecord ? "player name" : "IP address";
                 string recordValue = hasNameRecord ? nameRecord?.PlayerName ?? "" : $"{ipRecord?.PlayerIP}/{ipRecord?.SubnetMask}";
-        
+
                 var result = MessageBox.Show(
                     $"Are you sure you want to delete this {recordType} ban?\n\n{recordValue}",
                     "Confirm Delete",
@@ -685,7 +712,7 @@ namespace BHD_ServerManager.Forms.Panels
         private RecordDeleteAction Blacklist_ShowDeleteConfirmationDialog(bool hasName, bool hasIP, string playerName, string ipAddress)
         {
             string message = "This record has an associated ";
-    
+
             if (hasName && hasIP)
             {
                 message = $"These records are linked:\n\nPlayer Name: {playerName}\nIP Address: {ipAddress}\n\nWhat would you like to delete?";
@@ -871,7 +898,7 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Load common data (use nameRecord first, fallback to ipRecord)
             var dataRecord = nameRecord ?? (object?)ipRecord;
-    
+
             if (nameRecord != null)
             {
                 blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
@@ -1130,9 +1157,9 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 if (expireDate.Value <= DateTime.Now)
                 {
-                    MessageBox.Show("Temporary whitelist end date must be greater than the current date and time.", 
-                        "Validation Error", 
-                        MessageBoxButtons.OK, 
+                    MessageBox.Show("Temporary whitelist end date must be greater than the current date and time.",
+                        "Validation Error",
+                        MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return;
                 }
@@ -1790,55 +1817,82 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Load and display proxy check settings
         /// </summary>
+        /// <summary>
+        /// Load and display proxy check settings from instance
+        /// </summary>
         private void ProxyCheck_LoadSettings(object sender, EventArgs e)
         {
+            if (theInstance == null)
+                return;
+
+            // Load settings from database into instance if not already loaded
+            theInstance.proxyCheckEnabled = ServerSettings.Get("proxyCheckEnabled", theInstance.proxyCheckEnabled);
+            theInstance.proxyCheckAPIKey = ServerSettings.Get("proxyCheckAPIKey", theInstance.proxyCheckAPIKey);
+            theInstance.proxyCheckCacheTime = ServerSettings.Get("proxyCheckCacheTime", theInstance.proxyCheckCacheTime);
+            theInstance.proxyCheckProxyAction = ServerSettings.Get("proxyCheckProxyAction", theInstance.proxyCheckProxyAction);
+            theInstance.proxyCheckVPNAction = ServerSettings.Get("proxyCheckVPNAction", theInstance.proxyCheckVPNAction);
+            theInstance.proxyCheckTORAction = ServerSettings.Get("proxyCheckTORAction", theInstance.proxyCheckTORAction);
+            theInstance.proxyCheckGeoMode = ServerSettings.Get("proxyCheckGeoMode", theInstance.proxyCheckGeoMode);
+            theInstance.proxyCheckServiceProvider = ServerSettings.Get("proxyCheckServiceProvider", theInstance.proxyCheckServiceProvider);
+
             // General API Information and Overall Enablement
-            cb_enableProxyCheck.Checked = ServerSettings.Get("proxyCheckEnabled", false);
-            textBox_ProxyAPIKey.Text    = ServerSettings.Get("proxyCheckAPIKey", string.Empty);
-            num_proxyCacheDays.Value    = ServerSettings.Get("proxyCheckCacheTime", 30);
-            
+            cb_enableProxyCheck.Checked = theInstance.proxyCheckEnabled;
+            textBox_ProxyAPIKey.Text = theInstance.proxyCheckAPIKey;
+            num_proxyCacheDays.Value = theInstance.proxyCheckCacheTime;
+
             // Proxy Checkboxes
-            checkBox_proxyNone.Checked  = (ServerSettings.Get("proxyCheckProxyAction", 0) == 0? true : false);
-            checkBox_proxyKick.Checked  = (ServerSettings.Get("proxyCheckProxyAction", 0) == 1? true : false);
-            checkBox_proxyBlock.Checked = (ServerSettings.Get("proxyCheckProxyAction", 0) == 2? true : false);
+            checkBox_proxyNone.Checked = (theInstance.proxyCheckProxyAction == 0);
+            checkBox_proxyKick.Checked = (theInstance.proxyCheckProxyAction == 1);
+            checkBox_proxyBlock.Checked = (theInstance.proxyCheckProxyAction == 2);
+
             // VPN Checkboxes
-            checkBox_vpnNone.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 0? true : false);
-            checkBox_vpnKick.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 1? true : false);
-            checkBox_vpnBlock.Checked = (ServerSettings.Get("proxyCheckVPNAction", 0) == 2? true : false);
+            checkBox_vpnNone.Checked = (theInstance.proxyCheckVPNAction == 0);
+            checkBox_vpnKick.Checked = (theInstance.proxyCheckVPNAction == 1);
+            checkBox_vpnBlock.Checked = (theInstance.proxyCheckVPNAction == 2);
+
             // TOR Checkboxes
-            checkBox_torNone.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 0? true : false);
-            checkBox_torKick.Checked  = (ServerSettings.Get("proxyCheckVPNAction", 0) == 1? true : false);
-            checkBox_torBlock.Checked = (ServerSettings.Get("proxyCheckVPNAction", 0) == 2? true : false);
-            
+            checkBox_torNone.Checked = (theInstance.proxyCheckTORAction == 0);
+            checkBox_torKick.Checked = (theInstance.proxyCheckTORAction == 1);
+            checkBox_torBlock.Checked = (theInstance.proxyCheckTORAction == 2);
+
+            // GEO Checkboxes
+            checkBox_GeoOff.Checked = (theInstance.proxyCheckGeoMode == 0);
+            checkBox_GeoBlock.Checked = (theInstance.proxyCheckGeoMode == 1);
+            checkBox_GeoAllow.Checked = (theInstance.proxyCheckGeoMode == 2);
+
             // Proxy Checking Service Providers
-            cb_serviceProxyCheckIO.Checked = (ServerSettings.Get("proxyCheckServiceProvider", 0) == 1 ? true : false);
-            cb_serviceIP2LocationIO.Checked = (ServerSettings.Get("proxyCheckServiceProvider", 0) == 2 ? true : false);
+            cb_serviceProxyCheckIO.Checked = (theInstance.proxyCheckServiceProvider == 1);
+            cb_serviceIP2LocationIO.Checked = (theInstance.proxyCheckServiceProvider == 2);
         }
 
         private void ProxyCheck_SaveSettings(object sender, EventArgs e)
         {
-            // General API Information and Overall Enablement
-            ServerSettings.Set("proxyCheckEnabled", cb_enableProxyCheck.Checked);
-            ServerSettings.Set("proxyCheckAPIKey", textBox_ProxyAPIKey.Text);
-            ServerSettings.Set("proxyCheckCacheTime", (int)num_proxyCacheDays.Value);
-    
-            // Proxy Checkboxes
-            int proxyAction = checkBox_proxyBlock.Checked ? 2 : (checkBox_proxyKick.Checked ? 1 : 0);
-            ServerSettings.Set("proxyCheckProxyAction", proxyAction);
-    
-            // VPN Checkboxes
-            int vpnAction = checkBox_vpnBlock.Checked ? 2 : (checkBox_vpnKick.Checked ? 1 : 0);
-            ServerSettings.Set("proxyCheckVPNAction", vpnAction);
-    
-            // TOR Checkboxes
-            int torAction = checkBox_torBlock.Checked ? 2 : (checkBox_torKick.Checked ? 1 : 0);
-            ServerSettings.Set("proxyCheckTORAction", torAction);
+            if (theInstance == null)
+                return;
 
-            // Proxy Checking Service Providers
-            ServerSettings.Set("proxyCheckServiceProvider", 0);
-            if (cb_serviceProxyCheckIO.Checked) { ServerSettings.Set("proxyCheckServiceProvider", 1); }
-            if (cb_serviceIP2LocationIO.Checked) { ServerSettings.Set("proxyCheckServiceProvider", 2); }
+            // Update instance properties
+            theInstance.proxyCheckEnabled = cb_enableProxyCheck.Checked;
+            theInstance.proxyCheckAPIKey = textBox_ProxyAPIKey.Text;
+            theInstance.proxyCheckCacheTime = num_proxyCacheDays.Value;
+            theInstance.proxyCheckProxyAction = checkBox_proxyBlock.Checked ? 2 : (checkBox_proxyKick.Checked ? 1 : 0);
+            theInstance.proxyCheckVPNAction = checkBox_vpnBlock.Checked ? 2 : (checkBox_vpnKick.Checked ? 1 : 0);
+            theInstance.proxyCheckTORAction = checkBox_torBlock.Checked ? 2 : (checkBox_torKick.Checked ? 1 : 0);
+            theInstance.proxyCheckGeoMode = checkBox_GeoBlock.Checked ? 1 : (checkBox_GeoAllow.Checked ? 2 : 0);
+            theInstance.proxyCheckServiceProvider = 0;
+            theInstance.proxyCheckServiceProvider = (cb_serviceProxyCheckIO.Checked ? 1 : theInstance.proxyCheckServiceProvider);
+            theInstance.proxyCheckServiceProvider = (cb_serviceIP2LocationIO.Checked ? 2 : theInstance.proxyCheckServiceProvider);
 
+            // Persist to database
+            ServerSettings.Set("proxyCheckEnabled", theInstance.proxyCheckEnabled);
+            ServerSettings.Set("proxyCheckAPIKey", theInstance.proxyCheckAPIKey);
+            ServerSettings.Set("proxyCheckCacheTime", theInstance.proxyCheckCacheTime);
+            ServerSettings.Set("proxyCheckProxyAction", theInstance.proxyCheckProxyAction);
+            ServerSettings.Set("proxyCheckVPNAction", theInstance.proxyCheckVPNAction);
+            ServerSettings.Set("proxyCheckTORAction", theInstance.proxyCheckTORAction);
+            ServerSettings.Set("proxyCheckGeoMode", theInstance.proxyCheckGeoMode);
+            ServerSettings.Set("proxyCheckServiceProvider", theInstance.proxyCheckServiceProvider);
+
+            AppDebug.Log("tabBans", "Proxy check settings saved to database");
         }
 
         private void ProxyCheck_CBServicesChanged(object sender, EventArgs e)
@@ -1926,7 +1980,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 // Add to database
                 int newRecordId = DatabaseManager.AddProxyBlockedCountry(countryCode, countryName);
-        
+
                 if (newRecordId > 0)
                 {
                     // Add to in-memory list
@@ -2101,7 +2155,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                 // Test with a known IP address (Google DNS - should not be a proxy/VPN)
                 var testIP = IPAddress.Parse("8.8.8.8");
-        
+
                 AppDebug.Log("tabBans", $"Testing {serviceName} with IP: {testIP}");
 
                 // Make the API call
@@ -2119,7 +2173,7 @@ namespace BHD_ServerManager.Forms.Panels
                     resultMessage.AppendLine($"  • Proxy: {(result.IsProxy ? "Yes" : "No")}");
                     resultMessage.AppendLine($"  • Tor: {(result.IsTor ? "Yes" : "No")}");
                     resultMessage.AppendLine($"  • Risk Score: {result.RiskScore}/100");
-            
+
                     if (!string.IsNullOrEmpty(result.CountryName))
                     {
                         resultMessage.AppendLine($"");
@@ -2130,7 +2184,7 @@ namespace BHD_ServerManager.Forms.Panels
                         if (!string.IsNullOrEmpty(result.City))
                             resultMessage.AppendLine($"  • City: {result.City}");
                     }
-            
+
                     if (!string.IsNullOrEmpty(result.Provider))
                     {
                         resultMessage.AppendLine($"");
@@ -2171,6 +2225,134 @@ namespace BHD_ServerManager.Forms.Panels
                     button.Enabled = true;
                     button.Text = "Test Service";
                 }
+            }
+        }
+
+        // ================================================================================
+        // NETLIMITER CHECKING FUNCTIONALITY
+        // ================================================================================
+
+        /// <summary>
+        /// Load and display NetLimiter settings from instance
+        /// </summary>
+        private void NetLimiter_LoadSettings(object sender, EventArgs e)
+        {
+            if (theInstance == null)
+                return;
+
+            // Load settings from database into instance if not already loaded
+            theInstance.netLimiterEnabled = ServerSettings.Get("netLimiterEnabled", theInstance.netLimiterEnabled);
+            theInstance.netLimiterHost = ServerSettings.Get("netLimiterHost", theInstance.netLimiterHost);
+            theInstance.netLimiterPort = ServerSettings.Get("netLimiterPort", theInstance.netLimiterPort);
+            theInstance.netLimiterUsername = ServerSettings.Get("netLimiterUsername", theInstance.netLimiterUsername);
+            theInstance.netLimiterPassword = ServerSettings.Get("netLimiterPassword", theInstance.netLimiterPassword);
+            theInstance.netLimiterFilterName = ServerSettings.Get("netLimiterFilterName", theInstance.netLimiterFilterName);
+            theInstance.netLimiterEnableConLimit = ServerSettings.Get("netLimiterEnableConLimit", theInstance.netLimiterEnableConLimit);
+            theInstance.netLimiterConThreshold = ServerSettings.Get("netLimiterConThreshold", theInstance.netLimiterConThreshold);
+
+            // NetLimiter Integration Settings
+            checkBox_EnableNetLimiter.Checked = theInstance.netLimiterEnabled;
+            textBox_NetLimiterHost.Text = theInstance.netLimiterHost;
+            num_NetLimiterPort.Value = theInstance.netLimiterPort;
+            textBox_NetLimiterUsername.Text = theInstance.netLimiterUsername;
+            textBox_NetLimiterPassword.Text = theInstance.netLimiterPassword;
+            comboBox_NetLimiterFilterName.Text = theInstance.netLimiterFilterName;
+            checkBox_NetLimiterEnableConLimit.Checked = theInstance.netLimiterEnableConLimit;
+            num_NetLimiterConThreshold.Value = theInstance.netLimiterConThreshold;
+        }
+
+        /// <summary>
+        /// Save NetLimiter settings to instance and database
+        /// </summary>
+        private void NetLimiter_SaveSettings(object sender, EventArgs e)
+        {
+            if (theInstance == null)
+                return;
+
+            // Update instance properties
+            theInstance.netLimiterEnabled = checkBox_EnableNetLimiter.Checked;
+            theInstance.netLimiterHost = textBox_NetLimiterHost.Text.Trim();
+            theInstance.netLimiterPort = (int)num_NetLimiterPort.Value;
+            theInstance.netLimiterUsername = textBox_NetLimiterUsername.Text.Trim();
+            theInstance.netLimiterPassword = textBox_NetLimiterPassword.Text;
+            theInstance.netLimiterFilterName = comboBox_NetLimiterFilterName.Text.Trim();
+            theInstance.netLimiterEnableConLimit = checkBox_NetLimiterEnableConLimit.Checked;
+            theInstance.netLimiterConThreshold = num_NetLimiterConThreshold.Value;
+
+            // Persist to database
+            ServerSettings.Set("netLimiterEnabled", theInstance.netLimiterEnabled);
+            ServerSettings.Set("netLimiterHost", theInstance.netLimiterHost);
+            ServerSettings.Set("netLimiterPort", theInstance.netLimiterPort);
+            ServerSettings.Set("netLimiterUsername", theInstance.netLimiterUsername);
+            ServerSettings.Set("netLimiterPassword", theInstance.netLimiterPassword);
+            ServerSettings.Set("netLimiterFilterName", theInstance.netLimiterFilterName);
+            ServerSettings.Set("netLimiterEnableConLimit", theInstance.netLimiterEnableConLimit);
+            ServerSettings.Set("netLimiterConThreshold", theInstance.netLimiterConThreshold);
+
+            AppDebug.Log("tabBans", "NetLimiter settings saved to database");
+        }
+
+        public async void NetLimiter_RefreshFilters(object sender, EventArgs e)
+        {
+            // Start Process
+            if (!NetLimiter_StartBridge())
+            {
+                MessageBox.Show("Failed to start/access the NetLimiter Bridge process. Please ensure NetLimiter is installed and try again.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            List<string> filters = await NetLimiterClient.GetFilterNamesAsync();
+
+            if (filters.Count == 0)
+            {
+                MessageBox.Show("No filters were retrieved from NetLimiter. Please ensure filters are configured in NetLimiter.",
+                    "No Filters Found",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            comboBox_NetLimiterFilterName.Items.Clear();
+            foreach (var filter in filters)
+            {
+                comboBox_NetLimiterFilterName.Items.Add(filter);
+            }
+
+        }
+
+        public bool NetLimiter_StartBridge()
+        {
+            if (theInstance == null)
+                return false;
+
+            // If bridge is already running, return true
+            if (NetLimiterClient._bridgeProcess != null && !NetLimiterClient._bridgeProcess.HasExited)
+            {
+                return true;
+            }
+
+            try
+            {
+                // Always pass connection parameters, even for localhost
+                NetLimiterClient.StartBridgeProcess(
+                    theInstance.netLimiterHost,
+                    (ushort)theInstance.netLimiterPort,
+                    theInstance.netLimiterUsername,
+                    theInstance.netLimiterPassword);
+
+                return (NetLimiterClient._bridgeProcess != null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error starting NetLimiter Bridge process: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                AppDebug.Log("tabBans", $"Error starting NetLimiter Bridge process: {ex}");
+                return false;
             }
         }
     }

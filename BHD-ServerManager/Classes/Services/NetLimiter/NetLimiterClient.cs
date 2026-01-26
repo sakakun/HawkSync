@@ -18,7 +18,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
         private static NamedPipeClientStream? _pipeClient;
         private static SemaphoreSlim _pipeLock = new SemaphoreSlim(1, 1);
 
-        private static Process? _bridgeProcess;
+        public static Process? _bridgeProcess;
 
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
@@ -233,10 +233,15 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		            throw new FileNotFoundException($"NetLimiterBridge.exe not found at {bridgePath}");
 		        }
 
+				string varArguments = string.Empty;
+                if (hostname.Contains("localhost") || hostname.Contains("127.0.0.1")) {
+					varArguments = $"{hostname} {port} {username} {password}";
+				}
+
 		        var startInfo = new ProcessStartInfo
 		        {
 		            FileName = bridgePath,
-		            Arguments = $"{hostname} {port} {username} {password}",
+					Arguments = varArguments,
 		            UseShellExecute = false,
 		            CreateNoWindow = true, // Hide console window
 		            RedirectStandardOutput = true,

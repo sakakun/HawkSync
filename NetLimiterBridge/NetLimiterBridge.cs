@@ -25,7 +25,7 @@ namespace NetLimiterBridge
         private int _connectionLimit;
         private int _monitoredAppId;
 
-        public async Task RunAsync(string hostname, ushort port, string username, string password)
+        public async Task RunAsync(string hostname, ushort port, string username = "", string password = "")
         {
             SecureString securePassword = CreateSecurePassword(password);
             _client = new NLClient();

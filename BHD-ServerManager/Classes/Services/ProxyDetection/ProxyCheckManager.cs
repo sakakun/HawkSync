@@ -1,62 +1,47 @@
 ﻿using BHD_ServerManager.Classes.Instances;
+using BHD_ServerManager.Classes.CoreObjects;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
 
 namespace BHD_ServerManager.Classes.SupportClasses
 {
     /// <summary>
-    /// Manages proxy checking with in-memory caching using banInstance.ProxyRecords.
+    /// Static manager for proxy checking with in-memory caching using CommonCore.instanceBans.ProxyRecords.
     /// Reduces database I/O by checking memory first, then database, then API.
     /// </summary>
-    public class ProxyCheckManager
+    public static class ProxyCheckManager
     {
-        private readonly banInstance _banInstance;
-        private readonly IProxyCheckService _proxyService;
-        private readonly TimeSpan _cacheExpiration;
-        private readonly object _lock = new();
+        private static IProxyCheckService? _proxyService;
+        private static TimeSpan _cacheExpiration = TimeSpan.FromDays(7);
+        private static readonly object _lock = new();
+
+        public static bool IsInitialized => _proxyService != null;
 
         /// <summary>
-        /// Initialize the proxy check manager.
+        /// Initialize the proxy check manager with a service provider.
+        /// Call this during application startup after CommonCore.InitializeCore().
         /// </summary>
-        /// <param name="banInstance">The ban instance containing the in-memory proxy records</param>
         /// <param name="proxyService">The proxy check service to use (e.g., ProxyCheck.io)</param>
         /// <param name="cacheExpirationDays">Number of days before cache expires (default: 7)</param>
-        public ProxyCheckManager(banInstance banInstance, IProxyCheckService proxyService, int cacheExpirationDays = 7)
+        public static void Initialize(IProxyCheckService proxyService, int cacheExpirationDays = 7)
         {
-            _banInstance = banInstance ?? throw new ArgumentNullException(nameof(banInstance));
             _proxyService = proxyService ?? throw new ArgumentNullException(nameof(proxyService));
             _cacheExpiration = TimeSpan.FromDays(cacheExpirationDays);
-        }
-
-        /// <summary>
-        /// Load all proxy records from the database into memory.
-        /// Call this during application initialization.
-        /// </summary>
-        public int LoadCacheFromDatabase()
-        {
-            var dbRecords = DatabaseManager.GetProxyRecords();
-            
-            lock (_lock)
-            {
-                // Clear existing records to avoid duplicates
-                _banInstance.ProxyRecords.Clear();
-                
-                // Add all database records to memory
-                _banInstance.ProxyRecords.AddRange(dbRecords);
-            }
-
-            AppDebug.Log("ProxyCheckManager", $"Loaded {dbRecords.Count} proxy records from database into memory");
-            return dbRecords.Count;
+            AppDebug.Log("ProxyCheckManager", $"Initialized with {proxyService.ServiceName}, cache expiration: {cacheExpirationDays} days");
         }
 
         /// <summary>
         /// Reload cache from database, merging with existing in-memory records.
         /// Useful if another process might have updated the database.
         /// </summary>
-        public int ReloadCacheFromDatabase(bool replaceExisting = true)
+        public static int ReloadCacheFromDatabase(bool replaceExisting = true)
         {
+            if (CommonCore.instanceBans == null)
+                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+
             var dbRecords = DatabaseManager.GetProxyRecords();
             int addedCount = 0;
             int updatedCount = 0;
@@ -65,7 +50,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             {
                 foreach (var dbRecord in dbRecords)
                 {
-                    var existingRecord = _banInstance.ProxyRecords
+                    var existingRecord = CommonCore.instanceBans.ProxyRecords
                         .FirstOrDefault(r => r.IPAddress.Equals(dbRecord.IPAddress));
 
                     if (existingRecord != null)
@@ -89,7 +74,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     else
                     {
                         // Add new record
-                        _banInstance.ProxyRecords.Add(dbRecord);
+                        CommonCore.instanceBans.ProxyRecords.Add(dbRecord);
                         addedCount++;
                     }
                 }
@@ -104,8 +89,16 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <summary>
         /// Check an IP address for proxy/VPN/Tor. Uses in-memory cache first, then database, then API.
         /// </summary>
-        public async Task<ProxyCheckResult> CheckIPAsync(IPAddress ipAddress)
+        public static async Task<ProxyCheckResult> CheckIPAsync(IPAddress ipAddress)
         {
+            AppDebug.Log("CheckIPAsync", $"Attempting to check: {ipAddress.ToString()}");
+
+            if (CommonCore.instanceBans == null)
+                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+
+            if (_proxyService == null)
+                throw new InvalidOperationException("ProxyCheckManager is not initialized. Call Initialize() first.");
+
             if (ipAddress == null)
                 throw new ArgumentNullException(nameof(ipAddress));
 
@@ -126,9 +119,9 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     // Add to memory cache
                     lock (_lock)
                     {
-                        if (!_banInstance.ProxyRecords.Any(r => r.IPAddress.Equals(dbRecord.IPAddress)))
+                        if (!CommonCore.instanceBans.ProxyRecords.Any(r => r.IPAddress.Equals(dbRecord.IPAddress)))
                         {
-                            _banInstance.ProxyRecords.Add(dbRecord);
+                            CommonCore.instanceBans.ProxyRecords.Add(dbRecord);
                         }
                     }
 
@@ -169,18 +162,18 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <summary>
         /// Get a record from the in-memory cache.
         /// </summary>
-        private proxyRecord? GetFromMemoryCache(IPAddress ipAddress)
+        private static proxyRecord? GetFromMemoryCache(IPAddress ipAddress)
         {
             lock (_lock)
             {
-                return _banInstance.ProxyRecords.FirstOrDefault(r => r.IPAddress.Equals(ipAddress));
+                return CommonCore.instanceBans!.ProxyRecords.FirstOrDefault(r => r.IPAddress.Equals(ipAddress));
             }
         }
 
         /// <summary>
         /// Check if a cache record has expired.
         /// </summary>
-        private bool IsCacheExpired(proxyRecord record)
+        private static bool IsCacheExpired(proxyRecord record)
         {
             return DateTime.UtcNow > record.CacheExpiry;
         }
@@ -188,7 +181,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <summary>
         /// Update the cache (both memory and database) with new API results.
         /// </summary>
-        private void UpdateCache(IPAddress ipAddress, ProxyCheckResult apiResult, proxyRecord? existingRecord)
+        private static void UpdateCache(IPAddress ipAddress, ProxyCheckResult apiResult, proxyRecord? existingRecord)
         {
             var now = DateTime.UtcNow;
 
@@ -241,7 +234,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     // Add to memory cache
                     lock (_lock)
                     {
-                        _banInstance.ProxyRecords.Add(newRecord);
+                        CommonCore.instanceBans!.ProxyRecords.Add(newRecord);
                     }
 
                     AppDebug.Log("ProxyCheckManager", $"Added new cache entry for {ipAddress} (ID: {newId})");
@@ -252,7 +245,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <summary>
         /// Convert a proxyRecord to a ProxyCheckResult.
         /// </summary>
-        private ProxyCheckResult ConvertToResult(proxyRecord record, bool fromCache)
+        private static ProxyCheckResult ConvertToResult(proxyRecord record, bool fromCache)
         {
             return new ProxyCheckResult
             {
@@ -271,11 +264,14 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <summary>
         /// Manually invalidate cache for a specific IP (forces re-check on next query).
         /// </summary>
-        public void InvalidateCache(IPAddress ipAddress)
+        public static void InvalidateCache(IPAddress ipAddress)
         {
+            if (CommonCore.instanceBans == null)
+                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+
             lock (_lock)
             {
-                var record = _banInstance.ProxyRecords.FirstOrDefault(r => r.IPAddress.Equals(ipAddress));
+                var record = CommonCore.instanceBans.ProxyRecords.FirstOrDefault(r => r.IPAddress.Equals(ipAddress));
                 if (record != null)
                 {
                     record.CacheExpiry = DateTime.UtcNow.AddSeconds(-1);
@@ -287,13 +283,16 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <summary>
         /// Clear expired cache entries from memory and optionally from database.
         /// </summary>
-        public int CleanupExpiredCache(bool removeFromDatabase = false)
+        public static int CleanupExpiredCache(bool removeFromDatabase = false)
         {
+            if (CommonCore.instanceBans == null)
+                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+
             int removedCount = 0;
 
             lock (_lock)
             {
-                var expiredRecords = _banInstance.ProxyRecords
+                var expiredRecords = CommonCore.instanceBans.ProxyRecords
                     .Where(r => IsCacheExpired(r))
                     .ToList();
 
@@ -304,7 +303,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                         DatabaseManager.RemoveProxyRecord(record.RecordID);
                     }
 
-                    _banInstance.ProxyRecords.Remove(record);
+                    CommonCore.instanceBans.ProxyRecords.Remove(record);
                     removedCount++;
                 }
             }
@@ -320,15 +319,18 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <summary>
         /// Get cache statistics.
         /// </summary>
-        public CacheStatistics GetCacheStatistics()
+        public static CacheStatistics GetCacheStatistics()
         {
+            if (CommonCore.instanceBans == null)
+                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+
             lock (_lock)
             {
-                var total = _banInstance.ProxyRecords.Count;
-                var expired = _banInstance.ProxyRecords.Count(r => IsCacheExpired(r));
-                var vpnCount = _banInstance.ProxyRecords.Count(r => r.IsVpn);
-                var proxyCount = _banInstance.ProxyRecords.Count(r => r.IsProxy);
-                var torCount = _banInstance.ProxyRecords.Count(r => r.IsTor);
+                var total = CommonCore.instanceBans.ProxyRecords.Count;
+                var expired = CommonCore.instanceBans.ProxyRecords.Count(r => IsCacheExpired(r));
+                var vpnCount = CommonCore.instanceBans.ProxyRecords.Count(r => r.IsVpn);
+                var proxyCount = CommonCore.instanceBans.ProxyRecords.Count(r => r.IsProxy);
+                var torCount = CommonCore.instanceBans.ProxyRecords.Count(r => r.IsTor);
 
                 return new CacheStatistics
                 {
