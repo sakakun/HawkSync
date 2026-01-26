@@ -718,5 +718,182 @@ namespace BHD_ServerManager.Forms.Panels
                 MessageBox.Show("Sorry you can't skip currently, map is currently 'loading' please try again in a moment.", "Cannot Skip", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+        public void actionClick_backupPlaylist(object sender, EventArgs e)
+        {
+            if (dataGridView_currentMaps.Rows.Count == 0)
+            {
+                MessageBox.Show("Cannot backup an empty playlist.");
+                return;
+            }
+
+            SaveFileDialog saveDialog = new SaveFileDialog
+            {
+                Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*",
+                DefaultExt = "json",
+                FileName = $"Playlist_{theInstance!.SelectedMapPlaylist}_Backup_{DateTime.Now:yyyyMMdd_HHmmss}.json"
+            };
+
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var playlist = BuildPlaylistFromGrid();
+                    string json = System.Text.Json.JsonSerializer.Serialize(playlist, new System.Text.Json.JsonSerializerOptions 
+                    { 
+                        WriteIndented = true 
+                    });
+            
+                    File.WriteAllText(saveDialog.FileName, json);
+                    MessageBox.Show($"Playlist {theInstance!.SelectedMapPlaylist} backed up successfully to:\n{saveDialog.FileName}");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to backup playlist: {ex.Message}");
+                    AppDebug.Log("tabMaps", "actionClick_backupPlaylist: " + ex.Message);
+                }
+            }
+        }
+
+        public void actionClick_importPlaylist(object sender, EventArgs e)
+        {
+            OpenFileDialog openDialog = new OpenFileDialog
+            {
+                Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*",
+                DefaultExt = "json"
+            };
+
+            if (openDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string json = File.ReadAllText(openDialog.FileName);
+                    var importedMaps = System.Text.Json.JsonSerializer.Deserialize<List<mapFileInfo>>(json);
+
+                    if (importedMaps == null || importedMaps.Count == 0)
+                    {
+                        MessageBox.Show("The backup file contains no maps.");
+                        return;
+                    }
+
+                    // Build a lookup of available maps by MapFile and MapType
+                    var availableMapsLookup = new HashSet<(string MapFile, int MapType)>();
+                    foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
+                    {
+                        if (row.IsNewRow) continue;
+                
+                        string mapFile = row.Cells[2].Value?.ToString() ?? "";
+                        int mapType = (int)row.Cells[4].Value;
+                        availableMapsLookup.Add((mapFile, mapType));
+                    }
+
+                    // Clear current playlist
+                    dataGridView_currentMaps.Rows.Clear();
+
+                    int importedCount = 0;
+                    int skippedCount = 0;
+
+                    // Import only maps that exist in available maps
+                    foreach (var map in importedMaps)
+                    {
+                        if (availableMapsLookup.Contains((map.MapFile, map.MapType)))
+                        {
+                            int rowIndex = dataGridView_currentMaps.Rows.Add(
+                                dataGridView_currentMaps.Rows.Count + 1,
+                                map.MapName,
+                                map.MapFile,
+                                map.ModType,
+                                map.MapType,
+                                objectGameTypes.GetShortName(map.MapType)
+                            );
+                    
+                            DataGridViewRow newRow = dataGridView_currentMaps.Rows[rowIndex];
+                            string toolTip = $"Map File: {map.MapFile}";
+                            newRow.Cells[1].ToolTipText = toolTip;
+                    
+                            importedCount++;
+                        }
+                        else
+                        {
+                            skippedCount++;
+                            AppDebug.Log("tabMaps", $"Skipped unavailable map: {map.MapName} ({map.MapFile}) - Type: {map.MapType}");
+                        }
+                    }
+
+                    string message = $"Import complete.\n\nImported: {importedCount} maps";
+                    if (skippedCount > 0)
+                    {
+                        message += $"\nSkipped: {skippedCount} unavailable maps";
+                    }
+                    message += $"\n\nRemember to save the playlist to apply changes.";
+
+                    MessageBox.Show(message, "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to import playlist: {ex.Message}");
+                    AppDebug.Log("tabMaps", "actionClick_importPlaylist: " + ex.Message);
+                }
+            }
+        }
+
+        public void actionClick_randomizePlaylist(object sender, EventArgs e)
+        {
+            DataGridView grid = dataGridView_currentMaps;
+
+            if (grid.Rows.Count == 0 || (grid.Rows.Count == 1 && grid.Rows[0].IsNewRow))
+            {
+                MessageBox.Show("Cannot randomize an empty playlist.");
+                return;
+            }
+
+            // Store all current rows data
+            var mapList = new List<(object MapName, object MapFile, object ModType, object MapType, string ToolTip)>();
+    
+            foreach (DataGridViewRow row in grid.Rows)
+            {
+                if (row.IsNewRow)
+                    continue;
+
+                mapList.Add((
+                    row.Cells[1].Value,
+                    row.Cells[2].Value,
+                    row.Cells[3].Value,
+                    row.Cells[4].Value,
+                    row.Cells[1].ToolTipText
+                ));
+            }
+
+            // Randomize the list using Fisher-Yates shuffle
+            Random random = new Random();
+            for (int i = mapList.Count - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                (mapList[i], mapList[j]) = (mapList[j], mapList[i]);
+            }
+
+            // Clear and repopulate grid with randomized order
+            grid.Rows.Clear();
+
+            foreach (var map in mapList)
+            {
+                int rowIndex = grid.Rows.Add(
+                    0, // Temporary ID, will be renumbered
+                    map.MapName,
+                    map.MapFile,
+                    map.ModType,
+                    map.MapType,
+                    objectGameTypes.GetShortName((int)map.MapType)
+                );
+
+                grid.Rows[rowIndex].Cells[1].ToolTipText = map.ToolTip;
+            }
+
+            // Renumber the playlist order
+            methodFunction_renumberPlaylistOrder(grid);
+
+            MessageBox.Show($"Playlist {theInstance!.SelectedMapPlaylist} has been randomized.\n\nRemember to save the playlist to apply changes.", "Playlist Randomized", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
     }
 }

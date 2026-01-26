@@ -155,6 +155,9 @@ namespace BHD_ServerManager.Classes.Tickers
                         // Proxy/VPN/TOR and Geo-Blocking Checks
                         CheckAndPuntProxyViolations();
 
+                        // Role Restriction Checks
+                        CheckAndPuntDisabledRoles();
+
                     }
                 }
                 else
@@ -930,6 +933,77 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
 
                     // Punt the player
+                    ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                    AppDebug.Log("tickerBanManagement", $"Punting player '{player.PlayerName}' (Slot {slotNum}). Reason: {puntReason}");
+                }
+            }
+        }
+
+        // Check active players against role restrictions and punt if using disabled role
+        public static void CheckAndPuntDisabledRoles()
+        {
+            DateTime now = DateTime.Now;
+
+            // Cycle through all players in the player list
+            foreach (var kvp in theInstance.playerList)
+            {
+                int slotNum = kvp.Key;
+                playerObject player = kvp.Value;
+
+                // Only check players who were seen in the last 4 seconds (active players)
+                if ((now - player.PlayerLastSeen).TotalSeconds > 4)
+                    continue;
+
+                bool shouldPunt = false;
+                string puntReason = string.Empty;
+
+                // Check player's role against disabled roles
+                switch (player.RoleID)
+                {
+                    case (int)CharacterClass.CQB:
+                    case (int)CharacterClass.SAS_CQB:
+                        if (!theInstance.roleCQB)
+                        {
+                            shouldPunt = true;
+                            puntReason = "CQB role is disabled on this server";
+                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled CQB role.");
+                        }
+                        break;
+
+                    case (int)CharacterClass.MEDIC:
+                    case (int)CharacterClass.SAS_MEDIC:
+                        if (!theInstance.roleMedic)
+                        {
+                            shouldPunt = true;
+                            puntReason = "Medic role is disabled on this server";
+                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Medic role.");
+                        }
+                        break;
+
+                    case (int)CharacterClass.SNIPER:
+                    case (int)CharacterClass.SAS_SNIPER:
+                        if (!theInstance.roleSniper)
+                        {
+                            shouldPunt = true;
+                            puntReason = "Sniper role is disabled on this server";
+                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Sniper role.");
+                        }
+                        break;
+
+                    case (int)CharacterClass.GUNNER:
+                    case (int)CharacterClass.SAS_GUNNER:
+                        if (!theInstance.roleGunner)
+                        {
+                            shouldPunt = true;
+                            puntReason = "Gunner role is disabled on this server";
+                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Gunner role.");
+                        }
+                        break;
+                }
+
+                // Punt the player if they're using a disabled role
+                if (shouldPunt)
+                {
                     ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
                     AppDebug.Log("tickerBanManagement", $"Punting player '{player.PlayerName}' (Slot {slotNum}). Reason: {puntReason}");
                 }

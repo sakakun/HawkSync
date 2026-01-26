@@ -234,6 +234,7 @@
             btn_LoadSettings.Text = "LOAD";
             toolTip1.SetToolTip(btn_LoadSettings, "Load Settings from File");
             btn_LoadSettings.UseVisualStyleBackColor = true;
+            btn_LoadSettings.Click += actionClick_ImportSettings;
             // 
             // btn_ExportSettings
             // 
@@ -246,6 +247,7 @@
             btn_ExportSettings.Text = "EXPORT";
             toolTip1.SetToolTip(btn_ExportSettings, "Export Settings to File");
             btn_ExportSettings.UseVisualStyleBackColor = true;
+            btn_ExportSettings.Click += actionClick_ExportSettings;
             // 
             // btn_ResetSettings
             // 
@@ -1410,7 +1412,6 @@
             // 
             cb_roleCQB.AutoSize = true;
             cb_roleCQB.Dock = DockStyle.Fill;
-            cb_roleCQB.Enabled = false;
             cb_roleCQB.Location = new Point(10, 0);
             cb_roleCQB.Margin = new Padding(10, 0, 0, 0);
             cb_roleCQB.Name = "cb_roleCQB";
@@ -1423,7 +1424,6 @@
             // 
             cb_roleGunner.AutoSize = true;
             cb_roleGunner.Dock = DockStyle.Fill;
-            cb_roleGunner.Enabled = false;
             cb_roleGunner.Location = new Point(10, 26);
             cb_roleGunner.Margin = new Padding(10, 0, 0, 0);
             cb_roleGunner.Name = "cb_roleGunner";
@@ -1436,7 +1436,6 @@
             // 
             cb_roleMedic.AutoSize = true;
             cb_roleMedic.Dock = DockStyle.Fill;
-            cb_roleMedic.Enabled = false;
             cb_roleMedic.Location = new Point(10, 52);
             cb_roleMedic.Margin = new Padding(10, 0, 0, 0);
             cb_roleMedic.Name = "cb_roleMedic";
@@ -1449,7 +1448,6 @@
             // 
             cb_roleSniper.AutoSize = true;
             cb_roleSniper.Dock = DockStyle.Fill;
-            cb_roleSniper.Enabled = false;
             cb_roleSniper.Location = new Point(10, 78);
             cb_roleSniper.Margin = new Padding(10, 0, 0, 0);
             cb_roleSniper.Name = "cb_roleSniper";

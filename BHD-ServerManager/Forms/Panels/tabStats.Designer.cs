@@ -77,8 +77,6 @@
             PlayerTeam = new DataGridViewTextBoxColumn();
             PlayerActive = new DataGridViewTextBoxColumn();
             TimePlayed = new DataGridViewTextBoxColumn();
-            panel2 = new Panel();
-            label1 = new Label();
             tabWeaponStats = new TabPage();
             dataGridViewWeaponStats = new DataGridView();
             Weapon_PlayerName = new DataGridViewTextBoxColumn();
@@ -100,7 +98,6 @@
             tabPlayerStats.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).BeginInit();
-            panel2.SuspendLayout();
             tabWeaponStats.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).BeginInit();
             SuspendLayout();
@@ -352,7 +349,7 @@
             tabPlayerStats.Location = new Point(4, 24);
             tabPlayerStats.Name = "tabPlayerStats";
             tabPlayerStats.Padding = new Padding(3);
-            tabPlayerStats.Size = new Size(818, 380);
+            tabPlayerStats.Size = new Size(958, 394);
             tabPlayerStats.TabIndex = 1;
             tabPlayerStats.Text = "Player Stats";
             tabPlayerStats.UseVisualStyleBackColor = true;
@@ -361,16 +358,15 @@
             // 
             tableLayoutPanel2.ColumnCount = 1;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel2.Controls.Add(dataGridViewPlayerStats, 0, 1);
-            tableLayoutPanel2.Controls.Add(panel2, 0, 0);
+            tableLayoutPanel2.Controls.Add(dataGridViewPlayerStats, 0, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 3);
             tableLayoutPanel2.Margin = new Padding(0);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 2;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 83F));
+            tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(812, 374);
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.Size = new Size(952, 388);
             tableLayoutPanel2.TabIndex = 0;
             // 
             // dataGridViewPlayerStats
@@ -382,13 +378,13 @@
             dataGridViewPlayerStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewPlayerStats.Columns.AddRange(new DataGridViewColumn[] { PlayerName, Suicides, Murders, Kills, Deaths, ZoneTime, FBCaptures, FlagSaves, ADTargetsDestroyed, RevivesReceived, RevivesGiven, PSPAttempts, PSPTakeovers, FBCarrierKills, DoubleKills, Headshots, KnifeKills, SniperKills, TKOTHDefenseKills, TKOTHAttackKills, ShotsPerKill, ExperiencePoints, PlayerTeam, PlayerActive, TimePlayed });
             dataGridViewPlayerStats.Dock = DockStyle.Fill;
-            dataGridViewPlayerStats.Location = new Point(0, 83);
+            dataGridViewPlayerStats.Location = new Point(0, 0);
             dataGridViewPlayerStats.Margin = new Padding(0);
             dataGridViewPlayerStats.Name = "dataGridViewPlayerStats";
             dataGridViewPlayerStats.ReadOnly = true;
             dataGridViewPlayerStats.RowHeadersVisible = false;
             dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
-            dataGridViewPlayerStats.Size = new Size(812, 291);
+            dataGridViewPlayerStats.Size = new Size(952, 388);
             dataGridViewPlayerStats.TabIndex = 1;
             // 
             // PlayerName
@@ -592,31 +588,12 @@
             TimePlayed.ReadOnly = true;
             TimePlayed.ToolTipText = "Time Played (s)";
             // 
-            // panel2
-            // 
-            panel2.Controls.Add(label1);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(0, 0);
-            panel2.Margin = new Padding(0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(812, 83);
-            panel2.TabIndex = 2;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(354, 34);
-            label1.Name = "label1";
-            label1.Size = new Size(181, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Header Information To Be Added";
-            // 
             // tabWeaponStats
             // 
             tabWeaponStats.Controls.Add(dataGridViewWeaponStats);
             tabWeaponStats.Location = new Point(4, 24);
             tabWeaponStats.Name = "tabWeaponStats";
-            tabWeaponStats.Size = new Size(818, 380);
+            tabWeaponStats.Size = new Size(958, 394);
             tabWeaponStats.TabIndex = 2;
             tabWeaponStats.Text = "Weapon Stats";
             tabWeaponStats.UseVisualStyleBackColor = true;
@@ -632,7 +609,7 @@
             dataGridViewWeaponStats.Name = "dataGridViewWeaponStats";
             dataGridViewWeaponStats.ReadOnly = true;
             dataGridViewWeaponStats.RowHeadersVisible = false;
-            dataGridViewWeaponStats.Size = new Size(818, 380);
+            dataGridViewWeaponStats.Size = new Size(958, 394);
             dataGridViewWeaponStats.TabIndex = 1;
             // 
             // Weapon_PlayerName
@@ -695,8 +672,6 @@
             tabPlayerStats.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).EndInit();
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
             tabWeaponStats.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).EndInit();
             ResumeLayout(false);
@@ -728,8 +703,6 @@
         private Button btn_SaveSettings;
         private TableLayoutPanel tableLayoutPanel2;
         internal DataGridView dataGridViewPlayerStats;
-        private Panel panel2;
-        private Label label1;
         internal DataGridView dataGridViewWeaponStats;
         private DataGridViewTextBoxColumn Weapon_PlayerName;
         private DataGridViewTextBoxColumn WeaponName;

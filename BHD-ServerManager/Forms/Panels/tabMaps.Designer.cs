@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
             tableLayoutPanel6 = new TableLayoutPanel();
@@ -318,14 +318,14 @@
             dataGridView_availableMaps.AllowUserToDeleteRows = false;
             dataGridView_availableMaps.AllowUserToResizeColumns = false;
             dataGridView_availableMaps.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dataGridView_availableMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle9.BackColor = SystemColors.Control;
+            dataGridViewCellStyle9.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle9.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = DataGridViewTriState.True;
+            dataGridView_availableMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
             dataGridView_availableMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_availableMaps.Columns.AddRange(new DataGridViewColumn[] { avail_MapID, avail_MapName, avail_MapFileName, ModType, avail_MapType, avail_MapTypeShort });
             dataGridView_availableMaps.Dock = DockStyle.Fill;
@@ -412,14 +412,14 @@
             dataGridView_currentMaps.AllowUserToDeleteRows = false;
             dataGridView_currentMaps.AllowUserToResizeColumns = false;
             dataGridView_currentMaps.AllowUserToResizeRows = false;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dataGridView_currentMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle10.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle10.BackColor = SystemColors.Control;
+            dataGridViewCellStyle10.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle10.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = DataGridViewTriState.True;
+            dataGridView_currentMaps.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             dataGridView_currentMaps.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_currentMaps.Columns.AddRange(new DataGridViewColumn[] { current_MapID, current_MapName, current_MapFileName, current_MapModType, current_MapType, current_MapTypeShort });
             dataGridView_currentMaps.Dock = DockStyle.Fill;
@@ -733,6 +733,7 @@
             btn_mapControl7.TabIndex = 7;
             toolTip1.SetToolTip(btn_mapControl7, "Export");
             btn_mapControl7.UseVisualStyleBackColor = true;
+            btn_mapControl7.Click += actionClick_backupPlaylist;
             // 
             // btn_mapControl6
             // 
@@ -748,22 +749,23 @@
             btn_mapControl6.TabIndex = 6;
             toolTip1.SetToolTip(btn_mapControl6, "Import");
             btn_mapControl6.UseVisualStyleBackColor = true;
+            btn_mapControl6.Click += actionClick_importPlaylist;
             // 
             // btn_mapControl5
             // 
             btn_mapControl5.Dock = DockStyle.Fill;
-            btn_mapControl5.IconChar = FontAwesome.Sharp.IconChar.None;
+            btn_mapControl5.IconChar = FontAwesome.Sharp.IconChar.Infinity;
             btn_mapControl5.IconColor = Color.Black;
             btn_mapControl5.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btn_mapControl5.IconSize = 28;
+            btn_mapControl5.IconSize = 34;
             btn_mapControl5.Location = new Point(3, 239);
             btn_mapControl5.Name = "btn_mapControl5";
-            btn_mapControl5.Padding = new Padding(0, 5, 0, 0);
+            btn_mapControl5.Padding = new Padding(0, 3, 0, 0);
             btn_mapControl5.Size = new Size(54, 44);
             btn_mapControl5.TabIndex = 5;
-            toolTip1.SetToolTip(btn_mapControl5, "None");
+            toolTip1.SetToolTip(btn_mapControl5, "Randomize Selected Playlist");
             btn_mapControl5.UseVisualStyleBackColor = true;
-            btn_mapControl5.Visible = false;
+            btn_mapControl5.Click += actionClick_randomizePlaylist;
             // 
             // btn_mapControl4
             // 

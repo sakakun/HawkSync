@@ -8,8 +8,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Windows.Storage;
@@ -186,6 +188,213 @@ namespace BHD_ServerManager.Forms.Panels
             ServerSettings.Set("checkBox_selectNone", checkBox_selectNone.Checked);
 
         }
+
+        // --- Import/Export Settings ---
+        public void methodFunction_exportSettings()
+        {
+            try
+            {
+                using SaveFileDialog saveFileDialog = new()
+                {
+                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                    FilterIndex = 1,
+                    RestoreDirectory = true,
+                    FileName = $"GamePlaySettings_{DateTime.Now:yyyyMMdd_HHmmss}.json"
+                };
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var settings = new GamePlaySettings
+                    {
+                        // Lobby Passwords
+                        GamePasswordBlue = tb_bluePassword.Text,
+                        GamePasswordRed = tb_redPassword.Text,
+
+                        // Match Win Conditions
+                        GameScoreZoneTime = (int)num_scoresKOTH.Value,
+                        GameScoreKills = (int)num_scoresDM.Value,
+                        GameScoreFlags = (int)num_scoresFB.Value,
+
+                        // Server Values
+                        GameTimeLimit = (int)num_gameTimeLimit.Value,
+                        GameLoopMaps = cb_replayMaps.SelectedIndex,
+                        GameStartDelay = (int)num_gameStartDelay.Value,
+                        GameRespawnTime = (int)num_respawnTime.Value,
+                        GameScoreBoardDelay = (int)num_scoreBoardDelay.Value,
+                        GameMaxSlots = (int)num_maxPlayers.Value,
+                        GamePSPTOTimer = (int)num_pspTakeoverTimer.Value,
+                        GameFlagReturnTime = (int)num_flagReturnTime.Value,
+                        GameMaxTeamLives = (int)num_maxTeamLives.Value,
+
+                        // Server Options
+                        GameOptionAutoBalance = cb_autoBalance.Checked,
+                        GameOptionShowTracers = cb_showTracers.Checked,
+                        GameShowTeamClays = cb_showClays.Checked,
+                        GameOptionAutoRange = cb_autoRange.Checked,
+                        GameCustomSkins = cb_customSkins.Checked,
+                        GameDestroyBuildings = cb_enableDistroyBuildings.Checked,
+                        GameFatBullets = cb_enableFatBullets.Checked,
+                        GameOneShotKills = cb_enableOneShotKills.Checked,
+                        GameAllowLeftLeaning = cb_enableLeftLean.Checked,
+
+                        // Friendly Fire
+                        GameOptionFF = cb_enableFFkills.Checked,
+                        GameFriendlyFireKills = (int)num_maxFFKills.Value,
+                        GameOptionFFWarn = cb_warnFFkils.Checked,
+                        GameOptionFriendlyTags = cb_showTeamTags.Checked,
+
+                        // Role Restrictions
+                        RoleCQB = cb_roleCQB.Checked,
+                        RoleGunner = cb_roleGunner.Checked,
+                        RoleSniper = cb_roleSniper.Checked,
+                        RoleMedic = cb_roleMedic.Checked,
+
+                        // Weapon Restrictions
+                        WeaponColt45 = cb_weapColt45.Checked,
+                        WeaponM9Beretta = cb_weapM9Bereatta.Checked,
+                        WeaponCar15 = cb_weapCAR15.Checked,
+                        WeaponCar15203 = cb_weapCAR15203.Checked,
+                        WeaponM16 = cb_weapM16.Checked,
+                        WeaponM16203 = cb_weapM16203.Checked,
+                        WeaponG3 = cb_weapG3.Checked,
+                        WeaponG36 = cb_weapG36.Checked,
+                        WeaponM60 = cb_weapM60.Checked,
+                        WeaponM240 = cb_weapM240.Checked,
+                        WeaponMP5 = cb_weapMP5.Checked,
+                        WeaponSAW = cb_weapSaw.Checked,
+                        WeaponMCRT300 = cb_weap300Tact.Checked,
+                        WeaponM21 = cb_weapM21.Checked,
+                        WeaponM24 = cb_weapM24.Checked,
+                        WeaponBarrett = cb_weapBarret.Checked,
+                        WeaponPSG1 = cb_weapPSG1.Checked,
+                        WeaponShotgun = cb_weapShotgun.Checked,
+                        WeaponFragGrenade = cb_weapFragGrenade.Checked,
+                        WeaponSmokeGrenade = cb_weapSmokeGrenade.Checked,
+                        WeaponSatchelCharges = cb_weapSatchel.Checked,
+                        WeaponAT4 = cb_weapAT4.Checked,
+                        WeaponFlashGrenade = cb_weapFlashBang.Checked,
+                        WeaponClaymore = cb_weapClay.Checked,
+
+                        CheckBoxSelectAll = checkBox_selectAll.Checked,
+                        CheckBoxSelectNone = checkBox_selectNone.Checked
+                    };
+
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string jsonString = JsonSerializer.Serialize(settings, options);
+                    File.WriteAllText(saveFileDialog.FileName, jsonString);
+
+                    AppDebug.Log(Name, $"Settings exported to: {saveFileDialog.FileName}");
+                    MessageBox.Show("Settings exported successfully!", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log(Name, $"Error exporting settings: {ex.Message}");
+                MessageBox.Show($"Failed to export settings: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void methodFunction_importSettings()
+        {
+            try
+            {
+                using OpenFileDialog openFileDialog = new()
+                {
+                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string jsonString = File.ReadAllText(openFileDialog.FileName);
+                    var settings = JsonSerializer.Deserialize<GamePlaySettings>(jsonString);
+
+                    if (settings != null)
+                    {
+                        // Lobby Passwords
+                        tb_bluePassword.Text = settings.GamePasswordBlue;
+                        tb_redPassword.Text = settings.GamePasswordRed;
+
+                        // Match Win Conditions
+                        num_scoresKOTH.Value = settings.GameScoreZoneTime;
+                        num_scoresDM.Value = settings.GameScoreKills;
+                        num_scoresFB.Value = settings.GameScoreFlags;
+
+                        // Server Values
+                        num_gameTimeLimit.Value = settings.GameTimeLimit;
+                        cb_replayMaps.SelectedIndex = settings.GameLoopMaps;
+                        num_gameStartDelay.Value = settings.GameStartDelay;
+                        num_respawnTime.Value = settings.GameRespawnTime;
+                        num_scoreBoardDelay.Value = settings.GameScoreBoardDelay;
+                        num_maxPlayers.Value = settings.GameMaxSlots;
+                        num_pspTakeoverTimer.Value = settings.GamePSPTOTimer;
+                        num_flagReturnTime.Value = settings.GameFlagReturnTime;
+                        num_maxTeamLives.Value = settings.GameMaxTeamLives;
+
+                        // Server Options
+                        cb_autoBalance.Checked = settings.GameOptionAutoBalance;
+                        cb_showTracers.Checked = settings.GameOptionShowTracers;
+                        cb_showClays.Checked = settings.GameShowTeamClays;
+                        cb_autoRange.Checked = settings.GameOptionAutoRange;
+                        cb_customSkins.Checked = settings.GameCustomSkins;
+                        cb_enableDistroyBuildings.Checked = settings.GameDestroyBuildings;
+                        cb_enableFatBullets.Checked = settings.GameFatBullets;
+                        cb_enableOneShotKills.Checked = settings.GameOneShotKills;
+                        cb_enableLeftLean.Checked = settings.GameAllowLeftLeaning;
+
+                        // Friendly Fire
+                        cb_enableFFkills.Checked = settings.GameOptionFF;
+                        num_maxFFKills.Value = settings.GameFriendlyFireKills;
+                        cb_warnFFkils.Checked = settings.GameOptionFFWarn;
+                        cb_showTeamTags.Checked = settings.GameOptionFriendlyTags;
+
+                        // Role Restrictions
+                        cb_roleCQB.Checked = settings.RoleCQB;
+                        cb_roleGunner.Checked = settings.RoleGunner;
+                        cb_roleSniper.Checked = settings.RoleSniper;
+                        cb_roleMedic.Checked = settings.RoleMedic;
+
+                        // Weapon Restrictions
+                        cb_weapColt45.Checked = settings.WeaponColt45;
+                        cb_weapM9Bereatta.Checked = settings.WeaponM9Beretta;
+                        cb_weapCAR15.Checked = settings.WeaponCar15;
+                        cb_weapCAR15203.Checked = settings.WeaponCar15203;
+                        cb_weapM16.Checked = settings.WeaponM16;
+                        cb_weapM16203.Checked = settings.WeaponM16203;
+                        cb_weapG3.Checked = settings.WeaponG3;
+                        cb_weapG36.Checked = settings.WeaponG36;
+                        cb_weapM60.Checked = settings.WeaponM60;
+                        cb_weapM240.Checked = settings.WeaponM240;
+                        cb_weapMP5.Checked = settings.WeaponMP5;
+                        cb_weapSaw.Checked = settings.WeaponSAW;
+                        cb_weap300Tact.Checked = settings.WeaponMCRT300;
+                        cb_weapM21.Checked = settings.WeaponM21;
+                        cb_weapM24.Checked = settings.WeaponM24;
+                        cb_weapBarret.Checked = settings.WeaponBarrett;
+                        cb_weapPSG1.Checked = settings.WeaponPSG1;
+                        cb_weapShotgun.Checked = settings.WeaponShotgun;
+                        cb_weapFragGrenade.Checked = settings.WeaponFragGrenade;
+                        cb_weapSmokeGrenade.Checked = settings.WeaponSmokeGrenade;
+                        cb_weapSatchel.Checked = settings.WeaponSatchelCharges;
+                        cb_weapAT4.Checked = settings.WeaponAT4;
+                        cb_weapFlashBang.Checked = settings.WeaponFlashGrenade;
+                        cb_weapClay.Checked = settings.WeaponClaymore;
+
+                        checkBox_selectAll.Checked = settings.CheckBoxSelectAll;
+                        checkBox_selectNone.Checked = settings.CheckBoxSelectNone;
+
+                        AppDebug.Log(Name, $"Settings imported from: {openFileDialog.FileName}");
+                        MessageBox.Show("Settings imported successfully!\n\nClick 'Save Server Settings' to apply these settings.", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log(Name, $"Error importing settings: {ex.Message}");
+                MessageBox.Show($"Failed to import settings: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         
         // --- Weapon Checkbox Logic ---
         private void functionEvent_InitializeWeaponCheckboxes()
@@ -270,6 +479,16 @@ namespace BHD_ServerManager.Forms.Panels
             // Pull from Database and Reload Settings
             methodFunction_loadSettings();
         }
+        // --- Export Server Settings Button Clicked ---
+        private void actionClick_ExportSettings(object sender, EventArgs e)
+        {
+            methodFunction_exportSettings();
+        }
+        // --- Import Server Settings Button Clicked ---
+        private void actionClick_ImportSettings(object sender, EventArgs e)
+        {
+            methodFunction_importSettings();
+        }
         // --- Server Control Button Clicked ---
         private void actionClick_serverControl(object sender, EventArgs e)
         {
@@ -302,6 +521,82 @@ namespace BHD_ServerManager.Forms.Panels
         private void actionClick_ServerLockLobby(object sender, EventArgs e)
         {
             ServerMemory.WriteMemorySendConsoleCommand("lockgame");
+        }
+
+        // --- Settings Data Transfer Object ---
+        private class GamePlaySettings
+        {
+            // Lobby Passwords
+            public string GamePasswordBlue { get; set; } = string.Empty;
+            public string GamePasswordRed { get; set; } = string.Empty;
+
+            // Match Win Conditions
+            public int GameScoreZoneTime { get; set; }
+            public int GameScoreKills { get; set; }
+            public int GameScoreFlags { get; set; }
+
+            // Server Values
+            public int GameTimeLimit { get; set; }
+            public int GameLoopMaps { get; set; }
+            public int GameStartDelay { get; set; }
+            public int GameRespawnTime { get; set; }
+            public int GameScoreBoardDelay { get; set; }
+            public int GameMaxSlots { get; set; }
+            public int GamePSPTOTimer { get; set; }
+            public int GameFlagReturnTime { get; set; }
+            public int GameMaxTeamLives { get; set; }
+
+            // Server Options
+            public bool GameOptionAutoBalance { get; set; }
+            public bool GameOptionShowTracers { get; set; }
+            public bool GameShowTeamClays { get; set; }
+            public bool GameOptionAutoRange { get; set; }
+            public bool GameCustomSkins { get; set; }
+            public bool GameDestroyBuildings { get; set; }
+            public bool GameFatBullets { get; set; }
+            public bool GameOneShotKills { get; set; }
+            public bool GameAllowLeftLeaning { get; set; }
+
+            // Friendly Fire
+            public bool GameOptionFF { get; set; }
+            public int GameFriendlyFireKills { get; set; }
+            public bool GameOptionFFWarn { get; set; }
+            public bool GameOptionFriendlyTags { get; set; }
+
+            // Role Restrictions
+            public bool RoleCQB { get; set; }
+            public bool RoleGunner { get; set; }
+            public bool RoleSniper { get; set; }
+            public bool RoleMedic { get; set; }
+
+            // Weapon Restrictions
+            public bool WeaponColt45 { get; set; }
+            public bool WeaponM9Beretta { get; set; }
+            public bool WeaponCar15 { get; set; }
+            public bool WeaponCar15203 { get; set; }
+            public bool WeaponM16 { get; set; }
+            public bool WeaponM16203 { get; set; }
+            public bool WeaponG3 { get; set; }
+            public bool WeaponG36 { get; set; }
+            public bool WeaponM60 { get; set; }
+            public bool WeaponM240 { get; set; }
+            public bool WeaponMP5 { get; set; }
+            public bool WeaponSAW { get; set; }
+            public bool WeaponMCRT300 { get; set; }
+            public bool WeaponM21 { get; set; }
+            public bool WeaponM24 { get; set; }
+            public bool WeaponBarrett { get; set; }
+            public bool WeaponPSG1 { get; set; }
+            public bool WeaponShotgun { get; set; }
+            public bool WeaponFragGrenade { get; set; }
+            public bool WeaponSmokeGrenade { get; set; }
+            public bool WeaponSatchelCharges { get; set; }
+            public bool WeaponAT4 { get; set; }
+            public bool WeaponFlashGrenade { get; set; }
+            public bool WeaponClaymore { get; set; }
+
+            public bool CheckBoxSelectAll { get; set; }
+            public bool CheckBoxSelectNone { get; set; }
         }
     }
 }

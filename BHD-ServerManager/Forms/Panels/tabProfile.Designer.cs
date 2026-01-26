@@ -919,8 +919,8 @@
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel4.Controls.Add(btn_resetProfile, 3, 0);
-            tableLayoutPanel4.Controls.Add(btn_saveProfile, 1, 0);
+            tableLayoutPanel4.Controls.Add(btn_resetProfile, 1, 0);
+            tableLayoutPanel4.Controls.Add(btn_saveProfile, 0, 0);
             tableLayoutPanel4.Dock = DockStyle.Fill;
             tableLayoutPanel4.Location = new Point(3, 19);
             tableLayoutPanel4.Margin = new Padding(0);
@@ -934,7 +934,7 @@
             // btn_resetProfile
             // 
             btn_resetProfile.Dock = DockStyle.Fill;
-            btn_resetProfile.Location = new Point(306, 3);
+            btn_resetProfile.Location = new Point(104, 3);
             btn_resetProfile.Name = "btn_resetProfile";
             btn_resetProfile.Size = new Size(95, 30);
             btn_resetProfile.TabIndex = 1;
@@ -945,7 +945,7 @@
             // btn_saveProfile
             // 
             btn_saveProfile.Dock = DockStyle.Fill;
-            btn_saveProfile.Location = new Point(104, 3);
+            btn_saveProfile.Location = new Point(3, 3);
             btn_saveProfile.Name = "btn_saveProfile";
             btn_saveProfile.Size = new Size(95, 30);
             btn_saveProfile.TabIndex = 0;
