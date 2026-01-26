@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             banControls = new TabControl();
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -2388,16 +2388,16 @@
             // 
             // NL_ipAddress
             // 
-            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            NL_ipAddress.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_ipAddress.DefaultCellStyle = dataGridViewCellStyle1;
             NL_ipAddress.HeaderText = "IP Address";
             NL_ipAddress.Name = "NL_ipAddress";
             NL_ipAddress.ReadOnly = true;
             // 
             // NL_numCons
             // 
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            NL_numCons.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_numCons.DefaultCellStyle = dataGridViewCellStyle2;
             NL_numCons.HeaderText = "# Cons";
             NL_numCons.Name = "NL_numCons";
             NL_numCons.ReadOnly = true;
@@ -2405,8 +2405,8 @@
             // 
             // NL_vpnStatus
             // 
-            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            NL_vpnStatus.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_vpnStatus.DefaultCellStyle = dataGridViewCellStyle3;
             NL_vpnStatus.HeaderText = "Status";
             NL_vpnStatus.Name = "NL_vpnStatus";
             NL_vpnStatus.ReadOnly = true;

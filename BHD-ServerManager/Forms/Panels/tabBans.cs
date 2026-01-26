@@ -15,6 +15,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Windows.Services.Maps;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -63,9 +64,27 @@ namespace BHD_ServerManager.Forms.Panels
 
             if (theInstance!.proxyCheckEnabled && ProxyCheckManager.IsInitialized == false)
             {
+                IProxyCheckService? proxyService = null;
+    
                 // Initialize Proxy Services
-                var proxyService = new ProxyCheckIoService(theInstance!.proxyCheckAPIKey);
-                ProxyCheckManager.Initialize(proxyService, cacheExpirationDays: (int) theInstance.proxyCheckCacheTime);
+                if (theInstance.proxyCheckServiceProvider == 1) 
+                { 
+                    proxyService = new ProxyCheckIoService(theInstance!.proxyCheckAPIKey); 
+                }
+                else if (theInstance.proxyCheckServiceProvider == 2) 
+                { 
+                    proxyService = new IP2LocationService(theInstance!.proxyCheckAPIKey); 
+                }
+                else if (theInstance.proxyCheckServiceProvider == 0) 
+                { 
+                    theInstance!.proxyCheckEnabled = false; 
+                    return; 
+                }
+
+                if (proxyService != null)
+                {
+                    ProxyCheckManager.Initialize(proxyService, cacheExpirationDays: (int)theInstance.proxyCheckCacheTime);
+                }
             }
 
         }
@@ -420,6 +439,12 @@ namespace BHD_ServerManager.Forms.Panels
                                 ipRecord.Date.ToString("yyyy-MM-dd")
                             );
 
+                            // Add to NetLimiter filter if enabled
+                            if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName))
+                            {
+                                _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress.ToString(), subnetMask);
+                            }
+
                             // Track for potential association update
                             createdIPRecord = ipRecord;
                         }
@@ -429,6 +454,12 @@ namespace BHD_ServerManager.Forms.Panels
                             var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDIP);
                             if (ipRecord != null)
                             {
+                                // Store old IP and subnet for NetLimiter update
+                                string oldIP = ipRecord.PlayerIP.ToString();
+                                int oldSubnet = ipRecord.SubnetMask;
+                                bool ipChanged = !ipRecord.PlayerIP.Equals(ipAddress) || ipRecord.SubnetMask != subnetMask;
+
+                                // Update record
                                 ipRecord.PlayerIP = ipAddress;
                                 ipRecord.SubnetMask = subnetMask;
                                 ipRecord.Date = banDate;
@@ -440,9 +471,20 @@ namespace BHD_ServerManager.Forms.Panels
                                 // Update database
                                 DatabaseManager.UpdatePlayerIPRecord(ipRecord);
 
+                                // Update NetLimiter filter if enabled and IP/subnet changed
+                                if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName) && ipChanged)
+                                {
+                                    _ = Task.Run(async () =>
+                                    {
+                                        await NetLimiterClient.RemoveIpFromFilterAsync(theInstance.netLimiterFilterName, oldIP, oldSubnet);
+                                        await NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress.ToString(), subnetMask);
+                                    });
+                                }
+
                                 // Update DataGridView
                                 var row = dgPlayerAddressBlacklist.Rows.Cast<DataGridViewRow>()
                                     .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDIP);
+
                                 if (row != null)
                                 {
                                     row.Cells[1].Value = $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}";
@@ -459,6 +501,8 @@ namespace BHD_ServerManager.Forms.Panels
                     }
                 }
 
+
+
                 // Update bidirectional association if both records were created together
                 if (needsAssociationUpdate && createdNameRecord != null && createdIPRecord != null)
                 {
@@ -472,6 +516,10 @@ namespace BHD_ServerManager.Forms.Panels
                 _blacklistSelectedRecordIDIP = -1;
                 Blacklist_Reset_Click(sender, e);
                 blacklistForm.Visible = false;
+
+                blacklist_btnDelete.Visible = false;
+                blacklist_btnSave.Visible = false;
+                blacklist_btnReset.Visible = false;
 
                 MessageBox.Show("Ban record saved successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -618,6 +666,13 @@ namespace BHD_ServerManager.Forms.Panels
                 // Refresh the data
                 Blacklist_Refresh_Click(sender, e);
 
+                // Control Buttons
+                blacklist_btnClose.Visible = false;
+                blacklist_btnSave.Visible = false;
+                blacklist_btnDelete.Visible = false;
+                blacklist_btnReset.Visible = false;
+
+
                 MessageBox.Show("Record(s) deleted successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -644,7 +699,12 @@ namespace BHD_ServerManager.Forms.Panels
             // Remove from in-memory lists
             instanceBans.BannedPlayerNames.Remove(nameRecord);
             instanceBans.BannedPlayerIPs.Remove(ipRecord);
-
+            
+            // Update NetLimiter if Enabled
+            if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName))
+            {
+                _ = NetLimiterClient.RemoveIpFromFilterAsync(theInstance.netLimiterFilterName, ipRecord.PlayerIP.ToString(), ipRecord.SubnetMask);
+            }
             AppDebug.Log("tabBans", $"Deleted both records: Name ID {nameRecord.RecordID}, IP ID {ipRecord.RecordID}");
         }
 
@@ -701,6 +761,12 @@ namespace BHD_ServerManager.Forms.Panels
                     DatabaseManager.UpdatePlayerNameRecord(nameRecord);
                     AppDebug.Log("tabBans", $"Cleared association on name record {nameRecord.RecordID}");
                 }
+            }
+
+            // Update NetLimiter if Enabled
+            if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName))
+            {
+                _ = NetLimiterClient.RemoveIpFromFilterAsync(theInstance.netLimiterFilterName, ipRecord.PlayerIP.ToString(), ipRecord.SubnetMask);
             }
 
             AppDebug.Log("tabBans", $"Deleted IP record ID {ipRecord.RecordID}");

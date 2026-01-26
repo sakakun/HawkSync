@@ -21,6 +21,10 @@ namespace BHD_ServerManager.Classes.Tickers
         private static DateTime _lastNetLimiterCheck = DateTime.MinValue;
         private static readonly TimeSpan _netLimiterCheckInterval = TimeSpan.FromSeconds(10);
 
+        // Throttle for NetLimiter filter sync (once per minute)
+        private static DateTime _lastFilterSync = DateTime.MinValue;
+        private static readonly TimeSpan _filterSyncInterval = TimeSpan.FromMinutes(1);
+
 
         // Helper for UI thread safety
         private static void SafeInvoke(Control control, Action action)
@@ -36,7 +40,6 @@ namespace BHD_ServerManager.Classes.Tickers
         {
 
             string gameServerPath = Path.Combine(theInstance.profileServerPath, "dfbhd.exe");
-            int netLimiterAppId = 0;
 
             // Always marshal to UI thread for UI updates
             SafeInvoke(thisServer, () =>
@@ -120,6 +123,26 @@ namespace BHD_ServerManager.Classes.Tickers
                                 }
                             });
                         }
+
+                        // Sync NetLimiter filter with ban/whitelist (throttled to once per minute)
+                        if (!string.IsNullOrEmpty(theInstance.netLimiterFilterName) && 
+                            now - _lastFilterSync >= _filterSyncInterval)
+                        {
+                            _lastFilterSync = now;
+
+                            // Run filter sync on background thread
+                            Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    await SyncNetLimiterFilterAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                    AppDebug.Log("tickerBanManagement", $"NetLimiter filter sync error: {ex.Message}");
+                                }
+                            });
+                        }
                     }
 
                     // Only check and punt bans if server is ONLINE
@@ -137,6 +160,135 @@ namespace BHD_ServerManager.Classes.Tickers
                 }
 
             });
+        }
+
+        // Sync NetLimiter filter with ban and whitelist
+        private static async Task SyncNetLimiterFilterAsync()
+        {
+            string filterName = theInstance.netLimiterFilterName;
+    
+            if (string.IsNullOrEmpty(filterName))
+            {
+                AppDebug.Log("tickerBanManagement", "NetLimiter filter name not configured. Skipping filter sync.");
+                return;
+            }
+
+            AppDebug.Log("tickerBanManagement", $"Starting NetLimiter filter sync for filter '{filterName}'");
+
+            try
+            {
+                // Get current IPs in the NetLimiter filter
+                var filterIPs = await NetLimiterClient.GetFilterIpAddressesAsync(filterName);
+                var filterIPSet = new HashSet<string>(filterIPs);
+
+                AppDebug.Log("tickerBanManagement", $"Found {filterIPSet.Count} IPs in NetLimiter filter");
+
+                DateTime now = DateTime.Now;
+
+                // Build dictionary of IPs with their subnet masks (excluding expired and whitelisted)
+                var shouldBeBannedIPs = new Dictionary<string, int>(); // IP -> SubnetMask
+
+                foreach (var bannedIP in banInstance.BannedPlayerIPs)
+                {
+                    // Skip information-only records
+                    if (bannedIP.RecordType == banInstanceRecordType.Information)
+                        continue;
+
+                    // Skip expired temporary bans
+                    if (bannedIP.RecordType == banInstanceRecordType.Temporary &&
+                        bannedIP.ExpireDate.HasValue &&
+                        now > bannedIP.ExpireDate.Value)
+                        continue;
+
+                    // Check if this IP is whitelisted
+                    bool isWhitelisted = banInstance.WhitelistedIPs.Any(whitelistedIP =>
+                    {
+                        // Skip expired temporary whitelists
+                        if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
+                            whitelistedIP.ExpireDate.HasValue &&
+                            now > whitelistedIP.ExpireDate.Value)
+                            return false;
+
+                        return IsIPMatch(bannedIP.PlayerIP, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask);
+                    });
+
+                    // Only add to filter if not whitelisted
+                    if (!isWhitelisted)
+                    {
+                        string ipString = bannedIP.PlayerIP.ToString();
+                        int subnetMask = bannedIP.SubnetMask;
+
+                        // Store IP with its subnet mask
+                        if (!shouldBeBannedIPs.ContainsKey(ipString))
+                        {
+                            shouldBeBannedIPs.Add(ipString, subnetMask);
+                        }
+                    }
+                }
+
+                AppDebug.Log("tickerBanManagement", $"Calculated {shouldBeBannedIPs.Count} IPs that should be banned");
+
+                // Find IPs to add (in ban list but not in filter)
+                var ipsToAdd = shouldBeBannedIPs.Keys.Except(filterIPSet).ToList();
+
+                // Find IPs to remove (in filter but not in ban list)
+                var ipsToRemove = filterIPSet.Except(shouldBeBannedIPs.Keys).ToList();
+
+                // Add missing IPs to filter
+                int addedCount = 0;
+                foreach (var ip in ipsToAdd)
+                {
+                    try
+                    {
+                        int subnet = shouldBeBannedIPs[ip];
+                        bool added = await NetLimiterClient.AddIpToFilterAsync(filterName, ip, subnet);
+                        if (added)
+                        {
+                            addedCount++;
+                            AppDebug.Log("tickerBanManagement", $"Added IP {ip}/{subnet} to NetLimiter filter '{filterName}'");
+                        }
+                        else
+                        {
+                            AppDebug.Log("tickerBanManagement", $"Failed to add IP {ip}/{subnet} to NetLimiter filter '{filterName}'");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppDebug.Log("tickerBanManagement", $"Error adding IP {ip} to filter: {ex.Message}");
+                    }
+                }
+
+                // Remove IPs that shouldn't be in filter
+                int removedCount = 0;
+                foreach (var ip in ipsToRemove)
+                {
+                    try
+                    {
+                        // Default to /32 for removal since we don't track the original subnet from the filter
+                        bool removed = await NetLimiterClient.RemoveIpFromFilterAsync(filterName, ip, 32);
+                        if (removed)
+                        {
+                            removedCount++;
+                            AppDebug.Log("tickerBanManagement", $"Removed IP {ip} from NetLimiter filter '{filterName}'");
+                        }
+                        else
+                        {
+                            AppDebug.Log("tickerBanManagement", $"Failed to remove IP {ip} from NetLimiter filter '{filterName}'");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppDebug.Log("tickerBanManagement", $"Error removing IP {ip} from filter: {ex.Message}");
+                    }
+                }
+
+                AppDebug.Log("tickerBanManagement", $"NetLimiter filter sync complete: Added {addedCount}, Removed {removedCount} IPs");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("tickerBanManagement", $"Error during NetLimiter filter sync: {ex.Message}");
+                throw;
+            }
         }
 
         // Check active players against ban lists and punt if banned
@@ -328,6 +480,23 @@ namespace BHD_ServerManager.Classes.Tickers
                 string ip = ipGroup.Key!;
                 int count = ipGroup.Count();
         
+                // Check if connection limit enforcement is enabled and threshold exceeded
+                if (theInstance.netLimiterEnableConLimit && count >= theInstance.netLimiterConThreshold)
+                {
+                    // Run ban and NetLimiter add operations asynchronously
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await BanIPForExcessiveConnections(ip, count);
+                        }
+                        catch (Exception ex)
+                        {
+                            AppDebug.Log("tickerBanManagement", $"Error banning IP {ip} for excessive connections: {ex.Message}");
+                        }
+                    });
+                }
+        
                 // Check VPN/Proxy status
                 string vpnStatus = GetVpnStatus(ip);
         
@@ -342,6 +511,105 @@ namespace BHD_ServerManager.Classes.Tickers
                     vpnStatus,   // NL_vpnStatus
                     listStatus   // NL_notes
                 );
+            }
+        }
+
+        // Ban IP for excessive connections and add to NetLimiter filter
+        private static async Task BanIPForExcessiveConnections(string ipAddress, int connectionCount)
+        {
+            if (!IPAddress.TryParse(ipAddress, out IPAddress? ip))
+            {
+                AppDebug.Log("tickerBanManagement", $"Invalid IP address format: {ipAddress}");
+                return;
+            }
+
+            DateTime now = DateTime.Now;
+
+            // Check if IP is already banned
+            bool alreadyBanned = banInstance.BannedPlayerIPs.Any(bannedIP =>
+            {
+                // Skip expired temporary bans
+                if (bannedIP.RecordType == banInstanceRecordType.Temporary &&
+                    bannedIP.ExpireDate.HasValue &&
+                    now > bannedIP.ExpireDate.Value)
+                    return false;
+
+                return IsIPMatch(ip, bannedIP.PlayerIP, bannedIP.SubnetMask);
+            });
+
+            if (alreadyBanned)
+            {
+                AppDebug.Log("tickerBanManagement", $"IP {ipAddress} is already banned. Skipping.");
+                return;
+            }
+
+            // Check if IP is whitelisted
+            bool isWhitelisted = banInstance.WhitelistedIPs.Any(whitelistedIP =>
+            {
+                // Skip expired temporary whitelists
+                if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
+                    whitelistedIP.ExpireDate.HasValue &&
+                    now > whitelistedIP.ExpireDate.Value)
+                    return false;
+
+                return IsIPMatch(ip, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask);
+            });
+
+            if (isWhitelisted)
+            {
+                AppDebug.Log("tickerBanManagement", $"IP {ipAddress} is whitelisted. Skipping ban for excessive connections.");
+                return;
+            }
+
+            // Create ban record
+            var banRecord = new banInstancePlayerIP
+            {
+                RecordID = 0, // Will be set by database
+                MatchID = theInstance.gameMatchID,
+                PlayerIP = ip,
+                SubnetMask = 32, // Exact IP match
+                Date = now,
+                ExpireDate = null, // Permanent ban
+                AssociatedName = null,
+                RecordType = banInstanceRecordType.Permanent,
+                RecordCategory = 0, // Ban
+                Notes = $"Auto-banned: Excessive connections ({connectionCount}) exceeded threshold ({theInstance.netLimiterConThreshold})"
+            };
+
+            try
+            {
+                // Add to database
+                int recordId = DatabaseManager.AddPlayerIPRecord(banRecord);
+                banRecord.RecordID = recordId;
+
+                // Add to in-memory ban list
+                banInstance.BannedPlayerIPs.Add(banRecord);
+
+                AppDebug.Log("tickerBanManagement", $"Banned IP {ipAddress} for excessive connections: {connectionCount} connections (threshold: {theInstance.netLimiterConThreshold})");
+
+                // Add to NetLimiter filter if filter name is configured
+                if (!string.IsNullOrEmpty(theInstance.netLimiterFilterName))
+                {
+                    bool addedToFilter = await NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress, 32);
+                    
+                    if (addedToFilter)
+                    {
+                        AppDebug.Log("tickerBanManagement", $"Successfully added IP {ipAddress} to NetLimiter filter '{theInstance.netLimiterFilterName}'");
+                    }
+                    else
+                    {
+                        AppDebug.Log("tickerBanManagement", $"Failed to add IP {ipAddress} to NetLimiter filter '{theInstance.netLimiterFilterName}'");
+                    }
+                }
+                else
+                {
+                    AppDebug.Log("tickerBanManagement", $"NetLimiter filter name not configured. IP {ipAddress} not added to filter.");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("tickerBanManagement", $"Error adding ban record for IP {ipAddress}: {ex.Message}");
+                throw;
             }
         }
 

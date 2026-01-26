@@ -111,7 +111,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
             return new List<ConnectionInfo>();
         }
 
-        public static async Task<bool> AddIpToFilterAsync(string filterName, string ipAddress)
+        public static async Task<bool> AddIpToFilterAsync(string filterName, string ipAddress, int subnet)
         {
             var command = new Command
             {
@@ -119,7 +119,8 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
                 Parameters = new Dictionary<string, string>
                 {
                     { "filterName", filterName },
-                    { "ipAddress", ipAddress }
+                    { "ipAddress", ipAddress },
+					{ "subnet", subnet.ToString() }
                 }
             };
 
@@ -127,7 +128,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
             return response.Success;
         }
 
-        public static async Task<bool> RemoveIpFromFilterAsync(string filterName, string ipAddress)
+        public static async Task<bool> RemoveIpFromFilterAsync(string filterName, string ipAddress, int subnet)
         {
             var command = new Command
             {
@@ -135,41 +136,11 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
                 Parameters = new Dictionary<string, string>
                 {
                     { "filterName", filterName },
-                    { "ipAddress", ipAddress }
+                    { "ipAddress", ipAddress },
+					{ "subnet", subnet.ToString() }
                 }
             };
 
-            var response = await SendCommandAsync(command);
-            return response.Success;
-        }
-
-        public static async Task<bool> SetConnectionLimitAsync(int limit)
-        {
-            var command = new Command
-            {
-                Action = "setConnectionLimit",
-                Parameters = new Dictionary<string, string> { { "limit", limit.ToString() } }
-            };
-
-            var response = await SendCommandAsync(command);
-            return response.Success;
-        }
-
-        public static async Task<bool> EnableConnectionLimitAsync(bool enabled)
-        {
-            var command = new Command
-            {
-                Action = "enableConnectionLimit",
-                Parameters = new Dictionary<string, string> { { "enabled", enabled.ToString() } }
-            };
-
-            var response = await SendCommandAsync(command);
-            return response.Success;
-        }
-
-        public static async Task<bool> EndProgramAsync()
-        {
-            var command = new Command { Action = "endProgram" };
             var response = await SendCommandAsync(command);
             return response.Success;
         }

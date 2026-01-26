@@ -142,16 +142,20 @@ namespace NetLimiterBridge
 						return GetFilterNames();
 					case "getconnections":
 						return GetConnections(command.Parameters["appId"]);
-
 					case "getfilterobject":
 						return GetFilterObject(command.Parameters["filterName"]);
 					case "getfilterips":
 						return GetFilterIpAddresses(command.Parameters["filterName"]);
-					case "addiptofilter":
-						return AddIpToFilter(command.Parameters["filterName"], command.Parameters["ipAddress"]);
-
-					case "removeipfromfilter":
-						return RemoveIpFromFilter(command.Parameters["filterName"], command.Parameters["ipAddress"]);
+                    case "addiptofilter":
+                        int subnet = command.Parameters.ContainsKey("subnet") 
+                            ? int.Parse(command.Parameters["subnet"]) 
+                            : 32;
+                        return AddIpToFilter(command.Parameters["filterName"], command.Parameters["ipAddress"], subnet);
+                    case "removeipfromfilter":
+                        int removeSubnet = command.Parameters.ContainsKey("subnet") 
+                            ? int.Parse(command.Parameters["subnet"]) 
+                            : 32;
+                        return RemoveIpFromFilter(command.Parameters["filterName"], command.Parameters["ipAddress"], removeSubnet);
 
 					case "setconnectionlimit":
 						return SetConnectionLimit(int.Parse(command.Parameters["limit"]));
@@ -336,7 +340,7 @@ namespace NetLimiterBridge
             }
         }
 
-        private Response AddIpToFilter(string filterName, string ipAddress)
+        private Response AddIpToFilter(string filterName, string ipAddress, int subnet)
         {
             try
             {
@@ -345,30 +349,61 @@ namespace NetLimiterBridge
 
                 if (filter != null)
                 {
-                    // Add IP to filter logic here
                     var remoteAddressFilter = filter.Functions
-	                    .OfType<FFRemoteAddressInRange>()
-	                    .FirstOrDefault();
+                        .OfType<FFRemoteAddressInRange>()
+                        .FirstOrDefault();
 
                     if (remoteAddressFilter == null)
                     {
-	                    return new Response { Success = false, Message = "No existing 'Remote address in range' function found." };
+                        return new Response { Success = false, Message = "No existing 'Remote address in range' function found." };
                     }
 
+                    // Parse and validate IP address
                     IPAddress ip = IPAddress.Parse(ipAddress);
-
                     var ipString = ip.ToIPAddress4().ToString();
-                    if (remoteAddressFilter.Values.Any(range =>
-	                        IsInRange(range.Range.Start.ToString(), range.Range.End.ToString(), ipString)))
+
+                    // Validate subnet mask
+                    if (subnet < 0 || subnet > 32)
                     {
-	                    return new Response { Success = false, Message = $"IP {ipString} is already in the filter range." };
+                        return new Response { Success = false, Message = "Subnet mask must be between 0 and 32." };
                     }
 
-                    remoteAddressFilter.Values.Add(new IPRangeFilterValue(ipString, ipString));
+                    // Calculate range start and end based on subnet mask
+                    string rangeStart;
+                    string rangeEnd;
+
+                    if (subnet == 32)
+                    {
+                        // Single IP
+                        rangeStart = ipString;
+                        rangeEnd = ipString;
+                    }
+                    else
+                    {
+                        // Calculate subnet range
+                        CalculateSubnetRange(ipString, subnet, out rangeStart, out rangeEnd);
+                    }
+
+                    // Check if range already exists or overlaps
+                    if (remoteAddressFilter.Values.Any(range =>
+                        IsInRange(range.Range.Start.ToString(), range.Range.End.ToString(), rangeStart) ||
+                        IsInRange(range.Range.Start.ToString(), range.Range.End.ToString(), rangeEnd)))
+                    {
+                        return new Response { Success = false, Message = $"IP range {rangeStart}-{rangeEnd} already exists or overlaps with existing range." };
+                    }
+
+                    remoteAddressFilter.Values.Add(new IPRangeFilterValue(rangeStart, rangeEnd));
 
                     _client.UpdateFilter(filter);
-                    return new Response { Success = true, Message = $"IP {ipString} added to the filter."};
 
+                    if (rangeStart == rangeEnd)
+                    {
+                        return new Response { Success = true, Message = $"IP {rangeStart} added to the filter." };
+                    }
+                    else
+                    {
+                        return new Response { Success = true, Message = $"IP range {rangeStart}-{rangeEnd} (/{subnet}) added to the filter." };
+                    }
                 }
 
                 return new Response { Success = false, Message = "Filter not found" };
@@ -377,6 +412,40 @@ namespace NetLimiterBridge
             {
                 return new Response { Success = false, Message = ex.Message };
             }
+        }
+
+        private static void CalculateSubnetRange(string ipAddress, int subnetMask, out string rangeStart, out string rangeEnd)
+        {
+            var ip = System.Net.IPAddress.Parse(ipAddress);
+            byte[] ipBytes = ip.GetAddressBytes();
+
+            // Calculate the number of host bits
+            int hostBits = 32 - subnetMask;
+
+            // Create subnet mask bytes
+            uint maskValue = subnetMask == 0 ? 0 : 0xFFFFFFFF << hostBits;
+            byte[] maskBytes = new byte[4];
+            maskBytes[0] = (byte)((maskValue >> 24) & 0xFF);
+            maskBytes[1] = (byte)((maskValue >> 16) & 0xFF);
+            maskBytes[2] = (byte)((maskValue >> 8) & 0xFF);
+            maskBytes[3] = (byte)(maskValue & 0xFF);
+
+            // Calculate network address (start of range)
+            byte[] networkBytes = new byte[4];
+            for (int i = 0; i < 4; i++)
+            {
+                networkBytes[i] = (byte)(ipBytes[i] & maskBytes[i]);
+            }
+
+            // Calculate broadcast address (end of range)
+            byte[] broadcastBytes = new byte[4];
+            for (int i = 0; i < 4; i++)
+            {
+                broadcastBytes[i] = (byte)(networkBytes[i] | ~maskBytes[i]);
+            }
+
+            rangeStart = new System.Net.IPAddress(networkBytes).ToString();
+            rangeEnd = new System.Net.IPAddress(broadcastBytes).ToString();
         }
 
         private static bool IsInRange(string startAddress, string endAddress, string ipAddress)
@@ -399,7 +468,7 @@ namespace NetLimiterBridge
 	        return true;
         }
 
-        private Response RemoveIpFromFilter(string filterName, string ipAddress)
+        private Response RemoveIpFromFilter(string filterName, string ipAddress, int subnet)
         {
             try
             {
@@ -408,26 +477,60 @@ namespace NetLimiterBridge
 
                 if (filter != null)
                 {
-                    // Remove IP from filter logic here
-                    // Add IP to filter logic here
                     var remoteAddressFilter = filter.Functions
-	                    .OfType<FFRemoteAddressInRange>()
-	                    .FirstOrDefault();
+                        .OfType<FFRemoteAddressInRange>()
+                        .FirstOrDefault();
 
                     if (remoteAddressFilter == null)
                     {
-	                    return new Response { Success = false, Message = "No existing 'Remote address in range' function found." };
+                        return new Response { Success = false, Message = "No existing 'Remote address in range' function found." };
                     }
 
+                    // Parse and validate IP address
                     IPAddress ip = IPAddress.Parse(ipAddress);
-
                     var ipString = ip.ToIPAddress4().ToString();
-                    if (remoteAddressFilter.Values.Any(range =>
-	                        IsInRange(range.Range.Start.ToString(), range.Range.End.ToString(), ipString)))
+
+                    // Validate subnet mask
+                    if (subnet < 0 || subnet > 32)
                     {
-	                    remoteAddressFilter.Values.Remove(new IPRangeFilterValue(ipString, ipString));
-	                    _client.UpdateFilter(filter);
-	                    return new Response { Success = true, Message = $"IP {ipString} removed from the filter." };
+                        return new Response { Success = false, Message = "Subnet mask must be between 0 and 32." };
+                    }
+
+                    // Calculate range start and end based on subnet mask
+                    string rangeStart;
+                    string rangeEnd;
+
+                    if (subnet == 32)
+                    {
+                        // Single IP
+                        rangeStart = ipString;
+                        rangeEnd = ipString;
+                    }
+                    else
+                    {
+                        // Calculate subnet range
+                        CalculateSubnetRange(ipString, subnet, out rangeStart, out rangeEnd);
+                    }
+
+                    // Find the actual range object in the collection that matches this IP range
+                    var rangeToRemove = remoteAddressFilter.Values.FirstOrDefault(range =>
+                        range.Range.Start.ToString() == rangeStart && 
+                        range.Range.End.ToString() == rangeEnd);
+
+                    if (rangeToRemove != null)
+                    {
+                        // Remove the actual object reference from the collection
+                        remoteAddressFilter.Values.Remove(rangeToRemove);
+                        _client.UpdateFilter(filter);
+                
+                        if (rangeStart == rangeEnd)
+                        {
+                            return new Response { Success = true, Message = $"IP {rangeStart} removed from the filter." };
+                        }
+                        else
+                        {
+                            return new Response { Success = true, Message = $"IP range {rangeStart}-{rangeEnd} (/{subnet}) removed from the filter." };
+                        }
                     }
 
                     return new Response
