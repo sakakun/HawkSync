@@ -21,31 +21,44 @@ namespace BHD_ServerManager.Forms.Panels
         private theInstance? theInstance => CommonCore.theInstance;
 
         // --- Class Variables ---
-        private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
-        private DateTime _lastGridUpdate;                           // Last time the chat messages grid was updated.
-        private bool _chatGridFirstLoad;                            // Flag to determine if this is the first load of the chat grid.
+        private bool _firstLoadComplete = false;
+        private DateTime _lastGridUpdate;
+        private bool _chatGridFirstLoad = true;
 
         public tabChat()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Update slap messages grid from manager
+        /// </summary>
         public void fuctionEvent_UpdateSlapMessages()
         {
-
             dg_slapMessages.Rows.Clear();
+            
             foreach (var slapMsg in chatInstanceManager.GetSlapMessages())
+            {
                 dg_slapMessages.Rows.Add(slapMsg.SlapMessageId, slapMsg.SlapMessageText);
-
+            }
         }
+
+        /// <summary>
+        /// Update auto messages grid from manager
+        /// </summary>
         public void functionEvent_UpdateAutoMessages()
         {
-
             dg_autoMessages.Rows.Clear();
+            
             foreach (var autoMsg in chatInstanceManager.GetAutoMessages())
+            {
                 dg_autoMessages.Rows.Add(autoMsg.AutoMessageId, autoMsg.AutoMessageTigger, autoMsg.AutoMessageText);
-
+            }
         }
+
+        /// <summary>
+        /// Update chat messages grid from in-memory logs
+        /// </summary>
         public void functionEvent_UpdateChatMessagesGrid()
         {
             // Only allow update if at least 2 seconds have passed
@@ -61,28 +74,16 @@ namespace BHD_ServerManager.Forms.Panels
             int visibleRows = dgv.DisplayedRowCount(false);
             bool wasAtBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
 
-            // Clear and repopulate
+            // Clear and repopulate from manager
             dgv.Rows.Clear();
-            foreach (var entry in CommonCore.instanceChat!.ChatLog)
+            
+            var chatLogs = chatInstanceManager.GetChatLogs();
+            
+            foreach (var entry in chatLogs)
             {
-                string teamString = entry.MessageType switch
-                {
-                    0 => "Server",
-                    1 => "Global",
-                    2 => entry.MessageType2 switch
-                    {
-                        1 => "Blue",
-                        2 => "Red",
-                        _ => "Unknown Team"
-                    },
-                    _ => "Unknown"
-                };
-
-                entry.PlayerName = Functions.SanitizePlayerName(entry.PlayerName);
-
                 dgv.Rows.Add(
-                    entry.MessageTimeStamp.ToString("HH:mm:ss"),
-                    teamString,
+                    entry.Timestamp.ToString("HH:mm:ss"),
+                    entry.TeamDisplay,
                     entry.PlayerName,
                     entry.MessageText
                 );
@@ -126,145 +127,188 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
+        /// <summary>
+        /// Ticker hook for periodic updates
+        /// </summary>
         public void ChatTickerHook()
         {
-            // Ensure the first load is complete before proceeding with updates.
+            // Ensure the first load is complete before proceeding with updates
             if (!_firstLoadComplete)
             {
                 _firstLoadComplete = true;
                 return;
             }
-            // Update chat UI elements here, e.g., refresh chat messages, update counters, etc.
+
+            // Update chat UI elements
             functionEvent_UpdateAutoMessages();
             fuctionEvent_UpdateSlapMessages();
 
-            if (theInstance?.instanceStatus == InstanceStatus.ONLINE || theInstance?.instanceStatus == InstanceStatus.STARTDELAY)
+            if (theInstance?.instanceStatus == InstanceStatus.ONLINE || 
+                theInstance?.instanceStatus == InstanceStatus.STARTDELAY)
             {
                 // Update chat messages grid
                 functionEvent_UpdateChatMessagesGrid();
             }
-
         }
 
+        /// <summary>
+        /// Handle adding a slap message via Enter key
+        /// </summary>
         private void actionKeyPress_slapAddMessage(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
+            if (e.KeyChar != (char)Keys.Enter)
+                return;
+
+            string messageText = tb_slapMessage.Text.Trim();
+            if (string.IsNullOrWhiteSpace(messageText))
+                return;
+
+            // Add via manager
+            var result = chatInstanceManager.AddSlapMessage(messageText);
+            
+            if (result.Success)
             {
-                chatInstanceManager.AddSlapMessage(tb_slapMessage.Text);
                 tb_slapMessage.Clear();
                 fuctionEvent_UpdateSlapMessages();
             }
+            else
+            {
+                MessageBox.Show(result.Message, "Error Adding Slap Message",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
+
+        /// <summary>
+        /// Handle removing a slap message via double-click
+        /// </summary>
         private void actionClick_RemoveSlap(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.RowIndex < 0)
+                return;
+
             int slapMessageId = Convert.ToInt32(dg_slapMessages.Rows[e.RowIndex].Cells[0].Value);
-            chatInstanceManager.RemoveSlapMessage(slapMessageId);
-            fuctionEvent_UpdateSlapMessages();
+            
+            var dialogResult = MessageBox.Show(
+                "Are you sure you want to remove this slap message?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (dialogResult != DialogResult.Yes)
+                return;
+
+            // Remove via manager
+            var result = chatInstanceManager.RemoveSlapMessage(slapMessageId);
+            
+            if (result.Success)
+            {
+                fuctionEvent_UpdateSlapMessages();
+            }
+            else
+            {
+                MessageBox.Show(result.Message, "Error Removing Slap Message",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
+        /// <summary>
+        /// Handle adding an auto message via Enter key
+        /// </summary>
         private void actionKeyPress_AddAutoMessage(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-            {
-                chatInstanceManager.AddAutoMessage(tb_autoMessage.Text.Trim(), (int)num_AutoMessageTrigger.Value);
-                functionEvent_UpdateAutoMessages();
-                tb_autoMessage.Text = string.Empty;
-                num_AutoMessageTrigger.Value = 0;
-            }
+            if (e.KeyChar != (char)Keys.Enter)
+                return;
 
+            string messageText = tb_autoMessage.Text.Trim();
+            if (string.IsNullOrWhiteSpace(messageText))
+                return;
+
+            int triggerSeconds = (int)num_AutoMessageTrigger.Value;
+
+            // Add via manager
+            var result = chatInstanceManager.AddAutoMessage(messageText, triggerSeconds);
+            
+            if (result.Success)
+            {
+                tb_autoMessage.Clear();
+                num_AutoMessageTrigger.Value = 0;
+                functionEvent_UpdateAutoMessages();
+            }
+            else
+            {
+                MessageBox.Show(result.Message, "Error Adding Auto Message",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
+
+        /// <summary>
+        /// Handle removing an auto message via double-click
+        /// </summary>
         private void actionClick_RemoveAutoMessage(object sender, DataGridViewCellEventArgs e)
         {
-            int AutoMessageId = Convert.ToInt32(dg_autoMessages.Rows[e.RowIndex].Cells[0].Value);
-            chatInstanceManager.RemoveAutoMessage(AutoMessageId);
-            functionEvent_UpdateAutoMessages();
+            if (e.RowIndex < 0)
+                return;
+
+            int autoMessageId = Convert.ToInt32(dg_autoMessages.Rows[e.RowIndex].Cells[0].Value);
+            
+            var dialogResult = MessageBox.Show(
+                "Are you sure you want to remove this auto message?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (dialogResult != DialogResult.Yes)
+                return;
+
+            // Remove via manager
+            var result = chatInstanceManager.RemoveAutoMessage(autoMessageId);
+            
+            if (result.Success)
+            {
+                functionEvent_UpdateAutoMessages();
+            }
+            else
+            {
+                MessageBox.Show(result.Message, "Error Removing Auto Message",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
+        /// <summary>
+        /// Handle submitting a chat message via Enter key
+        /// </summary>
         private void actionKeyPress_SubmitMessage(object sender, KeyPressEventArgs e)
         {
-
             if (e.KeyChar != (char)Keys.Enter)
-            {
                 return;
-            }
-
-            if (theInstance!.instanceStatus == InstanceStatus.OFFLINE ||
-                theInstance!.instanceStatus == InstanceStatus.LOADINGMAP ||
-                theInstance!.instanceStatus == InstanceStatus.SCORING)
-            {
-                tb_chatMessage.Text = string.Empty;
-                return;
-            }
 
             string message = tb_chatMessage.Text.Trim();
-            if (string.IsNullOrEmpty(message))
+            if (string.IsNullOrWhiteSpace(message))
                 return;
 
-            int channel = 0;
+            // Map UI channel dropdown to channel number via manager
+            int channel = chatInstanceManager.MapChannelIndexToChannel(comboBox_chatGroup.SelectedIndex);
 
-            switch (comboBox_chatGroup.SelectedIndex)
+            // Send message via manager
+            var result = chatInstanceManager.SendChatMessage(message, channel);
+            
+            if (result.Success)
             {
+                tb_chatMessage.Clear();
+            }
+            else
+            {
+                // Show error to user
+                MessageBox.Show(result.Message, "Cannot Send Message",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 
-                case 1: channel = 1; break;
-                case 2: channel = 2; break;
-                case 3: channel = 3; break;
-                case 0: channel = 0; break;
-                default: channel = 0; break;
-
-            }
-
-            if (message.Contains("{P:") && message.Contains("}"))
-            {
-                int startIndex = message.IndexOf("{P:") + 3;
-                int endIndex = message.IndexOf("}", startIndex);
-                if (endIndex > startIndex)
+                // Clear textbox anyway if it was a validation error
+                if (!result.Message.Contains("offline") && 
+                    !result.Message.Contains("loading") && 
+                    !result.Message.Contains("scoring"))
                 {
-                    string playerSlot = message.Substring(startIndex, endIndex - startIndex);
-                    var playerEntry = theInstance.playerList.FirstOrDefault(p => p.Value.PlayerSlot.ToString() == playerSlot);
-                    if (playerEntry.Value == null)
-                    {
-                        MessageBox.Show($"No player found in PlayerSlot {playerSlot}. Message will not be sent.", "Player Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-                    string playerName = playerEntry.Value.PlayerName ?? string.Empty;
-                    if (!string.IsNullOrEmpty(playerName))
-                    {
-                        playerName = Functions.SanitizePlayerName(playerName);
-                        message = message.Replace($"{{P:{playerSlot}}}", playerName);
-                    }
+                    tb_chatMessage.Clear();
                 }
-            }
-
-            SendLongMessage(message, 59);
-
-            tb_chatMessage.Clear();
-        }
-        private static void SendLongMessage(string message, int maxLength = 59)
-        {
-            if (message.Length <= maxLength)
-            {
-                ServerMemory.WriteMemorySendChatMessage(1, message);
-                return;
-            }
-
-            for (int i = 0; i < message.Length; i += maxLength)
-            {
-                
-                int remainingLength = message.Length - i;
-                int chunkLength = Math.Min(maxLength, remainingLength);
-        
-                // Try to find a space to break at (word boundary)
-                if (chunkLength == maxLength && i + maxLength < message.Length)
-                {
-                    int lastSpace = message.LastIndexOf(' ', i + maxLength, maxLength);
-                    if (lastSpace > i)
-                    {
-                        chunkLength = lastSpace - i;
-                    }
-                }
-        
-                string chunk = message.Substring(i, chunkLength).Trim();
-                AppDebug.Log("SendLongMessage", $"Message being sent: {chunk}");
-                ServerMemory.WriteMemorySendChatMessage(1, chunk);
-                Thread.Sleep(1000); // Delay between chunks
             }
         }
     }
