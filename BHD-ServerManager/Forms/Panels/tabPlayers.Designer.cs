@@ -34,25 +34,26 @@
             // playerLayout
             // 
             playerLayout.ColumnCount = 5;
-            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 193F));
+            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 193F));
+            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 193F));
+            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 193F));
+            playerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 193F));
             playerLayout.Dock = DockStyle.Fill;
             playerLayout.Location = new Point(0, 0);
             playerLayout.Name = "playerLayout";
-            playerLayout.RowCount = 10;
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            playerLayout.RowCount = 11;
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            playerLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             playerLayout.Size = new Size(966, 422);
             playerLayout.TabIndex = 0;
             // 

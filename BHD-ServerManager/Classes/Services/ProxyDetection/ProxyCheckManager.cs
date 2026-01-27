@@ -85,7 +85,54 @@ namespace BHD_ServerManager.Classes.SupportClasses
             
             return addedCount + updatedCount;
         }
+        
+        /// <summary>
+        /// Check if an IP address is internal/private.
+        /// </summary>
+        private static bool IsInternalIP(IPAddress ipAddress)
+        {
+            if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+            {
+                // Check for IPv6 loopback (::1) and link-local (fe80::/10)
+                if (IPAddress.IsLoopback(ipAddress))
+                    return true;
 
+                byte[] bytes = ipAddress.GetAddressBytes();
+                // Link-local: fe80::/10
+                if (bytes[0] == 0xfe && (bytes[1] & 0xc0) == 0x80)
+                    return true;
+
+                // Unique local: fc00::/7
+                if ((bytes[0] & 0xfe) == 0xfc)
+                    return true;
+
+                return false;
+            }
+
+            // IPv4 checks
+            if (IPAddress.IsLoopback(ipAddress))
+                return true;
+
+            byte[] addressBytes = ipAddress.GetAddressBytes();
+
+            // 10.0.0.0/8
+            if (addressBytes[0] == 10)
+                return true;
+
+            // 172.16.0.0/12
+            if (addressBytes[0] == 172 && addressBytes[1] >= 16 && addressBytes[1] <= 31)
+                return true;
+
+            // 192.168.0.0/16
+            if (addressBytes[0] == 192 && addressBytes[1] == 168)
+                return true;
+
+            // 169.254.0.0/16 (link-local)
+            if (addressBytes[0] == 169 && addressBytes[1] == 254)
+                return true;
+
+            return false;
+        }
         /// <summary>
         /// Check an IP address for proxy/VPN/Tor. Uses in-memory cache first, then database, then API.
         /// </summary>
@@ -101,6 +148,21 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             if (ipAddress == null)
                 throw new ArgumentNullException(nameof(ipAddress));
+
+            // Step 0: Check if IP is internal/private - skip proxy check
+            if (IsInternalIP(ipAddress))
+            {
+                AppDebug.Log("ProxyCheckManager", $"Internal IP detected: {ipAddress} - Skipping proxy check");
+                return new ProxyCheckResult
+                {
+                    Success = true,
+                    IsProxy = false,
+                    IsVpn = false,
+                    IsTor = false,
+                    RiskScore = 0,
+                    ErrorMessage = "Internal IP Proxy Check Skipped"
+                };
+            }
 
             // Step 1: Check in-memory cache first
             var cachedRecord = GetFromMemoryCache(ipAddress);

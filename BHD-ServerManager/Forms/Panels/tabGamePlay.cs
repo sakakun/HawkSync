@@ -498,6 +498,7 @@ namespace BHD_ServerManager.Forms.Panels
                 {
                     ServerMemory.ReadMemoryServerStatus();
                     functionEvent_UpdateServerControls();
+                    Program.ServerManagerUI!.MapsTab.methodFunction_UpdateMapControls();
                 }
             }
             else

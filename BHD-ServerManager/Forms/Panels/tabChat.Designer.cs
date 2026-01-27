@@ -83,7 +83,6 @@
             chat_TabControl.SelectedIndex = 0;
             chat_TabControl.Size = new Size(966, 422);
             chat_TabControl.TabIndex = 0;
-            chat_TabControl.KeyPress += actionKeyPress_AddAutoMessage;
             // 
             // tabChatMessages
             // 

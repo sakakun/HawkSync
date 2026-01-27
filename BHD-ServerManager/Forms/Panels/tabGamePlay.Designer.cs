@@ -461,7 +461,6 @@
             cb_enableLeftLean.Checked = true;
             cb_enableLeftLean.CheckState = CheckState.Checked;
             cb_enableLeftLean.Dock = DockStyle.Fill;
-            cb_enableLeftLean.Enabled = false;
             cb_enableLeftLean.Location = new Point(15, 155);
             cb_enableLeftLean.Margin = new Padding(5, 0, 0, 0);
             cb_enableLeftLean.Name = "cb_enableLeftLean";

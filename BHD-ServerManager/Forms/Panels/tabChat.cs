@@ -69,14 +69,13 @@ namespace BHD_ServerManager.Forms.Panels
                 {
                     0 => "Server",
                     1 => "Global",
-                    3 => "Other",
                     2 => entry.MessageType2 switch
                     {
                         1 => "Blue",
                         2 => "Red",
-                        _ => "Other"
+                        _ => "Unknown Team"
                     },
-                    _ => "Other"
+                    _ => "Unknown"
                 };
 
                 entry.PlayerName = Functions.SanitizePlayerName(entry.PlayerName);
@@ -191,11 +190,8 @@ namespace BHD_ServerManager.Forms.Panels
                 theInstance!.instanceStatus == InstanceStatus.LOADINGMAP ||
                 theInstance!.instanceStatus == InstanceStatus.SCORING)
             {
-                tb_chatMessage.Enabled = false;
+                tb_chatMessage.Text = string.Empty;
                 return;
-            } else
-            {
-                tb_chatMessage.Enabled = true;
             }
 
             string message = tb_chatMessage.Text.Trim();
@@ -237,20 +233,39 @@ namespace BHD_ServerManager.Forms.Panels
                 }
             }
 
-            if (message.Length > 59)
-            {
-                for (int i = 0; i < message.Length; i += 59)
-                {
-                    string chunk = message.Substring(i, Math.Min(59, message.Length - i));
-                    ServerMemory.WriteMemorySendChatMessage(channel, chunk);
-                }
-            }
-            else
-            {
-                ServerMemory.WriteMemorySendChatMessage(channel, message);
-            }
+            SendLongMessage(message, 59);
 
             tb_chatMessage.Clear();
+        }
+        private static void SendLongMessage(string message, int maxLength = 59)
+        {
+            if (message.Length <= maxLength)
+            {
+                ServerMemory.WriteMemorySendChatMessage(1, message);
+                return;
+            }
+
+            for (int i = 0; i < message.Length; i += maxLength)
+            {
+                
+                int remainingLength = message.Length - i;
+                int chunkLength = Math.Min(maxLength, remainingLength);
+        
+                // Try to find a space to break at (word boundary)
+                if (chunkLength == maxLength && i + maxLength < message.Length)
+                {
+                    int lastSpace = message.LastIndexOf(' ', i + maxLength, maxLength);
+                    if (lastSpace > i)
+                    {
+                        chunkLength = lastSpace - i;
+                    }
+                }
+        
+                string chunk = message.Substring(i, chunkLength).Trim();
+                AppDebug.Log("SendLongMessage", $"Message being sent: {chunk}");
+                ServerMemory.WriteMemorySendChatMessage(1, chunk);
+                Thread.Sleep(1000); // Delay between chunks
+            }
         }
     }
 }

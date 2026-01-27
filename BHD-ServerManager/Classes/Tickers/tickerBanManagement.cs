@@ -426,6 +426,11 @@ namespace BHD_ServerManager.Classes.Tickers
                     // Punt the player if they're banned
                     if (shouldPunt)
                     {
+                        if (player.PlayerPing <= 0)
+                        {
+                            return;  // Player not in game yet. Needless to spam the "punt".
+                        }
+
                         ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
                         AppDebug.Log("tickerBanManagement", $"Punting player '{player.PlayerName}' (Slot {slotNum}). Reason: {puntReason}");
                     }

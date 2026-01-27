@@ -114,7 +114,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             // TODO: Remove the need for the thisServer variable in the ticker methods.
             CommonCore.Ticker?.Start("ServerManager", 500, () => tickerServerManager.runTicker());
-            CommonCore.Ticker?.Start("ChatManager", 500, () => tickerChatManagement.runTicker());
+            CommonCore.Ticker?.Start("ChatManager", 100, () => tickerChatManagement.runTicker());
             CommonCore.Ticker?.Start("PlayerManager", 1000, () => tickerPlayerManagement.runTicker());
             CommonCore.Ticker?.Start("BanManager", 1000, () => tickerBanManagement.runTicker());
 

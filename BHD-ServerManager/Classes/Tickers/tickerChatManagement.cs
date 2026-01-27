@@ -1,9 +1,10 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Forms;
+﻿using BHD_ServerManager;
 using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
+using BHD_ServerManager.Forms;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -19,28 +20,12 @@ namespace BHD_ServerManager.Classes.Tickers
         // For deduplication of chat messages
         private static string? _lastProcessedPlayerName = null;
         private static string? _lastProcessedMessageText = null;
-
-        // Helper for UI thread safety
+        private static DateTime _lastProcessedMessageTime = DateTime.MinValue;
 
         public static void runTicker()
         {
-            // Always ensure UI thread safety for UI-bound operations
-            if (thisServer.InvokeRequired)
-            {
-                try
-                {
-                    thisServer.BeginInvoke(new Action(runTicker));
-                }
-                catch (Exception ex)
-                {
-                    AppDebug.Log("tickerChatManagement", $"Error invoking runTicker: {ex.Message}");
-                }
-                return;
-            }
-
             lock (tickerLock)
             {
-
                 // Only process chat when server is online or in start delay
                 if (thisInstance.instanceStatus != InstanceStatus.ONLINE &&
                     thisInstance.instanceStatus != InstanceStatus.STARTDELAY)
@@ -48,31 +33,29 @@ namespace BHD_ServerManager.Classes.Tickers
                     return;
                 }
 
-                // Ensure the chat tab is initialized before proceeding
-                thisServer.ChatTab.ChatTickerHook();
-
-
                 if (ServerMemory.ReadMemoryIsProcessAttached())
                 {
                     // Recover auto message counter before processing auto messages
                     RecoverAutoMessageCounter();
 
-                    // Process auto messages (non-blocking)
+                    // Process auto messages (non-blocking to avoid ticker delays)
                     Task.Run(ProcessAutoMessages);
 
-                    // Process latest chat message and update UI (non-blocking)
-                    Task.Run(ProcessChatMessages);
+                    // Process latest chat message immediately (no Task.Run to prevent missing messages)
+                    ProcessChatMessages();
                 }
                 else
                 {
-                    AppDebug.Log("tickerChatManagement", "Server process is not attached. Ticker Skipping.");
+                    AppDebug.Log("tickerChatManagement", "Server process is not attached. Ticker skipping.");
                 }
             }
         }
 
         public static void ProcessChatMessages()
         {
+            // Read memory immediately on ticker thread to avoid missing messages
             var latestMessage = ServerMemory.ReadMemoryLastChatMessage();
+            
             if (latestMessage == null || latestMessage.Length < 3)
                 return;
 
@@ -92,13 +75,30 @@ namespace BHD_ServerManager.Classes.Tickers
 
             string playerName = lastMessage.Substring(0, msgStart).Trim();
             string playerMessage = lastMessage.Substring(msgStart + 1).Trim();
-
-            // Prevent duplicate messages based on last processed message
-            if (_lastProcessedPlayerName == playerName && _lastProcessedMessageText == playerMessage)
-                return;
-
+            
+            AppDebug.Log("ProcessChatMessages", $"Last Message: {latestMessage[0]} - {latestMessage[1]} - {latestMessage[2]}");
+            
             lock (chatLog)
             {
+                // Primary check: Compare against the most recent chat log entry
+                if (chatLog.Count > 0)
+                {
+                    var lastEntry = chatLog[^1];
+                    if (lastEntry.PlayerName == playerName && 
+                        lastEntry.MessageText == playerMessage)
+                    {
+                        return;
+                    }
+                }
+
+                // Secondary check: Use static fields with 1-second window
+                // This allows multi-part messages (sent 1+ seconds apart) to both be logged
+                if (_lastProcessedPlayerName == playerName && 
+                    _lastProcessedMessageText == playerMessage)
+                {
+                    return;
+                }
+
                 // Message type mapping
                 int msgType = msgTypeBytes switch
                 {
@@ -112,8 +112,9 @@ namespace BHD_ServerManager.Classes.Tickers
                 if (msgType == 0 && int.TryParse(latestMessage[0], out int chatLogAddr))
                     ServerMemory.WriteMemoryChatCountDownKiller(chatLogAddr);
 
-                // Find PlayerTeam number
+                // Find player team number
                 int teamNum = 3;
+
                 foreach (var player in thisInstance.playerList.Values)
                 {
                     if (player.PlayerName == playerName)
@@ -123,6 +124,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                 }
 
+                // Create chat log entry
                 ChatLogObject newChatLog = new ChatLogObject
                 {
                     PlayerName = playerName,
@@ -133,14 +135,24 @@ namespace BHD_ServerManager.Classes.Tickers
                 };
 
                 chatLog.Add(newChatLog);
-
                 chatInstanceManager.SaveChatLogEntry(newChatLog);
 
-                // Update last processed message for deduplication
+                // Update deduplication tracking
                 _lastProcessedPlayerName = playerName;
                 _lastProcessedMessageText = playerMessage;
+                _lastProcessedMessageTime = DateTime.Now;
 
                 AppDebug.Log("tickerChatManagement", $"Chat Message: {playerName} ({teamNum}) - {playerMessage} (Type: {msgType})");
+
+                // Marshal UI updates to UI thread AFTER processing
+                if (thisServer.InvokeRequired)
+                {
+                    thisServer.BeginInvoke(() => thisServer.ChatTab.ChatTickerHook());
+                }
+                else
+                {
+                    thisServer.ChatTab.ChatTickerHook();
+                }
             }
         }
 
@@ -222,6 +234,12 @@ namespace BHD_ServerManager.Classes.Tickers
             _autoMessageRecoveryDone = true;
         }
 
-
+        public static void ResetDeduplication()
+        {
+            _lastProcessedPlayerName = null;
+            _lastProcessedMessageText = null;
+            _lastProcessedMessageTime = DateTime.MinValue;
+            _autoMessageRecoveryDone = false;
+        }
     }
 }

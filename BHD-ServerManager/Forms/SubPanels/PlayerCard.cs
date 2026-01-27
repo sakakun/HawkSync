@@ -38,6 +38,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             label_dataSlotNum.Text = slotNum.ToString();
 
             ContextMenu = new ContextMenuStrip();
+            ContextMenu.Opening += ContextMenu_Opening;
             playerContextMenuIcon.ContextMenuStrip = ContextMenu;
             playerContextMenuIcon.Click -= PlayerContextMenuIcon_Click;
             playerContextMenuIcon.Click += PlayerContextMenuIcon_Click;
@@ -45,7 +46,19 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             BuildContextMenu();
 
             this.ResetStatus();
+        }
 
+        private void ContextMenu_Opening(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Refresh dynamic content
+            ContextMenu.Items[0].Text = Player.PlayerName ?? "Unknown";
+            ContextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms";
+    
+            // Refresh slap messages
+            if (ContextMenu.Items[5] is ToolStripMenuItem warningItem)
+            {
+                AddSlapsToWarningSubMenu(warningItem);
+            }
         }
 
         private void BuildContextMenu()
@@ -105,7 +118,6 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             };
             return command;
         }
-
 
         private ToolStripMenuItem CreateWarningMenuItem()
         {
@@ -174,7 +186,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                     {
                         RecordID = 0,
                         MatchID = 0,
-                        PlayerName = Player.PlayerNameBase64!,
+                        PlayerName = Player.PlayerName,
                         Date = DateTime.Now,
                         ExpireDate = null,
                         AssociatedIP = 0,
@@ -264,7 +276,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                     {
                         RecordID = 0,
                         MatchID = 0,
-                        PlayerName = Player.PlayerNameBase64!,
+                        PlayerName = Player.PlayerName!,
                         Date = DateTime.Now,
                         ExpireDate = null,
                         AssociatedIP = 0,
@@ -390,6 +402,8 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
             label_dataPlayerNameRole.Font = new Font("Segoe UI", 10, FontStyle.Regular);
             label_dataPlayerNameRole.UseCompatibleTextRendering = true;
+
+
             label_dataPlayerNameRole.Text = decodedPlayerName;
 
             label_dataIPinfo.Text = Player.PlayerIPAddress;

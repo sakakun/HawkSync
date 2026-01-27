@@ -1288,9 +1288,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int revert_colorbuffer = 0;
             byte[] revert_colorcode = Functions.ToByteArray("6A 01".Replace(" ", ""));
             WriteProcessMemory((int)processHandle, 0x00462ABA, revert_colorcode, revert_colorcode.Length, ref revert_colorbuffer);
-
-
-
+   
         }
         // Function: WriteMemoryChatCountDownKiller
         public static void WriteMemoryChatCountDownKiller(int ChatLogAddr)
@@ -1416,6 +1414,8 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             byte[] setDamageBy = BitConverter.GetBytes(0);
             int setDamageByWrite = 0;
+
+            AppDebug.Log("WriteMemoryTogglePlayerGodMode", $"Player Health Data - Base: 0x{playerNewLocationAddress:X8}, Object: 0x{playerObjectLocation:X8}, Damage Addr: 0x{(playerObjectLocation + 0x138):X8}, Health Addr: 0x{(playerObjectLocation + 0xE2):X8}");
 
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0x138, setDamageBy, setDamageBy.Length, ref setDamageByWrite);
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0xE2, setPlayerHealth, setPlayerHealth.Length, ref setPlayerHealthWrite);
@@ -2212,6 +2212,64 @@ namespace BHD_ServerManager.Classes.GameManagement
             int timerWritten1 = 0;
             WriteProcessMemory((int)processHandle, startingPtr1, timerBytes, timerBytes.Length, ref timerWritten1);
 
+        }
+
+        // Function: ReadMemoryPlayerLeaningStatus
+        // Returns: 0 = upright, 2 = left leaning, 4 = right leaning
+        public static int ReadMemoryPlayerLeaningStatus(int playerSlot)
+        {
+            int buffer = 0;
+            byte[] PointerAddr9 = new byte[4];
+            var Pointer = baseAddr + 0x005ED600;
+
+            // read the playerlist memory
+            ReadProcessMemory((int)processHandle, Pointer, PointerAddr9, PointerAddr9.Length, ref buffer);
+            var playerlistStartingLocationPointer = BitConverter.ToInt32(PointerAddr9, 0) + 0x28;
+            byte[] playerListStartingLocationByteArray = new byte[4];
+            int playerListStartingLocationBuffer = 0;
+            ReadProcessMemory((int)processHandle, playerlistStartingLocationPointer, playerListStartingLocationByteArray, playerListStartingLocationByteArray.Length, ref playerListStartingLocationBuffer);
+
+            int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
+
+            // Calculate the player's address
+            int playerNewLocationAddress = playerlistStartingLocation + (playerSlot - 1) * 0xAF33C;
+
+            byte[] playerObjectLocationBytes = new byte[4];
+            int playerObjectLocationRead = 0;
+            ReadProcessMemory((int)processHandle, playerNewLocationAddress + 0x11C, playerObjectLocationBytes, playerObjectLocationBytes.Length, ref playerObjectLocationRead);
+            int playerObjectLocation = BitConverter.ToInt32(playerObjectLocationBytes, 0);
+
+            // Read prone/rolling status (2 bytes)
+            byte[] proneStatusBytes = new byte[2];
+            int proneStatusRead = 0;
+            ReadProcessMemory((int)processHandle, playerObjectLocation + 0x164, proneStatusBytes, proneStatusBytes.Length, ref proneStatusRead);
+            short proneStatus = BitConverter.ToInt16(proneStatusBytes, 0);
+
+            // Check if player is rolling (95 or 96) - ignore leaning status when rolling
+            if (proneStatus == 95 || proneStatus == 96)
+            {
+                AppDebug.Log("ReadMemoryPlayerLeaningStatus", $"Slot {playerSlot} - Rolling detected (prone: {proneStatus}), ignoring lean");
+                return 0; // Return 0 (upright) when rolling
+            }
+
+            // Read leaning status (2 bytes)
+            byte[] leaningStatusBytes = new byte[2];
+            int leaningStatusRead = 0;
+            ReadProcessMemory((int)processHandle, playerObjectLocation + 0x102, leaningStatusBytes, leaningStatusBytes.Length, ref leaningStatusRead);
+            short leaningStatus = BitConverter.ToInt16(leaningStatusBytes, 0);
+
+            // Normalize the status (remove the +8 for moving)
+            // 0 = upright, 2 = left lean, 4 = right lean
+            // 8 = moving upright, 10 = moving left lean, 12 = moving right lean
+            int normalizedStatus = leaningStatus % 8;
+
+            AppDebug.Log("ReadMemoryPlayerLeaningStatus", 
+                $"Slot {playerSlot} - Object: 0x{playerObjectLocation:X8}, " +
+                $"Lean Addr: 0x{(playerObjectLocation + 0x102):X8}, " +
+                $"Prone Addr: 0x{(playerObjectLocation + 0x164):X8}, " +
+                $"Raw: {leaningStatus}, Normalized: {normalizedStatus}");
+
+            return normalizedStatus;
         }
 
     }

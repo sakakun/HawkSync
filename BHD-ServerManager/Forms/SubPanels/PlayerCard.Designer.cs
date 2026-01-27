@@ -47,26 +47,28 @@
             playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonHiking;
             playerTeamIcon.IconColor = SystemColors.ControlText;
             playerTeamIcon.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            playerTeamIcon.IconSize = 28;
-            playerTeamIcon.Location = new Point(2, 3);
+            playerTeamIcon.IconSize = 35;
+            playerTeamIcon.Location = new Point(3, 4);
             playerTeamIcon.Name = "playerTeamIcon";
-            playerTeamIcon.Size = new Size(32, 32);
+            playerTeamIcon.Size = new Size(37, 35);
             playerTeamIcon.TabIndex = 0;
             playerTeamIcon.TabStop = false;
             // 
             // playerContextMenuIcon
             // 
+            playerContextMenuIcon.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             playerContextMenuIcon.BackColor = SystemColors.Control;
+            playerContextMenuIcon.BackgroundImageLayout = ImageLayout.Center;
             playerContextMenuIcon.Cursor = Cursors.Hand;
             playerContextMenuIcon.ForeColor = SystemColors.ControlText;
             playerContextMenuIcon.IconChar = FontAwesome.Sharp.IconChar.EllipsisV;
             playerContextMenuIcon.IconColor = SystemColors.ControlText;
             playerContextMenuIcon.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            playerContextMenuIcon.IconSize = 24;
-            playerContextMenuIcon.Location = new Point(160, 4);
+            playerContextMenuIcon.IconSize = 33;
+            playerContextMenuIcon.Location = new Point(161, 7);
             playerContextMenuIcon.Margin = new Padding(0);
             playerContextMenuIcon.Name = "playerContextMenuIcon";
-            playerContextMenuIcon.Size = new Size(24, 24);
+            playerContextMenuIcon.Size = new Size(33, 35);
             playerContextMenuIcon.TabIndex = 1;
             playerContextMenuIcon.TabStop = false;
             // 
@@ -74,29 +76,29 @@
             // 
             label_dataPlayerNameRole.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label_dataPlayerNameRole.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label_dataPlayerNameRole.Location = new Point(61, 0);
+            label_dataPlayerNameRole.Location = new Point(50, 4);
             label_dataPlayerNameRole.Name = "label_dataPlayerNameRole";
             label_dataPlayerNameRole.Size = new Size(100, 15);
             label_dataPlayerNameRole.TabIndex = 2;
             label_dataPlayerNameRole.Text = "Slot Empty";
-            label_dataPlayerNameRole.TextAlign = ContentAlignment.MiddleRight;
+            label_dataPlayerNameRole.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label_dataIPinfo
             // 
             label_dataIPinfo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label_dataIPinfo.Location = new Point(61, 13);
+            label_dataIPinfo.Location = new Point(50, 19);
             label_dataIPinfo.Name = "label_dataIPinfo";
             label_dataIPinfo.Size = new Size(100, 15);
             label_dataIPinfo.TabIndex = 3;
             label_dataIPinfo.Text = "000.000.000.000";
-            label_dataIPinfo.TextAlign = ContentAlignment.MiddleRight;
+            label_dataIPinfo.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label_dataSlotNum
             // 
             label_dataSlotNum.AutoSize = true;
             label_dataSlotNum.FlatStyle = FlatStyle.Flat;
             label_dataSlotNum.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label_dataSlotNum.Location = new Point(31, 8);
+            label_dataSlotNum.Location = new Point(32, 4);
             label_dataSlotNum.Margin = new Padding(0);
             label_dataSlotNum.Name = "label_dataSlotNum";
             label_dataSlotNum.Size = new Size(21, 15);
@@ -109,13 +111,13 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BorderStyle = BorderStyle.FixedSingle;
+            Controls.Add(label_dataSlotNum);
             Controls.Add(playerContextMenuIcon);
             Controls.Add(playerTeamIcon);
             Controls.Add(label_dataPlayerNameRole);
             Controls.Add(label_dataIPinfo);
-            Controls.Add(label_dataSlotNum);
             Name = "PlayerCard";
-            Size = new Size(180, 30);
+            Size = new Size(193, 42);
             ((System.ComponentModel.ISupportInitialize)playerTeamIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)playerContextMenuIcon).EndInit();
             ResumeLayout(false);
