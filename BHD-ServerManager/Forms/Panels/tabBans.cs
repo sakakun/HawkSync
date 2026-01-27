@@ -62,31 +62,11 @@ namespace BHD_ServerManager.Forms.Panels
                 textBox_NetLimiterPassword.Enabled = shouldBeEnabled;
             }
 
-            if (theInstance!.proxyCheckEnabled && ProxyCheckManager.IsInitialized == false)
+            // Initialize Proxy Service if needed
+            if (theInstance!.proxyCheckEnabled && !ProxyCheckManager.IsInitialized)
             {
-                IProxyCheckService? proxyService = null;
-    
-                // Initialize Proxy Services
-                if (theInstance.proxyCheckServiceProvider == 1) 
-                { 
-                    proxyService = new ProxyCheckIoService(theInstance!.proxyCheckAPIKey); 
-                }
-                else if (theInstance.proxyCheckServiceProvider == 2) 
-                { 
-                    proxyService = new IP2LocationService(theInstance!.proxyCheckAPIKey); 
-                }
-                else if (theInstance.proxyCheckServiceProvider == 0) 
-                { 
-                    theInstance!.proxyCheckEnabled = false; 
-                    return; 
-                }
-
-                if (proxyService != null)
-                {
-                    ProxyCheckManager.Initialize(proxyService, cacheExpirationDays: (int)theInstance.proxyCheckCacheTime);
-                }
+                banInstanceManager.InitializeProxyService();
             }
-
         }
 
         /// <summary>
@@ -157,9 +137,8 @@ namespace BHD_ServerManager.Forms.Panels
             if (instanceBans == null)
                 return;
 
-            // Reload from database
-            instanceBans.BannedPlayerNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Ban);
-            instanceBans.BannedPlayerIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Ban);
+            // Reload from database via manager
+            banInstanceManager.LoadBlacklistRecords();
 
             // Refresh DataGridViews
             LoadBlacklistGrids();
@@ -293,199 +272,153 @@ namespace BHD_ServerManager.Forms.Panels
             if (instanceBans == null)
                 return;
 
-            // Determine ban type
+            // Gather form data
             var recordType = blacklist_PermBan.Checked
                 ? banInstanceRecordType.Permanent
                 : banInstanceRecordType.Temporary;
 
-            // Temp Ban Expiration Date
             DateTime? expireDate = recordType == banInstanceRecordType.Temporary
                 ? blacklist_DateEnd.Value
                 : null;
 
-            // Validate temporary ban has future end date
-            if (recordType == banInstanceRecordType.Temporary && expireDate.HasValue)
-            {
-                if (expireDate.Value <= DateTime.Now)
-                {
-                    MessageBox.Show("Temporary ban end date must be greater than the current date and time.",
-                        "Validation Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    return;
-                }
-            }
-
             DateTime banDate = blacklist_DateStart.Value;
             string notes = blacklist_notes.Text.Trim();
 
-            int nameRecordID = _blacklistSelectedRecordIDName;
-            int ipRecordID = _blacklistSelectedRecordIDIP;
+            bool isNameVisible = blacklist_PlayerName.Visible && !string.IsNullOrWhiteSpace(blacklist_PlayerNameTxt.Text);
+            bool isIPVisible = blacklist_IPAddress.Visible && !string.IsNullOrWhiteSpace(blacklist_IPAddressTxt.Text);
 
-            // Track if we need to update associations after both records are created
-            banInstancePlayerName? createdNameRecord = null;
-            banInstancePlayerIP? createdIPRecord = null;
-            bool needsAssociationUpdate = false;
+            // Parse IP if needed
+            IPAddress? ipAddress = null;
+            int subnetMask = 32;
+
+            if (isIPVisible)
+            {
+                if (!IPAddress.TryParse(blacklist_IPAddressTxt.Text.Trim(), out ipAddress))
+                {
+                    MessageBox.Show("Invalid IP Address format.", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!int.TryParse(blacklist_IPSubnetTxt.Text, out subnetMask))
+                    subnetMask = 32;
+            }
 
             try
             {
-                // Save Player Name Ban (if visible)
-                if (blacklist_PlayerName.Visible && !string.IsNullOrWhiteSpace(blacklist_PlayerNameTxt.Text))
+                // Determine if we're creating or updating
+                bool isCreatingName = _blacklistSelectedRecordIDName == -1;
+                bool isCreatingIP = _blacklistSelectedRecordIDIP == -1;
+
+                // Handle different scenarios
+                if (isNameVisible && isIPVisible)
                 {
-                    string playerName = blacklist_PlayerNameTxt.Text.Trim();
-
-                    if (_blacklistSelectedRecordIDName == -1)
+                    // Both name and IP
+                    if (isCreatingName && isCreatingIP)
                     {
-                        // Create new record
-                        var nameRecord = new banInstancePlayerName
-                        {
-                            RecordID = 0, // Will be assigned by database
-                            MatchID = 0,
-                            PlayerName = playerName,
-                            Date = banDate,
-                            ExpireDate = expireDate,
-                            AssociatedIP = ipRecordID > 0 ? ipRecordID : 0,
-                            RecordType = recordType,
-                            RecordCategory = (int)RecordCategory.Ban,
-                            Notes = notes
-                        };
-
-                        // Add to database
-                        nameRecordID = DatabaseManager.AddPlayerNameRecord(nameRecord);
-                        nameRecord.RecordID = nameRecordID;
-
-                        // Add to in-memory list
-                        instanceBans.BannedPlayerNames.Add(nameRecord);
-
-                        // Add to DataGridView
-                        dgPlayerNamesBlacklist.Rows.Add(
-                            nameRecord.RecordID,
-                            nameRecord.PlayerName,
-                            nameRecord.Date.ToString("yyyy-MM-dd")
+                        // Create both with bidirectional association
+                        var result = banInstanceManager.AddBlacklistBothRecords(
+                            blacklist_PlayerNameTxt.Text.Trim(),
+                            ipAddress!,
+                            subnetMask,
+                            banDate,
+                            expireDate,
+                            recordType,
+                            notes
                         );
 
-                        // Track for potential association update
-                        createdNameRecord = nameRecord;
-                        if (blacklist_IPAddress.Visible && _blacklistSelectedRecordIDIP == -1)
+                        if (!result.Success)
                         {
-                            needsAssociationUpdate = true;
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
                         }
-                    }
-                    else
-                    {
-                        // Update existing record
-                        var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDName);
+
+                        // Add to grids
+                        var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == result.NameRecordID);
+                        var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == result.IPRecordID);
+
                         if (nameRecord != null)
                         {
-                            nameRecord.PlayerName = playerName;
-                            nameRecord.Date = banDate;
-                            nameRecord.ExpireDate = expireDate;
-                            nameRecord.RecordType = recordType;
-                            nameRecord.Notes = notes;
-                            nameRecord.AssociatedIP = ipRecordID > 0 ? ipRecordID : nameRecord.AssociatedIP;
-
-                            // Update database
-                            DatabaseManager.UpdatePlayerNameRecord(nameRecord);
-
-                            // Update DataGridView
-                            var row = dgPlayerNamesBlacklist.Rows.Cast<DataGridViewRow>()
-                                .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDName);
-                            if (row != null)
-                            {
-                                row.Cells[1].Value = nameRecord.PlayerName;
-                                row.Cells[2].Value = nameRecord.Date.ToString("yyyy-MM-dd");
-                            }
+                            dgPlayerNamesBlacklist.Rows.Add(
+                                nameRecord.RecordID,
+                                nameRecord.PlayerName,
+                                nameRecord.Date.ToString("yyyy-MM-dd")
+                            );
                         }
-                    }
-                }
 
-                // Save IP Address Ban (if visible)
-                if (blacklist_IPAddress.Visible && !string.IsNullOrWhiteSpace(blacklist_IPAddressTxt.Text))
-                {
-                    if (IPAddress.TryParse(blacklist_IPAddressTxt.Text.Trim(), out IPAddress? ipAddress))
-                    {
-                        int subnetMask = int.TryParse(blacklist_IPSubnetTxt.Text, out int subnet)
-                            ? subnet
-                            : 32;
-
-                        if (_blacklistSelectedRecordIDIP == -1)
+                        if (ipRecord != null)
                         {
-                            // Create new record
-                            var ipRecord = new banInstancePlayerIP
-                            {
-                                RecordID = 0, // Will be assigned by database
-                                MatchID = 0,
-                                PlayerIP = ipAddress,
-                                SubnetMask = subnetMask,
-                                Date = banDate,
-                                ExpireDate = expireDate,
-                                AssociatedName = nameRecordID > 0 ? nameRecordID : 0,
-                                RecordType = recordType,
-                                RecordCategory = (int)RecordCategory.Ban,
-                                Notes = notes
-                            };
-
-                            // Add to database
-                            ipRecordID = DatabaseManager.AddPlayerIPRecord(ipRecord);
-                            ipRecord.RecordID = ipRecordID;
-
-                            // Add to in-memory list
-                            instanceBans.BannedPlayerIPs.Add(ipRecord);
-
-                            // Add to DataGridView
                             dgPlayerAddressBlacklist.Rows.Add(
                                 ipRecord.RecordID,
                                 $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}",
                                 ipRecord.Date.ToString("yyyy-MM-dd")
                             );
+                        }
+                    }
+                    else
+                    {
+                        // Update existing records
+                        if (isNameVisible && !isCreatingName)
+                        {
+                            var nameResult = banInstanceManager.UpdateBlacklistNameRecord(
+                                _blacklistSelectedRecordIDName,
+                                blacklist_PlayerNameTxt.Text.Trim(),
+                                banDate,
+                                expireDate,
+                                recordType,
+                                notes,
+                                isCreatingIP ? null : _blacklistSelectedRecordIDIP
+                            );
 
-                            // Add to NetLimiter filter if enabled
-                            if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName))
+                            if (!nameResult.Success)
                             {
-                                _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress.ToString(), subnetMask);
+                                MessageBox.Show(nameResult.Message, "Error",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
 
-                            // Track for potential association update
-                            createdIPRecord = ipRecord;
-                        }
-                        else
-                        {
-                            // Update existing record
-                            var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDIP);
-                            if (ipRecord != null)
+                            // Update grid
+                            var row = dgPlayerNamesBlacklist.Rows.Cast<DataGridViewRow>()
+                                .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDName);
+                            if (row != null)
                             {
-                                // Store old IP and subnet for NetLimiter update
-                                string oldIP = ipRecord.PlayerIP.ToString();
-                                int oldSubnet = ipRecord.SubnetMask;
-                                bool ipChanged = !ipRecord.PlayerIP.Equals(ipAddress) || ipRecord.SubnetMask != subnetMask;
-
-                                // Update record
-                                ipRecord.PlayerIP = ipAddress;
-                                ipRecord.SubnetMask = subnetMask;
-                                ipRecord.Date = banDate;
-                                ipRecord.ExpireDate = expireDate;
-                                ipRecord.RecordType = recordType;
-                                ipRecord.Notes = notes;
-                                ipRecord.AssociatedName = nameRecordID > 0 ? nameRecordID : ipRecord.AssociatedName;
-
-                                // Update database
-                                DatabaseManager.UpdatePlayerIPRecord(ipRecord);
-
-                                // Update NetLimiter filter if enabled and IP/subnet changed
-                                if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName) && ipChanged)
+                                var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDName);
+                                if (nameRecord != null)
                                 {
-                                    _ = Task.Run(async () =>
-                                    {
-                                        await NetLimiterClient.RemoveIpFromFilterAsync(theInstance.netLimiterFilterName, oldIP, oldSubnet);
-                                        await NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress.ToString(), subnetMask);
-                                    });
+                                    row.Cells[1].Value = nameRecord.PlayerName;
+                                    row.Cells[2].Value = nameRecord.Date.ToString("yyyy-MM-dd");
                                 }
+                            }
+                        }
 
-                                // Update DataGridView
-                                var row = dgPlayerAddressBlacklist.Rows.Cast<DataGridViewRow>()
-                                    .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDIP);
+                        if (isIPVisible && !isCreatingIP)
+                        {
+                            var ipResult = banInstanceManager.UpdateBlacklistIPRecord(
+                                _blacklistSelectedRecordIDIP,
+                                ipAddress!,
+                                subnetMask,
+                                banDate,
+                                expireDate,
+                                recordType,
+                                notes,
+                                isCreatingName ? null : _blacklistSelectedRecordIDName
+                            );
 
-                                if (row != null)
+                            if (!ipResult.Success)
+                            {
+                                MessageBox.Show(ipResult.Message, "Error",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            // Update grid
+                            var row = dgPlayerAddressBlacklist.Rows.Cast<DataGridViewRow>()
+                                .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDIP);
+                            if (row != null)
+                            {
+                                var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDIP);
+                                if (ipRecord != null)
                                 {
                                     row.Cells[1].Value = $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}";
                                     row.Cells[2].Value = ipRecord.Date.ToString("yyyy-MM-dd");
@@ -493,22 +426,132 @@ namespace BHD_ServerManager.Forms.Panels
                             }
                         }
                     }
+                }
+                else if (isNameVisible)
+                {
+                    // Name only
+                    if (isCreatingName)
+                    {
+                        var result = banInstanceManager.AddBlacklistNameRecord(
+                            blacklist_PlayerNameTxt.Text.Trim(),
+                            banDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == result.RecordID);
+                        if (nameRecord != null)
+                        {
+                            dgPlayerNamesBlacklist.Rows.Add(
+                                nameRecord.RecordID,
+                                nameRecord.PlayerName,
+                                nameRecord.Date.ToString("yyyy-MM-dd")
+                            );
+                        }
+                    }
                     else
                     {
-                        MessageBox.Show("Invalid IP Address format.", "Validation Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
+                        var result = banInstanceManager.UpdateBlacklistNameRecord(
+                            _blacklistSelectedRecordIDName,
+                            blacklist_PlayerNameTxt.Text.Trim(),
+                            banDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Update grid
+                        var row = dgPlayerNamesBlacklist.Rows.Cast<DataGridViewRow>()
+                            .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDName);
+                        if (row != null)
+                        {
+                            var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDName);
+                            if (nameRecord != null)
+                            {
+                                row.Cells[1].Value = nameRecord.PlayerName;
+                                row.Cells[2].Value = nameRecord.Date.ToString("yyyy-MM-dd");
+                            }
+                        }
                     }
                 }
-
-
-
-                // Update bidirectional association if both records were created together
-                if (needsAssociationUpdate && createdNameRecord != null && createdIPRecord != null)
+                else if (isIPVisible)
                 {
-                    createdNameRecord.AssociatedIP = createdIPRecord.RecordID;
-                    DatabaseManager.UpdatePlayerNameRecord(createdNameRecord);
-                    AppDebug.Log("tabBans", $"Updated bidirectional association: Name {createdNameRecord.RecordID} <-> IP {createdIPRecord.RecordID}");
+                    // IP only
+                    if (isCreatingIP)
+                    {
+                        var result = banInstanceManager.AddBlacklistIPRecord(
+                            ipAddress!,
+                            subnetMask,
+                            banDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == result.RecordID);
+                        if (ipRecord != null)
+                        {
+                            dgPlayerAddressBlacklist.Rows.Add(
+                                ipRecord.RecordID,
+                                $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}",
+                                ipRecord.Date.ToString("yyyy-MM-dd")
+                            );
+                        }
+                    }
+                    else
+                    {
+                        var result = banInstanceManager.UpdateBlacklistIPRecord(
+                            _blacklistSelectedRecordIDIP,
+                            ipAddress!,
+                            subnetMask,
+                            banDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Update grid
+                        var row = dgPlayerAddressBlacklist.Rows.Cast<DataGridViewRow>()
+                            .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDIP);
+                        if (row != null)
+                        {
+                            var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDIP);
+                            if (ipRecord != null)
+                            {
+                                row.Cells[1].Value = $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}";
+                                row.Cells[2].Value = ipRecord.Date.ToString("yyyy-MM-dd");
+                            }
+                        }
+                    }
                 }
 
                 // Reset selection IDs and form
@@ -571,7 +614,6 @@ namespace BHD_ServerManager.Forms.Panels
             blacklist_btnReset.Visible = false;
 
             blacklistForm.Visible = false;
-
         }
 
         /// <summary>
@@ -641,20 +683,35 @@ namespace BHD_ServerManager.Forms.Panels
 
             try
             {
-                // Perform deletion based on action
+                OperationResult opResult;
+
+                // Perform deletion based on action via manager
                 switch (deleteAction)
                 {
                     case RecordDeleteAction.Both:
-                        Blacklist_DeleteBothRecords(nameRecord!, ipRecord!);
+                        opResult = banInstanceManager.DeleteBlacklistBothRecords(
+                            _blacklistSelectedRecordIDName,
+                            _blacklistSelectedRecordIDIP
+                        );
                         break;
 
                     case RecordDeleteAction.NameOnly:
-                        Blacklist_DeleteNameRecord(nameRecord!, associatedIPID);
+                        opResult = banInstanceManager.DeleteBlacklistNameRecord(_blacklistSelectedRecordIDName);
                         break;
 
                     case RecordDeleteAction.IPOnly:
-                        Blacklist_DeleteIPRecord(ipRecord!, associatedNameID);
+                        opResult = banInstanceManager.DeleteBlacklistIPRecord(_blacklistSelectedRecordIDIP);
                         break;
+
+                    default:
+                        return;
+                }
+
+                if (!opResult.Success)
+                {
+                    MessageBox.Show(opResult.Message, "Delete Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
                 // Reset form
@@ -672,7 +729,6 @@ namespace BHD_ServerManager.Forms.Panels
                 blacklist_btnDelete.Visible = false;
                 blacklist_btnReset.Visible = false;
 
-
                 MessageBox.Show("Record(s) deleted successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -682,94 +738,6 @@ namespace BHD_ServerManager.Forms.Panels
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 AppDebug.Log("tabBans", $"Error deleting ban: {ex}");
             }
-        }
-
-        /// <summary>
-        /// Delete both name and IP records
-        /// </summary>
-        private void Blacklist_DeleteBothRecords(banInstancePlayerName nameRecord, banInstancePlayerIP ipRecord)
-        {
-            if (instanceBans == null)
-                return;
-
-            // Delete from database
-            DatabaseManager.RemovePlayerNameRecord(nameRecord.RecordID);
-            DatabaseManager.RemovePlayerIPRecord(ipRecord.RecordID);
-
-            // Remove from in-memory lists
-            instanceBans.BannedPlayerNames.Remove(nameRecord);
-            instanceBans.BannedPlayerIPs.Remove(ipRecord);
-            
-            // Update NetLimiter if Enabled
-            if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName))
-            {
-                _ = NetLimiterClient.RemoveIpFromFilterAsync(theInstance.netLimiterFilterName, ipRecord.PlayerIP.ToString(), ipRecord.SubnetMask);
-            }
-            AppDebug.Log("tabBans", $"Deleted both records: Name ID {nameRecord.RecordID}, IP ID {ipRecord.RecordID}");
-        }
-
-        /// <summary>
-        /// Delete name record only, update associated IP if exists
-        /// </summary>
-        private void Blacklist_DeleteNameRecord(banInstancePlayerName nameRecord, int associatedIPID)
-        {
-            if (instanceBans == null)
-                return;
-
-            // Delete from database
-            DatabaseManager.RemovePlayerNameRecord(nameRecord.RecordID);
-
-            // Remove from in-memory list
-            instanceBans.BannedPlayerNames.Remove(nameRecord);
-
-            // Update associated IP record to clear the association
-            if (associatedIPID > 0)
-            {
-                var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == associatedIPID);
-                if (ipRecord != null)
-                {
-                    ipRecord.AssociatedName = 0;
-                    DatabaseManager.UpdatePlayerIPRecord(ipRecord);
-                    AppDebug.Log("tabBans", $"Cleared association on IP record {ipRecord.RecordID}");
-                }
-            }
-
-            AppDebug.Log("tabBans", $"Deleted name record ID {nameRecord.RecordID}");
-        }
-
-        /// <summary>
-        /// Delete IP record only, update associated name if exists
-        /// </summary>
-        private void Blacklist_DeleteIPRecord(banInstancePlayerIP ipRecord, int associatedNameID)
-        {
-            if (instanceBans == null)
-                return;
-
-            // Delete from database
-            DatabaseManager.RemovePlayerIPRecord(ipRecord.RecordID);
-
-            // Remove from in-memory list
-            instanceBans.BannedPlayerIPs.Remove(ipRecord);
-
-            // Update associated name record to clear the association
-            if (associatedNameID > 0)
-            {
-                var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == associatedNameID);
-                if (nameRecord != null)
-                {
-                    nameRecord.AssociatedIP = 0;
-                    DatabaseManager.UpdatePlayerNameRecord(nameRecord);
-                    AppDebug.Log("tabBans", $"Cleared association on name record {nameRecord.RecordID}");
-                }
-            }
-
-            // Update NetLimiter if Enabled
-            if (theInstance!.netLimiterEnabled && !string.IsNullOrEmpty(theInstance.netLimiterFilterName))
-            {
-                _ = NetLimiterClient.RemoveIpFromFilterAsync(theInstance.netLimiterFilterName, ipRecord.PlayerIP.ToString(), ipRecord.SubnetMask);
-            }
-
-            AppDebug.Log("tabBans", $"Deleted IP record ID {ipRecord.RecordID}");
         }
 
         /// <summary>
@@ -862,17 +830,6 @@ namespace BHD_ServerManager.Forms.Panels
                     _ => RecordDeleteAction.None
                 };
             }
-        }
-
-        /// <summary>
-        /// Enum for delete action choices
-        /// </summary>
-        private enum RecordDeleteAction
-        {
-            None,
-            Both,
-            NameOnly,
-            IPOnly
         }
 
         /// <summary>
@@ -1018,6 +975,7 @@ namespace BHD_ServerManager.Forms.Panels
             blacklist_btnDelete.Visible = true;
             blacklist_btnSave.Visible = true;
             blacklist_btnReset.Visible = true;
+            blacklist_btnClose.Visible = true;
         }
 
         // ================================================================================
@@ -1072,9 +1030,8 @@ namespace BHD_ServerManager.Forms.Panels
             if (instanceBans == null)
                 return;
 
-            // Reload from database
-            instanceBans.WhitelistedNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Whitelist);
-            instanceBans.WhitelistedIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Whitelist);
+            // Reload from database via manager
+            banInstanceManager.LoadWhitelistRecords();
 
             // Refresh DataGridViews
             LoadWhitelistGrids();
@@ -1208,176 +1165,153 @@ namespace BHD_ServerManager.Forms.Panels
             if (instanceBans == null)
                 return;
 
-            // Determine exempt type
+            // Gather form data
             var recordType = checkBox_permWL.Checked
                 ? banInstanceRecordType.Permanent
                 : banInstanceRecordType.Temporary;
 
-            // Temp Exempt Expiration Date
             DateTime? expireDate = recordType == banInstanceRecordType.Temporary
                 ? dateTimePicker_WLend.Value
                 : null;
 
-            // Validate temporary whitelist has future end date
-            if (recordType == banInstanceRecordType.Temporary && expireDate.HasValue)
-            {
-                if (expireDate.Value <= DateTime.Now)
-                {
-                    MessageBox.Show("Temporary whitelist end date must be greater than the current date and time.",
-                        "Validation Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    return;
-                }
-            }
-
             DateTime exemptDate = dateTimePicker_WLstart.Value;
             string notes = textBox_notesWL.Text.Trim();
 
-            int nameRecordID = _whitelistSelectedRecordIDName;
-            int ipRecordID = _whitelistSelectedRecordIDIP;
+            bool isNameVisible = groupBox10.Visible && !string.IsNullOrWhiteSpace(textBox_playerNameWL.Text);
+            bool isIPVisible = groupBox9.Visible && !string.IsNullOrWhiteSpace(textBox_addressWL.Text);
 
-            // Track if we need to update associations after both records are created
-            banInstancePlayerName? createdNameRecord = null;
-            banInstancePlayerIP? createdIPRecord = null;
-            bool needsAssociationUpdate = false;
+            // Parse IP if needed
+            IPAddress? ipAddress = null;
+            int subnetMask = 32;
+
+            if (isIPVisible)
+            {
+                if (!IPAddress.TryParse(textBox_addressWL.Text.Trim(), out ipAddress))
+                {
+                    MessageBox.Show("Invalid IP Address format.", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!int.TryParse(cb_subnetWL.Text, out subnetMask))
+                    subnetMask = 32;
+            }
 
             try
             {
-                // Save Player Name Whitelist (if visible)
-                if (groupBox10.Visible && !string.IsNullOrWhiteSpace(textBox_playerNameWL.Text))
+                // Determine if we're creating or updating
+                bool isCreatingName = _whitelistSelectedRecordIDName == -1;
+                bool isCreatingIP = _whitelistSelectedRecordIDIP == -1;
+
+                // Handle different scenarios
+                if (isNameVisible && isIPVisible)
                 {
-                    string playerName = textBox_playerNameWL.Text.Trim();
-
-                    if (_whitelistSelectedRecordIDName == -1)
+                    // Both name and IP
+                    if (isCreatingName && isCreatingIP)
                     {
-                        // Create new record
-                        var nameRecord = new banInstancePlayerName
-                        {
-                            RecordID = 0, // Will be assigned by database
-                            MatchID = 0,
-                            PlayerName = playerName,
-                            Date = exemptDate,
-                            ExpireDate = expireDate,
-                            AssociatedIP = ipRecordID > 0 ? ipRecordID : 0,
-                            RecordType = recordType,
-                            RecordCategory = (int)RecordCategory.Whitelist,
-                            Notes = notes
-                        };
-
-                        // Add to database
-                        nameRecordID = DatabaseManager.AddPlayerNameRecord(nameRecord);
-                        nameRecord.RecordID = nameRecordID;
-
-                        // Add to in-memory list
-                        instanceBans.WhitelistedNames.Add(nameRecord);
-
-                        // Add to DataGridView
-                        dgPlayerNamesWhitelist.Rows.Add(
-                            nameRecord.RecordID,
-                            nameRecord.PlayerName,
-                            nameRecord.Date.ToString("yyyy-MM-dd")
+                        // Create both with bidirectional association
+                        var result = banInstanceManager.AddWhitelistBothRecords(
+                            textBox_playerNameWL.Text.Trim(),
+                            ipAddress!,
+                            subnetMask,
+                            exemptDate,
+                            expireDate,
+                            recordType,
+                            notes
                         );
 
-                        // Track for potential association update
-                        createdNameRecord = nameRecord;
-                        if (groupBox9.Visible && _whitelistSelectedRecordIDIP == -1)
+                        if (!result.Success)
                         {
-                            needsAssociationUpdate = true;
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
                         }
-                    }
-                    else
-                    {
-                        // Update existing record
-                        var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDName);
+
+                        // Add to grids
+                        var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == result.NameRecordID);
+                        var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == result.IPRecordID);
+
                         if (nameRecord != null)
                         {
-                            nameRecord.PlayerName = playerName;
-                            nameRecord.Date = exemptDate;
-                            nameRecord.ExpireDate = expireDate;
-                            nameRecord.RecordType = recordType;
-                            nameRecord.Notes = notes;
-                            nameRecord.AssociatedIP = ipRecordID > 0 ? ipRecordID : nameRecord.AssociatedIP;
-
-                            // Update database
-                            DatabaseManager.UpdatePlayerNameRecord(nameRecord);
-
-                            // Update DataGridView
-                            var row = dgPlayerNamesWhitelist.Rows.Cast<DataGridViewRow>()
-                                .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDName);
-                            if (row != null)
-                            {
-                                row.Cells[1].Value = nameRecord.PlayerName;
-                                row.Cells[2].Value = nameRecord.Date.ToString("yyyy-MM-dd");
-                            }
+                            dgPlayerNamesWhitelist.Rows.Add(
+                                nameRecord.RecordID,
+                                nameRecord.PlayerName,
+                                nameRecord.Date.ToString("yyyy-MM-dd")
+                            );
                         }
-                    }
-                }
 
-                // Save IP Address Whitelist (if visible)
-                if (groupBox9.Visible && !string.IsNullOrWhiteSpace(textBox_addressWL.Text))
-                {
-                    if (IPAddress.TryParse(textBox_addressWL.Text.Trim(), out IPAddress? ipAddress))
-                    {
-                        int subnetMask = int.TryParse(cb_subnetWL.Text, out int subnet)
-                            ? subnet
-                            : 32;
-
-                        if (_whitelistSelectedRecordIDIP == -1)
+                        if (ipRecord != null)
                         {
-                            // Create new record
-                            var ipRecord = new banInstancePlayerIP
-                            {
-                                RecordID = 0, // Will be assigned by database
-                                MatchID = 0,
-                                PlayerIP = ipAddress,
-                                SubnetMask = subnetMask,
-                                Date = exemptDate,
-                                ExpireDate = expireDate,
-                                AssociatedName = nameRecordID > 0 ? nameRecordID : 0,
-                                RecordType = recordType,
-                                RecordCategory = (int)RecordCategory.Whitelist,
-                                Notes = notes
-                            };
-
-                            // Add to database
-                            ipRecordID = DatabaseManager.AddPlayerIPRecord(ipRecord);
-                            ipRecord.RecordID = ipRecordID;
-
-                            // Add to in-memory list
-                            instanceBans.WhitelistedIPs.Add(ipRecord);
-
-                            // Add to DataGridView
                             dgPlayerAddressWhitelist.Rows.Add(
                                 ipRecord.RecordID,
                                 $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}",
                                 ipRecord.Date.ToString("yyyy-MM-dd")
                             );
-
-                            // Track for potential association update
-                            createdIPRecord = ipRecord;
                         }
-                        else
+                    }
+                    else
+                    {
+                        // Update existing records
+                        if (isNameVisible && !isCreatingName)
                         {
-                            // Update existing record
-                            var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDIP);
-                            if (ipRecord != null)
+                            var nameResult = banInstanceManager.UpdateWhitelistNameRecord(
+                                _whitelistSelectedRecordIDName,
+                                textBox_playerNameWL.Text.Trim(),
+                                exemptDate,
+                                expireDate,
+                                recordType,
+                                notes,
+                                isCreatingIP ? null : _whitelistSelectedRecordIDIP
+                            );
+
+                            if (!nameResult.Success)
                             {
-                                ipRecord.PlayerIP = ipAddress;
-                                ipRecord.SubnetMask = subnetMask;
-                                ipRecord.Date = exemptDate;
-                                ipRecord.ExpireDate = expireDate;
-                                ipRecord.RecordType = recordType;
-                                ipRecord.Notes = notes;
-                                ipRecord.AssociatedName = nameRecordID > 0 ? nameRecordID : ipRecord.AssociatedName;
+                                MessageBox.Show(nameResult.Message, "Error",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
 
-                                // Update database
-                                DatabaseManager.UpdatePlayerIPRecord(ipRecord);
+                            // Update grid
+                            var row = dgPlayerNamesWhitelist.Rows.Cast<DataGridViewRow>()
+                                .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDName);
+                            if (row != null)
+                            {
+                                var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDName);
+                                if (nameRecord != null)
+                                {
+                                    row.Cells[1].Value = nameRecord.PlayerName;
+                                    row.Cells[2].Value = nameRecord.Date.ToString("yyyy-MM-dd");
+                                }
+                            }
+                        }
 
-                                // Update DataGridView
-                                var row = dgPlayerAddressWhitelist.Rows.Cast<DataGridViewRow>()
-                                    .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDIP);
-                                if (row != null)
+                        if (isIPVisible && !isCreatingIP)
+                        {
+                            var ipResult = banInstanceManager.UpdateWhitelistIPRecord(
+                                _whitelistSelectedRecordIDIP,
+                                ipAddress!,
+                                subnetMask,
+                                exemptDate,
+                                expireDate,
+                                recordType,
+                                notes,
+                                isCreatingName ? null : _whitelistSelectedRecordIDName
+                            );
+
+                            if (!ipResult.Success)
+                            {
+                                MessageBox.Show(ipResult.Message, "Error",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            // Update grid
+                            var row = dgPlayerAddressWhitelist.Rows.Cast<DataGridViewRow>()
+                                .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDIP);
+                            if (row != null)
+                            {
+                                var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDIP);
+                                if (ipRecord != null)
                                 {
                                     row.Cells[1].Value = $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}";
                                     row.Cells[2].Value = ipRecord.Date.ToString("yyyy-MM-dd");
@@ -1385,20 +1319,132 @@ namespace BHD_ServerManager.Forms.Panels
                             }
                         }
                     }
+                }
+                else if (isNameVisible)
+                {
+                    // Name only
+                    if (isCreatingName)
+                    {
+                        var result = banInstanceManager.AddWhitelistNameRecord(
+                            textBox_playerNameWL.Text.Trim(),
+                            exemptDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == result.RecordID);
+                        if (nameRecord != null)
+                        {
+                            dgPlayerNamesWhitelist.Rows.Add(
+                                nameRecord.RecordID,
+                                nameRecord.PlayerName,
+                                nameRecord.Date.ToString("yyyy-MM-dd")
+                            );
+                        }
+                    }
                     else
                     {
-                        MessageBox.Show("Invalid IP Address format.", "Validation Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
+                        var result = banInstanceManager.UpdateWhitelistNameRecord(
+                            _whitelistSelectedRecordIDName,
+                            textBox_playerNameWL.Text.Trim(),
+                            exemptDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Update grid
+                        var row = dgPlayerNamesWhitelist.Rows.Cast<DataGridViewRow>()
+                            .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDName);
+                        if (row != null)
+                        {
+                            var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDName);
+                            if (nameRecord != null)
+                            {
+                                row.Cells[1].Value = nameRecord.PlayerName;
+                                row.Cells[2].Value = nameRecord.Date.ToString("yyyy-MM-dd");
+                            }
+                        }
                     }
                 }
-
-                // Update bidirectional association if both records were created together
-                if (needsAssociationUpdate && createdNameRecord != null && createdIPRecord != null)
+                else if (isIPVisible)
                 {
-                    createdNameRecord.AssociatedIP = createdIPRecord.RecordID;
-                    DatabaseManager.UpdatePlayerNameRecord(createdNameRecord);
-                    AppDebug.Log("tabBans", $"Updated bidirectional association: Name {createdNameRecord.RecordID} <-> IP {createdIPRecord.RecordID}");
+                    // IP only
+                    if (isCreatingIP)
+                    {
+                        var result = banInstanceManager.AddWhitelistIPRecord(
+                            ipAddress!,
+                            subnetMask,
+                            exemptDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == result.RecordID);
+                        if (ipRecord != null)
+                        {
+                            dgPlayerAddressWhitelist.Rows.Add(
+                                ipRecord.RecordID,
+                                $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}",
+                                ipRecord.Date.ToString("yyyy-MM-dd")
+                            );
+                        }
+                    }
+                    else
+                    {
+                        var result = banInstanceManager.UpdateWhitelistIPRecord(
+                            _whitelistSelectedRecordIDIP,
+                            ipAddress!,
+                            subnetMask,
+                            exemptDate,
+                            expireDate,
+                            recordType,
+                            notes
+                        );
+
+                        if (!result.Success)
+                        {
+                            MessageBox.Show(result.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Update grid
+                        var row = dgPlayerAddressWhitelist.Rows.Cast<DataGridViewRow>()
+                            .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDIP);
+                        if (row != null)
+                        {
+                            var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDIP);
+                            if (ipRecord != null)
+                            {
+                                row.Cells[1].Value = $"{ipRecord.PlayerIP}/{ipRecord.SubnetMask}";
+                                row.Cells[2].Value = ipRecord.Date.ToString("yyyy-MM-dd");
+                            }
+                        }
+                    }
                 }
 
                 // Reset selection IDs and form
@@ -1526,20 +1572,35 @@ namespace BHD_ServerManager.Forms.Panels
 
             try
             {
-                // Perform deletion based on action
+                OperationResult opResult;
+
+                // Perform deletion based on action via manager
                 switch (deleteAction)
                 {
                     case RecordDeleteAction.Both:
-                        Whitelist_DeleteBothRecords(nameRecord!, ipRecord!);
+                        opResult = banInstanceManager.DeleteWhitelistBothRecords(
+                            _whitelistSelectedRecordIDName,
+                            _whitelistSelectedRecordIDIP
+                        );
                         break;
 
                     case RecordDeleteAction.NameOnly:
-                        Whitelist_DeleteNameRecord(nameRecord!, associatedIPID);
+                        opResult = banInstanceManager.DeleteWhitelistNameRecord(_whitelistSelectedRecordIDName);
                         break;
 
                     case RecordDeleteAction.IPOnly:
-                        Whitelist_DeleteIPRecord(ipRecord!, associatedNameID);
+                        opResult = banInstanceManager.DeleteWhitelistIPRecord(_whitelistSelectedRecordIDIP);
                         break;
+
+                    default:
+                        return;
+                }
+
+                if (!opResult.Success)
+                {
+                    MessageBox.Show(opResult.Message, "Delete Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
                 // Reset form
@@ -1560,83 +1621,6 @@ namespace BHD_ServerManager.Forms.Panels
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 AppDebug.Log("tabBans", $"Error deleting whitelist: {ex}");
             }
-        }
-
-        /// <summary>
-        /// Delete both name and IP whitelist records
-        /// </summary>
-        private void Whitelist_DeleteBothRecords(banInstancePlayerName nameRecord, banInstancePlayerIP ipRecord)
-        {
-            if (instanceBans == null)
-                return;
-
-            // Delete from database
-            DatabaseManager.RemovePlayerNameRecord(nameRecord.RecordID);
-            DatabaseManager.RemovePlayerIPRecord(ipRecord.RecordID);
-
-            // Remove from in-memory lists
-            instanceBans.WhitelistedNames.Remove(nameRecord);
-            instanceBans.WhitelistedIPs.Remove(ipRecord);
-
-            AppDebug.Log("tabBans", $"Deleted both whitelist records: Name ID {nameRecord.RecordID}, IP ID {ipRecord.RecordID}");
-        }
-
-        /// <summary>
-        /// Delete name whitelist record only, update associated IP if exists
-        /// </summary>
-        private void Whitelist_DeleteNameRecord(banInstancePlayerName nameRecord, int associatedIPID)
-        {
-            if (instanceBans == null)
-                return;
-
-            // Delete from database
-            DatabaseManager.RemovePlayerNameRecord(nameRecord.RecordID);
-
-            // Remove from in-memory list
-            instanceBans.WhitelistedNames.Remove(nameRecord);
-
-            // Update associated IP record to clear the association
-            if (associatedIPID > 0)
-            {
-                var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == associatedIPID);
-                if (ipRecord != null)
-                {
-                    ipRecord.AssociatedName = 0;
-                    DatabaseManager.UpdatePlayerIPRecord(ipRecord);
-                    AppDebug.Log("tabBans", $"Cleared association on IP whitelist record {ipRecord.RecordID}");
-                }
-            }
-
-            AppDebug.Log("tabBans", $"Deleted name whitelist record ID {nameRecord.RecordID}");
-        }
-
-        /// <summary>
-        /// Delete IP whitelist record only, update associated name if exists
-        /// </summary>
-        private void Whitelist_DeleteIPRecord(banInstancePlayerIP ipRecord, int associatedNameID)
-        {
-            if (instanceBans == null)
-                return;
-
-            // Delete from database
-            DatabaseManager.RemovePlayerIPRecord(ipRecord.RecordID);
-
-            // Remove from in-memory list
-            instanceBans.WhitelistedIPs.Remove(ipRecord);
-
-            // Update associated name record to clear the association
-            if (associatedNameID > 0)
-            {
-                var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == associatedNameID);
-                if (nameRecord != null)
-                {
-                    nameRecord.AssociatedIP = 0;
-                    DatabaseManager.UpdatePlayerNameRecord(nameRecord);
-                    AppDebug.Log("tabBans", $"Cleared association on name whitelist record {nameRecord.RecordID}");
-                }
-            }
-
-            AppDebug.Log("tabBans", $"Deleted IP whitelist record ID {ipRecord.RecordID}");
         }
 
         /// <summary>
@@ -1874,15 +1858,13 @@ namespace BHD_ServerManager.Forms.Panels
             wlControlDelete.Visible = true;
             wlControlSave.Visible = true;
             wlControlReset.Visible = true;
+            wlControlClose.Visible = true;
         }
 
         // ================================================================================
         // PROXY CHECKING FUNCTIONALITY
         // ================================================================================
 
-        /// <summary>
-        /// Load and display proxy check settings
-        /// </summary>
         /// <summary>
         /// Load and display proxy check settings from instance
         /// </summary>
@@ -1891,44 +1873,37 @@ namespace BHD_ServerManager.Forms.Panels
             if (theInstance == null)
                 return;
 
-            // Load settings from database into instance if not already loaded
-            theInstance.proxyCheckEnabled = ServerSettings.Get("proxyCheckEnabled", theInstance.proxyCheckEnabled);
-            theInstance.proxyCheckAPIKey = ServerSettings.Get("proxyCheckAPIKey", theInstance.proxyCheckAPIKey);
-            theInstance.proxyCheckCacheTime = ServerSettings.Get("proxyCheckCacheTime", theInstance.proxyCheckCacheTime);
-            theInstance.proxyCheckProxyAction = ServerSettings.Get("proxyCheckProxyAction", theInstance.proxyCheckProxyAction);
-            theInstance.proxyCheckVPNAction = ServerSettings.Get("proxyCheckVPNAction", theInstance.proxyCheckVPNAction);
-            theInstance.proxyCheckTORAction = ServerSettings.Get("proxyCheckTORAction", theInstance.proxyCheckTORAction);
-            theInstance.proxyCheckGeoMode = ServerSettings.Get("proxyCheckGeoMode", theInstance.proxyCheckGeoMode);
-            theInstance.proxyCheckServiceProvider = ServerSettings.Get("proxyCheckServiceProvider", theInstance.proxyCheckServiceProvider);
+            // Load settings via manager
+            var settings = banInstanceManager.LoadProxyCheckSettings();
 
             // General API Information and Overall Enablement
-            cb_enableProxyCheck.Checked = theInstance.proxyCheckEnabled;
-            textBox_ProxyAPIKey.Text = theInstance.proxyCheckAPIKey;
-            num_proxyCacheDays.Value = theInstance.proxyCheckCacheTime;
+            cb_enableProxyCheck.Checked = settings.Enabled;
+            textBox_ProxyAPIKey.Text = settings.ApiKey;
+            num_proxyCacheDays.Value = settings.CacheTime;
 
             // Proxy Checkboxes
-            checkBox_proxyNone.Checked = (theInstance.proxyCheckProxyAction == 0);
-            checkBox_proxyKick.Checked = (theInstance.proxyCheckProxyAction == 1);
-            checkBox_proxyBlock.Checked = (theInstance.proxyCheckProxyAction == 2);
+            checkBox_proxyNone.Checked = (settings.ProxyAction == 0);
+            checkBox_proxyKick.Checked = (settings.ProxyAction == 1);
+            checkBox_proxyBlock.Checked = (settings.ProxyAction == 2);
 
             // VPN Checkboxes
-            checkBox_vpnNone.Checked = (theInstance.proxyCheckVPNAction == 0);
-            checkBox_vpnKick.Checked = (theInstance.proxyCheckVPNAction == 1);
-            checkBox_vpnBlock.Checked = (theInstance.proxyCheckVPNAction == 2);
+            checkBox_vpnNone.Checked = (settings.VpnAction == 0);
+            checkBox_vpnKick.Checked = (settings.VpnAction == 1);
+            checkBox_vpnBlock.Checked = (settings.VpnAction == 2);
 
             // TOR Checkboxes
-            checkBox_torNone.Checked = (theInstance.proxyCheckTORAction == 0);
-            checkBox_torKick.Checked = (theInstance.proxyCheckTORAction == 1);
-            checkBox_torBlock.Checked = (theInstance.proxyCheckTORAction == 2);
+            checkBox_torNone.Checked = (settings.TorAction == 0);
+            checkBox_torKick.Checked = (settings.TorAction == 1);
+            checkBox_torBlock.Checked = (settings.TorAction == 2);
 
             // GEO Checkboxes
-            checkBox_GeoOff.Checked = (theInstance.proxyCheckGeoMode == 0);
-            checkBox_GeoBlock.Checked = (theInstance.proxyCheckGeoMode == 1);
-            checkBox_GeoAllow.Checked = (theInstance.proxyCheckGeoMode == 2);
+            checkBox_GeoOff.Checked = (settings.GeoMode == 0);
+            checkBox_GeoBlock.Checked = (settings.GeoMode == 1);
+            checkBox_GeoAllow.Checked = (settings.GeoMode == 2);
 
             // Proxy Checking Service Providers
-            cb_serviceProxyCheckIO.Checked = (theInstance.proxyCheckServiceProvider == 1);
-            cb_serviceIP2LocationIO.Checked = (theInstance.proxyCheckServiceProvider == 2);
+            cb_serviceProxyCheckIO.Checked = (settings.ServiceProvider == 1);
+            cb_serviceIP2LocationIO.Checked = (settings.ServiceProvider == 2);
         }
 
         private void ProxyCheck_SaveSettings(object sender, EventArgs e)
@@ -1936,29 +1911,31 @@ namespace BHD_ServerManager.Forms.Panels
             if (theInstance == null)
                 return;
 
-            // Update instance properties
-            theInstance.proxyCheckEnabled = cb_enableProxyCheck.Checked;
-            theInstance.proxyCheckAPIKey = textBox_ProxyAPIKey.Text;
-            theInstance.proxyCheckCacheTime = num_proxyCacheDays.Value;
-            theInstance.proxyCheckProxyAction = checkBox_proxyBlock.Checked ? 2 : (checkBox_proxyKick.Checked ? 1 : 0);
-            theInstance.proxyCheckVPNAction = checkBox_vpnBlock.Checked ? 2 : (checkBox_vpnKick.Checked ? 1 : 0);
-            theInstance.proxyCheckTORAction = checkBox_torBlock.Checked ? 2 : (checkBox_torKick.Checked ? 1 : 0);
-            theInstance.proxyCheckGeoMode = checkBox_GeoBlock.Checked ? 1 : (checkBox_GeoAllow.Checked ? 2 : 0);
-            theInstance.proxyCheckServiceProvider = 0;
-            theInstance.proxyCheckServiceProvider = (cb_serviceProxyCheckIO.Checked ? 1 : theInstance.proxyCheckServiceProvider);
-            theInstance.proxyCheckServiceProvider = (cb_serviceIP2LocationIO.Checked ? 2 : theInstance.proxyCheckServiceProvider);
+            // Gather settings from UI
+            var settings = new ProxyCheckSettings(
+                Enabled: cb_enableProxyCheck.Checked,
+                ApiKey: textBox_ProxyAPIKey.Text,
+                CacheTime: num_proxyCacheDays.Value,
+                ProxyAction: checkBox_proxyBlock.Checked ? 2 : (checkBox_proxyKick.Checked ? 1 : 0),
+                VpnAction: checkBox_vpnBlock.Checked ? 2 : (checkBox_vpnKick.Checked ? 1 : 0),
+                TorAction: checkBox_torBlock.Checked ? 2 : (checkBox_torKick.Checked ? 1 : 0),
+                GeoMode: checkBox_GeoBlock.Checked ? 1 : (checkBox_GeoAllow.Checked ? 2 : 0),
+                ServiceProvider: cb_serviceProxyCheckIO.Checked ? 1 : (cb_serviceIP2LocationIO.Checked ? 2 : 0)
+            );
 
-            // Persist to database
-            ServerSettings.Set("proxyCheckEnabled", theInstance.proxyCheckEnabled);
-            ServerSettings.Set("proxyCheckAPIKey", theInstance.proxyCheckAPIKey);
-            ServerSettings.Set("proxyCheckCacheTime", theInstance.proxyCheckCacheTime);
-            ServerSettings.Set("proxyCheckProxyAction", theInstance.proxyCheckProxyAction);
-            ServerSettings.Set("proxyCheckVPNAction", theInstance.proxyCheckVPNAction);
-            ServerSettings.Set("proxyCheckTORAction", theInstance.proxyCheckTORAction);
-            ServerSettings.Set("proxyCheckGeoMode", theInstance.proxyCheckGeoMode);
-            ServerSettings.Set("proxyCheckServiceProvider", theInstance.proxyCheckServiceProvider);
+            // Save via manager
+            var result = banInstanceManager.SaveProxyCheckSettings(settings);
 
-            AppDebug.Log("tabBans", "Proxy check settings saved to database");
+            if (result.Success)
+            {
+                MessageBox.Show("Proxy check settings saved successfully.", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show($"Error saving proxy check settings: {result.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void ProxyCheck_CBServicesChanged(object sender, EventArgs e)
@@ -1967,7 +1944,6 @@ namespace BHD_ServerManager.Forms.Panels
             cb_serviceProxyCheckIO.Checked = clicked == cb_serviceProxyCheckIO;
             cb_serviceIP2LocationIO.Checked = clicked == cb_serviceIP2LocationIO;
         }
-
 
         private void ProxyCheck_CBProxyChange(object sender, EventArgs e)
         {
@@ -2012,76 +1988,22 @@ namespace BHD_ServerManager.Forms.Panels
             string countryCode = textBox_countryCode.Text.Trim().ToUpper();
             string countryName = textBox_countryName.Text.Trim();
 
-            // Validate country code
-            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length != 2)
+            // Add via manager
+            var result = banInstanceManager.AddBlockedCountry(countryCode, countryName);
+
+            if (result.Success)
             {
-                MessageBox.Show("Country code must be exactly 2 characters (e.g., US, CN, RU).",
-                    "Validation Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
+                // Add to DataGridView
+                dgProxyCountryBlockList.Rows.Add(result.RecordID, countryCode, countryName);
+
+                // Clear input fields
+                textBox_countryCode.Text = string.Empty;
+                textBox_countryName.Text = string.Empty;
             }
-
-            // Validate country name
-            if (string.IsNullOrWhiteSpace(countryName))
+            else
             {
-                MessageBox.Show("Country name cannot be empty.",
-                    "Validation Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Check if already exists
-            if (instanceBans.ProxyBlockedCountries.Any(c => c.CountryCode.Equals(countryCode, StringComparison.OrdinalIgnoreCase)))
-            {
-                MessageBox.Show($"Country code '{countryCode}' is already in the blocked list.",
-                    "Duplicate Entry",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                // Add to database
-                int newRecordId = DatabaseManager.AddProxyBlockedCountry(countryCode, countryName);
-
-                if (newRecordId > 0)
-                {
-                    // Add to in-memory list
-                    var newCountry = new proxyCountry
-                    {
-                        RecordID = newRecordId,
-                        CountryCode = countryCode,
-                        CountryName = countryName
-                    };
-                    instanceBans.ProxyBlockedCountries.Add(newCountry);
-
-                    // Add to DataGridView with RecordID in first column (hidden)
-                    dgProxyCountryBlockList.Rows.Add(newRecordId, countryCode, countryName);
-
-                    // Clear input fields
-                    textBox_countryCode.Text = string.Empty;
-                    textBox_countryName.Text = string.Empty;
-
-                    AppDebug.Log("tabBans", $"Added blocked country: {countryCode} - {countryName} (ID: {newRecordId})");
-                }
-                else
-                {
-                    MessageBox.Show($"Failed to add country '{countryCode}'. It may already exist.",
-                        "Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error adding blocked country: {ex.Message}",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                AppDebug.Log("tabBans", $"Error adding blocked country: {ex}");
+                MessageBox.Show(result.Message, "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -2097,47 +2019,27 @@ namespace BHD_ServerManager.Forms.Panels
             string countryCode = dgProxyCountryBlockList.Rows[e.RowIndex].Cells[1].Value?.ToString() ?? "";
             string countryName = dgProxyCountryBlockList.Rows[e.RowIndex].Cells[2].Value?.ToString() ?? "";
 
-            var result = MessageBox.Show(
+            var dialogResult = MessageBox.Show(
                 $"Are you sure you want to remove '{countryName}' ({countryCode}) from the blocked countries list?",
                 "Confirm Delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
-            if (result != DialogResult.Yes)
+            if (dialogResult != DialogResult.Yes)
                 return;
 
-            try
+            // Remove via manager
+            var result = banInstanceManager.RemoveBlockedCountry(recordId);
+
+            if (result.Success)
             {
-                // Remove from database
-                if (DatabaseManager.RemoveProxyBlockedCountry(recordId))
-                {
-                    // Remove from in-memory list
-                    var country = instanceBans.ProxyBlockedCountries.FirstOrDefault(c => c.RecordID == recordId);
-                    if (country != null)
-                    {
-                        instanceBans.ProxyBlockedCountries.Remove(country);
-                    }
-
-                    // Remove from DataGridView
-                    dgProxyCountryBlockList.Rows.RemoveAt(e.RowIndex);
-
-                    AppDebug.Log("tabBans", $"Removed blocked country: {countryCode} - {countryName} (ID: {recordId})");
-                }
-                else
-                {
-                    MessageBox.Show($"Failed to remove country '{countryCode}'.",
-                        "Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                }
+                // Remove from DataGridView
+                dgProxyCountryBlockList.Rows.RemoveAt(e.RowIndex);
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error removing blocked country: {ex.Message}",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                AppDebug.Log("tabBans", $"Error removing blocked country: {ex}");
+                MessageBox.Show(result.Message, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -2151,14 +2053,17 @@ namespace BHD_ServerManager.Forms.Panels
 
             dgProxyCountryBlockList.Rows.Clear();
 
-            foreach (var country in instanceBans.ProxyBlockedCountries.OrderBy(c => c.CountryName))
+            var countries = banInstanceManager.LoadBlockedCountries();
+
+            foreach (var country in countries.OrderBy(c => c.CountryName))
             {
                 // Add RecordID as first column (typically hidden in designer)
                 dgProxyCountryBlockList.Rows.Add(country.RecordID, country.CountryCode, country.CountryName);
             }
 
-            AppDebug.Log("tabBans", $"Loaded {instanceBans.ProxyBlockedCountries.Count} blocked countries");
+            AppDebug.Log("tabBans", $"Loaded {countries.Count} blocked countries");
         }
+
         /// <summary>
         /// Test the selected proxy check service with a sample IP address
         /// </summary>
@@ -2195,40 +2100,19 @@ namespace BHD_ServerManager.Forms.Panels
 
             try
             {
-                // Create the appropriate service
-                IProxyCheckService? proxyService = null;
-                string serviceName = "";
-
-                if (cb_serviceProxyCheckIO.Checked)
-                {
-                    proxyService = new ProxyCheckIoService(apiKey);
-                    serviceName = "ProxyCheck.io";
-                }
-                else if (cb_serviceIP2LocationIO.Checked)
-                {
-                    proxyService = new IP2LocationService(apiKey);
-                    serviceName = "IP2Location.io";
-                }
-
-                if (proxyService == null)
-                {
-                    MessageBox.Show("Failed to initialize proxy service.",
-                        "Initialization Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
-                }
+                int serviceProvider = cb_serviceProxyCheckIO.Checked ? 1 : 2;
+                string serviceName = cb_serviceProxyCheckIO.Checked ? "ProxyCheck.io" : "IP2Location.io";
 
                 // Test with a known IP address (Google DNS - should not be a proxy/VPN)
                 var testIP = IPAddress.Parse("8.8.8.8");
 
                 AppDebug.Log("tabBans", $"Testing {serviceName} with IP: {testIP}");
 
-                // Make the API call
-                var result = await proxyService.CheckIPAsync(testIP);
+                // Test via manager
+                var (success, result, errorMessage) = await banInstanceManager.TestProxyService(apiKey, serviceProvider, testIP);
 
                 // Display results
-                if (result.Success)
+                if (success && result != null)
                 {
                     var resultMessage = new StringBuilder();
                     resultMessage.AppendLine($"Service: {serviceName}");
@@ -2261,17 +2145,13 @@ namespace BHD_ServerManager.Forms.Panels
                         "Service Test Successful",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
-
-                    AppDebug.Log("tabBans", $"{serviceName} test successful");
                 }
                 else
                 {
-                    MessageBox.Show($"Service: {serviceName}\nError: {result.ErrorMessage}",
+                    MessageBox.Show($"Service: {serviceName}\nError: {errorMessage}",
                         "Service Test Failed",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
-
-                    AppDebug.Log("tabBans", $"{serviceName} test failed: {result.ErrorMessage}");
                 }
             }
             catch (Exception ex)
@@ -2306,25 +2186,18 @@ namespace BHD_ServerManager.Forms.Panels
             if (theInstance == null)
                 return;
 
-            // Load settings from database into instance if not already loaded
-            theInstance.netLimiterEnabled = ServerSettings.Get("netLimiterEnabled", theInstance.netLimiterEnabled);
-            theInstance.netLimiterHost = ServerSettings.Get("netLimiterHost", theInstance.netLimiterHost);
-            theInstance.netLimiterPort = ServerSettings.Get("netLimiterPort", theInstance.netLimiterPort);
-            theInstance.netLimiterUsername = ServerSettings.Get("netLimiterUsername", theInstance.netLimiterUsername);
-            theInstance.netLimiterPassword = ServerSettings.Get("netLimiterPassword", theInstance.netLimiterPassword);
-            theInstance.netLimiterFilterName = ServerSettings.Get("netLimiterFilterName", theInstance.netLimiterFilterName);
-            theInstance.netLimiterEnableConLimit = ServerSettings.Get("netLimiterEnableConLimit", theInstance.netLimiterEnableConLimit);
-            theInstance.netLimiterConThreshold = ServerSettings.Get("netLimiterConThreshold", theInstance.netLimiterConThreshold);
+            // Load settings via manager
+            var settings = banInstanceManager.LoadNetLimiterSettings();
 
             // NetLimiter Integration Settings
-            checkBox_EnableNetLimiter.Checked = theInstance.netLimiterEnabled;
-            textBox_NetLimiterHost.Text = theInstance.netLimiterHost;
-            num_NetLimiterPort.Value = theInstance.netLimiterPort;
-            textBox_NetLimiterUsername.Text = theInstance.netLimiterUsername;
-            textBox_NetLimiterPassword.Text = theInstance.netLimiterPassword;
-            comboBox_NetLimiterFilterName.Text = theInstance.netLimiterFilterName;
-            checkBox_NetLimiterEnableConLimit.Checked = theInstance.netLimiterEnableConLimit;
-            num_NetLimiterConThreshold.Value = theInstance.netLimiterConThreshold;
+            checkBox_EnableNetLimiter.Checked = settings.Enabled;
+            textBox_NetLimiterHost.Text = settings.Host;
+            num_NetLimiterPort.Value = settings.Port;
+            textBox_NetLimiterUsername.Text = settings.Username;
+            textBox_NetLimiterPassword.Text = settings.Password;
+            comboBox_NetLimiterFilterName.Text = settings.FilterName;
+            checkBox_NetLimiterEnableConLimit.Checked = settings.EnableConLimit;
+            num_NetLimiterConThreshold.Value = settings.ConThreshold;
         }
 
         /// <summary>
@@ -2335,33 +2208,38 @@ namespace BHD_ServerManager.Forms.Panels
             if (theInstance == null)
                 return;
 
-            // Update instance properties
-            theInstance.netLimiterEnabled = checkBox_EnableNetLimiter.Checked;
-            theInstance.netLimiterHost = textBox_NetLimiterHost.Text.Trim();
-            theInstance.netLimiterPort = (int)num_NetLimiterPort.Value;
-            theInstance.netLimiterUsername = textBox_NetLimiterUsername.Text.Trim();
-            theInstance.netLimiterPassword = textBox_NetLimiterPassword.Text;
-            theInstance.netLimiterFilterName = comboBox_NetLimiterFilterName.Text.Trim();
-            theInstance.netLimiterEnableConLimit = checkBox_NetLimiterEnableConLimit.Checked;
-            theInstance.netLimiterConThreshold = num_NetLimiterConThreshold.Value;
+            // Gather settings from UI
+            var settings = new NetLimiterSettings(
+                Enabled: checkBox_EnableNetLimiter.Checked,
+                Host: textBox_NetLimiterHost.Text.Trim(),
+                Port: (int)num_NetLimiterPort.Value,
+                Username: textBox_NetLimiterUsername.Text.Trim(),
+                Password: textBox_NetLimiterPassword.Text,
+                FilterName: comboBox_NetLimiterFilterName.Text.Trim(),
+                EnableConLimit: checkBox_NetLimiterEnableConLimit.Checked,
+                ConThreshold: num_NetLimiterConThreshold.Value
+            );
 
-            // Persist to database
-            ServerSettings.Set("netLimiterEnabled", theInstance.netLimiterEnabled);
-            ServerSettings.Set("netLimiterHost", theInstance.netLimiterHost);
-            ServerSettings.Set("netLimiterPort", theInstance.netLimiterPort);
-            ServerSettings.Set("netLimiterUsername", theInstance.netLimiterUsername);
-            ServerSettings.Set("netLimiterPassword", theInstance.netLimiterPassword);
-            ServerSettings.Set("netLimiterFilterName", theInstance.netLimiterFilterName);
-            ServerSettings.Set("netLimiterEnableConLimit", theInstance.netLimiterEnableConLimit);
-            ServerSettings.Set("netLimiterConThreshold", theInstance.netLimiterConThreshold);
+            // Save via manager
+            var result = banInstanceManager.SaveNetLimiterSettings(settings);
 
-            AppDebug.Log("tabBans", "NetLimiter settings saved to database");
+            if (result.Success)
+            {
+                MessageBox.Show("NetLimiter settings saved successfully.", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show($"Error saving NetLimiter settings: {result.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public async void NetLimiter_RefreshFilters(object sender, EventArgs e)
         {
-            // Start Process
-            if (!NetLimiter_StartBridge())
+            // Start Process via manager
+            var startResult = NetLimiter_StartBridge();
+            if (!startResult)
             {
                 MessageBox.Show("Failed to start/access the NetLimiter Bridge process. Please ensure NetLimiter is installed and try again.",
                     "Error",
@@ -2370,9 +2248,10 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
 
-            List<string> filters = await NetLimiterClient.GetFilterNamesAsync();
+            // Get filters via manager
+            var (success, filters, errorMessage) = await banInstanceManager.GetNetLimiterFilters();
 
-            if (filters.Count == 0)
+            if (!success || filters.Count == 0)
             {
                 MessageBox.Show("No filters were retrieved from NetLimiter. Please ensure filters are configured in NetLimiter.",
                     "No Filters Found",
@@ -2386,7 +2265,6 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 comboBox_NetLimiterFilterName.Items.Add(filter);
             }
-
         }
 
         public bool NetLimiter_StartBridge()
@@ -2394,32 +2272,23 @@ namespace BHD_ServerManager.Forms.Panels
             if (theInstance == null)
                 return false;
 
-            // If bridge is already running, return true
-            if (NetLimiterClient._bridgeProcess != null && !NetLimiterClient._bridgeProcess.HasExited)
-            {
-                return true;
-            }
+            // Start via manager
+            var result = banInstanceManager.StartNetLimiterBridge(
+                theInstance.netLimiterHost,
+                theInstance.netLimiterPort,
+                theInstance.netLimiterUsername,
+                theInstance.netLimiterPassword
+            );
 
-            try
+            if (!result.Success)
             {
-                // Always pass connection parameters, even for localhost
-                NetLimiterClient.StartBridgeProcess(
-                    theInstance.netLimiterHost,
-                    (ushort)theInstance.netLimiterPort,
-                    theInstance.netLimiterUsername,
-                    theInstance.netLimiterPassword);
-
-                return (NetLimiterClient._bridgeProcess != null);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error starting NetLimiter Bridge process: {ex.Message}",
-                    "Error",
+                MessageBox.Show(result.Message, "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
-                AppDebug.Log("tabBans", $"Error starting NetLimiter Bridge process: {ex}");
                 return false;
             }
+
+            return true;
         }
     }
 }
