@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace BHD_ServerManager.Classes.StatsManagement
 {
-    public static class StatFunctions
+    public static class statsInstanceManager
     {
         private static theInstance theInstance = CommonCore.theInstance!;
         private static statInstance instanceStats = CommonCore.instanceStats!;

@@ -46,8 +46,8 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Update stats grids (these should be UI-thread safe)
                 try
                 {
-                    StatFunctions.PopulatePlayerStatsGrid();
-                    StatFunctions.PopulateWeaponStatsGrid();
+                    statsInstanceManager.PopulatePlayerStatsGrid();
+                    statsInstanceManager.PopulateWeaponStatsGrid();
                 }
                 catch (Exception ex)
                 {

@@ -123,7 +123,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
 
                     // Stats update
-                    StatFunctions.RunPlayerStatsUpdate();                               // Collect Player Stats
+                    statsInstanceManager.RunPlayerStatsUpdate();                               // Collect Player Stats
                 
                     // WebStats Updates and Reports
                     if (theInstance.WebStatsEnabled)
@@ -131,7 +131,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         if (DateTime.Now > instanceStats.lastPlayerStatsUpdate.AddSeconds(theInstance.WebStatsUpdateInterval))
                         {
                             instanceStats.lastPlayerStatsUpdate = DateTime.Now;
-                            Task.Run(() => StatFunctions.SendUpdateData(thisServer));
+                            Task.Run(() => statsInstanceManager.SendUpdateData(thisServer));
                         
                         }
                         if (DateTime.Now > instanceStats.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval) && theInstance.WebStatsAnnouncements)
@@ -139,7 +139,7 @@ namespace BHD_ServerManager.Classes.Tickers
                             Task.Run(async () =>
                             {
                                 instanceStats.lastPlayerStatsReport = DateTime.Now;
-                                string ReportResults = await StatFunctions.SendReportData(thisServer);
+                                string ReportResults = await statsInstanceManager.SendReportData(thisServer);
                                 // handle ReportResults if needed
                             });
                         
@@ -174,7 +174,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 instanceChat.AutoMessageCounter = 0;
                 instanceChat.ChatLog?.Clear();
                 theInstance.playerList.Clear();
-                StatFunctions.ResetPlayerStats();
+                statsInstanceManager.ResetPlayerStats();
 
                 // New MatchID
                 theInstanceManager.GenerateMatchID();
@@ -198,7 +198,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Read Winning Team
                 ServerMemory.ReadMemoryWinningTeam();
 				// Final Stats Update
-				Task.Run(() => StatFunctions.SendImportData(thisServer!));
+				Task.Run(() => statsInstanceManager.SendImportData(thisServer!));
                 // Set the Next Map Type
                 ServerMemory.SetNextMapType();
                 // Update the Scores Required to Win the Next Game
