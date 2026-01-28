@@ -57,7 +57,7 @@
             // playerContextMenuIcon
             // 
             playerContextMenuIcon.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            playerContextMenuIcon.BackColor = SystemColors.Control;
+            playerContextMenuIcon.BackColor = Color.Transparent;
             playerContextMenuIcon.BackgroundImageLayout = ImageLayout.Center;
             playerContextMenuIcon.Cursor = Cursors.Hand;
             playerContextMenuIcon.ForeColor = SystemColors.ControlText;
@@ -75,6 +75,7 @@
             // label_dataPlayerNameRole
             // 
             label_dataPlayerNameRole.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label_dataPlayerNameRole.BackColor = Color.Transparent;
             label_dataPlayerNameRole.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label_dataPlayerNameRole.Location = new Point(50, 4);
             label_dataPlayerNameRole.Name = "label_dataPlayerNameRole";
@@ -86,6 +87,7 @@
             // label_dataIPinfo
             // 
             label_dataIPinfo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label_dataIPinfo.BackColor = Color.Transparent;
             label_dataIPinfo.Location = new Point(50, 19);
             label_dataIPinfo.Name = "label_dataIPinfo";
             label_dataIPinfo.Size = new Size(100, 15);
@@ -111,8 +113,8 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BorderStyle = BorderStyle.FixedSingle;
-            Controls.Add(label_dataSlotNum);
             Controls.Add(playerContextMenuIcon);
+            Controls.Add(label_dataSlotNum);
             Controls.Add(playerTeamIcon);
             Controls.Add(label_dataPlayerNameRole);
             Controls.Add(label_dataIPinfo);

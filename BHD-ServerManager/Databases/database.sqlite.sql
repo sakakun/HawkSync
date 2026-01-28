@@ -92,6 +92,24 @@ CREATE TABLE IF NOT EXISTS "tb_settings" (
 	"value"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE TABLE IF NOT EXISTS "tb_userPermissions" (
+	"PermissionID"	INTEGER,
+	"UserID"	INTEGER NOT NULL,
+	"Permission"	TEXT NOT NULL,
+	PRIMARY KEY("PermissionID" AUTOINCREMENT),
+	FOREIGN KEY("UserID") REFERENCES "tb_users"("UserID") ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "tb_users" (
+	"UserID"	INTEGER,
+	"Username"	TEXT NOT NULL UNIQUE COLLATE NOCASE,
+	"PasswordHash"	TEXT NOT NULL,
+	"Salt"	TEXT NOT NULL,
+	"IsActive"	INTEGER DEFAULT 1,
+	"Created"	TEXT DEFAULT (datetime('now')),
+	"LastLogin"	TEXT,
+	"Notes"	TEXT DEFAULT '',
+	PRIMARY KEY("UserID" AUTOINCREMENT)
+);
 INSERT INTO "tb_defaultMaps" VALUES (1,'Road Rage','DMK_01A.BMS',0,0);
 INSERT INTO "tb_defaultMaps" VALUES (2,'City Madness','DMM_01A.BMS',0,0);
 INSERT INTO "tb_defaultMaps" VALUES (3,'Cracked','DMM_01E.BMS',0,0);
@@ -217,6 +235,12 @@ INSERT INTO "tb_defaultMaps" VALUES (122,'Desert Fox A','KHM_03A.BMS',0,4);
 CREATE INDEX IF NOT EXISTS "idx_chatLogs_timestamp" ON "tb_chatLogs" (
 	"messageTimeStamp"
 );
+CREATE INDEX IF NOT EXISTS "idx_permissions_permission" ON "tb_userPermissions" (
+	"Permission"
+);
+CREATE INDEX IF NOT EXISTS "idx_permissions_userid" ON "tb_userPermissions" (
+	"UserID"
+);
 CREATE INDEX IF NOT EXISTS "idx_playerip_category" ON "tb_playerIPRecords" (
 	"RecordCategory",
 	"RecordType"
@@ -256,5 +280,11 @@ CREATE INDEX IF NOT EXISTS "idx_proxy_vpn" ON "tb_proxyRecords" (
 	"IsVpn",
 	"IsProxy",
 	"IsTor"
+);
+CREATE INDEX IF NOT EXISTS "idx_users_active" ON "tb_users" (
+	"IsActive"
+);
+CREATE INDEX IF NOT EXISTS "idx_users_username" ON "tb_users" (
+	"Username"
 );
 COMMIT;

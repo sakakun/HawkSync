@@ -4,6 +4,7 @@ using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
+using BHD_ServerManager.Classes.Services;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -18,6 +19,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         private const string EncodingName = "Windows-1252";
 
         private static chatInstance ChatInstance = CommonCore.instanceChat!;
+        private static theInstance TheInstance = CommonCore.theInstance!;
         private playerObject Player { get; set; } = new playerObject();
         private int SlotNumber = 0;
         private ContextMenuStrip ContextMenu;
@@ -362,10 +364,71 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         }
 
         // ================================================================================
-        // PLAYER CARD UI UPDATE METHODS (No changes needed)
+        // PROXY/VPN DETECTION METHODS
         // ================================================================================
 
-        public void UpdateStatus(playerObject playerInfo)
+        /// <summary>
+        /// Check if player's IP is flagged as proxy/VPN/TOR
+        /// </summary>
+        private async Task<bool> IsProxyDetectedAsync(string ipAddress)
+        {
+            try
+            {
+                // Check if proxy detection is enabled
+                if (!TheInstance.proxyCheckEnabled || !ProxyCheckManager.IsInitialized)
+                    return false;
+
+                if (!IPAddress.TryParse(ipAddress, out IPAddress? ip))
+                    return false;
+
+                var result = await ProxyCheckManager.CheckIPAsync(ip);
+                
+                if (result.Success)
+                {
+                    // Check if any proxy/VPN/TOR flag is set
+                    return result.IsProxy || result.IsVpn || result.IsTor;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("PlayerCard", $"Error checking proxy status: {ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Update player icon based on team and proxy status
+        /// </summary>
+        private async Task UpdatePlayerIconAsync(string ipAddress, int team)
+        {
+            bool isProxyDetected = await IsProxyDetectedAsync(ipAddress);
+
+            if (isProxyDetected)
+            {
+                // Show warning icon for proxy/VPN/TOR
+                playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonCircleExclamation;
+                playerTeamIcon.IconColor = Color.Yellow;
+            }
+            else
+            {
+                // Show default team icon
+                playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonHiking;
+                playerTeamIcon.IconColor = team switch
+                {
+                    1 => Color.Blue,
+                    2 => Color.Red,
+                    _ => Color.Black
+                };
+            }
+        }
+
+        // ================================================================================
+        // PLAYER CARD UI UPDATE METHODS
+        // ================================================================================
+
+        public async void UpdateStatus(playerObject playerInfo)
         {
             Player = playerInfo;
 
@@ -378,12 +441,9 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             label_dataPlayerNameRole.Text = decodedPlayerName;
 
             label_dataIPinfo.Text = Player.PlayerIPAddress;
-            playerTeamIcon.IconColor = Player.PlayerTeam switch
-            {
-                1 => Color.Blue,
-                2 => Color.Red,
-                _ => Color.Black
-            };
+            
+            // Update icon based on proxy detection and team
+            await UpdatePlayerIconAsync(Player.PlayerIPAddress, Player.PlayerTeam);
             
             ContextMenu.Items[0].Text = decodedPlayerName;
             ContextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms";
@@ -407,7 +467,11 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             label_dataPlayerNameRole.UseCompatibleTextRendering = true;
             label_dataPlayerNameRole.Text = Player.PlayerName;
             label_dataSlotNum.Text = Player.PlayerSlot.ToString();
+            
+            // Reset to default icon
+            playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonHiking;
             playerTeamIcon.IconColor = Color.Black;
+            
             playerContextMenuIcon.Visible = false;
         }
 
