@@ -965,7 +965,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Test proxy service with a given IP address
         /// </summary>
-        public static async Task<(bool success, ProxyCheckResult? result, string errorMessage)> TestProxyService(
+        public static async Task<(bool success, ProxyCheckResult? result, string? errorMessage)> TestProxyService(
             string apiKey,
             int serviceProvider,
             IPAddress testIP)

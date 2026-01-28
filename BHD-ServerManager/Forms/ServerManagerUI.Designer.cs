@@ -50,6 +50,7 @@ namespace BHD_ServerManager.Forms
             tabStats = new TabPage();
             openFileDialog = new OpenFileDialog();
             toolTip = new ToolTip(components);
+            tabAdmin = new TabPage();
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
@@ -130,6 +131,7 @@ namespace BHD_ServerManager.Forms
             tabControl.Controls.Add(tabChat);
             tabControl.Controls.Add(tabBans);
             tabControl.Controls.Add(tabStats);
+            tabControl.Controls.Add(tabAdmin);
             tabControl.Dock = DockStyle.Fill;
             tabControl.Location = new Point(5, 5);
             tabControl.Multiline = true;
@@ -152,7 +154,7 @@ namespace BHD_ServerManager.Forms
             tabGamePlay.Location = new Point(4, 24);
             tabGamePlay.Name = "tabGamePlay";
             tabGamePlay.Padding = new Padding(3);
-            tabGamePlay.Size = new Size(902, 362);
+            tabGamePlay.Size = new Size(966, 422);
             tabGamePlay.TabIndex = 0;
             tabGamePlay.Text = "Game Play";
             tabGamePlay.UseVisualStyleBackColor = true;
@@ -162,7 +164,7 @@ namespace BHD_ServerManager.Forms
             tabMaps.Location = new Point(4, 24);
             tabMaps.Name = "tabMaps";
             tabMaps.Padding = new Padding(3);
-            tabMaps.Size = new Size(902, 362);
+            tabMaps.Size = new Size(966, 422);
             tabMaps.TabIndex = 1;
             tabMaps.Text = "Maps";
             tabMaps.UseVisualStyleBackColor = true;
@@ -171,7 +173,7 @@ namespace BHD_ServerManager.Forms
             // 
             tabPlayers.Location = new Point(4, 24);
             tabPlayers.Name = "tabPlayers";
-            tabPlayers.Size = new Size(902, 362);
+            tabPlayers.Size = new Size(966, 422);
             tabPlayers.TabIndex = 2;
             tabPlayers.Text = "Players";
             tabPlayers.UseVisualStyleBackColor = true;
@@ -181,7 +183,7 @@ namespace BHD_ServerManager.Forms
             tabChat.Location = new Point(4, 24);
             tabChat.Name = "tabChat";
             tabChat.Padding = new Padding(3);
-            tabChat.Size = new Size(902, 362);
+            tabChat.Size = new Size(966, 422);
             tabChat.TabIndex = 9;
             tabChat.Text = "Chat";
             tabChat.UseVisualStyleBackColor = true;
@@ -191,7 +193,7 @@ namespace BHD_ServerManager.Forms
             tabBans.Location = new Point(4, 24);
             tabBans.Name = "tabBans";
             tabBans.Padding = new Padding(3);
-            tabBans.Size = new Size(902, 362);
+            tabBans.Size = new Size(966, 422);
             tabBans.TabIndex = 4;
             tabBans.Text = "Bans";
             tabBans.UseVisualStyleBackColor = true;
@@ -201,7 +203,7 @@ namespace BHD_ServerManager.Forms
             tabStats.Location = new Point(4, 24);
             tabStats.Name = "tabStats";
             tabStats.Padding = new Padding(3);
-            tabStats.Size = new Size(902, 362);
+            tabStats.Size = new Size(966, 422);
             tabStats.TabIndex = 6;
             tabStats.Text = "Stats";
             tabStats.UseVisualStyleBackColor = true;
@@ -210,7 +212,17 @@ namespace BHD_ServerManager.Forms
             // 
             openFileDialog.FileName = "openFileDialog";
             // 
-            // ServerManager
+            // tabAdmin
+            // 
+            tabAdmin.Location = new Point(4, 24);
+            tabAdmin.Name = "tabAdmin";
+            tabAdmin.Padding = new Padding(3);
+            tabAdmin.Size = new Size(966, 422);
+            tabAdmin.TabIndex = 10;
+            tabAdmin.Text = "Admins";
+            tabAdmin.UseVisualStyleBackColor = true;
+            // 
+            // ServerManagerUI
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -221,7 +233,7 @@ namespace BHD_ServerManager.Forms
             MaximizeBox = false;
             MaximumSize = new Size(1000, 524);
             MinimumSize = new Size(1000, 500);
-            Name = "ServerManager";
+            Name = "ServerManagerUI";
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Black Hawk Down Server Manager";
@@ -252,5 +264,6 @@ namespace BHD_ServerManager.Forms
         private TabPage tabChat;
         private TabPage tabBans;
         private TabPage tabStats;
+        private TabPage tabAdmin;
     }
 }

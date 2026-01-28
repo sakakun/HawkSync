@@ -19,12 +19,13 @@ namespace BHD_ServerManager.Forms
 
         // Server Manager Tabs
         public tabProfile ProfileTab = null!;                   // The Profile Tab User Control
-        public tabGamePlay  ServerTab  = null!;                   // The Server Tab User Control
+        public tabGamePlay  ServerTab  = null!;                 // The Server Tab User Control
         public tabMaps    MapsTab    = null!;                   // The Maps Tab User Control
         public tabPlayers PlayersTab = null!;                   // The Players Tab User Control
         public tabChat    ChatTab    = null!;                   // The Chat Tab User Control
         public tabBans    BanTab     = null!;                   // The Bans Tab User Control
         public tabStats   StatsTab   = null!;                   // The Stats Tab User Control
+        public tabAdmin   AdminTab   = null!;                   // The Admin Tab User Control
 
         public ServerManagerUI()
         {
@@ -41,7 +42,8 @@ namespace BHD_ServerManager.Forms
             chatInstanceManager.LoadSettings();
             banInstanceManager.LoadSettings();
 			theInstanceManager.InitializeTickers();
-            theInstanceManager.GetServerVariables();
+            theInstanceManager.LoadWebStatsSettings();
+            adminInstanceManager.InitializeDefaultAdmin();
 
 			// New Server Settings Initialization
 			ProfileTab.methodFunction_loadSettings();
@@ -58,6 +60,7 @@ namespace BHD_ServerManager.Forms
             tabChat.Controls.Add(ChatTab = new tabChat());
             tabBans.Controls.Add(BanTab = new tabBans());
             tabStats.Controls.Add(StatsTab = new tabStats());
+            tabAdmin.Controls.Add(AdminTab = new tabAdmin());
         }
 
         // --- Server Status and Controls ---

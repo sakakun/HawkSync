@@ -1367,6 +1367,488 @@ namespace BHD_ServerManager.Classes.SupportClasses
             return null;
         }
 
+        // ================================================================================
+        // USER MANAGEMENT METHODS
+        // ================================================================================
+
+        /// <summary>
+        /// Get all users from the database.
+        /// </summary>
+        public static List<UserRecord> GetAllUsers()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var users = new List<UserRecord>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT UserID, Username, IsActive, Created, LastLogin, Notes
+                FROM tb_users
+                ORDER BY Username COLLATE NOCASE;
+            ";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new UserRecord
+                {
+                    UserID = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    IsActive = reader.GetInt32(2) == 1,
+                    Created = reader.IsDBNull(3) ? DateTime.MinValue : DateTime.Parse(reader.GetString(3)),
+                    LastLogin = reader.IsDBNull(4) ? null : DateTime.Parse(reader.GetString(4)),
+                    Notes = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
+                });
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {users.Count} users");
+            return users;
+        }
+
+        /// <summary>
+        /// Get a single user by username.
+        /// </summary>
+        public static UserRecord? GetUserByUsername(string username)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT UserID, Username, PasswordHash, Salt, IsActive, Created, LastLogin, Notes
+                FROM tb_users
+                WHERE Username = $username COLLATE NOCASE
+                LIMIT 1;
+            ";
+            cmd.Parameters.AddWithValue("$username", username);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new UserRecord
+                {
+                    UserID = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    PasswordHash = reader.GetString(2),
+                    Salt = reader.GetString(3),
+                    IsActive = reader.GetInt32(4) == 1,
+                    Created = reader.IsDBNull(5) ? DateTime.MinValue : DateTime.Parse(reader.GetString(5)),
+                    LastLogin = reader.IsDBNull(6) ? null : DateTime.Parse(reader.GetString(6)),
+                    Notes = reader.IsDBNull(7) ? string.Empty : reader.GetString(7)
+                };
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get a single user by UserID.
+        /// </summary>
+        public static UserRecord? GetUserByID(int userID)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT UserID, Username, PasswordHash, Salt, IsActive, Created, LastLogin, Notes
+                FROM tb_users
+                WHERE UserID = $userID
+                LIMIT 1;
+            ";
+            cmd.Parameters.AddWithValue("$userID", userID);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new UserRecord
+                {
+                    UserID = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    PasswordHash = reader.GetString(2),
+                    Salt = reader.GetString(3),
+                    IsActive = reader.GetInt32(4) == 1,
+                    Created = reader.IsDBNull(5) ? DateTime.MinValue : DateTime.Parse(reader.GetString(5)),
+                    LastLogin = reader.IsDBNull(6) ? null : DateTime.Parse(reader.GetString(6)),
+                    Notes = reader.IsDBNull(7) ? string.Empty : reader.GetString(7)
+                };
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Add a new user to the database.
+        /// </summary>
+        public static int AddUser(string username, string passwordHash, string salt, bool isActive, string notes)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Username cannot be empty.", nameof(username));
+
+            if (string.IsNullOrWhiteSpace(passwordHash))
+                throw new ArgumentException("Password hash cannot be empty.", nameof(passwordHash));
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_users (Username, PasswordHash, Salt, IsActive, Notes, Created)
+                    VALUES ($username, $passwordHash, $salt, $isActive, $notes, datetime('now'));
+                    SELECT last_insert_rowid();
+                ";
+
+                cmd.Parameters.AddWithValue("$username", username);
+                cmd.Parameters.AddWithValue("$passwordHash", passwordHash);
+                cmd.Parameters.AddWithValue("$salt", salt);
+                cmd.Parameters.AddWithValue("$isActive", isActive ? 1 : 0);
+                cmd.Parameters.AddWithValue("$notes", notes ?? string.Empty);
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Added user: {username} (ID: {newId})");
+                return (int)newId;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update an existing user (without changing password).
+        /// </summary>
+        public static bool UpdateUser(int userID, string username, bool isActive, string notes)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_users 
+                    SET Username = $username,
+                        IsActive = $isActive,
+                        Notes = $notes
+                    WHERE UserID = $userID;
+                ";
+
+                cmd.Parameters.AddWithValue("$userID", userID);
+                cmd.Parameters.AddWithValue("$username", username);
+                cmd.Parameters.AddWithValue("$isActive", isActive ? 1 : 0);
+                cmd.Parameters.AddWithValue("$notes", notes ?? string.Empty);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Updated user ID: {userID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update a user's password.
+        /// </summary>
+        public static bool UpdateUserPassword(int userID, string passwordHash, string salt)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_users 
+                    SET PasswordHash = $passwordHash,
+                        Salt = $salt
+                    WHERE UserID = $userID;
+                ";
+
+                cmd.Parameters.AddWithValue("$userID", userID);
+                cmd.Parameters.AddWithValue("$passwordHash", passwordHash);
+                cmd.Parameters.AddWithValue("$salt", salt);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Updated password for user ID: {userID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Delete a user from the database.
+        /// </summary>
+        public static bool DeleteUser(int userID)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_users
+                    WHERE UserID = $userID;
+                ";
+                cmd.Parameters.AddWithValue("$userID", userID);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Deleted user ID: {userID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update a user's last login timestamp.
+        /// </summary>
+        public static bool UpdateUserLastLogin(int userID)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_users 
+                    SET LastLogin = datetime('now')
+                    WHERE UserID = $userID;
+                ";
+                cmd.Parameters.AddWithValue("$userID", userID);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get all permissions for a user.
+        /// </summary>
+        public static List<string> GetUserPermissions(int userID)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var permissions = new List<string>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT Permission
+                FROM tb_userPermissions
+                WHERE UserID = $userID
+                ORDER BY Permission;
+            ";
+            cmd.Parameters.AddWithValue("$userID", userID);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                permissions.Add(reader.GetString(0));
+            }
+
+            return permissions;
+        }
+
+        /// <summary>
+        /// Add a permission to a user.
+        /// </summary>
+        public static bool AddUserPermission(int userID, string permission)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            if (string.IsNullOrWhiteSpace(permission))
+                throw new ArgumentException("Permission cannot be empty.", nameof(permission));
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_userPermissions (UserID, Permission)
+                    VALUES ($userID, $permission);
+                ";
+                cmd.Parameters.AddWithValue("$userID", userID);
+                cmd.Parameters.AddWithValue("$permission", permission.ToLower());
+
+                cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                return true;
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint
+            {
+                tx.Rollback();
+                // Permission already exists for this user - not an error
+                return false;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Delete all permissions for a user.
+        /// </summary>
+        public static bool DeleteAllUserPermissions(int userID)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_userPermissions
+                    WHERE UserID = $userID;
+                ";
+                cmd.Parameters.AddWithValue("$userID", userID);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Deleted {rowsAffected} permissions for user ID: {userID}");
+                return true;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Check if a username already exists (case-insensitive).
+        /// </summary>
+        public static bool UsernameExists(string username)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT COUNT(*) 
+                FROM tb_users 
+                WHERE Username = $username COLLATE NOCASE;
+            ";
+            cmd.Parameters.AddWithValue("$username", username);
+
+            return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+        }
+
+        /// <summary>
+        /// Check if a username exists for a different user (for updates).
+        /// </summary>
+        public static bool UsernameExistsForOtherUser(string username, int excludeUserID)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT COUNT(*) 
+                FROM tb_users 
+                WHERE Username = $username COLLATE NOCASE 
+                AND UserID != $excludeUserID;
+            ";
+            cmd.Parameters.AddWithValue("$username", username);
+            cmd.Parameters.AddWithValue("$excludeUserID", excludeUserID);
+
+            return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+        }
+
         /// <summary>
         /// Releases the exclusive lock and closes the internal connection.
         /// Call this at application shutdown.

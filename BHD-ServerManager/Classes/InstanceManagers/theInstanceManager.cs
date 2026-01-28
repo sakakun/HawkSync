@@ -1040,12 +1040,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             return true;
         }
 
-        public static void GetServerVariables(bool import = false, theInstance updatedInstance = null!)
-        {
-            var newInstance = import && updatedInstance != null ? updatedInstance : theInstance;
-            thisServer.StatsTab.functionEvent_GetStatSettings((updatedInstance != null ? updatedInstance : null!));
-        }
-
         public static void UpdateGameServer()
         {
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
