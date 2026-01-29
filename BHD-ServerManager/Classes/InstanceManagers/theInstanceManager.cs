@@ -50,6 +50,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         bool MaxPingEnabled,
         int MinPingValue,
         int MaxPingValue,
+        bool EnableRemote,
+        int RemotePort,
         CommandLineFlags Attributes
     );
 
@@ -198,6 +200,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     MaxPingEnabled: ServerSettings.Get("gameMaxPing", false),
                     MinPingValue: ServerSettings.Get("gameMinPingValue", 0),
                     MaxPingValue: ServerSettings.Get("gameMaxPingValue", 999),
+                    EnableRemote: ServerSettings.Get("profileEnableRemote", false),
+                    RemotePort: ServerSettings.Get("profileRemotePort", 9090),
                     Attributes: flags
                 );
 
@@ -244,6 +248,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("gameMaxPing", settings.MaxPingEnabled);
                 ServerSettings.Set("gameMinPingValue", settings.MinPingValue);
                 ServerSettings.Set("gameMaxPingValue", settings.MaxPingValue);
+                ServerSettings.Set("profileEnableRemote", settings.EnableRemote);
+                ServerSettings.Set("profileRemotePort", settings.RemotePort);
 
                 // Save command-line flags
                 ServerSettings.Set("profileServerAttribute01", settings.Attributes.Flag01);
@@ -320,6 +326,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             if (!ValidatePort(settings.BindPort, out string portError))
                 errors.Add(portError);
 
+            // Validate remote port
+            if (settings.EnableRemote && !ValidatePort(settings.RemotePort, out string remotePortError))
+                errors.Add($"Remote port error: {remotePortError}");
+
             // Validate country code
             if (!ValidateCountryCode(settings.CountryCode, out string countryError))
                 errors.Add(countryError);
@@ -363,7 +373,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.profileBindIP, theInstance.profileBindPort,
                     theInstance.gamePasswordLobby, theInstance.gameDedicated, theInstance.gameRequireNova,
                     theInstance.gameCountryCode, theInstance.gameMinPing, theInstance.gameMaxPing,
-                    theInstance.gameMinPingValue, theInstance.gameMaxPingValue, flags
+                    theInstance.gameMinPingValue, theInstance.gameMaxPingValue,
+                    theInstance.profileEnableRemote, theInstance.profileRemotePort,
+                    flags
                 );
 
                 var options = new JsonSerializerOptions { WriteIndented = true };
@@ -929,6 +941,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             theInstance.gameMaxPing = settings.MaxPingEnabled;
             theInstance.gameMinPingValue = settings.MinPingValue;
             theInstance.gameMaxPingValue = settings.MaxPingValue;
+            theInstance.profileEnableRemote = settings.EnableRemote;
+            theInstance.profileRemotePort = settings.RemotePort;
 
             theInstance.profileServerAttribute01 = settings.Attributes.Flag01;
             theInstance.profileServerAttribute02 = settings.Attributes.Flag02;

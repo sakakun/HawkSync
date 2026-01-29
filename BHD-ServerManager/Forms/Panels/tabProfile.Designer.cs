@@ -92,6 +92,8 @@
             btn_saveProfile = new Button();
             folderProfileBrowserDialog = new FolderBrowserDialog();
             openFileDialog1 = new OpenFileDialog();
+            num_remotePort = new NumericUpDown();
+            checkBox_enableRemote = new CheckBox();
             tableLayoutPanel1.SuspendLayout();
             profileFileManagers.SuspendLayout();
             tabProfilePage1.SuspendLayout();
@@ -114,6 +116,7 @@
             panel1.SuspendLayout();
             groupBox4.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)num_remotePort).BeginInit();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -240,7 +243,7 @@
             groupBox7.Dock = DockStyle.Top;
             groupBox7.Location = new Point(3, 118);
             groupBox7.Name = "groupBox7";
-            groupBox7.Size = new Size(428, 137);
+            groupBox7.Size = new Size(428, 157);
             groupBox7.TabIndex = 1;
             groupBox7.TabStop = false;
             groupBox7.Text = "Server Details";
@@ -249,8 +252,9 @@
             // 
             tableLayoutPanel6.ColumnCount = 3;
             tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 43.43435F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32.32323F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 24.242424F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32.3232269F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 24.2424221F));
+            tableLayoutPanel6.Controls.Add(num_remotePort, 2, 4);
             tableLayoutPanel6.Controls.Add(cb_serverDedicated, 1, 3);
             tableLayoutPanel6.Controls.Add(cb_requireNova, 1, 2);
             tableLayoutPanel6.Controls.Add(label3, 0, 1);
@@ -258,15 +262,17 @@
             tableLayoutPanel6.Controls.Add(label1, 0, 0);
             tableLayoutPanel6.Controls.Add(num_serverPort, 2, 0);
             tableLayoutPanel6.Controls.Add(cb_serverIP, 1, 0);
+            tableLayoutPanel6.Controls.Add(checkBox_enableRemote, 0, 4);
             tableLayoutPanel6.Dock = DockStyle.Fill;
             tableLayoutPanel6.Location = new Point(3, 19);
             tableLayoutPanel6.Name = "tableLayoutPanel6";
-            tableLayoutPanel6.RowCount = 4;
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel6.Size = new Size(422, 115);
+            tableLayoutPanel6.RowCount = 5;
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel6.Size = new Size(422, 135);
             tableLayoutPanel6.TabIndex = 0;
             // 
             // cb_serverDedicated
@@ -277,10 +283,10 @@
             cb_serverDedicated.CheckState = CheckState.Checked;
             tableLayoutPanel6.SetColumnSpan(cb_serverDedicated, 2);
             cb_serverDedicated.Dock = DockStyle.Fill;
-            cb_serverDedicated.Location = new Point(186, 87);
+            cb_serverDedicated.Location = new Point(186, 84);
             cb_serverDedicated.Margin = new Padding(3, 3, 10, 3);
             cb_serverDedicated.Name = "cb_serverDedicated";
-            cb_serverDedicated.Size = new Size(226, 25);
+            cb_serverDedicated.Size = new Size(226, 21);
             cb_serverDedicated.TabIndex = 11;
             cb_serverDedicated.Text = "Run in Dedicated Mode";
             cb_serverDedicated.TextAlign = ContentAlignment.MiddleRight;
@@ -292,10 +298,10 @@
             cb_requireNova.CheckAlign = ContentAlignment.MiddleRight;
             tableLayoutPanel6.SetColumnSpan(cb_requireNova, 2);
             cb_requireNova.Dock = DockStyle.Fill;
-            cb_requireNova.Location = new Point(186, 59);
+            cb_requireNova.Location = new Point(186, 57);
             cb_requireNova.Margin = new Padding(3, 3, 10, 3);
             cb_requireNova.Name = "cb_requireNova";
-            cb_requireNova.Size = new Size(226, 22);
+            cb_requireNova.Size = new Size(226, 21);
             cb_requireNova.TabIndex = 10;
             cb_requireNova.Text = "NovaWorld Login Required";
             cb_requireNova.TextAlign = ContentAlignment.MiddleRight;
@@ -305,9 +311,9 @@
             // 
             label3.AutoSize = true;
             label3.Dock = DockStyle.Fill;
-            label3.Location = new Point(3, 28);
+            label3.Location = new Point(3, 27);
             label3.Name = "label3";
-            label3.Size = new Size(177, 28);
+            label3.Size = new Size(177, 27);
             label3.TabIndex = 9;
             label3.Text = "Lobby Password";
             label3.TextAlign = ContentAlignment.MiddleRight;
@@ -316,7 +322,7 @@
             // 
             tableLayoutPanel6.SetColumnSpan(tb_serverPassword, 2);
             tb_serverPassword.Dock = DockStyle.Fill;
-            tb_serverPassword.Location = new Point(186, 31);
+            tb_serverPassword.Location = new Point(186, 30);
             tb_serverPassword.MaxLength = 16;
             tb_serverPassword.Name = "tb_serverPassword";
             tb_serverPassword.PlaceholderText = "Server Password";
@@ -330,7 +336,7 @@
             label1.Dock = DockStyle.Fill;
             label1.Location = new Point(3, 0);
             label1.Name = "label1";
-            label1.Size = new Size(177, 28);
+            label1.Size = new Size(177, 27);
             label1.TabIndex = 5;
             label1.Text = "Game IP Infomation";
             label1.TextAlign = ContentAlignment.MiddleRight;
@@ -957,6 +963,32 @@
             // 
             openFileDialog1.FileName = "openModFileDialog";
             // 
+            // num_remotePort
+            // 
+            num_remotePort.Dock = DockStyle.Fill;
+            num_remotePort.Location = new Point(322, 111);
+            num_remotePort.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
+            num_remotePort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            num_remotePort.Name = "num_remotePort";
+            num_remotePort.Size = new Size(97, 23);
+            num_remotePort.TabIndex = 12;
+            num_remotePort.TextAlign = HorizontalAlignment.Center;
+            num_remotePort.Value = new decimal(new int[] { 9090, 0, 0, 0 });
+            // 
+            // checkBox_enableRemote
+            // 
+            checkBox_enableRemote.AutoSize = true;
+            checkBox_enableRemote.CheckAlign = ContentAlignment.MiddleRight;
+            tableLayoutPanel6.SetColumnSpan(checkBox_enableRemote, 2);
+            checkBox_enableRemote.Dock = DockStyle.Fill;
+            checkBox_enableRemote.Location = new Point(3, 111);
+            checkBox_enableRemote.Name = "checkBox_enableRemote";
+            checkBox_enableRemote.Size = new Size(313, 21);
+            checkBox_enableRemote.TabIndex = 13;
+            checkBox_enableRemote.Text = "Enable Remote Access";
+            checkBox_enableRemote.TextAlign = ContentAlignment.MiddleRight;
+            checkBox_enableRemote.UseVisualStyleBackColor = true;
+            // 
             // tabProfile
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -992,6 +1024,7 @@
             panel1.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)num_remotePort).EndInit();
             ResumeLayout(false);
         }
 
@@ -1061,5 +1094,7 @@
         public CheckBox cb_enableMinCheck;
         public CheckBox cb_enableMaxCheck;
         public NumericUpDown num_minPing;
+        public NumericUpDown num_remotePort;
+        private CheckBox checkBox_enableRemote;
     }
 }

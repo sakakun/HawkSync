@@ -18,6 +18,7 @@ namespace BHD_ServerManager.Classes.CoreObjects
         public static statInstance? instanceStats { get; set; }
         public static playerInstance? instancePlayers { get; set; }
         public static adminInstance? instanceAdmin { get; set; } 
+        public static mapInstance? instanceMaps { get; set; }
 
         public static banInstance? instanceBans { get; set; }
 		// Object: Ticker, Timer Constructor for periodic tasks
@@ -31,6 +32,7 @@ namespace BHD_ServerManager.Classes.CoreObjects
             instanceStats = new statInstance();
             instancePlayers = new playerInstance();
             instanceAdmin = new adminInstance();
+            instanceMaps = new mapInstance();
             instanceBans = DatabaseManager.LoadBanInstance();
 
             // Initialize the Ticker

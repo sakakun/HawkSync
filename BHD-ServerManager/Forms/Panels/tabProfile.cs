@@ -205,12 +205,16 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 cb_serverIP.SelectedIndex = 0; // Default to "0.0.0.0"
             }
-            
+    
             num_serverPort.Value = theInstance.profileBindPort;
             tb_serverPassword.Text = theInstance.gamePasswordLobby;
             cb_serverDedicated.Checked = theInstance.gameDedicated;
             cb_requireNova.Checked = theInstance.gameRequireNova;
             serverCountryCode.Text = theInstance.gameCountryCode;
+
+            // Remote Connection Settings
+            checkBox_enableRemote.Checked = theInstance.profileEnableRemote;
+            num_remotePort.Value = theInstance.profileRemotePort;
 
             // Ping Checking
             cb_enableMinCheck.Checked = theInstance.gameMinPing;
@@ -287,9 +291,12 @@ namespace BHD_ServerManager.Forms.Panels
                 MaxPingEnabled: cb_enableMaxCheck.Checked,
                 MinPingValue: (int)num_minPing.Value,
                 MaxPingValue: (int)num_maxPing.Value,
+                EnableRemote: checkBox_enableRemote.Checked,
+                RemotePort: (int)num_remotePort.Value,
                 Attributes: flags
             );
         }
+
 
         /// <summary>
         /// Apply ProfileSettings DTO to UI controls
@@ -314,12 +321,16 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 cb_serverIP.SelectedIndex = 0;
             }
-            
+    
             num_serverPort.Value = settings.BindPort;
             tb_serverPassword.Text = settings.LobbyPassword;
             cb_serverDedicated.Checked = settings.Dedicated;
             cb_requireNova.Checked = settings.RequireNova;
             serverCountryCode.Text = settings.CountryCode;
+
+            // Remote Connection Settings
+            checkBox_enableRemote.Checked = settings.EnableRemote;
+            num_remotePort.Value = settings.RemotePort;
 
             // Ping Checking
             cb_enableMinCheck.Checked = settings.MinPingEnabled;

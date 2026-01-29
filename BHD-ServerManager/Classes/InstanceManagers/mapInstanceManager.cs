@@ -51,7 +51,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     public static class mapInstanceManager
     {
         private static theInstance theInstance => CommonCore.theInstance!;
-        private static Dictionary<int, List<mapFileInfo>> MapPlaylists => theInstance.MapPlaylists;
+        private static mapInstance mapInstance => CommonCore.instanceMaps!;
 
         // ================================================================================
         // MAP LOADING & SCANNING
@@ -314,7 +314,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var maps = DatabaseManager.GetPlaylistMaps(playlistID);
 
                 // Update in-memory playlist
-                MapPlaylists[playlistID] = maps;
+                mapInstance.Playlists[playlistID] = maps;
 
                 AppDebug.Log("mapInstanceManager", $"Loaded playlist {playlistID} with {maps.Count} maps");
 
@@ -363,7 +363,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 DatabaseManager.SavePlaylist(playlistID, maps);
 
                 // Update in-memory
-                MapPlaylists[playlistID] = maps;
+                mapInstance.Playlists[playlistID] = maps;
 
                 AppDebug.Log("mapInstanceManager", $"Saved playlist {playlistID} with {maps.Count} maps");
 
@@ -386,10 +386,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (playlistID < 0 || playlistID > 5)
                     return (false, new List<mapFileInfo>(), "Invalid playlist ID.");
 
-                if (!MapPlaylists.ContainsKey(playlistID))
+                if (!mapInstance.Playlists.ContainsKey(playlistID))
                     return (false, new List<mapFileInfo>(), $"Playlist {playlistID} not initialized.");
 
-                return (true, MapPlaylists[playlistID], string.Empty);
+                return (true, mapInstance.Playlists[playlistID], string.Empty);
             }
             catch (Exception ex)
             {
@@ -418,13 +418,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new PlaylistResult(false, "Cannot change playlist while server is in scoring phase.");
 
                 // Backup current active playlist (for server memory update)
-                if (theInstance.ActiveMapPlaylist != playlistID)
+                if (mapInstance.ActivePlaylist != playlistID)
                 {
-                    MapPlaylists[0] = MapPlaylists[theInstance.ActiveMapPlaylist];
+                    mapInstance.Playlists[0] = mapInstance.Playlists[mapInstance.ActivePlaylist];
                 }
 
                 // Set as active
-                theInstance.ActiveMapPlaylist = playlistID;
+                mapInstance.ActivePlaylist = playlistID;
 
                 // Save setting
                 ServerSettings.Set("ActiveMapPlaylist", playlistID);
@@ -652,7 +652,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
                     return new OperationResult(false, "Server is offline.");
 
-                var (success, maps, error) = GetPlaylistMaps(theInstance.ActiveMapPlaylist);
+                var (success, maps, error) = GetPlaylistMaps(mapInstance.ActivePlaylist);
                 if (!success)
                     return new OperationResult(false, error);
 
@@ -735,12 +735,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Initialize playlist dictionaries
                 for (int i = 0; i <= 5; i++)
                 {
-                    MapPlaylists[i] = new List<mapFileInfo>();
+                    mapInstance.Playlists[i] = new List<mapFileInfo>();
                 }
 
                 // Load active playlist setting
-                theInstance.ActiveMapPlaylist = ServerSettings.Get("ActiveMapPlaylist", 1);
-                theInstance.SelectedMapPlaylist = theInstance.ActiveMapPlaylist;
+                mapInstance.ActivePlaylist = ServerSettings.Get("ActiveMapPlaylist", 1);
+                mapInstance.SelectedPlaylist = mapInstance.ActivePlaylist;
 
                 // Load all playlists
                 for (int i = 1; i <= 5; i++)

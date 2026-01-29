@@ -48,9 +48,9 @@ namespace BHD_ServerManager.Forms
             tabChat = new TabPage();
             tabBans = new TabPage();
             tabStats = new TabPage();
+            tabAdmin = new TabPage();
             openFileDialog = new OpenFileDialog();
             toolTip = new ToolTip(components);
-            tabAdmin = new TabPage();
             toolStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             tabControl.SuspendLayout();
@@ -208,10 +208,6 @@ namespace BHD_ServerManager.Forms
             tabStats.Text = "Stats";
             tabStats.UseVisualStyleBackColor = true;
             // 
-            // openFileDialog
-            // 
-            openFileDialog.FileName = "openFileDialog";
-            // 
             // tabAdmin
             // 
             tabAdmin.Location = new Point(4, 24);
@@ -221,6 +217,10 @@ namespace BHD_ServerManager.Forms
             tabAdmin.TabIndex = 10;
             tabAdmin.Text = "Admins";
             tabAdmin.UseVisualStyleBackColor = true;
+            // 
+            // openFileDialog
+            // 
+            openFileDialog.FileName = "openFileDialog";
             // 
             // ServerManagerUI
             // 

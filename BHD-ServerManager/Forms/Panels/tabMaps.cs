@@ -13,7 +13,7 @@ namespace BHD_ServerManager.Forms.Panels
     {
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
-        private Dictionary<int, List<mapFileInfo>> MapPlaylists => CommonCore.theInstance!.MapPlaylists;
+        private mapInstance mapInstance => CommonCore.instanceMaps!;
 
         // --- Class Variables ---
         public int MapTypeFilter;
@@ -29,7 +29,7 @@ namespace BHD_ServerManager.Forms.Panels
         /// </summary>
         public void methodFunction_UpdateMapControls()
         {
-            bool isActivePlaylist = theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist;
+            bool isActivePlaylist = mapInstance.ActivePlaylist == mapInstance!.SelectedPlaylist;
             bool isServerOnline = theInstance!.instanceStatus != InstanceStatus.OFFLINE;
 
             btn_mapControl1.Enabled = isActivePlaylist && isServerOnline;
@@ -48,13 +48,13 @@ namespace BHD_ServerManager.Forms.Panels
             mapInstanceManager.Initialize();
 
             // Update UI
-            btn_activePlaylist.Text = $"P{theInstance!.ActiveMapPlaylist}";
+            btn_activePlaylist.Text = $"P{mapInstance.ActivePlaylist}";
 
             // Load available maps
             methodFunction_loadSourceMaps();
 
             // Set initial UI state (this will load the playlist)
-            methodFunction_selectPlaylist(theInstance!.ActiveMapPlaylist);
+            methodFunction_selectPlaylist(mapInstance.ActivePlaylist);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace BHD_ServerManager.Forms.Panels
             dataGridView_currentMaps.Rows.Clear();
 
             // Set selected playlist
-            theInstance!.SelectedMapPlaylist = playlistNum;
+            mapInstance!.SelectedPlaylist = playlistNum;
 
             // Get maps from manager
             var (success, maps, error) = mapInstanceManager.GetPlaylistMaps(playlistNum);
@@ -263,7 +263,7 @@ namespace BHD_ServerManager.Forms.Panels
                 }
 
                 // Check if this is the active playlist and server is running
-                if (theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist &&
+                if (mapInstance.ActivePlaylist == mapInstance!.SelectedPlaylist &&
                     theInstance!.instanceStatus != InstanceStatus.OFFLINE)
                 {
                     if (theInstance!.instanceStatus == InstanceStatus.ONLINE ||
@@ -281,10 +281,10 @@ namespace BHD_ServerManager.Forms.Panels
                         if (result == DialogResult.Yes)
                         {
                             // Backup the active playlist
-                            MapPlaylists[0] = MapPlaylists[theInstance!.ActiveMapPlaylist];
+                            mapInstance.Playlists[0] = mapInstance.Playlists[mapInstance.ActivePlaylist];
 
                             // Save via manager
-                            var saveResult = mapInstanceManager.SavePlaylist(theInstance!.SelectedMapPlaylist, playlist);
+                            var saveResult = mapInstanceManager.SavePlaylist(mapInstance!.SelectedPlaylist, playlist);
 
                             if (!saveResult.Success)
                             {
@@ -303,10 +303,10 @@ namespace BHD_ServerManager.Forms.Panels
                             }
 
                             // Update UI
-                            btn_activePlaylist.Text = $"P{theInstance!.SelectedMapPlaylist}";
-                            theInstance!.ActiveMapPlaylist = theInstance!.SelectedMapPlaylist;
+                            btn_activePlaylist.Text = $"P{mapInstance!.SelectedPlaylist}";
+                            mapInstance.ActivePlaylist = mapInstance!.SelectedPlaylist;
 
-                            MessageBox.Show($"Map Playlist {theInstance!.SelectedMapPlaylist} saved and in-game rotation updated.",
+                            MessageBox.Show($"Map Playlist {mapInstance!.SelectedPlaylist} saved and in-game rotation updated.",
                                 "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             return;
                         }
@@ -314,11 +314,11 @@ namespace BHD_ServerManager.Forms.Panels
                 }
 
                 // Save via manager
-                var playlistResult = mapInstanceManager.SavePlaylist(theInstance!.SelectedMapPlaylist, playlist);
+                var playlistResult = mapInstanceManager.SavePlaylist(mapInstance!.SelectedPlaylist, playlist);
 
                 if (playlistResult.Success)
                 {
-                    MessageBox.Show($"Map Playlist {theInstance!.SelectedMapPlaylist} has been saved.",
+                    MessageBox.Show($"Map Playlist {mapInstance!.SelectedPlaylist} has been saved.",
                         "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
@@ -379,7 +379,7 @@ namespace BHD_ServerManager.Forms.Panels
             Color notSelected = Button.DefaultBackColor;
 
             // Set selected playlist
-            theInstance!.SelectedMapPlaylist = playlistID;
+            mapInstance!.SelectedPlaylist = playlistID;
 
             // Update button colors
             btn_loadPlaylist1.BackColor = playlistID == 1 ? selected : notSelected;
@@ -389,7 +389,7 @@ namespace BHD_ServerManager.Forms.Panels
             btn_loadPlaylist5.BackColor = playlistID == 5 ? selected : notSelected;
 
             // Update active playlist display
-            btn_activePlaylist.Text = $"P{theInstance!.ActiveMapPlaylist}";
+            btn_activePlaylist.Text = $"P{mapInstance.ActivePlaylist}";
 
             // Update map controls
             methodFunction_UpdateMapControls();
@@ -421,9 +421,9 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             // Check if already active
-            if (theInstance!.ActiveMapPlaylist == theInstance!.SelectedMapPlaylist)
+            if (mapInstance.ActivePlaylist == mapInstance!.SelectedPlaylist)
             {
-                MessageBox.Show($"Playlist {theInstance!.SelectedMapPlaylist} is already the active playlist.",
+                MessageBox.Show($"Playlist {mapInstance!.SelectedPlaylist} is already the active playlist.",
                     "Already Active", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -443,7 +443,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             // Save playlist first
-            var saveResult = mapInstanceManager.SavePlaylist(theInstance!.SelectedMapPlaylist, playlist);
+            var saveResult = mapInstanceManager.SavePlaylist(mapInstance!.SelectedPlaylist, playlist);
 
             if (!saveResult.Success)
             {
@@ -453,14 +453,14 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             // Set as active via manager
-            var activateResult = mapInstanceManager.SetActivePlaylist(theInstance!.SelectedMapPlaylist);
+            var activateResult = mapInstanceManager.SetActivePlaylist(mapInstance!.SelectedPlaylist);
 
             if (activateResult.Success)
             {
                 // Update UI
-                btn_activePlaylist.Text = $"P{theInstance!.ActiveMapPlaylist}";
+                btn_activePlaylist.Text = $"P{mapInstance.ActivePlaylist}";
 
-                MessageBox.Show($"Playlist {theInstance!.ActiveMapPlaylist} is now active.",
+                MessageBox.Show($"Playlist {mapInstance.ActivePlaylist} is now active.",
                     "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
@@ -477,7 +477,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             methodFunction_loadSourceMaps();
             methodFunction_hideSourceRows(MapTypeFilter);
-            methodFunction_selectPlaylist(theInstance!.SelectedMapPlaylist);
+            methodFunction_selectPlaylist(mapInstance!.SelectedPlaylist);
         }
 
         /// <summary>
@@ -612,16 +612,16 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*",
                 DefaultExt = "json",
-                FileName = $"Playlist_{theInstance!.SelectedMapPlaylist}_Backup_{DateTime.Now:yyyyMMdd_HHmmss}.json"
+                FileName = $"Playlist_{mapInstance!.SelectedPlaylist}_Backup_{DateTime.Now:yyyyMMdd_HHmmss}.json"
             };
 
             if (saveDialog.ShowDialog() == DialogResult.OK)
             {
-                var result = mapInstanceManager.ExportPlaylistToJson(theInstance!.SelectedMapPlaylist, saveDialog.FileName);
+                var result = mapInstanceManager.ExportPlaylistToJson(mapInstance!.SelectedPlaylist, saveDialog.FileName);
 
                 if (result.Success)
                 {
-                    MessageBox.Show($"Playlist {theInstance!.SelectedMapPlaylist} backed up successfully to:\n{saveDialog.FileName}",
+                    MessageBox.Show($"Playlist {mapInstance!.SelectedPlaylist} backed up successfully to:\n{saveDialog.FileName}",
                         "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
@@ -729,10 +729,67 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             MessageBox.Show(
-                $"Playlist {theInstance!.SelectedMapPlaylist} has been randomized.\n\nRemember to save the playlist to apply changes.",
+                $"Playlist {mapInstance!.SelectedPlaylist} has been randomized.\n\nRemember to save the playlist to apply changes.",
                 "Playlist Randomized",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
-    }
+
+        /// <summary>
+        /// Update map highlighting in current playlist grid (called by ticker)
+        /// Shows current map in green, next map in blue, or yellow if looping same map
+        /// </summary>
+        public void UpdateCurrentMapHighlighting()
+        {
+
+
+
+            // Clear all row backgrounds first
+            foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
+            {
+                if (row.IsNewRow) continue;
+                row.DefaultCellStyle.BackColor = Color.White;
+            }
+
+            // Only highlight if viewing the active playlist and server is online
+            if (mapInstance.ActivePlaylist != mapInstance.SelectedPlaylist)
+                return;
+
+            if (theInstance?.instanceStatus == InstanceStatus.OFFLINE)
+                return;
+
+            // Use the stable "actually playing" index for UI display
+            int actualCurrentMapIndex = mapInstance.ActualPlayingMapIndex;
+
+            int currentMapIndex = mapInstance.CurrentMapIndex;
+
+            // Calculate next map naturally from the actual current map
+            int nextMapIndex = mapInstance.CurrentMapIndex + 1;
+            
+            if (nextMapIndex >= dataGridView_currentMaps.Rows.Count)
+            {
+                nextMapIndex = 0; // Loop to beginning
+            }
+            
+            AppDebug.Log("UpdateCurrentMapHighlighting", $"Map Index: Actual: {actualCurrentMapIndex} Current: {currentMapIndex} Next: {nextMapIndex} Row Count: {dataGridView_currentMaps.Rows.Count}");                
+
+            // Check if current and next are the same (looping same map)
+            if (actualCurrentMapIndex == nextMapIndex)
+            {
+                // Yellow for looping the same map
+                dataGridView_currentMaps.Rows[actualCurrentMapIndex].DefaultCellStyle.BackColor = Color.Yellow;
+            }
+            else
+            {
+
+                if(theInstance!.instanceStatus != InstanceStatus.LOADINGMAP || theInstance!.instanceStatus != InstanceStatus.SCORING)
+                {
+                    dataGridView_currentMaps.Rows[actualCurrentMapIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+                }               
+
+                // Next map is blue
+                dataGridView_currentMaps.Rows[nextMapIndex].DefaultCellStyle.BackColor = Color.LightBlue;
+            }
+        }
+        }
 }
