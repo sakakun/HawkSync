@@ -15,6 +15,7 @@ namespace BHD_ServerManager.Classes.Tickers
         // Global Variables
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static theInstance thisInstance => CommonCore.theInstance!;
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // Track disarmed players and their re-arm time
         private static Dictionary<int, DateTime> disarmedPlayers = new Dictionary<int, DateTime>();
@@ -82,7 +83,7 @@ namespace BHD_ServerManager.Classes.Tickers
 
             // Remove disconnected players from tracking
             var disconnectedPlayers = disarmedPlayers.Keys
-                .Where(slot => !thisInstance.playerList.ContainsKey(slot))
+                .Where(slot => !playerInstance.PlayerList.ContainsKey(slot))
                 .ToList();
             
             foreach (var slot in disconnectedPlayers)
@@ -91,7 +92,7 @@ namespace BHD_ServerManager.Classes.Tickers
             }
 
             // Check all active players for left leaning
-            foreach (var playerKvp in thisInstance.playerList.ToList())
+            foreach (var playerKvp in playerInstance.PlayerList.ToList())
             {
                 int playerSlot = playerKvp.Key;
                 var playerInfo = playerKvp.Value;

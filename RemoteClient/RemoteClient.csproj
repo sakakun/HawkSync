@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BaseOutputPath>\\VM-DEV\ServerData\Development\HawkSync\RemoteClient</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Forms\AboutWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabAdmin.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabBans.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabChat.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabGamePlay.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabMaps.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabPlayers.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabProfile.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\Panels\tabStats.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\ServerManagerUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\PlayerCard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Classes\" />
+    <Folder Include="Databases\" />
+  </ItemGroup>
+
+</Project>

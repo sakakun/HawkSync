@@ -16,14 +16,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         private static theInstance theInstance => CommonCore.theInstance!;
         private static banInstance banInstance => CommonCore.instanceBans!;
 
-        // ================================================================================
-        // PLAYER VALIDATION
-        // ================================================================================
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
-        /// <summary>
-        /// Validate that server is online and player exists
-        /// </summary>
-        private static (bool isValid, string errorMessage) ValidatePlayerOperation(int playerSlot, string playerName)
+		// ================================================================================
+		// PLAYER VALIDATION
+		// ================================================================================
+
+		/// <summary>
+		/// Validate that server is online and player exists
+		/// </summary>
+		private static (bool isValid, string errorMessage) ValidatePlayerOperation(int playerSlot, string playerName)
         {
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
                 return (false, "Server is offline. Player operations are not available.");
@@ -34,7 +36,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             if (string.IsNullOrWhiteSpace(playerName))
                 return (false, "Player name cannot be empty.");
 
-            if (!theInstance.playerList.ContainsKey(playerSlot))
+            if (!playerInstance.PlayerList.ContainsKey(playerSlot))
                 return (false, $"Player slot {playerSlot} is empty.");
 
             return (true, string.Empty);
@@ -214,12 +216,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new OperationResult(false, errorMessage);
 
                 // Check if already queued for team switch
-                var existing = theInstance.playerChangeTeamList.FirstOrDefault(p => p.slotNum == playerSlot);
+                var existing = playerInstance.PlayerChangeTeamList.FirstOrDefault(p => p.slotNum == playerSlot);
                 
                 if (existing != null)
                 {
                     // Undo the team switch
-                    theInstance.playerChangeTeamList.Remove(existing);
+                    playerInstance.PlayerChangeTeamList.Remove(existing);
                     AppDebug.Log("playerInstanceManager", $"Team switch undone for player {playerName}");
                     return new OperationResult(true, $"Team switch for {playerName} has been undone.");
                 }
@@ -238,7 +240,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 }
 
                 // Queue team switch for next map
-                theInstance.playerChangeTeamList.Add(new playerTeamObject
+                playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                 {
                     slotNum = playerSlot,
                     Team = newTeam
@@ -287,7 +289,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return banResult;
 
                 // Kick the player if they're online
-                if (playerSlot > 0 && theInstance.playerList.ContainsKey(playerSlot))
+                if (playerSlot > 0 && playerInstance.PlayerList.ContainsKey(playerSlot))
                 {
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {playerSlot}");
                 }
@@ -346,7 +348,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 }
 
                 // Kick the player if they're online
-                if (playerSlot > 0 && theInstance.playerList.ContainsKey(playerSlot))
+                if (playerSlot > 0 && playerInstance.PlayerList.ContainsKey(playerSlot))
                 {
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {playerSlot}");
                 }
@@ -408,7 +410,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 }
 
                 // Kick the player if they're online
-                if (playerSlot > 0 && theInstance.playerList.ContainsKey(playerSlot))
+                if (playerSlot > 0 && playerInstance.PlayerList.ContainsKey(playerSlot))
                 {
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {playerSlot}");
                 }
@@ -439,7 +441,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new OperationResult(false, errorMessage);
 
                 int kickedCount = 0;
-                foreach (var player in theInstance.playerList.Values.ToList())
+                foreach (var player in playerInstance.PlayerList.Values.ToList())
                 {
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {player.PlayerSlot}");
                     kickedCount++;

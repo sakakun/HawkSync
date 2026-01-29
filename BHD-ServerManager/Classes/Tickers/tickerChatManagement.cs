@@ -13,6 +13,7 @@ namespace BHD_ServerManager.Classes.Tickers
         private static theInstance thisInstance => CommonCore.theInstance!;
         private static chatInstance instanceChat => CommonCore.instanceChat!;
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         private static readonly object tickerLock = new();
         private static bool _autoMessageRecoveryDone = false;
@@ -115,7 +116,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Find player team number
                 int teamNum = 3;
 
-                foreach (var player in thisInstance.playerList.Values)
+                foreach (var player in playerInstance.PlayerList.Values)
                 {
                     if (player.PlayerName == playerName)
                     {

@@ -18,6 +18,7 @@ namespace BHD_ServerManager.Forms.Panels
     public partial class tabPlayers : UserControl
     {
         private theInstance? theInstance => CommonCore.theInstance;
+        private playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // --- Class Variables ---
         private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
@@ -81,7 +82,7 @@ namespace BHD_ServerManager.Forms.Panels
                     for (int i = 0; i < theInstance.gameMaxSlots; i++)
                     {
                         int slotNum = i + 1;
-                        if (theInstance.playerList.TryGetValue(slotNum, out var playerInfo))
+                        if (playerInstance.PlayerList.TryGetValue(slotNum, out var playerInfo))
                         {
                             playerCards[i].UpdateCard(playerInfo, true);
                         }

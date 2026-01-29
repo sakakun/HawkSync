@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerManager", "BHD-Server
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetLimiterBridge", "NetLimiterBridge\NetLimiterBridge.csproj", "{461734DA-B792-4DCB-9618-BD9EE48A2D76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteClient", "RemoteClient\RemoteClient.csproj", "{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Release|Any CPU.Build.0 = Release|Any CPU
 		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Release|x86.ActiveCfg = Release|Any CPU
 		{461734DA-B792-4DCB-9618-BD9EE48A2D76}.Release|x86.Build.0 = Release|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Debug|x86.Build.0 = Debug|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Release|x86.ActiveCfg = Release|Any CPU
+		{A04B5D85-0CEB-4CA7-8344-388BF2F6FD30}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

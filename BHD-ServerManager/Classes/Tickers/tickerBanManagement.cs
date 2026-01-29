@@ -16,6 +16,7 @@ namespace BHD_ServerManager.Classes.Tickers
         private static theInstance theInstance => CommonCore.theInstance!;
         private static banInstance banInstance => CommonCore.instanceBans!;
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // Throttle for NetLimiter connection checks
         private static DateTime _lastNetLimiterCheck = DateTime.MinValue;
@@ -304,7 +305,7 @@ namespace BHD_ServerManager.Classes.Tickers
             DateTime now = DateTime.Now;
     
             // Cycle through all players in the player list
-            foreach (var kvp in theInstance.playerList)
+            foreach (var kvp in playerInstance.PlayerList)
             {
                 int slotNum = kvp.Key;
                 playerObject player = kvp.Value;
@@ -766,7 +767,7 @@ namespace BHD_ServerManager.Classes.Tickers
             DateTime now = DateTime.Now;
 
             // Cycle through all players in the player list
-            foreach (var kvp in theInstance.playerList)
+            foreach (var kvp in playerInstance.PlayerList)
             {
                 int slotNum = kvp.Key;
                 playerObject player = kvp.Value;
@@ -950,7 +951,7 @@ namespace BHD_ServerManager.Classes.Tickers
             DateTime now = DateTime.Now;
 
             // Cycle through all players in the player list
-            foreach (var kvp in theInstance.playerList)
+            foreach (var kvp in playerInstance.PlayerList)
             {
                 int slotNum = kvp.Key;
                 playerObject player = kvp.Value;

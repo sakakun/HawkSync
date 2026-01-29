@@ -16,6 +16,7 @@ namespace BHD_ServerManager.Forms
     {
         // The Instances (Data)
         private static theInstance thisInstance => CommonCore.theInstance!;
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // Server Manager Tabs
         public tabProfile ProfileTab = null!;                   // The Profile Tab User Control
@@ -103,20 +104,20 @@ namespace BHD_ServerManager.Forms
             // Player Online Label
             label_PlayersOnline.Text = $"[{thisInstance.gameInfoCurrentNumPlayers}/{thisInstance.gameMaxSlots}]";
 
-            if (thisInstance.playerList.Count > 0)
+            if (playerInstance.PlayerList.Count > 0)
             {
                 winConditions = $"[{thisInstance.gameInfoCurrentGameWinCond} Kills ({thisInstance.gameInfoGameType})]";
 
                 if (thisInstance.gameInfoGameType == 0)
                 {
-                    topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
+                    topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
                     scoreTotal = topPlayer!.stat_Kills;
                     playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
                     blueScore = $"{scoreTotal}";
                     redScore = $"{playerName}";
                 } else if (thisInstance.gameInfoGameType == 4)
                 {
-                    topPlayer = thisInstance.playerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
+                    topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
                     scoreTotal = topPlayer!.ActiveZoneTime;
                     playerName = ( scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
                     blueScore = $"{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}";

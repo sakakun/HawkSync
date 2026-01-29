@@ -15,6 +15,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
         private static theInstance theInstance = CommonCore.theInstance!;
         private static statInstance instanceStats = CommonCore.instanceStats!;
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
+        private static playerInstance playerInstance = CommonCore.instancePlayers!;
 
         // Throttle updates to once every 15 seconds
         private static DateTime _lastPlayerStatsUpdate = DateTime.MinValue;
@@ -23,7 +24,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
 
         public static void RunPlayerStatsUpdate()
         {
-            foreach (var playerRecord in theInstance.playerList)
+            foreach (var playerRecord in playerInstance.PlayerList)
             {
                 var playerObj = playerRecord.Value;
                 if (playerObj != null && playerObj.PlayerNameBase64 != null)
@@ -212,7 +213,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             string servername = theInstance.gameServerName;
             string mapname = theInstance.gameInfoMapName;
             string maxplayers = theInstance.gameMaxSlots.ToString() ?? "0";
-            string numplayers = theInstance.playerList?.Count.ToString() ?? "0";
+            string numplayers = playerInstance.PlayerList?.Count.ToString() ?? "0";
             string winner = theInstance.gameMatchWinner.ToString();
             string mod = (theInstance.profileServerType == 0) ? "7" : "8";
 
@@ -270,7 +271,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             PlayerStatLine += " "; // spacer for the SPK ratio
             PlayerStatLine += player.stat_ExperiencePoints + " ";
             PlayerStatLine += player.PlayerTeam + " ";
-            bool playerActive = theInstance.playerList.Values.Any(p => p.PlayerName == player.PlayerName);
+            bool playerActive = playerInstance.PlayerList.Values.Any(p => p.PlayerName == player.PlayerName);
             PlayerStatLine += playerActive ? "1 " : "0 ";
             PlayerStatLine += player.PlayerTimePlayed;
             return PlayerStatLine + "\n";
@@ -518,7 +519,7 @@ namespace BHD_ServerManager.Classes.StatsManagement
             {
                 var player = statObj.PlayerStatsCurrent;
                 var shotsPerKill = player.stat_Kills > 0 ? (player.stat_TotalShotsFired / player.stat_Kills).ToString() : "0";
-                bool playerActive = theInstance.playerList.Values.Any(p => p.PlayerName == player.PlayerName);
+                bool playerActive = playerInstance.PlayerList.Values.Any(p => p.PlayerName == player.PlayerName);
 
                 dataGridViewPlayerStats.Rows.Add(
                     player.PlayerName,

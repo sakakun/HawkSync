@@ -18,6 +18,7 @@ namespace BHD_ServerManager.Classes.Tickers
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
         private static ServerManagerUI? thisServer => Program.ServerManagerUI;
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // Lock for thread safety (if needed for shared resources)
         private static int isTickerRunning = 0;
@@ -173,7 +174,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Resets
                 instanceChat.AutoMessageCounter = 0;
                 instanceChat.ChatLog?.Clear();
-                theInstance.playerList.Clear();
+                playerInstance.PlayerList.Clear();
                 statsInstanceManager.ResetPlayerStats();
 
                 // New MatchID

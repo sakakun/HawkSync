@@ -43,15 +43,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     {
         private static chatInstance instanceChat => CommonCore.instanceChat!;
         private static theInstance theInstance => CommonCore.theInstance!;
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
-        // ================================================================================
-        // SETTINGS MANAGEMENT
-        // ================================================================================
+		// ================================================================================
+		// SETTINGS MANAGEMENT
+		// ================================================================================
 
-        /// <summary>
-        /// Load chat settings from database
-        /// </summary>
-        public static OperationResult LoadSettings()
+		/// <summary>
+		/// Load chat settings from database
+		/// </summary>
+		public static OperationResult LoadSettings()
         {
             try
             {
@@ -434,7 +435,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         return (false, message, $"Invalid player slot format: {playerSlotText}");
                     }
 
-                    var playerEntry = theInstance.playerList.FirstOrDefault(p => p.Value.PlayerSlot == playerSlot);
+                    var playerEntry = playerInstance.PlayerList.FirstOrDefault(p => p.Value.PlayerSlot == playerSlot);
                     
                     if (playerEntry.Value == null)
                     {

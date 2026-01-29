@@ -15,12 +15,12 @@ namespace BHD_ServerManager.Classes.CoreObjects
         // Object: thisInstance, Memory and Variable storage for the current instance of the application
         public static theInstance? theInstance { get; set; }
         public static chatInstance? instanceChat { get; set; }
-        public static banInstance? instanceBans { get; set; }
         public static statInstance? instanceStats { get; set; }
+        public static playerInstance? instancePlayers { get; set; }
 
-
-        // Object: Ticker, Timer Constructor for periodic tasks
-        public static Ticker? Ticker { get; set; }
+        public static banInstance? instanceBans { get; set; }
+		// Object: Ticker, Timer Constructor for periodic tasks
+		public static Ticker? Ticker { get; set; }
 
         public static void InitializeCore()
         {
@@ -28,9 +28,8 @@ namespace BHD_ServerManager.Classes.CoreObjects
             theInstance = new theInstance();
             instanceChat = new chatInstance();
             instanceStats = new statInstance();
-
-            // Initialize Ban Instance
-            CommonCore.instanceBans = DatabaseManager.LoadBanInstance();
+            instancePlayers = new playerInstance();
+			instanceBans = DatabaseManager.LoadBanInstance();
 
             // Initialize the Ticker
             Ticker = new Ticker();

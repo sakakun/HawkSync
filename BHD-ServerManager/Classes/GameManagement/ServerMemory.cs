@@ -18,10 +18,11 @@ namespace BHD_ServerManager.Classes.GameManagement
     {
         // Global Variables
         private readonly static theInstance thisInstance = CommonCore.theInstance!;
+        private readonly static playerInstance playerInstance = CommonCore.instancePlayers!;
 
-        // START: Process Memory Variables
-        // Import of Dynamic Link Libraries
-        [DllImport("kernel32.dll", SetLastError = true)]
+		// START: Process Memory Variables
+		// Import of Dynamic Link Libraries
+		[DllImport("kernel32.dll", SetLastError = true)]
         public static extern nint OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
         [DllImport("kernel32.dll")]
         public static extern bool ReadProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
@@ -1170,7 +1171,7 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function UpdatePlayerTeam
         public static void UpdatePlayerTeam()
         {
-            if (thisInstance.playerChangeTeamList.Count == 0)
+            if (playerInstance.PlayerChangeTeamList.Count == 0)
             {
                 return;
             }
@@ -1190,16 +1191,16 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
 
-                for (int ii = 0; ii < thisInstance.playerChangeTeamList.Count; ii++)
+                for (int ii = 0; ii < playerInstance.PlayerChangeTeamList.Count; ii++)
                 {
-                    int playerLocationOffset = (thisInstance.playerChangeTeamList[ii].slotNum - 1) * 0xAF33C;
+                    int playerLocationOffset = (playerInstance.PlayerChangeTeamList[ii].slotNum - 1) * 0xAF33C;
 
                     int playerLocation = playerlistStartingLocation + playerLocationOffset;
                     int playerTeamLocation = playerLocation + 0x90;
-                    byte[] teamBytes = BitConverter.GetBytes(thisInstance.playerChangeTeamList[ii].Team);
+                    byte[] teamBytes = BitConverter.GetBytes(playerInstance.PlayerChangeTeamList[ii].Team);
                     int bytesWritten = 0;
                     WriteProcessMemory((int)processHandle, playerTeamLocation, teamBytes, teamBytes.Length, ref bytesWritten);
-                    thisInstance.playerChangeTeamList.RemoveAt(ii);
+                    playerInstance.PlayerChangeTeamList.RemoveAt(ii);
                 }
 
 
@@ -1698,7 +1699,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                         try
                         {
                             // Try to preserve PlayerJoined if player already exists in the persistent list
-                            if (thisInstance.playerList.TryGetValue(playerSlot, out var existingPlayer))
+                            if (playerInstance.PlayerList.TryGetValue(playerSlot, out var existingPlayer))
                             {
                                 PlayerStats.PlayerJoined = existingPlayer.PlayerJoined;
                             }
@@ -1737,10 +1738,10 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
             }
-            thisInstance.playerList.Clear();
+            playerInstance.PlayerList.Clear();
             foreach (var kvp in currentPlayerList)
             {
-                thisInstance.playerList[kvp.Key] = kvp.Value;
+                playerInstance.PlayerList[kvp.Key] = kvp.Value;
             }
             // CoreManager.DebugLog("PlayerList Updated");
         }

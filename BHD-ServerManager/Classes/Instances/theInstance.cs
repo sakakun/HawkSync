@@ -168,8 +168,11 @@ namespace BHD_ServerManager.Classes.Instances
         public bool banInstanceUpdated { get; set; } = false;
 
         // Player Team Information
+        [Obsolete("Use playerInstance Object instead.")]
         public Dictionary<int, playerObject> playerList { get; set; } = new();
+        [Obsolete("Use playerInstance Object instead.")]
         public List<playerTeamObject> playerChangeTeamList { get; set; } = new();
+        [Obsolete("Use playerInstance Object instead.")]
         public List<playerTeamObject> playerPreviousTeamList { get; set; } = new();
 
         // Map Playlist

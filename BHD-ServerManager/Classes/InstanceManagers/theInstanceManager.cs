@@ -146,6 +146,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     {
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static theInstance theInstance => CommonCore.theInstance!;
+        private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // ================================================================================
         // PROFILE SETTINGS MANAGEMENT
@@ -1088,16 +1089,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             if (isNextMapTeamMap == false && isCurrentMapTeamMap == true)
             {
-                foreach (var playerRecord in theInstance.playerList)
+                foreach (var playerRecord in playerInstance.PlayerList)
                 {
                     playerObject playerObj = playerRecord.Value;
-                    theInstance.playerPreviousTeamList.Add(new playerTeamObject
+                    playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
                     {
                         slotNum = playerObj.PlayerSlot,
                         Team = playerObj.PlayerTeam
                     });
 
-                    theInstance.playerChangeTeamList.Add(new playerTeamObject
+                    playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                     {
                         slotNum = playerObj.PlayerSlot,
                         Team = playerObj.PlayerSlot + 5
@@ -1106,22 +1107,22 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             else if (isNextMapTeamMap == true && isCurrentMapTeamMap == false)
             {
-                foreach (playerTeamObject playerObj in theInstance.playerPreviousTeamList)
+                foreach (playerTeamObject playerObj in playerInstance.PlayerPreviousTeamList)
                 {
-                    if (theInstance.playerList[playerObj.slotNum] != null)
+                    if (playerInstance.PlayerList[playerObj.slotNum] != null)
                     {
-                        theInstance.playerChangeTeamList.Add(new playerTeamObject
+                        playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                         {
                             slotNum = playerObj.slotNum,
                             Team = playerObj.Team
                         });
                     }
                 }
-                foreach (var playerRecord in theInstance.playerList)
+                foreach (var playerRecord in playerInstance.PlayerList)
                 {
                     playerObject player = playerRecord.Value;
                     bool found = false;
-                    foreach (playerTeamObject previousPlayer in theInstance.playerPreviousTeamList)
+                    foreach (playerTeamObject previousPlayer in playerInstance.PlayerPreviousTeamList)
                     {
                         if (player.PlayerSlot == previousPlayer.slotNum)
                         {
@@ -1135,7 +1136,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         int blueteam = 0;
                         int redteam = 0;
 
-                        foreach (playerTeamObject playerTeam in theInstance.playerPreviousTeamList)
+                        foreach (playerTeamObject playerTeam in playerInstance.PlayerPreviousTeamList)
                         {
                             if (playerTeam.Team == (int)Teams.TEAM_BLUE)
                             {
@@ -1149,12 +1150,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                         if (blueteam > redteam)
                         {
-                            theInstance.playerChangeTeamList.Add(new playerTeamObject
+                            playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                             {
                                 slotNum = player.PlayerSlot,
                                 Team = (int)Teams.TEAM_RED
                             });
-                            theInstance.playerPreviousTeamList.Add(new playerTeamObject
+                            playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
                             {
                                 slotNum = player.PlayerSlot,
                                 Team = (int)Teams.TEAM_RED
@@ -1162,12 +1163,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         }
                         else if (blueteam < redteam)
                         {
-                            theInstance.playerChangeTeamList.Add(new playerTeamObject
+                            playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                             {
                                 slotNum = player.PlayerSlot,
                                 Team = (int)Teams.TEAM_BLUE
                             });
-                            theInstance.playerPreviousTeamList.Add(new playerTeamObject
+                            playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
                             {
                                 slotNum = player.PlayerSlot,
                                 Team = (int)Teams.TEAM_BLUE
@@ -1179,12 +1180,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                             int rnd = rand.Next(1, 3);
                             if (rnd == 1)
                             {
-                                theInstance.playerChangeTeamList.Add(new playerTeamObject
+                                playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                                 {
                                     slotNum = player.PlayerSlot,
                                     Team = (int)Teams.TEAM_BLUE
                                 });
-                                theInstance.playerPreviousTeamList.Add(new playerTeamObject
+                                playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
                                 {
                                     slotNum = player.PlayerSlot,
                                     Team = (int)Teams.TEAM_BLUE
@@ -1192,12 +1193,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                             }
                             else if (rnd == 2)
                             {
-                                theInstance.playerChangeTeamList.Add(new playerTeamObject
+                                playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                                 {
                                     slotNum = player.PlayerSlot,
                                     Team = (int)Teams.TEAM_RED
                                 });
-                                theInstance.playerPreviousTeamList.Add(new playerTeamObject
+                                playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
                                 {
                                     slotNum = player.PlayerSlot,
                                     Team = (int)Teams.TEAM_RED
@@ -1206,7 +1207,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         }
                     }
                 }
-                theInstance.playerPreviousTeamList.Clear();
+                playerInstance.PlayerPreviousTeamList.Clear();
             }
         }
 
