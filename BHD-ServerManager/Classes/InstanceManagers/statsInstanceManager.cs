@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
-namespace BHD_ServerManager.Classes.StatsManagement
+namespace BHD_ServerManager.Classes.InstanceManagers
 {
     public static class statsInstanceManager
     {

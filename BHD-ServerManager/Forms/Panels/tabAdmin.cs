@@ -1,4 +1,5 @@
-﻿using BHD_ServerManager.Classes.InstanceManagers;
+﻿using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
 using static BHD_ServerManager.Classes.InstanceManagers.adminInstanceManager;
 
@@ -53,15 +54,16 @@ public partial class tabAdmin : UserControl
     // ================================================================================
 
     /// <summary>
-    /// Load all users into the DataGridView
+    /// Load all users into the DataGridView from cache
     /// </summary>
     private void LoadUserList()
     {
         dataGridView1.Rows.Clear();
 
-        var users = adminInstanceManager.GetAllUsers();
+        // Get users from cache (adminInstance.Users)
+        var users = CommonCore.instanceAdmin!.Users;
 
-        foreach (var user in users)
+        foreach (var user in users.OrderBy(u => u.UserID))
         {
             dataGridView1.Rows.Add(
                 user.UserID,
@@ -72,7 +74,7 @@ public partial class tabAdmin : UserControl
             );
         }
 
-        AppDebug.Log("tabAdmin", $"Loaded {users.Count} users");
+        AppDebug.Log("tabAdmin", $"Loaded {users.Count} users from cache");
     }
 
     // ================================================================================
@@ -134,7 +136,7 @@ public partial class tabAdmin : UserControl
         textBox_username.Clear();
         textBox_password.Clear();
         textBox_password2.Clear();
-        textBox_userNotes.Clear(); // Notes
+        textBox_userNotes.Clear();
         checkBox_userActive.Checked = true;
 
         // Clear all permissions
@@ -203,7 +205,9 @@ public partial class tabAdmin : UserControl
         if (e.RowIndex < 0) return;
 
         int userId = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells[0].Value);
-        var user = adminInstanceManager.GetUserByID(userId);
+        
+        // Get from cache
+        var user = CommonCore.instanceAdmin!.Users.FirstOrDefault(u => u.UserID == userId);
 
         if (user != null)
         {
@@ -217,10 +221,11 @@ public partial class tabAdmin : UserControl
     // ================================================================================
 
     /// <summary>
-    /// Refresh button clicked
+    /// Refresh button clicked - reload cache from database
     /// </summary>
     private void BtnRefresh_Click(object? sender, EventArgs e)
     {
+        adminInstanceManager.LoadUsersCache();
         LoadUserList();
         SetFormMode(FormMode.View);
     }
@@ -269,7 +274,7 @@ public partial class tabAdmin : UserControl
         {
             MessageBox.Show("User deleted successfully.", "Success",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadUserList();
+            LoadUserList(); // Cache already updated by manager
             SetFormMode(FormMode.View);
         }
         else
@@ -313,14 +318,14 @@ public partial class tabAdmin : UserControl
             Notes: textBox_userNotes.Text.Trim()
         );
 
-        // Call manager
+        // Call manager (cache will be auto-updated)
         var result = adminInstanceManager.CreateUser(request);
 
         if (result.Success)
         {
             MessageBox.Show("User created successfully.", "Success",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadUserList();
+            LoadUserList(); // Refresh grid from updated cache
             SetFormMode(FormMode.View);
         }
         else
@@ -347,14 +352,14 @@ public partial class tabAdmin : UserControl
             Notes: textBox_userNotes.Text.Trim()
         );
 
-        // Call manager
+        // Call manager (cache will be auto-updated)
         var result = adminInstanceManager.UpdateUser(request);
 
         if (result.Success)
         {
             MessageBox.Show("User updated successfully.", "Success",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadUserList();
+            LoadUserList(); // Refresh grid from updated cache
             SetFormMode(FormMode.View);
         }
         else

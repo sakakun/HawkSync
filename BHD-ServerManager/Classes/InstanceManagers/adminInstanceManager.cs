@@ -1,4 +1,6 @@
 ﻿using BCrypt.Net;
+using BHD_ServerManager.Classes.CoreObjects;
+using BHD_ServerManager.Classes.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 
 namespace BHD_ServerManager.Classes.InstanceManagers;
@@ -8,6 +10,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers;
 /// </summary>
 public static class adminInstanceManager
 {
+    private static adminInstance adminInstance => adminInstance!;
     // Valid permissions that can be assigned to users
     private static readonly string[] ValidPermissions = new[]
     {
@@ -60,13 +63,13 @@ public static class adminInstanceManager
     );
 
     // ================================================================================
-    // USER CRUD OPERATIONS
+    // CACHE MANAGEMENT
     // ================================================================================
 
     /// <summary>
-    /// Get all users from database
+    /// Load all users from database into adminInstance.Users cache
     /// </summary>
-    public static List<UserDTO> GetAllUsers()
+    public static void LoadUsersCache()
     {
         try
         {
@@ -89,30 +92,34 @@ public static class adminInstanceManager
                 });
             }
 
-            AppDebug.Log("adminInstanceManager", $"Retrieved {users.Count} users");
-            return users;
+            adminInstance.Users = users;
+            AppDebug.Log("adminInstanceManager", $"Loaded {users.Count} users into cache");
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error getting all users: {ex.Message}");
-            return new List<UserDTO>();
+            AppDebug.Log("adminInstanceManager", $"Error loading users cache: {ex.Message}");
+            adminInstance.Users = new List<UserDTO>();
         }
     }
 
     /// <summary>
-    /// Get a single user by UserID
+    /// Refresh a specific user in the cache
     /// </summary>
-    public static UserDTO? GetUserByID(int userID)
+    private static void RefreshUserInCache(int userID)
     {
         try
         {
             var record = DatabaseManager.GetUserByID(userID);
             if (record == null)
-                return null;
+            {
+                // User was deleted, remove from cache
+                adminInstance.Users.RemoveAll(u => u.UserID == userID);
+                return;
+            }
 
             var permissions = DatabaseManager.GetUserPermissions(record.UserID);
 
-            return new UserDTO
+            var userDTO = new UserDTO
             {
                 UserID = record.UserID,
                 Username = record.Username,
@@ -122,12 +129,46 @@ public static class adminInstanceManager
                 Notes = record.Notes,
                 Permissions = permissions
             };
+
+            // Remove old entry and add updated one
+            adminInstance.Users.RemoveAll(u => u.UserID == userID);
+            adminInstance.Users.Add(userDTO);
+
+            AppDebug.Log("adminInstanceManager", $"Refreshed user {userID} in cache");
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error getting user by ID: {ex.Message}");
-            return null;
+            AppDebug.Log("adminInstanceManager", $"Error refreshing user in cache: {ex.Message}");
         }
+    }
+
+    // ================================================================================
+    // USER CRUD OPERATIONS
+    // ================================================================================
+
+    /// <summary>
+    /// Get all users from cache (use this for UI/API)
+    /// </summary>
+    public static List<UserDTO> GetAllUsers()
+    {
+        return adminInstance.Users.ToList();
+    }
+
+    /// <summary>
+    /// Get a single user by UserID from cache
+    /// </summary>
+    public static UserDTO? GetUserByID(int userID)
+    {
+        return adminInstance.Users.FirstOrDefault(u => u.UserID == userID);
+    }
+
+    /// <summary>
+    /// Get a single user by Username from cache
+    /// </summary>
+    public static UserDTO? GetUserByUsername(string username)
+    {
+        return adminInstance.Users
+            .FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -177,6 +218,13 @@ public static class adminInstanceManager
                 DatabaseManager.AddUserPermission(userID, permission.ToLower());
             }
 
+            // Refresh cache with new user
+            RefreshUserInCache(userID);
+
+            // Log audit
+            LogAudit("system", "USER_CREATED", 
+                $"User '{request.Username}' created with ID {userID}");
+
             AppDebug.Log("adminInstanceManager", 
                 $"Created user: {request.Username} (ID: {userID}) with {request.Permissions.Count} permissions");
 
@@ -204,10 +252,15 @@ public static class adminInstanceManager
             if (request.Username.Length < 3 || request.Username.Length > 50)
                 return new OperationResult(false, "Username must be between 3 and 50 characters.");
 
-            // Check if user exists
-            var existingUser = DatabaseManager.GetUserByID(request.UserID);
-            if (existingUser == null)
-                return new OperationResult(false, "User not found.");
+            // Check if user exists in cache
+            var existingCachedUser = GetUserByID(request.UserID);
+            if (existingCachedUser == null)
+            {
+                // Fallback to database check
+                var existingUser = DatabaseManager.GetUserByID(request.UserID);
+                if (existingUser == null)
+                    return new OperationResult(false, "User not found.");
+            }
 
             // Check if username is taken by another user
             if (DatabaseManager.UsernameExistsForOtherUser(request.Username, request.UserID))
@@ -253,6 +306,13 @@ public static class adminInstanceManager
                 DatabaseManager.AddUserPermission(request.UserID, permission.ToLower());
             }
 
+            // Refresh cache with updated user
+            RefreshUserInCache(request.UserID);
+
+            // Log audit
+            LogAudit("system", "USER_UPDATED", 
+                $"User ID {request.UserID} ({request.Username}) updated");
+
             AppDebug.Log("adminInstanceManager", 
                 $"Updated user ID: {request.UserID} ({request.Username}) with {request.Permissions.Count} permissions");
 
@@ -278,16 +338,30 @@ public static class adminInstanceManager
                 return new OperationResult(false, 
                     "Cannot delete the default admin user.");
 
-            // Check if user exists
-            var user = DatabaseManager.GetUserByID(userID);
+            // Check if user exists in cache
+            var user = GetUserByID(userID);
             if (user == null)
-                return new OperationResult(false, "User not found.");
+            {
+                // Fallback to database check
+                var dbUser = DatabaseManager.GetUserByID(userID);
+                if (dbUser == null)
+                    return new OperationResult(false, "User not found.");
+                
+                user = new UserDTO { UserID = dbUser.UserID, Username = dbUser.Username };
+            }
 
             // Delete user (permissions will cascade delete)
             bool deleteSuccess = DatabaseManager.DeleteUser(userID);
 
             if (!deleteSuccess)
                 return new OperationResult(false, "Failed to delete user.");
+
+            // Remove from cache
+            adminInstance.Users.RemoveAll(u => u.UserID == userID);
+
+            // Log audit
+            LogAudit("system", "USER_DELETED", 
+                $"User ID {userID} ({user.Username}) deleted");
 
             AppDebug.Log("adminInstanceManager", 
                 $"Deleted user ID: {userID} ({user.Username})");
@@ -317,12 +391,13 @@ public static class adminInstanceManager
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                 return (false, null, "Username and password are required.");
 
-            // Get user from database
+            // Get user from database (can't use cache since we need password hash)
             var userRecord = DatabaseManager.GetUserByUsername(username);
             
             if (userRecord == null)
             {
                 AppDebug.Log("adminInstanceManager", $"Authentication failed: User not found - {username}");
+                LogAudit(username, "LOGIN_FAILED", "User not found");
                 return (false, null, "Invalid username or password.");
             }
 
@@ -330,6 +405,7 @@ public static class adminInstanceManager
             if (!userRecord.IsActive)
             {
                 AppDebug.Log("adminInstanceManager", $"Authentication failed: User disabled - {username}");
+                LogAudit(username, "LOGIN_FAILED", "Account disabled");
                 return (false, null, "This account has been disabled.");
             }
 
@@ -339,6 +415,7 @@ public static class adminInstanceManager
             if (!passwordValid)
             {
                 AppDebug.Log("adminInstanceManager", $"Authentication failed: Invalid password - {username}");
+                LogAudit(username, "LOGIN_FAILED", "Invalid password");
                 return (false, null, "Invalid username or password.");
             }
 
@@ -360,6 +437,12 @@ public static class adminInstanceManager
                 Permissions = permissions
             };
 
+            // Refresh cache with updated login time
+            RefreshUserInCache(userRecord.UserID);
+
+            // Log audit
+            LogAudit(username, "LOGIN_SUCCESS", "User authenticated successfully");
+
             AppDebug.Log("adminInstanceManager", 
                 $"User authenticated successfully: {username} (ID: {userRecord.UserID})");
 
@@ -370,6 +453,95 @@ public static class adminInstanceManager
             AppDebug.Log("adminInstanceManager", $"Authentication error: {ex.Message}");
             return (false, null, $"Authentication error: {ex.Message}");
         }
+    }
+
+    // ================================================================================
+    // AUDIT LOGGING
+    // ================================================================================
+
+    /// <summary>
+    /// Log an audit entry
+    /// </summary>
+    private static void LogAudit(string username, string action, string details)
+    {
+        try
+        {
+            var auditEntry = new AdminAuditLog
+            {
+                Timestamp = DateTime.Now,
+                Username = username,
+                Action = action,
+                Details = details
+            };
+
+            adminInstance.AuditLog.Add(auditEntry);
+
+            // Keep only last 1000 entries in memory
+            if (adminInstance.AuditLog.Count > 1000)
+            {
+                adminInstance.AuditLog.RemoveAt(0);
+            }
+
+            // Optionally persist to database
+            // DatabaseManager.AddAuditLog(auditEntry);
+
+            AppDebug.Log("adminInstanceManager", $"AUDIT: [{username}] {action} - {details}");
+        }
+        catch (Exception ex)
+        {
+            AppDebug.Log("adminInstanceManager", $"Error logging audit: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Get recent audit log entries
+    /// </summary>
+    public static List<AdminAuditLog> GetRecentAuditLog(int count = 50)
+    {
+        return adminInstance.AuditLog
+            .OrderByDescending(x => x.Timestamp)
+            .Take(count)
+            .ToList();
+    }
+
+    // ================================================================================
+    // SESSION MANAGEMENT
+    // ================================================================================
+
+    /// <summary>
+    /// Track a user session (for remote clients)
+    /// </summary>
+    public static void TrackSession(string username)
+    {
+        adminInstance.ActiveSessions[username] = DateTime.Now;
+        AppDebug.Log("adminInstanceManager", $"Session tracked for user: {username}");
+    }
+
+    /// <summary>
+    /// Remove a user session
+    /// </summary>
+    public static void RemoveSession(string username)
+    {
+        if (adminInstance.ActiveSessions.Remove(username))
+        {
+            LogAudit("system", "SESSION_REMOVED", $"Session removed for user: {username}");
+            AppDebug.Log("adminInstanceManager", $"Session removed for user: {username}");
+        }
+    }
+
+    /// <summary>
+    /// Get active sessions
+    /// </summary>
+    public static List<(string Username, DateTime LoginTime, TimeSpan Duration)> GetActiveSessions()
+    {
+        return adminInstance.ActiveSessions
+            .Select(kvp => (
+                Username: kvp.Key,
+                LoginTime: kvp.Value,
+                Duration: DateTime.Now - kvp.Value
+            ))
+            .OrderByDescending(x => x.LoginTime)
+            .ToList();
     }
 
     // ================================================================================
@@ -449,19 +621,12 @@ public static class adminInstanceManager
     }
 
     /// <summary>
-    /// Check if a user has a specific permission
+    /// Check if a user has a specific permission (by UserID)
     /// </summary>
     public static bool UserHasPermission(int userID, string permission)
     {
-        try
-        {
-            var permissions = DatabaseManager.GetUserPermissions(userID);
-            return permissions.Contains(permission.ToLower());
-        }
-        catch
-        {
-            return false;
-        }
+        var user = GetUserByID(userID);
+        return user?.Permissions.Contains(permission.ToLower()) ?? false;
     }
 
     /// <summary>
@@ -492,6 +657,10 @@ public static class adminInstanceManager
             if (users.Count > 0)
             {
                 AppDebug.Log("adminInstanceManager", "Users already exist, skipping default admin creation");
+                
+                // Load existing users into cache
+                LoadUsersCache();
+                
                 return new OperationResult(true, "Users already exist.");
             }
 
@@ -510,6 +679,9 @@ public static class adminInstanceManager
             {
                 AppDebug.Log("adminInstanceManager", 
                     "Created default admin user (username: admin, password: admin)");
+                
+                // Load cache after creating first user
+                LoadUsersCache();
             }
 
             return result;

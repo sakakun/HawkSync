@@ -1,7 +1,6 @@
 ﻿using BHD_ServerManager.Classes.CoreObjects;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.StatsManagement;
 using BHD_ServerManager.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;
@@ -139,15 +138,6 @@ namespace BHD_ServerManager.Forms.Panels
         }
 
         // --- Legacy Method (for backwards compatibility) ---
-        
-        /// <summary>
-        /// Legacy method - calls new load method
-        /// </summary>
-        [Obsolete("Use methodFunction_loadSettings() instead")]
-        public void functionEvent_GetStatSettings(theInstance updatedInstance)
-        {
-            methodFunction_loadSettings();
-        }
 
         // --- Action Click Events ---
 
