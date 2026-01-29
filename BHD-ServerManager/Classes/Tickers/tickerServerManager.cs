@@ -13,6 +13,7 @@ namespace BHD_ServerManager.Classes.Tickers
     {
         // The Instances (Data)
         private static theInstance theInstance => CommonCore.theInstance!;
+        private static mapInstance mapInstance => CommonCore.instanceMaps!;
         private static chatInstance instanceChat => CommonCore.instanceChat!;
         private static banInstance instanceBans => CommonCore.instanceBans!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
@@ -75,6 +76,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
                     thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
                     thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
+                    
+                    thisServer.MapsTab.UpdateCurrentMapHighlighting();                              // Current Map Highlighting Update
                 });
 
                 if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
@@ -85,6 +88,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     return;
                 }
 
+                // 1. General Updates (Always Run When Online)             
                 if (theInstance.instanceStatus != InstanceStatus.LOADINGMAP || theInstance.instanceStatus != InstanceStatus.SCORING)
                 {
                     // Map Ended, Wait for Updates
@@ -111,9 +115,14 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 3. Start Delay
                 else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
                 {
-                    theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
+                    if (!theInstance.instancePreGameProcRun)
+                    {
+                        mapInstance.ActualPlayingMapIndex = mapInstance.CurrentMapIndex;    // Set the actual playing map index
+                        theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
+                    }
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
                     ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
+
                 }
                 // 4. Online (game in progress)
                 else if (theInstance.instanceStatus == InstanceStatus.ONLINE)

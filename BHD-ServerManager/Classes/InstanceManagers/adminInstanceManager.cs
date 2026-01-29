@@ -10,7 +10,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers;
 /// </summary>
 public static class adminInstanceManager
 {
-    private static adminInstance adminInstance => adminInstance!;
+    private static adminInstance adminInstance => CommonCore.instanceAdmin!;
     // Valid permissions that can be assigned to users
     private static readonly string[] ValidPermissions = new[]
     {

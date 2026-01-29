@@ -14,6 +14,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     {
         private static theInstance theInstance = CommonCore.theInstance!;
         private static statInstance instanceStats = CommonCore.instanceStats!;
+        private static mapInstance instanceMaps = CommonCore.instanceMaps!;
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static playerInstance playerInstance = CommonCore.instancePlayers!;
 
@@ -211,7 +212,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             string gametype = objectGameTypes.GetShortName(theInstance.gameInfoGameType) ?? "0";
             string dedicated = theInstance.gameDedicated ? "1" : "0";
             string servername = theInstance.gameServerName;
-            string mapname = theInstance.gameInfoMapName;
+            string mapname = instanceMaps.CurrentMapName;
             string maxplayers = theInstance.gameMaxSlots.ToString() ?? "0";
             string numplayers = playerInstance.PlayerList?.Count.ToString() ?? "0";
             string winner = theInstance.gameMatchWinner.ToString();
