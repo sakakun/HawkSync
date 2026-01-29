@@ -380,7 +380,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                             // Update grid
                             var row = dgPlayerNamesBlacklist.Rows.Cast<DataGridViewRow>()
-                                .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDName);
+                                .FirstOrDefault(r => (int)r.Cells[0].Value! == _blacklistSelectedRecordIDName);
                             if (row != null)
                             {
                                 var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDName);
@@ -414,7 +414,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                             // Update grid
                             var row = dgPlayerAddressBlacklist.Rows.Cast<DataGridViewRow>()
-                                .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDIP);
+                                .FirstOrDefault(r => (int)r.Cells[0].Value! == _blacklistSelectedRecordIDIP);
                             if (row != null)
                             {
                                 var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDIP);
@@ -477,7 +477,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                         // Update grid
                         var row = dgPlayerNamesBlacklist.Rows.Cast<DataGridViewRow>()
-                            .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDName);
+                            .FirstOrDefault(r => (int)r.Cells[0].Value! == _blacklistSelectedRecordIDName);
                         if (row != null)
                         {
                             var nameRecord = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDName);
@@ -541,7 +541,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                         // Update grid
                         var row = dgPlayerAddressBlacklist.Rows.Cast<DataGridViewRow>()
-                            .FirstOrDefault(r => (int)r.Cells[0].Value == _blacklistSelectedRecordIDIP);
+                            .FirstOrDefault(r => (int)r.Cells[0].Value! == _blacklistSelectedRecordIDIP);
                         if (row != null)
                         {
                             var ipRecord = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == _blacklistSelectedRecordIDIP);
@@ -840,7 +840,7 @@ namespace BHD_ServerManager.Forms.Panels
             if (e.RowIndex < 0 || instanceBans == null)
                 return;
 
-            var recordID = (int)dgPlayerNamesBlacklist.Rows[e.RowIndex].Cells[0].Value;
+            var recordID = (int)dgPlayerNamesBlacklist.Rows[e.RowIndex].Cells[0].Value!;
             var record = instanceBans.BannedPlayerNames.FirstOrDefault(x => x.RecordID == recordID);
 
             if (record == null)
@@ -857,7 +857,7 @@ namespace BHD_ServerManager.Forms.Panels
             if (e.RowIndex < 0 || instanceBans == null)
                 return;
 
-            var recordID = (int)dgPlayerAddressBlacklist.Rows[e.RowIndex].Cells[0].Value;
+            var recordID = (int)dgPlayerAddressBlacklist.Rows[e.RowIndex].Cells[0].Value!;
             var record = instanceBans.BannedPlayerIPs.FirstOrDefault(x => x.RecordID == recordID);
 
             if (record == null)
@@ -1273,7 +1273,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                             // Update grid
                             var row = dgPlayerNamesWhitelist.Rows.Cast<DataGridViewRow>()
-                                .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDName);
+                                .FirstOrDefault(r => (int)r.Cells[0].Value! == _whitelistSelectedRecordIDName);
                             if (row != null)
                             {
                                 var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDName);
@@ -1307,7 +1307,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                             // Update grid
                             var row = dgPlayerAddressWhitelist.Rows.Cast<DataGridViewRow>()
-                                .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDIP);
+                                .FirstOrDefault(r => (int)r.Cells[0].Value! == _whitelistSelectedRecordIDIP);
                             if (row != null)
                             {
                                 var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDIP);
@@ -1370,7 +1370,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                         // Update grid
                         var row = dgPlayerNamesWhitelist.Rows.Cast<DataGridViewRow>()
-                            .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDName);
+                            .FirstOrDefault(r => (int)r.Cells[0].Value! == _whitelistSelectedRecordIDName);
                         if (row != null)
                         {
                             var nameRecord = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDName);
@@ -1434,7 +1434,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                         // Update grid
                         var row = dgPlayerAddressWhitelist.Rows.Cast<DataGridViewRow>()
-                            .FirstOrDefault(r => (int)r.Cells[0].Value == _whitelistSelectedRecordIDIP);
+                            .FirstOrDefault(r => (int)r.Cells[0].Value! == _whitelistSelectedRecordIDIP);
                         if (row != null)
                         {
                             var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == _whitelistSelectedRecordIDIP);
@@ -1723,7 +1723,7 @@ namespace BHD_ServerManager.Forms.Panels
             if (e.RowIndex < 0 || instanceBans == null)
                 return;
 
-            var recordID = (int)dgPlayerNamesWhitelist.Rows[e.RowIndex].Cells[0].Value;
+            var recordID = (int)dgPlayerNamesWhitelist.Rows[e.RowIndex].Cells[0].Value!;
             var record = instanceBans.WhitelistedNames.FirstOrDefault(x => x.RecordID == recordID);
 
             if (record == null)
@@ -1740,7 +1740,7 @@ namespace BHD_ServerManager.Forms.Panels
             if (e.RowIndex < 0 || instanceBans == null)
                 return;
 
-            var recordID = (int)dgPlayerAddressWhitelist.Rows[e.RowIndex].Cells[0].Value;
+            var recordID = (int)dgPlayerAddressWhitelist.Rows[e.RowIndex].Cells[0].Value!;
             var record = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == recordID);
 
             if (record == null)
@@ -2015,7 +2015,7 @@ namespace BHD_ServerManager.Forms.Panels
             if (e.RowIndex < 0 || instanceBans == null)
                 return;
 
-            int recordId = (int)dgProxyCountryBlockList.Rows[e.RowIndex].Cells[0].Value;
+            int recordId = (int)dgProxyCountryBlockList.Rows[e.RowIndex].Cells[0].Value!;
             string countryCode = dgProxyCountryBlockList.Rows[e.RowIndex].Cells[1].Value?.ToString() ?? "";
             string countryName = dgProxyCountryBlockList.Rows[e.RowIndex].Cells[2].Value?.ToString() ?? "";
 

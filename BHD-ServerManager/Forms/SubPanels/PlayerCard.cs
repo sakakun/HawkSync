@@ -22,7 +22,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         private static theInstance TheInstance = CommonCore.theInstance!;
         private playerObject Player { get; set; } = new playerObject();
         private int SlotNumber = 0;
-        private ContextMenuStrip ContextMenu;
+        private new ContextMenuStrip ContextMenu;
 
         private playerObject? LastPlayerData = null;
         private bool LastVisible = true;

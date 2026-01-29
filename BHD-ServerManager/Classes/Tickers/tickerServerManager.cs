@@ -46,6 +46,12 @@ namespace BHD_ServerManager.Classes.Tickers
                 if (thisServer == null)
                     return;
 
+                // ═══════════════════════════════════════════════════════════
+                // CHECK AND MANAGE EMBEDDED API
+                // ═══════════════════════════════════════════════════════════
+                // This runs every tick (500ms) to ensure API state matches configuration
+                theInstanceManager.ManageEmbeddedApi();
+
                 // Only run the rest if it's time for an update
                 DateTime currentTime = DateTime.Now;
                 if (DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) >= 0)

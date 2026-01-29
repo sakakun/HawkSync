@@ -1396,5 +1396,79 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             theInstance.WebStatsUpdateInterval = settings.UpdateInterval;
         }
 
+        // Add this to the end of the theInstanceManager class, before the closing brace
+
+        // ================================================================================
+        // REMOTE API MANAGEMENT
+        // ================================================================================
+
+        /// <summary>
+        /// Check and start/stop the embedded API based on profile settings.
+        /// Called from ticker to ensure API state matches configuration.
+        /// </summary>
+        public static void ManageEmbeddedApi()
+        {
+            try
+            {
+                bool shouldBeRunning = theInstance.profileEnableRemote;
+                bool isCurrentlyRunning = CommonCore.IsApiRunning;
+                int configuredPort = theInstance.profileRemotePort;
+
+                // Case 1: Should be running but isn't
+                if (shouldBeRunning && !isCurrentlyRunning)
+                {
+                    AppDebug.Log("theInstanceManager", 
+                        $"Remote API enabled but not running. Starting on port {configuredPort}...");
+            
+                    try
+                    {
+                        CommonCore.StartApiHost(configuredPort);
+                    }
+                    catch (Exception ex)
+                    {
+                        AppDebug.Log("theInstanceManager", 
+                            $"Failed to start API host: {ex.Message}");
+                    }
+                }
+                // Case 2: Should NOT be running but is
+                else if (!shouldBeRunning && isCurrentlyRunning)
+                {
+                    AppDebug.Log("theInstanceManager", 
+                        "Remote API disabled but currently running. Stopping...");
+            
+                    // Fire and forget - async shutdown
+                    _ = CommonCore.StopApiHost();
+                }
+                // Case 3 & 4: Already in correct state (no action needed)
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("theInstanceManager", 
+                    $"Error managing embedded API: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get the current status of the embedded API
+        /// </summary>
+        /// <returns>Tuple with (isEnabled, isRunning, port)</returns>
+        public static (bool isEnabled, bool isRunning, int port) GetApiStatus()
+        {
+            return (
+                isEnabled: theInstance.profileEnableRemote,
+                isRunning: CommonCore.IsApiRunning,
+                port: theInstance.profileRemotePort
+            );
+        }
+
+        /// <summary>
+        /// Restart the API host on a new port (useful when port changes)
+        /// </summary>
+        public static async Task RestartApiHost(int newPort)
+        {
+            AppDebug.Log("theInstanceManager", $"Restarting API host on new port {newPort}");
+            await CommonCore.RestartApiHost(newPort);
+        }
+
     }
 }

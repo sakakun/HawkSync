@@ -96,12 +96,25 @@ namespace BHD_ServerManager.Forms.Panels
 
             if (result.Success)
             {
-                MessageBox.Show("Profile settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // *** RELOAD settings so ticker picks up changes ***
+                theInstanceManager.LoadProfileSettings();
+        
+                MessageBox.Show(
+                    "Profile settings saved successfully.\n\n", 
+                    "Success", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Information);
+        
                 AppDebug.Log(Name, "Profile settings saved successfully");
             }
             else
             {
-                MessageBox.Show($"Failed to save profile settings:\n\n{result.Message}", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    $"Failed to save profile settings:\n\n{result.Message}", 
+                    "Validation Error", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Warning);
+        
                 AppDebug.Log(Name, $"Failed to save profile settings: {result.Message}");
             }
         }

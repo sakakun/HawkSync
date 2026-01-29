@@ -105,11 +105,11 @@ namespace BHD_ServerManager.Forms.Panels
 
             int newRowIndex = targetGrid.Rows.Add(
                 targetGrid.Rows.Count + 1,
-                row.Cells[1].Value,
-                row.Cells[2].Value,
-                row.Cells[3].Value,
-                row.Cells[4].Value,
-                objectGameTypes.GetShortName((int)row.Cells[4].Value)
+                row.Cells[1].Value!,
+                row.Cells[2].Value!,
+                row.Cells[3].Value!,
+                row.Cells[4].Value!,
+                objectGameTypes.GetShortName((int)row.Cells[4].Value!)
             );
 
             DataGridViewRow newRow = targetGrid.Rows[newRowIndex];
@@ -350,11 +350,11 @@ namespace BHD_ServerManager.Forms.Panels
 
                 list.Add(new mapFileInfo
                 {
-                    MapID = (int)row.Cells[0].Value,
+                    MapID = (int)row.Cells[0].Value!,
                     MapName = row.Cells[1].Value?.ToString()!,
                     MapFile = row.Cells[2].Value?.ToString()!,
-                    ModType = (int)row.Cells[3].Value,
-                    MapType = (int)row.Cells[4].Value
+                    ModType = (int)row.Cells[3].Value!,
+                    MapType = (int)row.Cells[4].Value!
                 });
             }
 
@@ -516,7 +516,7 @@ namespace BHD_ServerManager.Forms.Panels
                 foreach (DataGridViewRow row in dataGridView_availableMaps.Rows)
                 {
                     if (row.IsNewRow) continue;
-                    int mapType = (int)row.Cells[4].Value;
+                    int mapType = (int)row.Cells[4].Value!;
                     row.Visible = (mapType == filterInt);
                 }
             }

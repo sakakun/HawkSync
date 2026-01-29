@@ -13,19 +13,27 @@ namespace BHD_ServerManager
 		[STAThread]
 		static void Main()
 		{   
-
+			ApplicationConfiguration.Initialize();
 			// Encoding for legacy code pages
 			System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-
-			// Initialize the Instance of the Application
-			DatabaseManager.Initialize();
-			CommonCore.InitializeCore();
+			try { 
+				// Initialize the Instance of the Application
+				DatabaseManager.Initialize();
+				CommonCore.InitializeCore();
 			
-
-			ApplicationConfiguration.Initialize();
-			ServerManagerUI = new ServerManagerUI();
-
-			Application.Run(ServerManagerUI);
+				ServerManagerUI = new ServerManagerUI();
+				Application.Run(ServerManagerUI);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fatal error: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Cleanup all core infrastructure
+                CommonCore.Shutdown().Wait();
+            }
 		}
 	}
 }
