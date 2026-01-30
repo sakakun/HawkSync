@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.DTOs;
+using HawkSyncShared.ObjectClasses;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -45,7 +46,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    private string GenerateJwtToken(adminInstanceManager.UserDTO user)
+    private string GenerateJwtToken(UserDTO user)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

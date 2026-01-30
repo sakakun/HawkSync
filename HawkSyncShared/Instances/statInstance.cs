@@ -1,8 +1,8 @@
-﻿using BHD_ServerManager.Classes.ObjectClasses;
+﻿using HawkSyncShared.ObjectClasses;
 using System;
 using System.Collections.Generic;
 
-namespace BHD_ServerManager.Classes.Instances
+namespace HawkSyncShared.Instances
 {
     public class statInstance
     {

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +53,10 @@
   <ItemGroup>
     <Folder Include="Classes\" />
     <Folder Include="Databases\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HawkSyncShared\HawkSyncShared.csproj" />
   </ItemGroup>
 
 </Project>

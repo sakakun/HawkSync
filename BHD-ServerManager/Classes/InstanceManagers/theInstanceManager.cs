@@ -1,10 +1,12 @@
-﻿using BHD_ServerManager.Classes.CoreObjects;
+﻿using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.ObjectClasses;
+using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Tickers;
 using BHD_ServerManager.Forms;
+using BHD_ServerManager.API;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -1411,7 +1413,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             try
             {
                 bool shouldBeRunning = theInstance.profileEnableRemote;
-                bool isCurrentlyRunning = CommonCore.IsApiRunning;
+                bool isCurrentlyRunning = APICore.IsApiRunning;
                 int configuredPort = theInstance.profileRemotePort;
 
                 // Case 1: Should be running but isn't
@@ -1422,7 +1424,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             
                     try
                     {
-                        CommonCore.StartApiHost(configuredPort);
+                        APICore.StartApiHost(configuredPort);
                     }
                     catch (Exception ex)
                     {
@@ -1437,7 +1439,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         "Remote API disabled but currently running. Stopping...");
             
                     // Fire and forget - async shutdown
-                    _ = CommonCore.StopApiHost();
+                    _ = APICore.StopApiHost();
                 }
                 // Case 3 & 4: Already in correct state (no action needed)
             }
@@ -1456,7 +1458,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             return (
                 isEnabled: theInstance.profileEnableRemote,
-                isRunning: CommonCore.IsApiRunning,
+                isRunning: APICore.IsApiRunning,
                 port: theInstance.profileRemotePort
             );
         }
@@ -1467,7 +1469,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public static async Task RestartApiHost(int newPort)
         {
             AppDebug.Log("theInstanceManager", $"Restarting API host on new port {newPort}");
-            await CommonCore.RestartApiHost(newPort);
+            await APICore.RestartApiHost(newPort);
         }
 
     }

@@ -1,12 +1,15 @@
-﻿using HawkSyncShared.DTOs;
-using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.ObjectClasses;
+﻿using HawkSyncShared;
+using HawkSyncShared.DTOs;
+using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
+using HawkSyncShared.SupportClasses;
 using System.Text;
 
 namespace BHD_ServerManager.API.Services;
 
 public static class InstanceMapper
 {
+
     public static ServerSnapshot CreateSnapshot(
         theInstance server,
         Dictionary<int, playerObject> playerList,
@@ -16,30 +19,12 @@ public static class InstanceMapper
     {
         return new ServerSnapshot
         {
-            Server = MapServerInstance(server, playerList),
+            ServerData = server,
             Players = MapPlayerInstance(playerList),
             Chat = MapChatInstance(chat),
             Bans = MapBanInstance(bans),
             Maps = MapMapInstance(maps),
             SnapshotTime = DateTime.UtcNow
-        };
-    }
-
-    private static ServerInstanceDTO MapServerInstance(theInstance server, Dictionary<int, playerObject> playerList)
-    {
-        return new ServerInstanceDTO
-        {
-            Status = server.instanceStatus.ToString(),
-            ServerName = server.gameServerName,
-            MOTD = server.gameMOTD,
-            HostName = server.gameHostName,
-            MaxSlots = server.gameMaxSlots,
-            CurrentPlayers = playerList.Count,
-            BlueScore = server.gameInfoCurrentBlueScore,
-            RedScore = server.gameInfoCurrentRedScore,
-            TimeRemaining = server.gameInfoTimeRemaining,
-            CurrentMap = "Current Map",
-            GameType = server.gameInfoGameType
         };
     }
 

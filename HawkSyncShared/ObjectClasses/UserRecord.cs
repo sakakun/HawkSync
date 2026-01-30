@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BHD_ServerManager.Classes.ObjectClasses
+namespace HawkSyncShared.ObjectClasses
 { 
     /// <summary>
     /// Represents a user record from the database.

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Timer = System.Timers.Timer;
 
-namespace BHD_ServerManager.Classes.SupportClasses
+namespace HawkSyncShared.SupportClasses
 {
     public class Ticker
     {

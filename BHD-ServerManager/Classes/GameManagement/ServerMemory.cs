@@ -1,7 +1,8 @@
-﻿using BHD_ServerManager.Classes.CoreObjects;
+﻿using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.ObjectClasses;
+using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using System.Diagnostics;
 using System.Net;
@@ -1615,7 +1616,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] buffer = new byte[4];
             ReadProcessMemory((int)processHandle, 0x0065DCBC, buffer, buffer.Length, ref bytesRead);
             int CurrentPlayers = BitConverter.ToInt32(buffer, 0);
-            thisInstance.gameInfoCurrentNumPlayers = CurrentPlayers;
+            thisInstance.gameInfoNumPlayers = CurrentPlayers;
 
 
         }
@@ -1628,7 +1629,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
 
             Dictionary<int, playerObject> currentPlayerList = new Dictionary<int, playerObject>();
-            int NumPlayers = thisInstance.gameInfoCurrentNumPlayers;
+            int NumPlayers = thisInstance.gameInfoNumPlayers;
 
             if (NumPlayers > 0)
             {
@@ -2102,18 +2103,18 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             if (winConditionBlue == winConditionRed || winConditionBlue > winConditionRed)
             {
-                if (gameTypeId == 6) { thisInstance.gameInfoCurrentGameDefendingTeamBlue = true; }
-                thisInstance.gameInfoCurrentGameWinCond = winConditionBlue;
+                if (gameTypeId == 6) { thisInstance.gameInfoIsBlueDefending = true; }
+                thisInstance.gameInfoWinCond = winConditionBlue;
             }
             else if (winConditionBlue < winConditionRed)
             {
-                if (gameTypeId == 6) { thisInstance.gameInfoCurrentGameDefendingTeamBlue = false; }
-                thisInstance.gameInfoCurrentGameWinCond = winConditionRed;
+                if (gameTypeId == 6) { thisInstance.gameInfoIsBlueDefending = false; }
+                thisInstance.gameInfoWinCond = winConditionRed;
             }
             else
             {
                 // Should never hit this, but just in case...
-                thisInstance.gameInfoCurrentGameWinCond = winConditionRed;
+                thisInstance.gameInfoWinCond = winConditionRed;
             }
             
         }
@@ -2176,8 +2177,8 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             if (gameTypeId == 0 || gameTypeId == 2 || gameTypeId == 4)
             {
-                thisInstance.gameInfoCurrentBlueScore = 0;
-                thisInstance.gameInfoCurrentRedScore = 0;
+                thisInstance.gameInfoBlueScore = 0;
+                thisInstance.gameInfoRedScore = 0;
                 return;
             }
 
@@ -2193,8 +2194,8 @@ namespace BHD_ServerManager.Classes.GameManagement
             bool success2 = ReadProcessMemory((int)processHandle, scoreAddress2, score2Bytes, score2Bytes.Length, ref bytes2Read);
             int redTeamScore = (success2 ? BitConverter.ToInt32(score2Bytes, 0) : 0);
 
-            thisInstance.gameInfoCurrentBlueScore = blueTeamScore;
-            thisInstance.gameInfoCurrentRedScore = redTeamScore;
+            thisInstance.gameInfoBlueScore = blueTeamScore;
+            thisInstance.gameInfoRedScore = redTeamScore;
             return;
 
         }

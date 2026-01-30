@@ -1,4 +1,4 @@
-﻿using BHD_ServerManager.Classes.Instances;
+﻿using HawkSyncShared.Instances;
 using System;
 using System.Collections.Generic;
 using System.Linq;

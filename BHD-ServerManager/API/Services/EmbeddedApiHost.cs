@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BHD_ServerManager.API.Hubs;
+using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 
 namespace BHD_ServerManager.API.Services;

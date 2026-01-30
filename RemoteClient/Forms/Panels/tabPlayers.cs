@@ -1,24 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using HawkSyncShared.DTOs;
+using RemoteClient.Core;
 
-namespace RemoteClient.Forms.Panels
+namespace RemoteClient.Forms.Panels;
+
+public partial class tabPlayers : UserControl
 {
-    public partial class tabPlayers : UserControl
+    public tabPlayers()
     {
+        InitializeComponent();
         
+        // Subscribe to snapshot updates
+        ApiCore.OnSnapshotReceived += OnSnapshotReceived;
+    }
 
-        public tabPlayers()
+    private void OnSnapshotReceived(ServerSnapshot snapshot)
+    {
+        if (InvokeRequired)
         {
-            InitializeComponent();
+            Invoke(() => UpdatePlayerGrid(snapshot.Players));
         }
+        else
+        {
+            UpdatePlayerGrid(snapshot.Players);
+        }
+    }
+
+    private void UpdatePlayerGrid(PlayerInstanceDTO players)
+    {
 
     }
+
+
+
 }

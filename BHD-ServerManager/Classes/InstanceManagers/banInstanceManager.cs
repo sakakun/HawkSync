@@ -1,7 +1,8 @@
 ﻿using BHD_ServerManager.Forms;
-using BHD_ServerManager.Classes.CoreObjects;
+using HawkSyncShared;
 using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.Instances;
+using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Services;
 using BHD_ServerManager.Classes.Services.NetLimiter;

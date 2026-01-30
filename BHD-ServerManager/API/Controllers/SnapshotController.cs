@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BHD_ServerManager.Classes.CoreObjects;
+using HawkSyncShared;
 using HawkSyncShared.DTOs;
 using BHD_ServerManager.API.Services;
 

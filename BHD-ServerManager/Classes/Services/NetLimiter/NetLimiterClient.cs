@@ -7,6 +7,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using HawkSyncShared.SupportClasses;
 
 namespace BHD_ServerManager.Classes.Services.NetLimiter
 {

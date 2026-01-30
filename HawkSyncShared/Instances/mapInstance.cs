@@ -1,7 +1,8 @@
-﻿using BHD_ServerManager.Classes.ObjectClasses;
+﻿using HawkSyncShared.ObjectClasses;
+using HawkSyncShared.Instances;
 using System.Collections.Generic;
 
-namespace BHD_ServerManager.Classes.Instances;
+namespace HawkSyncShared.Instances;
 
 /// <summary>
 /// Contains all map-related data for map management and playlists

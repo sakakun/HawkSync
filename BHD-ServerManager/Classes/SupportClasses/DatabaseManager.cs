@@ -1,5 +1,6 @@
-﻿using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.ObjectClasses;
+﻿using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
+using HawkSyncShared.SupportClasses;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Diagnostics;

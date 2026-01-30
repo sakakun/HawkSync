@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace BHD_ServerManager.Classes.ObjectClasses
+namespace HawkSyncShared.ObjectClasses
 {
 
     public class mapFileInfo

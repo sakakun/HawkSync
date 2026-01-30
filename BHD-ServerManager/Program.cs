@@ -1,6 +1,7 @@
-using BHD_ServerManager.Classes.CoreObjects;
+using HawkSyncShared;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
+using BHD_ServerManager.API;
 
 namespace BHD_ServerManager
 {
@@ -32,7 +33,7 @@ namespace BHD_ServerManager
             finally
             {
                 // Cleanup all core infrastructure
-                CommonCore.Shutdown().Wait();
+                APICore.Shutdown().Wait();
             }
 		}
 	}

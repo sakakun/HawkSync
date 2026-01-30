@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text.Json.Serialization;
 
-namespace BHD_ServerManager.Classes.Instances
+namespace HawkSyncShared.Instances
 {
     public class banInstance
     {

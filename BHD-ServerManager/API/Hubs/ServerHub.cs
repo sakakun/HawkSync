@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 
 namespace BHD_ServerManager.API.Hubs;

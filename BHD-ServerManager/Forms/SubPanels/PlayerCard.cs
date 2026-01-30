@@ -1,8 +1,9 @@
-﻿using BHD_ServerManager.Classes.CoreObjects;
+﻿using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.ObjectClasses;
+using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Services;
 using System.Diagnostics;

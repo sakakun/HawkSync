@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using static BHD_ServerManager.Classes.InstanceManagers.adminInstanceManager;
+using HawkSyncShared.DTOs;
 
-namespace BHD_ServerManager.Classes.Instances;
+namespace HawkSyncShared.Instances;
 
 /// <summary>
 /// Contains admin user management data

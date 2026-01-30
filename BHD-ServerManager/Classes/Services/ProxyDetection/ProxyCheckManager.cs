@@ -1,5 +1,6 @@
-﻿using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.CoreObjects;
+﻿using HawkSyncShared.Instances;
+using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
 using System;
 using System.Linq;
 using System.Net;

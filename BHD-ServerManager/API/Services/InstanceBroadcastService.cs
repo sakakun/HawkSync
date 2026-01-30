@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
-using BHD_ServerManager.Classes.CoreObjects;
+using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
 using HawkSyncShared.DTOs;
 using BHD_ServerManager.API.Hubs;
 using BHD_ServerManager.Classes.SupportClasses;

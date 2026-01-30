@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace BHD_ServerManager.Classes.Instances
+namespace HawkSyncShared.Instances
 {
     public class chatInstance
     {

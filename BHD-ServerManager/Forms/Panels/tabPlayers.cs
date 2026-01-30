@@ -1,7 +1,8 @@
 ﻿using BHD_ServerManager.Classes.PlayerManagementClasses;
-using BHD_ServerManager.Classes.CoreObjects;
-using BHD_ServerManager.Classes.Instances;
-using BHD_ServerManager.Classes.ObjectClasses;
+using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
+using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

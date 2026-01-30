@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BHD_ServerManager.Classes.ObjectClasses
+namespace HawkSyncShared.ObjectClasses
 {
     public class playerObject
     {

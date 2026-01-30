@@ -1,28 +1,15 @@
-﻿namespace HawkSyncShared.DTOs;
+﻿using HawkSyncShared.Instances;
+
+namespace HawkSyncShared.DTOs;
 
 public record ServerSnapshot
 {
-    public ServerInstanceDTO Server { get; init; } = new();
+    public theInstance ServerData { get; init; } = new();
     public PlayerInstanceDTO Players { get; init; } = new();
     public ChatInstanceDTO Chat { get; init; } = new();
     public BanInstanceDTO Bans { get; init; } = new();
     public MapInstanceDTO Maps { get; init; } = new();
     public DateTime SnapshotTime { get; init; } = DateTime.UtcNow;
-}
-
-public record ServerInstanceDTO
-{
-    public string Status { get; init; } = "OFFLINE";
-    public string ServerName { get; init; } = string.Empty;
-    public string MOTD { get; init; } = string.Empty;
-    public string HostName { get; init; } = string.Empty;
-    public int MaxSlots { get; init; }
-    public int CurrentPlayers { get; init; }
-    public int BlueScore { get; init; }
-    public int RedScore { get; init; }
-    public TimeSpan TimeRemaining { get; init; }
-    public string CurrentMap { get; init; } = string.Empty;
-    public int GameType { get; init; }
 }
 
 public record PlayerInstanceDTO

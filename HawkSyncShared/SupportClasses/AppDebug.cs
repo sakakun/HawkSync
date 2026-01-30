@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace BHD_ServerManager.Classes.SupportClasses
+namespace HawkSyncShared.SupportClasses
 {
     public static class AppDebug
     {
@@ -19,18 +19,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
 
             return;
-            /*
-            try
-            {
-                // Append the log message to the file
-                File.AppendAllText(LogFilePath, logMessage + Environment.NewLine);
-            }
-            catch (Exception ex)
-            {
-                // Handle any file I/O errors gracefully
-                Debug.WriteLine($"[ERROR][AppDebug] {DateTime.Now}: Failed to write to log file. {ex.Message}");
-            }
-            */
         }
     }
 }

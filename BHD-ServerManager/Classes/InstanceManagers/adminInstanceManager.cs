@@ -1,7 +1,9 @@
 ﻿using BCrypt.Net;
-using BHD_ServerManager.Classes.CoreObjects;
-using BHD_ServerManager.Classes.Instances;
+using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
+using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
+using HawkSyncShared.DTOs;
 
 namespace BHD_ServerManager.Classes.InstanceManagers;
 
@@ -24,20 +26,6 @@ public static class adminInstanceManager
     // ================================================================================
     // DATA TRANSFER OBJECTS (DTOs)
     // ================================================================================
-
-    /// <summary>
-    /// User data transfer object for UI display
-    /// </summary>
-    public record UserDTO
-    {
-        public int UserID { get; init; }
-        public string Username { get; init; } = string.Empty;
-        public List<string> Permissions { get; init; } = new();
-        public bool IsActive { get; init; } = true;
-        public DateTime Created { get; init; }
-        public DateTime? LastLogin { get; init; }
-        public string Notes { get; init; } = string.Empty;
-    }
 
     /// <summary>
     /// Request for creating a new user

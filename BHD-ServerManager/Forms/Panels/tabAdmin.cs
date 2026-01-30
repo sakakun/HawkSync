@@ -1,6 +1,8 @@
-﻿using BHD_ServerManager.Classes.CoreObjects;
+﻿using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
+using HawkSyncShared.DTOs;
 using static BHD_ServerManager.Classes.InstanceManagers.adminInstanceManager;
 
 namespace BHD_ServerManager.Forms.Panels;
