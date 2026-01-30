@@ -1,5 +1,5 @@
 ﻿using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.ObjectClasses;
+using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;

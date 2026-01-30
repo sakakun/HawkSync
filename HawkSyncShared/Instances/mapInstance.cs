@@ -1,15 +1,8 @@
-<<<<<<< HEAD:HawkSyncShared/Instances/mapInstance.cs
 ﻿using HawkSyncShared.ObjectClasses;
 using HawkSyncShared.Instances;
 using System.Collections.Generic;
 
 namespace HawkSyncShared.Instances;
-=======
-﻿using BHD_ServerManager.Classes.ObjectClasses;
-using System.Collections.Generic;
-
-namespace BHD_ServerManager.Classes.Instances;
->>>>>>> ed4f84426d6449f979e54b6025b7ef785c7a674e:BHD-ServerManager/Classes/Instances/mapInstance.cs
 
 /// <summary>
 /// Contains all map-related data for map management and playlists
