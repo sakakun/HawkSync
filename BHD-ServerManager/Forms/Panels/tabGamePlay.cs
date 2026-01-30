@@ -427,7 +427,7 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Update server control button states
         /// </summary>
-        private void functionEvent_UpdateServerControls()
+        public void functionEvent_UpdateServerControls()
         {
             bool isOffline = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
 

@@ -207,7 +207,7 @@
             btn_serverControl.Text = "START";
             toolTip1.SetToolTip(btn_serverControl, "Start/Stop Server");
             btn_serverControl.UseVisualStyleBackColor = true;
-            
+            btn_serverControl.Click += BtnServerControl_Click;
             // 
             // btn_LockLobby
             // 
@@ -221,6 +221,7 @@
             toolTip1.SetToolTip(btn_LockLobby, "Lock Server from Entry");
             btn_LockLobby.UseVisualStyleBackColor = true;
             btn_LockLobby.Visible = false;
+            btn_LockLobby.Click += BtnLockLobby_Click;
             // 
             // btn_LoadSettings
             // 
@@ -233,6 +234,7 @@
             btn_LoadSettings.Text = "LOAD";
             toolTip1.SetToolTip(btn_LoadSettings, "Load Settings from File");
             btn_LoadSettings.UseVisualStyleBackColor = true;
+            btn_LoadSettings.Click += BtnLoad_Click;
             // 
             // btn_ExportSettings
             // 
@@ -245,6 +247,7 @@
             btn_ExportSettings.Text = "EXPORT";
             toolTip1.SetToolTip(btn_ExportSettings, "Export Settings to File");
             btn_ExportSettings.UseVisualStyleBackColor = true;
+            btn_ExportSettings.Click += BtnExport_Click;
             // 
             // btn_ResetSettings
             // 
@@ -257,6 +260,7 @@
             btn_ResetSettings.Text = "RESET";
             toolTip1.SetToolTip(btn_ResetSettings, "Reset Changes to Settings");
             btn_ResetSettings.UseVisualStyleBackColor = true;
+            btn_ResetSettings.Click += BtnReset_Click;
             // 
             // btn_SaveSettings
             // 
@@ -269,6 +273,7 @@
             btn_SaveSettings.Text = "SAVE";
             toolTip1.SetToolTip(btn_SaveSettings, "Save Settings to Instance and File");
             btn_SaveSettings.UseVisualStyleBackColor = true;
+            btn_SaveSettings.Click += BtnSave_Click;
             // 
             // btn_ServerUpdate
             // 
@@ -282,6 +287,7 @@
             toolTip1.SetToolTip(btn_ServerUpdate, "Update Game Server using Saved Settings");
             btn_ServerUpdate.UseVisualStyleBackColor = true;
             btn_ServerUpdate.Visible = false;
+            btn_ServerUpdate.Click += BtnServerUpdate_Click;
             // 
             // panel1
             // 

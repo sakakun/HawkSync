@@ -48,6 +48,9 @@ namespace BHD_ServerManager.Forms.Panels
             // Initialize via manager
             mapInstanceManager.Initialize();
 
+            // Update map controls
+            methodFunction_UpdateMapControls();
+
             // Update UI
             btn_activePlaylist.Text = $"P{mapInstance.ActivePlaylist}";
 
@@ -474,7 +477,7 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Refresh all map lists
         /// </summary>
-        private void actionClick_refeshMapLists(object sender, EventArgs e)
+        public void actionClick_refeshMapLists(object sender, EventArgs e)
         {
             methodFunction_loadSourceMaps();
             methodFunction_hideSourceRows(MapTypeFilter);
@@ -743,8 +746,6 @@ namespace BHD_ServerManager.Forms.Panels
         public void UpdateCurrentMapHighlighting()
         {
 
-
-
             // Clear all row backgrounds first
             foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
             {
@@ -792,5 +793,5 @@ namespace BHD_ServerManager.Forms.Panels
                 dataGridView_currentMaps.Rows[nextMapIndex].DefaultCellStyle.BackColor = Color.LightBlue;
             }
         }
-        }
+    }
 }

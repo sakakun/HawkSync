@@ -39,6 +39,8 @@
             num_minPing = new NumericUpDown();
             groupBox7 = new GroupBox();
             tableLayoutPanel6 = new TableLayoutPanel();
+            num_remotePort = new NumericUpDown();
+            checkBox_enableRemote = new CheckBox();
             cb_serverDedicated = new CheckBox();
             cb_requireNova = new CheckBox();
             label3 = new Label();
@@ -92,8 +94,6 @@
             btn_saveProfile = new Button();
             folderProfileBrowserDialog = new FolderBrowserDialog();
             openFileDialog1 = new OpenFileDialog();
-            checkBox_enableRemote = new CheckBox();
-            num_remotePort = new NumericUpDown();
             tableLayoutPanel1.SuspendLayout();
             profileFileManagers.SuspendLayout();
             tabProfilePage1.SuspendLayout();
@@ -103,6 +103,7 @@
             ((System.ComponentModel.ISupportInitialize)num_minPing).BeginInit();
             groupBox7.SuspendLayout();
             tableLayoutPanel6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)num_remotePort).BeginInit();
             ((System.ComponentModel.ISupportInitialize)num_serverPort).BeginInit();
             groupBox6.SuspendLayout();
             tableLayoutPanel5.SuspendLayout();
@@ -116,7 +117,6 @@
             panel1.SuspendLayout();
             groupBox4.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)num_remotePort).BeginInit();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -274,6 +274,32 @@
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             tableLayoutPanel6.Size = new Size(422, 135);
             tableLayoutPanel6.TabIndex = 0;
+            // 
+            // num_remotePort
+            // 
+            num_remotePort.Dock = DockStyle.Fill;
+            num_remotePort.Location = new Point(322, 111);
+            num_remotePort.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
+            num_remotePort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            num_remotePort.Name = "num_remotePort";
+            num_remotePort.Size = new Size(97, 23);
+            num_remotePort.TabIndex = 15;
+            num_remotePort.TextAlign = HorizontalAlignment.Center;
+            num_remotePort.Value = new decimal(new int[] { 9090, 0, 0, 0 });
+            // 
+            // checkBox_enableRemote
+            // 
+            checkBox_enableRemote.AutoSize = true;
+            checkBox_enableRemote.CheckAlign = ContentAlignment.MiddleRight;
+            tableLayoutPanel6.SetColumnSpan(checkBox_enableRemote, 2);
+            checkBox_enableRemote.Dock = DockStyle.Fill;
+            checkBox_enableRemote.Location = new Point(3, 111);
+            checkBox_enableRemote.Name = "checkBox_enableRemote";
+            checkBox_enableRemote.Size = new Size(313, 21);
+            checkBox_enableRemote.TabIndex = 14;
+            checkBox_enableRemote.Text = "Enable Remote Access";
+            checkBox_enableRemote.TextAlign = ContentAlignment.MiddleRight;
+            checkBox_enableRemote.UseVisualStyleBackColor = true;
             // 
             // cb_serverDedicated
             // 
@@ -501,6 +527,7 @@
             btn_profileBrowse2.TabIndex = 5;
             btn_profileBrowse2.Text = "Browse";
             btn_profileBrowse2.UseVisualStyleBackColor = true;
+            btn_profileBrowse2.Click += BtnBrowseModFile_Click;
             // 
             // groupBox2
             // 
@@ -531,6 +558,7 @@
             // btn_profileBrowse1
             // 
             btn_profileBrowse1.Dock = DockStyle.Fill;
+            btn_profileBrowse1.Enabled = false;
             btn_profileBrowse1.FlatStyle = FlatStyle.Flat;
             btn_profileBrowse1.Location = new Point(336, 3);
             btn_profileBrowse1.Name = "btn_profileBrowse1";
@@ -538,6 +566,7 @@
             btn_profileBrowse1.TabIndex = 2;
             btn_profileBrowse1.Text = "Browse";
             btn_profileBrowse1.UseVisualStyleBackColor = true;
+            btn_profileBrowse1.Click += BtnBrowseServerPath_Click;
             // 
             // tb_profileServerPath
             // 
@@ -944,6 +973,7 @@
             btn_resetProfile.TabIndex = 1;
             btn_resetProfile.Text = "Reset";
             btn_resetProfile.UseVisualStyleBackColor = true;
+            btn_resetProfile.Click += BtnReset_Click;
             // 
             // btn_saveProfile
             // 
@@ -954,36 +984,11 @@
             btn_saveProfile.TabIndex = 0;
             btn_saveProfile.Text = "Save";
             btn_saveProfile.UseVisualStyleBackColor = true;
+            btn_saveProfile.Click += BtnSave_Click;
             // 
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openModFileDialog";
-            // 
-            // checkBox_enableRemote
-            // 
-            checkBox_enableRemote.AutoSize = true;
-            checkBox_enableRemote.CheckAlign = ContentAlignment.MiddleRight;
-            tableLayoutPanel6.SetColumnSpan(checkBox_enableRemote, 2);
-            checkBox_enableRemote.Dock = DockStyle.Fill;
-            checkBox_enableRemote.Location = new Point(3, 111);
-            checkBox_enableRemote.Name = "checkBox_enableRemote";
-            checkBox_enableRemote.Size = new Size(313, 21);
-            checkBox_enableRemote.TabIndex = 14;
-            checkBox_enableRemote.Text = "Enable Remote Access";
-            checkBox_enableRemote.TextAlign = ContentAlignment.MiddleRight;
-            checkBox_enableRemote.UseVisualStyleBackColor = true;
-            // 
-            // num_remotePort
-            // 
-            num_remotePort.Dock = DockStyle.Fill;
-            num_remotePort.Location = new Point(322, 111);
-            num_remotePort.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
-            num_remotePort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            num_remotePort.Name = "num_remotePort";
-            num_remotePort.Size = new Size(97, 23);
-            num_remotePort.TabIndex = 15;
-            num_remotePort.TextAlign = HorizontalAlignment.Center;
-            num_remotePort.Value = new decimal(new int[] { 9090, 0, 0, 0 });
             // 
             // tabProfile
             // 
@@ -1003,6 +1008,7 @@
             groupBox7.ResumeLayout(false);
             tableLayoutPanel6.ResumeLayout(false);
             tableLayoutPanel6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)num_remotePort).EndInit();
             ((System.ComponentModel.ISupportInitialize)num_serverPort).EndInit();
             groupBox6.ResumeLayout(false);
             tableLayoutPanel5.ResumeLayout(false);
@@ -1020,7 +1026,6 @@
             panel1.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)num_remotePort).EndInit();
             ResumeLayout(false);
         }
 
