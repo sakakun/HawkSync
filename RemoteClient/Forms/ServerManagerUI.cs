@@ -4,13 +4,17 @@ using HawkSyncShared.ObjectClasses;
 using HawkSyncShared;
 using RemoteClient.Core;
 using RemoteClient.Forms.Panels;
+using HawkSyncShared.SupportClasses;
 
 namespace RemoteClient.Forms;
 
 public partial class ServerManagerUI : Form
 {
-            // The Instances (Data)
+     
+    // The Instances (Data)
     private static theInstance thisInstance => CommonCore.theInstance!;
+
+
     private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
     // Server Manager Tabs
@@ -23,15 +27,14 @@ public partial class ServerManagerUI : Form
     public tabStats         StatsTab   = null!;     // The Stats Tab User Control
     public tabAdmin         AdminTab   = null!;     // The Admin Tab User Control
 
-
     public ServerManagerUI()
     {
         InitializeComponent();
         
-        // ✅ SUBSCRIBE TO CONNECTION STATE CHANGES
+        // SUBSCRIBE TO CONNECTION STATE CHANGES
         ApiCore.OnConnectionStateChanged += OnConnectionStateChanged;
         
-        // ✅ OPTIONALLY: Subscribe to snapshots for server info panel
+        // OPTIONALLY: Subscribe to snapshots for server info panel
         ApiCore.OnSnapshotReceived += OnSnapshotReceived;
         
         Load += PostServerManagerInitalization;
@@ -60,7 +63,7 @@ public partial class ServerManagerUI : Form
     }
 
 
-    // ✅ EVENT HANDLER - Connection state changed
+    // EVENT HANDLER - Connection state changed
     private void OnConnectionStateChanged(string state)
     {
         if (InvokeRequired)
@@ -68,14 +71,23 @@ public partial class ServerManagerUI : Form
             Invoke(() => OnConnectionStateChanged(state));
             return;
         }
-        
-        toolStripStatus.Text = state;
-        toolStripStatus.ForeColor = state.Contains("🟢") ? Color.Green :
-                                         state.Contains("🟡") ? Color.Orange :
-                                         Color.Red;
+
+        if (state.Contains("Reconnecting"))
+        {
+            MessageBox.Show("Connection to the server has been lost. The remote is attempting to reconnect.", 
+                "Connection Lost", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        // If the connection state indicates a disconnection, close the UI
+        if (state.Contains("Disconnected"))
+        {
+            MessageBox.Show("Connection to the server has been lost. The Server Manager will now close.", 
+                "Connection Lost", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Close();
+        }
     }
 
-    // ✅ EVENT HANDLER - Snapshot received (optional - for server info panel)
+    // EVENT HANDLER - Snapshot received
     private void OnSnapshotReceived(ServerSnapshot snapshot)
     {
         if (InvokeRequired)
@@ -84,6 +96,12 @@ public partial class ServerManagerUI : Form
             return;
         }
         
+        // Update the Core Instances
+        CommonCore.theInstance = snapshot.ServerData;
+        CommonCore.instanceMaps = snapshot.Maps;
+
+        AppDebug.Log("ServerManagerUI", "Snapshot received, updating server info panel. Active Playlist: " + CommonCore.instanceMaps.ActivePlaylist);
+
         UpdateServerInfo();
     }
 
@@ -93,112 +111,108 @@ public partial class ServerManagerUI : Form
         
         var s = ApiCore.CurrentSnapshot;
         
+        functionEvent_UpdateStatusLabels();
     }
 
-    // --- Server Status and Controls ---
-        public void functionEvent_tickerServerGUI()
+    private void functionEvent_UpdateStatusLabels()
+    {
+        // Update the Server Status Text
+        toolStripStatus.Text = thisInstance.instanceStatus switch
         {
-            // Update the Server Status Text
-            toolStripStatus.Text = thisInstance.instanceStatus switch
-            {
-                InstanceStatus.OFFLINE => "Server is not running.",
-                InstanceStatus.ONLINE => "Server is running. Game in progress.",
-                InstanceStatus.SCORING => "Server is running. Game has ended, currently scoring.",
-                InstanceStatus.LOADINGMAP => "Server is running. Game reset in progress.",
-                InstanceStatus.STARTDELAY => "Server is running. Game ready, waiting for start.",
-                _ => toolStripStatus.Text
-            };
-            // Update Label for Win Condition
-            functionEvent_UpdateStatusLabels();
+            InstanceStatus.OFFLINE => "Server is not running.",
+            InstanceStatus.ONLINE => "Server is running. Game in progress.",
+            InstanceStatus.SCORING => "Server is running. Game has ended, currently scoring.",
+            InstanceStatus.LOADINGMAP => "Server is running. Game reset in progress.",
+            InstanceStatus.STARTDELAY => "Server is running. Game ready, waiting for start.",
+            _ => toolStripStatus.Text
+        };
+
+        // Offline Labels
+        if (thisInstance.instanceStatus == InstanceStatus.OFFLINE)
+        {
+            label_PlayersOnline.Text = "[Players Online]";
+            label_BlueScore.Text = "[Blue Score]";
+            label_RedScore.Text = "[Red Score]";
+            label_WinCondition.Text = "[Win Condition]";
+            label_TimeLeft.Text = "[Time Left]";
+            return;
         }
 
-        private void functionEvent_UpdateStatusLabels()
+        // Variables
+        int scoreTotal = 0;
+        string blueScore = string.Empty;
+        string redScore = string.Empty;
+        string playerName = string.Empty;
+        playerObject? topPlayer = null;
+        string winConditions = string.Empty;
+
+        // Player Online Label
+        label_PlayersOnline.Text = $"[{thisInstance.gameInfoNumPlayers}/{thisInstance.gameMaxSlots}]";
+
+        if (playerInstance.PlayerList.Count > 0)
         {
-            // Offline Labels
-            if (thisInstance.instanceStatus == InstanceStatus.OFFLINE)
-            {
-                label_PlayersOnline.Text = "[Players Online]";
-                label_BlueScore.Text = "[Blue Score]";
-                label_RedScore.Text = "[Red Score]";
-                label_WinCondition.Text = "[Win Condition]";
-                label_TimeLeft.Text = "[Time Left]";
-                return;
-            }
-            // Variables
-            int scoreTotal = 0;
-            string blueScore = string.Empty;
-            string redScore = string.Empty;
-            string playerName = string.Empty;
-            playerObject? topPlayer = null;
-            string winConditions = string.Empty;
+            winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
 
-            // Player Online Label
-            label_PlayersOnline.Text = $"[{thisInstance.gameInfoNumPlayers}/{thisInstance.gameMaxSlots}]";
-
-            if (playerInstance.PlayerList.Count > 0)
+            if (thisInstance.gameInfoGameType == 0)
             {
+                topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
+                scoreTotal = topPlayer!.stat_Kills;
+                playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
+                blueScore = $"{scoreTotal}";
+                redScore = $"{playerName}";
+            } else if (thisInstance.gameInfoGameType == 4)
+            {
+                topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
+                scoreTotal = topPlayer!.ActiveZoneTime;
+                playerName = ( scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
+                blueScore = $"{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}";
+                redScore = $"{playerName}";
+                winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond*60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
+            } else if (thisInstance.gameInfoGameType == 5)
+            {
+                blueScore = $"{thisInstance.gameInfoBlueScore}";
+                redScore = $"{thisInstance.gameInfoRedScore}";
+                winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({thisInstance.gameInfoGameType})]";
+            } else if (thisInstance.gameInfoGameType == 6)
+            {
+                blueScore = $"{(thisInstance.gameInfoIsBlueDefending == false ? "Red Attacking" : thisInstance.gameInfoBlueScore) }";
+                redScore = $"{(thisInstance.gameInfoIsBlueDefending ? "Blue Attacking" : thisInstance.gameInfoRedScore )}";
+                winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({thisInstance.gameInfoGameType})]";
+            } else if (thisInstance.gameInfoGameType == 3)
+            {
+                blueScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoBlueScore * 60):hh\\:mm\\:ss}";
+                redScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoRedScore * 60):hh\\:mm\\:ss}";
+                winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond * 60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
+            } else if (thisInstance.gameInfoGameType == 7 || thisInstance.gameInfoGameType == 8)
+            {
+                blueScore = $"{thisInstance.gameInfoBlueScore}";
+                redScore = $"{thisInstance.gameInfoRedScore}";
+                winConditions = $"[{thisInstance.gameInfoWinCond} Captures ({thisInstance.gameInfoGameType})]";
+            } else if (thisInstance.gameInfoGameType == 1)
+            {
+                blueScore = $"{thisInstance.gameInfoBlueScore}";
+                redScore = $"{thisInstance.gameInfoRedScore}";
                 winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
-
-                if (thisInstance.gameInfoGameType == 0)
-                {
-                    topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
-                    scoreTotal = topPlayer!.stat_Kills;
-                    playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
-                    blueScore = $"{scoreTotal}";
-                    redScore = $"{playerName}";
-                } else if (thisInstance.gameInfoGameType == 4)
-                {
-                    topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
-                    scoreTotal = topPlayer!.ActiveZoneTime;
-                    playerName = ( scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
-                    blueScore = $"{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}";
-                    redScore = $"{playerName}";
-                    winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond*60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == 5)
-                {
-                    blueScore = $"{thisInstance.gameInfoBlueScore}";
-                    redScore = $"{thisInstance.gameInfoRedScore}";
-                    winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == 6)
-                {
-                    blueScore = $"{(thisInstance.gameInfoIsBlueDefending == false ? "Red Attacking" : thisInstance.gameInfoBlueScore) }";
-                    redScore = $"{(thisInstance.gameInfoIsBlueDefending ? "Blue Attacking" : thisInstance.gameInfoRedScore )}";
-                    winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == 3)
-                {
-                    blueScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoBlueScore * 60):hh\\:mm\\:ss}";
-                    redScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoRedScore * 60):hh\\:mm\\:ss}";
-                    winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond * 60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == 7 || thisInstance.gameInfoGameType == 8)
-                {
-                    blueScore = $"{thisInstance.gameInfoBlueScore}";
-                    redScore = $"{thisInstance.gameInfoRedScore}";
-                    winConditions = $"[{thisInstance.gameInfoWinCond} Captures ({thisInstance.gameInfoGameType})]";
-                } else if (thisInstance.gameInfoGameType == 1)
-                {
-                    blueScore = $"{thisInstance.gameInfoBlueScore}";
-                    redScore = $"{thisInstance.gameInfoRedScore}";
-                    winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
-                } else
-                {
-                    blueScore = $"{thisInstance.gameInfoBlueScore}";
-                    redScore = $"{thisInstance.gameInfoRedScore}";
-                    winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
-                }
-
-
-                label_BlueScore.Text = $"[{blueScore}]";
-                label_RedScore.Text = $"[{redScore}]";
-
             } else
             {
-                label_BlueScore.Text = "[NO]";
-                label_RedScore.Text = "[PLAYERS]";
+                blueScore = $"{thisInstance.gameInfoBlueScore}";
+                redScore = $"{thisInstance.gameInfoRedScore}";
+                winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
             }
 
-            label_WinCondition.Text = winConditions;
-            label_TimeLeft.Text = "[ "+ thisInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss") + " ]";
+
+            label_BlueScore.Text = $"[{blueScore}]";
+            label_RedScore.Text = $"[{redScore}]";
+
+        } else
+        {
+            label_BlueScore.Text = "[NO]";
+            label_RedScore.Text = "[PLAYERS]";
         }
+
+        label_WinCondition.Text = winConditions;
+        label_TimeLeft.Text = "[ "+ thisInstance.gameInfoTimeRemaining.ToString(@"hh\:mm\:ss") + " ]";
+    }
 
 
 }

@@ -23,7 +23,7 @@ public static class InstanceMapper
             Players = MapPlayerInstance(playerList),
             Chat = MapChatInstance(chat),
             Bans = MapBanInstance(bans),
-            Maps = MapMapInstance(maps),
+            Maps = maps,
             SnapshotTime = DateTime.UtcNow
         };
     }

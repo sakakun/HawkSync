@@ -8,7 +8,7 @@ public record ServerSnapshot
     public PlayerInstanceDTO Players { get; init; } = new();
     public ChatInstanceDTO Chat { get; init; } = new();
     public BanInstanceDTO Bans { get; init; } = new();
-    public MapInstanceDTO Maps { get; init; } = new();
+    public mapInstance Maps { get; init; } = new();
     public DateTime SnapshotTime { get; init; } = DateTime.UtcNow;
 }
 
@@ -63,5 +63,3 @@ public record MapInstanceDTO
     public int CurrentMapIndex { get; init; }
     public string NextMap { get; init; } = string.Empty;
 }
-
-public record MapDTO(int ID, string Name, string File, int GameType);
