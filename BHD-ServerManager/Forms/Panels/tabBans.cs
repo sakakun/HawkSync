@@ -30,6 +30,8 @@ namespace BHD_ServerManager.Forms.Panels
         {
             InitializeComponent();
 
+            banInstanceManager.LoadSettings();
+
             // Load Data into DataGridViews
             LoadBlacklistGrids();
             LoadWhitelistGrids();

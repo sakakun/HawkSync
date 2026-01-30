@@ -41,7 +41,6 @@ namespace BHD_ServerManager.Forms
 
 			// Old Server Settings Initialization
             chatInstanceManager.LoadSettings();
-            banInstanceManager.LoadSettings();
 			theInstanceManager.InitializeTickers();
             theInstanceManager.LoadWebStatsSettings();
             adminInstanceManager.InitializeDefaultAdmin();
