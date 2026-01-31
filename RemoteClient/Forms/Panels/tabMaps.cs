@@ -77,11 +77,11 @@ namespace RemoteClient.Forms.Panels
             btn_mapTypeFB.Click += (s, e) => FilterAvailableMaps(8);
 
             // Playlist selection
-            btn_loadPlaylist1.Click += (s, e) => LoadPlaylist(1);
-            btn_loadPlaylist2.Click += (s, e) => LoadPlaylist(2);
-            btn_loadPlaylist3.Click += (s, e) => LoadPlaylist(3);
-            btn_loadPlaylist4.Click += (s, e) => LoadPlaylist(4);
-            btn_loadPlaylist5.Click += (s, e) => LoadPlaylist(5);
+            btn_loadPlaylist1.Click += (s, e) => actionClick_loadMapPlaylist1();
+            btn_loadPlaylist2.Click += (s, e) => actionClick_loadMapPlaylist2();
+            btn_loadPlaylist3.Click += (s, e) => actionClick_loadMapPlaylist3();
+            btn_loadPlaylist4.Click += (s, e) => actionClick_loadMapPlaylist4();
+            btn_loadPlaylist5.Click += (s, e) => actionClick_loadMapPlaylist5();
 
             // Playlist editing
             dataGridView_availableMaps.CellDoubleClick += (s, e) => AddMapToPlaylist(e.RowIndex);
@@ -184,8 +184,23 @@ namespace RemoteClient.Forms.Panels
                 MessageBox.Show("Cannot randomize an empty playlist.", "Empty Playlist", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            var rnd = new Random();
-            _currentPlaylist = _currentPlaylist.OrderBy(x => rnd.Next()).ToList();
+
+            // Fisher-Yates shuffle
+            var random = new Random();
+            for (int i = _currentPlaylist.Count - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                var temp = _currentPlaylist[i];
+                _currentPlaylist[i] = _currentPlaylist[j];
+                _currentPlaylist[j] = temp;
+            }
+
+            // Renumber MapIDs sequentially (1-based)
+            for (int i = 0; i < _currentPlaylist.Count; i++)
+            {
+                _currentPlaylist[i].MapID = i + 1;
+            }
+
             RefreshCurrentPlaylistGrid();
             MessageBox.Show("Playlist randomized. Remember to save to apply changes.", "Randomized", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -199,6 +214,43 @@ namespace RemoteClient.Forms.Panels
                 dataGridView_currentMaps.Rows.Add(
                     id++, map.MapName, map.MapFile, map.ModType, map.MapType, GetShortType(map.MapType));
             }
+        }
+        
+        /// <summary>
+        /// Playlist selection button handlers
+        /// </summary>
+        private void actionClick_loadMapPlaylist1() => methodFunction_selectPlaylist(1);
+        private void actionClick_loadMapPlaylist2() => methodFunction_selectPlaylist(2);
+        private void actionClick_loadMapPlaylist3() => methodFunction_selectPlaylist(3);
+        private void actionClick_loadMapPlaylist4() => methodFunction_selectPlaylist(4);
+        private void actionClick_loadMapPlaylist5() => methodFunction_selectPlaylist(5);
+
+        /// <summary>
+        /// Select and load a specific playlist
+        /// </summary>
+        private void methodFunction_selectPlaylist(int playlistID)
+        {
+            Color selected = SystemColors.ActiveBorder;
+            Color notSelected = Button.DefaultBackColor;
+
+            // Set selected playlist
+            mapInstance!.SelectedPlaylist = playlistID;
+
+            // Update button colors
+            btn_loadPlaylist1.BackColor = playlistID == 1 ? selected : notSelected;
+            btn_loadPlaylist2.BackColor = playlistID == 2 ? selected : notSelected;
+            btn_loadPlaylist3.BackColor = playlistID == 3 ? selected : notSelected;
+            btn_loadPlaylist4.BackColor = playlistID == 4 ? selected : notSelected;
+            btn_loadPlaylist5.BackColor = playlistID == 5 ? selected : notSelected;
+
+            // Update active playlist display
+            btn_activePlaylist.Text = $"P{mapInstance.ActivePlaylist}";
+
+            // Update map controls
+            methodFunction_UpdateMapControls();
+
+            // Load playlist
+            _ = LoadPlaylist(playlistID);
         }
 
         private string GetShortType(int mapType)

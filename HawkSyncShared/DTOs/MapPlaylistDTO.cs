@@ -12,28 +12,6 @@ public class MapDTO
     public string MapFile { get; set; } = string.Empty;
     public int ModType { get; set; }
     public int MapType { get; set; }
-
-    // Add this constructor:
-    public MapDTO(int mapID, string mapName, string mapFile, int mapType)
-    {
-        MapID = mapID;
-        MapName = mapName;
-        MapFile = mapFile;
-        MapType = mapType;
-    }
-
-    // Optionally, add a full constructor if you want to set ModType too:
-    public MapDTO(int mapID, string mapName, string mapFile, int modType, int mapType)
-    {
-        MapID = mapID;
-        MapName = mapName;
-        MapFile = mapFile;
-        ModType = modType;
-        MapType = mapType;
-    }
-
-    // Parameterless constructor for serialization
-    public MapDTO() { }
 }
 
 /// <summary>

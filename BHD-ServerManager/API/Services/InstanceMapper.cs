@@ -76,24 +76,6 @@ public static class InstanceMapper
         };
     }
 
-    private static MapInstanceDTO MapMapInstance(mapInstance maps)
-    {
-        var playlists = maps.Playlists.ToDictionary(
-            kvp => kvp.Key,
-            kvp => kvp.Value.Select(m =>
-                new MapDTO(m.MapID, m.MapName, m.MapFile, m.MapType)).ToList()
-        );
-
-        return new MapInstanceDTO
-        {
-            Playlists = playlists,
-            ActivePlaylist = maps.ActivePlaylist,
-            CurrentMap = maps.CurrentMapName,
-            CurrentMapIndex = maps.CurrentMapIndex,
-            NextMap = maps.NextMapName
-        };
-    }
-
     private static string DecodePlayerName(string? base64)
     {
         if (string.IsNullOrEmpty(base64)) return "Unknown";
