@@ -133,7 +133,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     MessageText = playerMessage,
                     MessageType = msgType,
                     MessageType2 = teamNum,
-                    MessageTimeStamp = DateTime.Now
+                    MessageTimeStamp = DateTime.Now,
+                    TeamDisplay = chatInstanceManager.GetTeamDisplayName(msgType, teamNum)
                 };
 
                 chatLog.Add(newChatLog);

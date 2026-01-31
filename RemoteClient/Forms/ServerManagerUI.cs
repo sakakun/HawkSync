@@ -98,6 +98,7 @@ public partial class ServerManagerUI : Form
         
         // Update the Core Instances
         CommonCore.theInstance = snapshot.ServerData;
+        CommonCore.instanceChat = snapshot.Chat;
         CommonCore.instanceMaps = snapshot.Maps;
 
         AppDebug.Log("ServerManagerUI", "Snapshot received, updating server info panel. Active Playlist: " + CommonCore.instanceMaps.ActivePlaylist);

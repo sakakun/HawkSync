@@ -20,6 +20,7 @@ namespace BHD_ServerManager.Forms.Panels
     {
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
+        private chatInstance? chatInstance => CommonCore.instanceChat;
 
         // --- Class Variables ---
         private bool _firstLoadComplete = false;
@@ -78,12 +79,14 @@ namespace BHD_ServerManager.Forms.Panels
             // Clear and repopulate from manager
             dgv.Rows.Clear();
             
-            var chatLogs = chatInstanceManager.GetChatLogs();
+            var chatLogs = chatInstance!.ChatLog;
             
-            foreach (var entry in chatLogs)
+            foreach (ChatLogObject entry in chatLogs)
             {
+                DateTime TimeStamp = entry.MessageTimeStamp;
+
                 dgv.Rows.Add(
-                    entry.Timestamp.ToString("HH:mm:ss"),
+                    TimeStamp.ToString("HH:mm:ss"),
                     entry.TeamDisplay,
                     entry.PlayerName,
                     entry.MessageText

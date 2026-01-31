@@ -1,5 +1,6 @@
 ﻿using BHD_ServerManager.Forms;
 using HawkSyncShared;
+using HawkSyncShared.DTOs;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
@@ -8,34 +9,10 @@ using BHD_ServerManager.Classes.SupportClasses;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using static HawkSyncShared.DTOs.ChatDTOs;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
-    // ================================================================================
-    // DTOs (Data Transfer Objects)
-    // ================================================================================
-
-    /// <summary>
-    /// Chat log entry for display
-    /// </summary>
-    public record ChatLogEntry(
-        DateTime Timestamp,
-        int MessageType,
-        int MessageType2,
-        string PlayerName,
-        string MessageText,
-        string TeamDisplay
-    );
-
-    /// <summary>
-    /// Chat log query parameters
-    /// </summary>
-    public record ChatLogQuery(
-        DateTime? StartDate = null,
-        DateTime? EndDate = null,
-        int MaxResults = 1000
-    );
-
     // ================================================================================
     // Chat Instance Manager - Business Logic Layer
     // ================================================================================
@@ -323,70 +300,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 AppDebug.Log("chatInstanceManager", $"Error saving chat log entry: {ex.Message}");
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
-        }
-
-        /// <summary>
-        /// Get all chat log entries (in-memory) for display
-        /// </summary>
-        public static List<ChatLogEntry> GetChatLogs()
-        {
-            try
-            {
-                var entries = new List<ChatLogEntry>();
-
-                foreach (var entry in instanceChat.ChatLog)
-                {
-                    string teamString = GetTeamDisplayName(entry.MessageType, entry.MessageType2);
-                    string sanitizedName = Functions.SanitizePlayerName(entry.PlayerName);
-
-                    entries.Add(new ChatLogEntry(
-                        Timestamp: entry.MessageTimeStamp,
-                        MessageType: entry.MessageType,
-                        MessageType2: entry.MessageType2,
-                        PlayerName: sanitizedName,
-                        MessageText: entry.MessageText,
-                        TeamDisplay: teamString
-                    ));
-                }
-
-                return entries;
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("chatInstanceManager", $"Error getting chat logs: {ex.Message}");
-                return new List<ChatLogEntry>();
-            }
-        }
-
-        /// <summary>
-        /// Get chat logs from database with query parameters
-        /// </summary>
-        public static (bool success, List<ChatLogObject> logs, string errorMessage) GetChatLogsFromDatabase(ChatLogQuery query)
-        {
-            try
-            {
-                var logs = DatabaseManager.GetChatLogs(
-                    query.StartDate,
-                    query.EndDate,
-                    query.MaxResults
-                );
-
-                return (true, logs, string.Empty);
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("chatInstanceManager", $"Error getting chat logs from database: {ex.Message}");
-                return (false, new List<ChatLogObject>(), ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Clear in-memory chat log
-        /// </summary>
-        public static void ClearChatLog()
-        {
-            instanceChat.ChatLog.Clear();
-            AppDebug.Log("chatInstanceManager", "Cleared in-memory chat log");
         }
 
         // ================================================================================

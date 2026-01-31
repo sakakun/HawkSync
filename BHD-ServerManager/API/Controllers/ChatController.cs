@@ -1,43 +1,50 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.DTOs;
-
-namespace BHD_ServerManager.API.Controllers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class ChatController : ControllerBase
 {
-    /// <summary>
-    /// Send a chat message to the game server
-    /// </summary>
-    /// <param name="command">Message and channel (0=Server, 1=Global, 2=Blue, 3=Red)</param>
     [HttpPost("send")]
     public ActionResult<CommandResult> SendMessage([FromBody] SendChatCommand command)
     {
-        if (!HasPermission("chat"))
-            return Forbid();
-
-        // Validate channel
+        if (!HasPermission("chat")) return Forbid();
         if (command.Channel < 0 || command.Channel > 3)
-        {
-            return BadRequest(new CommandResult
-            {
-                Success = false,
-                Message = "Invalid channel. Must be 0 (Server), 1 (Global), 2 (Blue), or 3 (Red)."
-            });
-        }
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid channel." });
 
-        // Send via manager (includes CanSendMessage validation)
         var result = chatInstanceManager.SendChatMessage(command.Message, command.Channel);
+        return Ok(new CommandResult { Success = result.Success, Message = result.Message });
+    }
 
-        return Ok(new CommandResult
-        {
-            Success = result.Success,
-            Message = result.Message
-        });
+    [HttpPost("auto/add")]
+    public ActionResult<CommandResult> AddAutoMessage([FromBody] AutoMessageRequest request)
+    {
+        var result = chatInstanceManager.AddAutoMessage(request.Message!, request.Interval);
+        return Ok(new CommandResult { Success = result.Success, Message = result.Message });
+    }
+
+    [HttpPost("auto/remove")]
+    public ActionResult<CommandResult> RemoveAutoMessage([FromBody] RemoveMessageRequest request)
+    {
+        var result = chatInstanceManager.RemoveAutoMessage(int.Parse(request.Id!));
+        return Ok(new CommandResult { Success = result.Success, Message = result.Message });
+    }
+
+    [HttpPost("slap/add")]
+    public ActionResult<CommandResult> AddSlapMessage([FromBody] SlapMessageRequest request)
+    {
+        var result = chatInstanceManager.AddSlapMessage(request.Message!);
+        return Ok(new CommandResult { Success = result.Success, Message = result.Message });
+    }
+
+    [HttpPost("slap/remove")]
+    public ActionResult<CommandResult> RemoveSlapMessage([FromBody] RemoveMessageRequest request)
+    {
+        var result = chatInstanceManager.RemoveSlapMessage(int.Parse(request.Id!));
+        return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
 
     private bool HasPermission(string permission)
@@ -46,3 +53,7 @@ public class ChatController : ControllerBase
         return permissions.Contains(permission);
     }
 }
+
+public class AutoMessageRequest { public string? Message { get; set; } public int Interval { get; set; } }
+public class SlapMessageRequest { public string? Message { get; set; } }
+public class RemoveMessageRequest { public string? Id { get; set; } }

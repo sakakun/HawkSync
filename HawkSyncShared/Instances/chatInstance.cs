@@ -20,11 +20,12 @@ namespace HawkSyncShared.Instances
 
     public class ChatLogObject
     {
-        public DateTime MessageTimeStamp { get; set; }
-        public string PlayerName { get; set; } = string.Empty;
-        public int MessageType { get; set; } // 0 = server, 1 = global, 2 = PlayerTeam, 3 = other
-        public int MessageType2 { get; set; } // 0 = self, 1 = blue, 2 = red, 3 = host
-        public string MessageText { get; set; } = string.Empty;
+        public DateTime         MessageTimeStamp        { get; set; }
+        public string           PlayerName              { get; set; } = string.Empty;
+        public int              MessageType             { get; set; } // 0 = server, 1 = global, 2 = PlayerTeam, 3 = other
+        public int              MessageType2            { get; set; } // 0 = self, 1 = blue, 2 = red, 3 = host
+        public string           MessageText             { get; set; } = string.Empty;
+        public string           TeamDisplay             { get; set; } = string.Empty;
     }
 
     public class SlapMessages

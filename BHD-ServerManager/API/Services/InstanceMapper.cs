@@ -21,7 +21,7 @@ public static class InstanceMapper
         {
             ServerData = server,
             Players = MapPlayerInstance(playerList),
-            Chat = MapChatInstance(chat),
+            Chat = chat,
             Bans = MapBanInstance(bans),
             Maps = maps,
             SnapshotTime = DateTime.UtcNow

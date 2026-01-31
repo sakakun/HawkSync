@@ -16,6 +16,7 @@ namespace RemoteClient.Forms.Panels
         private List<MapDTO> _availableMaps = new();
         private List<MapDTO> _currentPlaylist = new();
         private int _selectedPlaylist = 1;
+        private bool IsEditMode = false;
 
         public tabMaps()
         {
@@ -23,7 +24,6 @@ namespace RemoteClient.Forms.Panels
             LoadInitialData();
             WireUpEvents();
 
-                    
             // OPTIONALLY: Subscribe to snapshots for server info panel
             ApiCore.OnSnapshotReceived += OnSnapshotReceived;
 
@@ -41,7 +41,9 @@ namespace RemoteClient.Forms.Panels
             // Update UI
             methodFunction_UpdateMapControls();
             btn_activePlaylist.Text = $"P{mapInstance.ActivePlaylist}";
-        
+
+            _ = EnsurePlaylistSynced();
+
             // Update the Core Instances
             UpdateCurrentMapHighlighting();
         }
@@ -60,6 +62,28 @@ namespace RemoteClient.Forms.Panels
         {
             await RefreshAvailableMaps();
             await LoadPlaylist(_selectedPlaylist);
+        }
+
+        private async Task EnsurePlaylistSynced()
+        {
+            if (IsEditMode)
+                return;
+
+            if (_selectedPlaylist == mapInstance.ActivePlaylist)
+            {
+                var activePlaylist = mapInstance.Playlists[mapInstance.ActivePlaylist];
+
+                bool playlistsMatch = _currentPlaylist.Count == activePlaylist.Count &&
+                    !_currentPlaylist.Where((map, idx) =>
+                        map.MapName != activePlaylist[idx].MapName ||
+                        map.MapType != activePlaylist[idx].MapType
+                    ).Any();
+
+                if (!playlistsMatch)
+                {
+                    await LoadPlaylist(_selectedPlaylist);
+                }
+            }
         }
 
         private void WireUpEvents()
@@ -135,6 +159,7 @@ namespace RemoteClient.Forms.Panels
                 MapType = (int)row.Cells[4].Value!
             };
             _currentPlaylist.Add(map);
+            IsEditMode = true;
             RefreshCurrentPlaylistGrid();
         }
 
@@ -143,6 +168,7 @@ namespace RemoteClient.Forms.Panels
             if (rowIndex < 0 || rowIndex >= _currentPlaylist.Count) return;
             _currentPlaylist.RemoveAt(rowIndex);
             RefreshCurrentPlaylistGrid();
+            IsEditMode = true;
         }
 
         private void MoveMapUp()
@@ -156,6 +182,7 @@ namespace RemoteClient.Forms.Panels
             _currentPlaylist.Insert(idx - 1, item);
             RefreshCurrentPlaylistGrid();
             grid.Rows[idx - 1].Selected = true;
+            IsEditMode = true;
         }
 
         private void MoveMapDown()
@@ -169,11 +196,13 @@ namespace RemoteClient.Forms.Panels
             _currentPlaylist.Insert(idx + 1, item);
             RefreshCurrentPlaylistGrid();
             grid.Rows[idx + 1].Selected = true;
+            IsEditMode = true;
         }
 
         private void ClearPlaylist()
         {
             _currentPlaylist.Clear();
+            IsEditMode = true;
             RefreshCurrentPlaylistGrid();
         }
 
@@ -184,7 +213,7 @@ namespace RemoteClient.Forms.Panels
                 MessageBox.Show("Cannot randomize an empty playlist.", "Empty Playlist", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
+            IsEditMode = true;
             // Fisher-Yates shuffle
             var random = new Random();
             for (int i = _currentPlaylist.Count - 1; i > 0; i--)
@@ -286,6 +315,7 @@ namespace RemoteClient.Forms.Panels
             var playlist = await ApiCore.ApiClient!.GetPlaylistAsync(playlistId);
             _currentPlaylist = playlist?.Maps ?? new List<MapDTO>();
             RefreshCurrentPlaylistGrid();
+            IsEditMode = false;
         }
 
         private async Task SavePlaylist()
@@ -398,6 +428,10 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         public void UpdateCurrentMapHighlighting()
         {
+
+            // No Maps In Current Playlist (Race Condition Issues)
+            if (dataGridView_currentMaps.Rows.Count == 0)
+                return;
 
             // Clear all row backgrounds first
             foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)

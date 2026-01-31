@@ -1,6 +1,8 @@
+using HawkSyncShared.DTOs;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using HawkSyncShared.DTOs;
+using System.Threading.Channels;
+using System.Windows.Forms;
 
 namespace RemoteClient.Services;
 
@@ -135,6 +137,31 @@ public class ApiClient : IDisposable
     {
         var command = new SendChatCommand(message, channel);
         return await SendCommandAsync("/api/chat/send", command);
+    }
+
+    // Example generic command sender for auto/slap messages
+    public async Task<CommandResult> SendAutoMessageAsync(string message, int interval)
+    {
+        var command = new { Message = message, Interval = interval };
+        return await SendCommandAsync("/api/chat/auto/add", command);
+    }
+
+    public async Task<CommandResult> RemoveAutoMessageAsync(string id)
+    {
+        var command = new { Id = id };
+        return await SendCommandAsync("/api/chat/auto/remove", command);
+    }
+
+    public async Task<CommandResult> SendSlapMessageAsync(string message)
+    {
+        var command = new { Message = message };
+        return await SendCommandAsync("/api/chat/slap/add", command);
+    }
+
+    public async Task<CommandResult> RemoveSlapMessageAsync(string id)
+    {
+        var command = new { Id = id };
+        return await SendCommandAsync("/api/chat/slap/remove", command);
     }
 
     // ================================================================================
