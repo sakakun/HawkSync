@@ -566,6 +566,7 @@ namespace BHD_ServerManager.Forms.Panels
                 blacklist_btnDelete.Visible = false;
                 blacklist_btnSave.Visible = false;
                 blacklist_btnReset.Visible = false;
+                blacklist_btnClose.Visible = false;
 
                 MessageBox.Show("Ban record saved successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1455,6 +1456,12 @@ namespace BHD_ServerManager.Forms.Panels
                 _whitelistSelectedRecordIDIP = -1;
                 Whitelist_Reset_Click(sender, e);
                 panel2.Visible = false;
+
+                // Control Buttons
+                wlControlClose.Visible = false;
+                wlControlSave.Visible = false;
+                wlControlDelete.Visible = false;
+                wlControlReset.Visible = false;
 
                 MessageBox.Show("Whitelist record saved successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);

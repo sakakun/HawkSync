@@ -5,9 +5,9 @@ namespace HawkSyncShared.DTOs;
 public record ServerSnapshot
 {
     public theInstance ServerData { get; init; } = new();
-    public PlayerInstanceDTO Players { get; init; } = new();
+    public playerInstance Players { get; init; } = new();
     public chatInstance Chat { get; init; } = new();
-    public BanInstanceDTO Bans { get; init; } = new();
+    public banInstance Bans { get; init; } = new();
     public mapInstance Maps { get; init; } = new();
     public DateTime SnapshotTime { get; init; } = DateTime.UtcNow;
 }

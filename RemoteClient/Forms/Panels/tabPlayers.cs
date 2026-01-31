@@ -17,18 +17,12 @@ public partial class tabPlayers : UserControl
     {
         if (InvokeRequired)
         {
-            Invoke(() => UpdatePlayerGrid(snapshot.Players));
+            Invoke(() => OnSnapshotReceived(snapshot));
+            return;
         }
-        else
-        {
-            UpdatePlayerGrid(snapshot.Players);
-        }
-    }
-
-    private void UpdatePlayerGrid(PlayerInstanceDTO players)
-    {
 
     }
+
 
 
 

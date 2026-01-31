@@ -33,7 +33,7 @@ public class InstanceBroadcastService : BackgroundService
 
                 var snapshot = InstanceMapper.CreateSnapshot(
                     CommonCore.theInstance,
-                    CommonCore.instancePlayers!.PlayerList ?? new(),
+                    CommonCore.instancePlayers ?? new(),
                     CommonCore.instanceChat ?? new(),
                     CommonCore.instanceBans ?? new(),
                     CommonCore.instanceMaps ?? new()
