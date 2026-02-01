@@ -4,6 +4,7 @@ using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared.DTOs;
 using static BHD_ServerManager.Classes.InstanceManagers.adminInstanceManager;
+using HawkSyncShared.Instances;
 
 namespace BHD_ServerManager.Forms.Panels;
 
@@ -12,6 +13,8 @@ public partial class tabAdmin : UserControl
     // ================================================================================
     // FIELDS
     // ================================================================================
+
+    private adminInstance adminInstance => CommonCore.instanceAdmin!;
 
     private int _selectedUserID = -1;
     private bool _isEditMode = false;
@@ -31,8 +34,29 @@ public partial class tabAdmin : UserControl
     {
         InitializeComponent();
         InitializeEvents();
+
+        adminInstanceManager.LoadUsersCache();
         LoadUserList();
+
         SetFormMode(FormMode.View);
+    }
+
+    public void tickerAdmin_Tick()
+    {
+        if(InvokeRequired)
+        {
+            Invoke(new Action(tickerAdmin_Tick));
+            return;
+        }
+
+        //Periodic tasks can be added here if needed
+        if (adminInstance.ForceUIUpdate)
+        {
+            adminInstanceManager.LoadUsersCache();
+            LoadUserList();
+            adminInstance.ForceUIUpdate = false;
+        }
+
     }
 
     private void InitializeEvents()
@@ -312,13 +336,14 @@ public partial class tabAdmin : UserControl
         }
 
         // Build request
-        var request = new CreateUserRequest(
-            Username: textBox_username.Text.Trim(),
-            Password: textBox_password.Text,
-            Permissions: GetSelectedPermissions(),
-            IsActive: checkBox_userActive.Checked,
-            Notes: textBox_userNotes.Text.Trim()
-        );
+        var request = new CreateUserRequest
+        {
+            Username = textBox_username.Text.Trim(),
+            Password = textBox_password.Text,
+            Permissions = GetSelectedPermissions(),
+            IsActive = checkBox_userActive.Checked,
+            Notes = textBox_userNotes.Text.Trim()
+        };
 
         // Call manager (cache will be auto-updated)
         var result = adminInstanceManager.CreateUser(request);
@@ -343,16 +368,17 @@ public partial class tabAdmin : UserControl
     private void UpdateUser()
     {
         // Build request
-        var request = new UpdateUserRequest(
-            UserID: _selectedUserID,
-            Username: textBox_username.Text.Trim(),
-            NewPassword: string.IsNullOrWhiteSpace(textBox_password.Text)
+        var request = new UpdateUserRequest
+        {
+            UserID = _selectedUserID,
+            Username = textBox_username.Text.Trim(),
+            NewPassword = string.IsNullOrWhiteSpace(textBox_password.Text)
                 ? null
                 : textBox_password.Text,
-            Permissions: GetSelectedPermissions(),
-            IsActive: checkBox_userActive.Checked,
-            Notes: textBox_userNotes.Text.Trim()
-        );
+            Permissions = GetSelectedPermissions(),
+            IsActive = checkBox_userActive.Checked,
+            Notes = textBox_userNotes.Text.Trim()
+        };
 
         // Call manager (cache will be auto-updated)
         var result = adminInstanceManager.UpdateUser(request);

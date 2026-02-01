@@ -18,6 +18,7 @@ public class adminInstance
     
     // Audit log
     public List<AdminAuditLog> AuditLog { get; set; } = new();
+    public bool ForceUIUpdate = false;
 }
 
 public class AdminAuditLog

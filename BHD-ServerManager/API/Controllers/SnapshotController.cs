@@ -24,7 +24,8 @@ public class SnapshotController : ControllerBase
             CommonCore.instancePlayers ?? new(),
             CommonCore.instanceChat ?? new(),
             CommonCore.instanceBans ?? new(),
-            CommonCore.instanceMaps ?? new()
+            CommonCore.instanceMaps ?? new(),
+            CommonCore.instanceAdmin ?? new()
         );
 
         return Ok(snapshot);

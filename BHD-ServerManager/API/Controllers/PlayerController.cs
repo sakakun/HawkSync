@@ -87,7 +87,7 @@ public class PlayerController : ControllerBase
         // if BanIP is false
         if (!banIP && (playerName == string.Empty || playerName == null))
         {
-            result = playerInstanceManager.BanPlayerByName(playerName, playerSlot);
+            result = playerInstanceManager.BanPlayerByName(playerName!, playerSlot);
             return Ok(new CommandResult
             {
                 Success = result.Success,
@@ -98,9 +98,9 @@ public class PlayerController : ControllerBase
         // if playerName is empty or null and BanIP is true
         if (banIP && (playerName == string.Empty || playerName == null))
         {
-            if (IPAddress.TryParse(playerIP, out IPAddress ipAddress))
+            if (IPAddress.TryParse(playerIP, out IPAddress? ipAddress))
             {
-                result = await playerInstanceManager.BanPlayerByIPAsync(ipAddress, playerName, playerSlot);
+                result = await playerInstanceManager.BanPlayerByIPAsync(ipAddress, playerName!, playerSlot);
             }
             else
             {
@@ -120,7 +120,7 @@ public class PlayerController : ControllerBase
         // BanIP is true and playerName is not empty or null
         if(banIP && !(playerName == string.Empty || playerName == null))
         {
-            if (IPAddress.TryParse(playerIP, out IPAddress ipAddress))
+            if (IPAddress.TryParse(playerIP, out IPAddress? ipAddress))
             {
                 result = await playerInstanceManager.BanPlayerByBothAsync(playerName, ipAddress, playerSlot);
             }

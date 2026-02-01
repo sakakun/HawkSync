@@ -9,6 +9,7 @@ public record ServerSnapshot
     public chatInstance Chat { get; init; } = new();
     public banInstance Bans { get; init; } = new();
     public mapInstance Maps { get; init; } = new();
+    public adminInstance Admins { get; init; } = new();
     public DateTime SnapshotTime { get; init; } = DateTime.UtcNow;
 }
 

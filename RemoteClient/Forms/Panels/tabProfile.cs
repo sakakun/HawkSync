@@ -25,6 +25,7 @@ public partial class tabProfile : UserControl
 
         // Subscribe to server updates
         ApiCore.OnSnapshotReceived += OnSnapshotReceived;
+
         // Initial load from server
         ApplySettingsToUI();
 

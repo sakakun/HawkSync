@@ -27,29 +27,6 @@ public static class adminInstanceManager
     // DATA TRANSFER OBJECTS (DTOs)
     // ================================================================================
 
-    /// <summary>
-    /// Request for creating a new user
-    /// </summary>
-    public record CreateUserRequest(
-        string Username,
-        string Password,
-        List<string> Permissions,
-        bool IsActive,
-        string Notes
-    );
-
-    /// <summary>
-    /// Request for updating an existing user
-    /// </summary>
-    public record UpdateUserRequest(
-        int UserID,
-        string Username,
-        string? NewPassword, // null = don't change password
-        List<string> Permissions,
-        bool IsActive,
-        string Notes
-    );
-
     // ================================================================================
     // CACHE MANAGEMENT
     // ================================================================================
@@ -653,13 +630,14 @@ public static class adminInstanceManager
             }
 
             // Create default admin
-            var request = new CreateUserRequest(
-                Username: "admin",
-                Password: "admin", // User should change this immediately
-                Permissions: GetDefaultPermissionsForRole("admin"),
-                IsActive: true,
-                Notes: "Default administrator account - CHANGE PASSWORD IMMEDIATELY"
-            );
+            var request = new CreateUserRequest
+            {
+                Username = "admin",
+                Password = "admin",
+                Permissions = GetDefaultPermissionsForRole("admin"),
+                IsActive = true,
+                Notes = "Default administrator account - CHANGE PASSWORD IMMEDIATELY"
+            };
 
             var result = CreateUser(request);
 

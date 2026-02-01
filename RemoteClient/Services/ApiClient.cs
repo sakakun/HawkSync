@@ -815,4 +815,24 @@ public class ApiClient : IDisposable
             return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
         }
     }
+
+    public async Task<AdminCommandResult> CreateUserAsync(CreateUserRequest request)
+    {
+        var result = await SendCommandAsync("/api/admin/create", request);
+        return new AdminCommandResult { Success = result.Success, Message = result.Message };
+    }
+
+    public async Task<AdminCommandResult> UpdateUserAsync(UpdateUserRequest request)
+    {
+        var result = await SendCommandAsync("/api/admin/update", request);
+        return new AdminCommandResult { Success = result.Success, Message = result.Message };
+    }
+
+    public async Task<AdminCommandResult> DeleteUserAsync(int userId)
+    {
+        var request = new DeleteUserRequest { UserID = userId };
+        var result = await SendCommandAsync("/api/admin/delete", request);
+        return new AdminCommandResult { Success = result.Success, Message = result.Message };
+    }
+
 }

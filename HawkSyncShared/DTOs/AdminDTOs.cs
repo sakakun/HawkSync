@@ -16,4 +16,34 @@ namespace HawkSyncShared.DTOs
         public DateTime? LastLogin { get; init; }
         public string Notes { get; init; } = string.Empty;
     }
+
+    public class CreateUserRequest
+    {
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+        public List<string> Permissions { get; set; } = new();
+        public bool IsActive { get; set; }
+        public string Notes { get; set; } = "";
+    }
+
+    public class UpdateUserRequest
+    {
+        public int UserID { get; set; }
+        public string Username { get; set; } = "";
+        public string? NewPassword { get; set; }
+        public List<string> Permissions { get; set; } = new();
+        public bool IsActive { get; set; }
+        public string Notes { get; set; } = "";
+    }
+
+    public class DeleteUserRequest
+    {
+        public int UserID { get; set; }
+    }
+
+    public class AdminCommandResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
+    }
 }
