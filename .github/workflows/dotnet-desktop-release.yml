@@ -183,7 +183,7 @@ jobs:
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
-    # Copy NetLimiterBridge to both outputs
+    # Copy NetLimiterBridge to both outputs (ServerManager only)
     - name: Copy NetLimiterBridge to Framework-Dependent output
       shell: pwsh
       run: |
@@ -285,21 +285,31 @@ jobs:
       run: |
         $version = "${{ needs.validate.outputs.version }}"
 
-        # Framework-dependent
-        Compress-Archive -Path ./publish/framework-dependent/* `
-          -DestinationPath "./${{ env.OUTPUT_NAME }}-v$version-FrameworkDependent.zip"
+        # ServerManager Framework-dependent
+        Compress-Archive -Path ./publish/framework-dependent/ServerManager/* `
+          -DestinationPath "./HawkSync-ServerManager-v$version-FrameworkDependent.zip"
 
-        # Self-contained
-        Compress-Archive -Path ./publish/self-contained/* `
-          -DestinationPath "./${{ env.OUTPUT_NAME }}-v$version-SelfContained.zip"
+        # ServerManager Self-contained
+        Compress-Archive -Path ./publish/self-contained/ServerManager/* `
+          -DestinationPath "./HawkSync-ServerManager-v$version-SelfContained.zip"
+
+        # RemoteClient Framework-dependent
+        Compress-Archive -Path ./publish/framework-dependent/RemoteClient/* `
+          -DestinationPath "./HawkSync-RemoteClient-v$version-FrameworkDependent.zip"
+
+        # RemoteClient Self-contained
+        Compress-Archive -Path ./publish/self-contained/RemoteClient/* `
+          -DestinationPath "./HawkSync-RemoteClient-v$version-SelfContained.zip"
 
     - name: Generate checksums
       shell: pwsh
       run: |
         $version = "${{ needs.validate.outputs.version }}"
         $files = @(
-          "${{ env.OUTPUT_NAME }}-v$version-FrameworkDependent.zip",
-          "${{ env.OUTPUT_NAME }}-v$version-SelfContained.zip"
+          "HawkSync-ServerManager-v$version-FrameworkDependent.zip",
+          "HawkSync-ServerManager-v$version-SelfContained.zip",
+          "HawkSync-RemoteClient-v$version-FrameworkDependent.zip",
+          "HawkSync-RemoteClient-v$version-SelfContained.zip"
         )
 
         $checksums = @()
@@ -315,7 +325,10 @@ jobs:
       with:
         name: release-packages-v${{ needs.validate.outputs.version }}
         path: |
-          ./${{ env.OUTPUT_NAME }}-*.zip
+          ./HawkSync-ServerManager-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./HawkSync-ServerManager-v${{ needs.validate.outputs.version }}-SelfContained.zip
+          ./HawkSync-RemoteClient-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./HawkSync-RemoteClient-v${{ needs.validate.outputs.version }}-SelfContained.zip
           ./checksums.txt
         retention-days: 90
 
@@ -341,15 +354,20 @@ jobs:
         tag_name: v${{ needs.validate.outputs.version }}
         name: Release v${{ needs.validate.outputs.version }}
         files: |
-          ./${{ env.OUTPUT_NAME }}-*.zip
+          ./HawkSync-ServerManager-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./HawkSync-ServerManager-v${{ needs.validate.outputs.version }}-SelfContained.zip
+          ./HawkSync-RemoteClient-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./HawkSync-RemoteClient-v${{ needs.validate.outputs.version }}-SelfContained.zip
           ./checksums.txt
         body: |
           ## 🚀 HawkSync Server Manager v${{ needs.validate.outputs.version }}
           
           ### 📦 Download Options
           
-          - **Framework-Dependent** (~5MB) - Requires .NET 8.0 Runtime
-          - **Self-Contained** (~100MB) - No dependencies required
+          - **ServerManager Framework-Dependent** - Requires .NET 8.0 Runtime
+          - **ServerManager Self-Contained** - No dependencies required
+          - **RemoteClient Framework-Dependent** - Requires .NET 8.0 Runtime
+          - **RemoteClient Self-Contained** - No dependencies required
           
           ### 🔧 Components
           
@@ -360,12 +378,12 @@ jobs:
           
           ### ✅ Requirements
           
-          **Framework-Dependent Edition:**
+          **Framework-Dependent Editions:**
           - Windows 10/11 (x64)
           - [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
           - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
           
-          **Self-Contained Edition:**
+          **Self-Contained Editions:**
           - Windows 10/11 (x64)
           - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
           
