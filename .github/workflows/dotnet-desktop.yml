@@ -1,5 +1,5 @@
 name: Development Build and Publish
-
+# Description: Build and publish development builds for HawkSync-ServerManager and its components.
 on:
   push:
     branches: [ master, main ]
