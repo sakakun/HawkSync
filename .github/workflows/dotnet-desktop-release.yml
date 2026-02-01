@@ -29,6 +29,7 @@ jobs:
     runs-on: windows-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
+      dynamic_tag: ${{ steps.gen_tag.outputs.tag }}
     
     steps:
     - name: Checkout code
@@ -42,18 +43,33 @@ jobs:
       run: |
         if ("${{ github.event_name }}" -eq "workflow_dispatch") {
           $version = "${{ github.event.inputs.version }}"
-          echo "version=$version" >> $env:GITHUB_OUTPUT
-        } else {
+        } elseif ("${{ github.ref_type }}" -eq "tag") {
           $version = "${{ github.ref_name }}" -replace '^v', ''
-          echo "version=$version" >> $env:GITHUB_OUTPUT
+        } else {
+          $version = "0.0.0" # fallback for branches
         }
+        echo "version=$version" >> $env:GITHUB_OUTPUT
         echo "Release version: $version"
+
+    - name: Generate dynamic tag
+      id: gen_tag
+      shell: pwsh
+      run: |
+        $latestTag = git describe --tags --abbrev=0 2>$null
+        if (-not $latestTag) { $latestTag = "v0.0.0" }
+        $now = Get-Date -Format "MMddHHmm"
+        $commit = git rev-parse --short HEAD
+        $tag = "$latestTag-$now-$commit"
+        echo "tag=$tag" >> $env:GITHUB_OUTPUT
+        Write-Host "Generated tag: $tag"
 
     - name: Validate version format
       shell: pwsh
       run: |
         $version = "${{ steps.get_version.outputs.version }}"
-        if ($version -notmatch '^\d+\.\d+\.\d+$') {
+        $refType = "${{ github.ref_type }}"
+        # Only enforce strict version format for tags
+        if ($refType -eq "tag" -and $version -notmatch '^\d+\.\d+\.\d+$') {
           Write-Error "Invalid version format: $version (expected: X.Y.Z)"
           exit 1
         }
