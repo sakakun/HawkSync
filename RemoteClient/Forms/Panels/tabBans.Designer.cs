@@ -36,9 +36,9 @@
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
+            blacklist_btnClose = new FontAwesome.Sharp.IconButton();
             blacklist_btnDelete = new FontAwesome.Sharp.IconButton();
             blacklist_btnSave = new FontAwesome.Sharp.IconButton();
-            blacklist_btnReset = new FontAwesome.Sharp.IconButton();
             dgPlayerAddressBlacklist = new DataGridView();
             blplayerip_recordID = new DataGridViewTextBoxColumn();
             blplayerip_address = new DataGridViewTextBoxColumn();
@@ -48,7 +48,6 @@
             blplayername_name = new DataGridViewTextBoxColumn();
             blplayername_datetime = new DataGridViewTextBoxColumn();
             tableLayoutPanel2 = new TableLayoutPanel();
-            blacklist_btnClose = new FontAwesome.Sharp.IconButton();
             blControlRefresh = new FontAwesome.Sharp.IconButton();
             blControl3 = new FontAwesome.Sharp.IconButton();
             blControl2 = new FontAwesome.Sharp.IconButton();
@@ -73,9 +72,9 @@
             tabWhitelist = new TabPage();
             tableLayoutPanel7 = new TableLayoutPanel();
             tableLayoutPanel8 = new TableLayoutPanel();
+            wlControlClose = new FontAwesome.Sharp.IconButton();
             wlControlDelete = new FontAwesome.Sharp.IconButton();
             wlControlSave = new FontAwesome.Sharp.IconButton();
-            wlControlReset = new FontAwesome.Sharp.IconButton();
             dgPlayerAddressWhitelist = new DataGridView();
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
@@ -85,12 +84,11 @@
             dataGridViewTextBoxColumn5 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
             tableLayoutPanel9 = new TableLayoutPanel();
-            wlControlClose = new FontAwesome.Sharp.IconButton();
             wlControlRefresh = new FontAwesome.Sharp.IconButton();
             wlControl3 = new FontAwesome.Sharp.IconButton();
             wlControl2 = new FontAwesome.Sharp.IconButton();
             wlControl1 = new FontAwesome.Sharp.IconButton();
-            panel2 = new Panel();
+            WhitelistForm = new Panel();
             groupBox6 = new GroupBox();
             textBox_notesWL = new TextBox();
             groupBox7 = new GroupBox();
@@ -214,7 +212,7 @@
             ((System.ComponentModel.ISupportInitialize)dgPlayerAddressWhitelist).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgPlayerNamesWhitelist).BeginInit();
             tableLayoutPanel9.SuspendLayout();
-            panel2.SuspendLayout();
+            WhitelistForm.SuspendLayout();
             groupBox6.SuspendLayout();
             groupBox7.SuspendLayout();
             tableLayoutPanel10.SuspendLayout();
@@ -316,9 +314,9 @@
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel3.Controls.Add(blacklist_btnClose, 0, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnDelete, 2, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnSave, 4, 0);
-            tableLayoutPanel3.Controls.Add(blacklist_btnReset, 0, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(620, 348);
             tableLayoutPanel3.Margin = new Padding(0);
@@ -328,6 +326,22 @@
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel3.Size = new Size(312, 40);
             tableLayoutPanel3.TabIndex = 3;
+            // 
+            // blacklist_btnClose
+            // 
+            blacklist_btnClose.Dock = DockStyle.Fill;
+            blacklist_btnClose.IconChar = FontAwesome.Sharp.IconChar.Close;
+            blacklist_btnClose.IconColor = Color.Black;
+            blacklist_btnClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnClose.IconSize = 32;
+            blacklist_btnClose.Location = new Point(3, 3);
+            blacklist_btnClose.Name = "blacklist_btnClose";
+            blacklist_btnClose.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnClose.Size = new Size(56, 34);
+            blacklist_btnClose.TabIndex = 12;
+            toolTip1.SetToolTip(blacklist_btnClose, "Close Record");
+            blacklist_btnClose.UseVisualStyleBackColor = true;
+            blacklist_btnClose.Click += blacklist_btnClose_Click;
             // 
             // blacklist_btnDelete
             // 
@@ -343,6 +357,7 @@
             blacklist_btnDelete.TabIndex = 9;
             toolTip1.SetToolTip(blacklist_btnDelete, "Delete Record(s)");
             blacklist_btnDelete.UseVisualStyleBackColor = true;
+            blacklist_btnDelete.Click += blacklist_btnDelete_Click;
             // 
             // blacklist_btnSave
             // 
@@ -358,21 +373,7 @@
             blacklist_btnSave.TabIndex = 8;
             toolTip1.SetToolTip(blacklist_btnSave, "Save");
             blacklist_btnSave.UseVisualStyleBackColor = true;
-            // 
-            // blacklist_btnReset
-            // 
-            blacklist_btnReset.Dock = DockStyle.Fill;
-            blacklist_btnReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
-            blacklist_btnReset.IconColor = Color.Black;
-            blacklist_btnReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blacklist_btnReset.IconSize = 32;
-            blacklist_btnReset.Location = new Point(3, 3);
-            blacklist_btnReset.Name = "blacklist_btnReset";
-            blacklist_btnReset.Padding = new Padding(0, 3, 0, 0);
-            blacklist_btnReset.Size = new Size(56, 34);
-            blacklist_btnReset.TabIndex = 10;
-            toolTip1.SetToolTip(blacklist_btnReset, "Reset");
-            blacklist_btnReset.UseVisualStyleBackColor = true;
+            blacklist_btnSave.Click += Blacklist_Save_Click;
             // 
             // dgPlayerAddressBlacklist
             // 
@@ -392,6 +393,7 @@
             dgPlayerAddressBlacklist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerAddressBlacklist.Size = new Size(294, 382);
             dgPlayerAddressBlacklist.TabIndex = 1;
+            dgPlayerAddressBlacklist.CellDoubleClick += Blacklist_IPGrid_CellDoubleClick;
             // 
             // blplayerip_recordID
             // 
@@ -429,6 +431,7 @@
             dgPlayerNamesBlacklist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerNamesBlacklist.Size = new Size(294, 382);
             dgPlayerNamesBlacklist.TabIndex = 0;
+            dgPlayerNamesBlacklist.CellDoubleClick += Blacklist_NameGrid_CellDoubleClick;
             // 
             // blplayername_recordID
             // 
@@ -456,7 +459,6 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel2.Controls.Add(blacklist_btnClose, 4, 0);
             tableLayoutPanel2.Controls.Add(blControlRefresh, 0, 0);
             tableLayoutPanel2.Controls.Add(blControl3, 3, 0);
             tableLayoutPanel2.Controls.Add(blControl2, 2, 0);
@@ -480,21 +482,6 @@
             tableLayoutPanel2.Size = new Size(312, 40);
             tableLayoutPanel2.TabIndex = 2;
             // 
-            // blacklist_btnClose
-            // 
-            blacklist_btnClose.Dock = DockStyle.Fill;
-            blacklist_btnClose.IconChar = FontAwesome.Sharp.IconChar.Close;
-            blacklist_btnClose.IconColor = Color.Black;
-            blacklist_btnClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blacklist_btnClose.IconSize = 32;
-            blacklist_btnClose.Location = new Point(251, 3);
-            blacklist_btnClose.Name = "blacklist_btnClose";
-            blacklist_btnClose.Padding = new Padding(0, 3, 0, 0);
-            blacklist_btnClose.Size = new Size(58, 34);
-            blacklist_btnClose.TabIndex = 11;
-            toolTip1.SetToolTip(blacklist_btnClose, "Close Record");
-            blacklist_btnClose.UseVisualStyleBackColor = true;
-            // 
             // blControlRefresh
             // 
             blControlRefresh.Dock = DockStyle.Fill;
@@ -509,6 +496,7 @@
             blControlRefresh.TabIndex = 0;
             toolTip1.SetToolTip(blControlRefresh, "Blacklist Refresh");
             blControlRefresh.UseVisualStyleBackColor = true;
+            blControlRefresh.Click += RefreshBlacklistWhitelist;
             // 
             // blControl3
             // 
@@ -524,6 +512,7 @@
             blControl3.TabIndex = 0;
             toolTip1.SetToolTip(blControl3, "New Record Both");
             blControl3.UseVisualStyleBackColor = true;
+            blControl3.Click += Blacklist_AddBoth_Click;
             // 
             // blControl2
             // 
@@ -539,6 +528,7 @@
             blControl2.TabIndex = 0;
             toolTip1.SetToolTip(blControl2, "New Address Record");
             blControl2.UseVisualStyleBackColor = true;
+            blControl2.Click += Blacklist_AddIPOnly_Click;
             // 
             // blControl1
             // 
@@ -554,6 +544,7 @@
             blControl1.TabIndex = 0;
             toolTip1.SetToolTip(blControl1, "New Player Name Record");
             blControl1.UseVisualStyleBackColor = true;
+            blControl1.Click += Blacklist_AddNameOnly_Click;
             // 
             // blacklistForm
             // 
@@ -630,6 +621,7 @@
             blacklist_TempBan.Text = "Temporary";
             blacklist_TempBan.TextAlign = ContentAlignment.MiddleCenter;
             blacklist_TempBan.UseVisualStyleBackColor = true;
+            blacklist_TempBan.Click += Blacklist_BanTypeToggle_Click;
             // 
             // blacklist_PermBan
             // 
@@ -643,6 +635,7 @@
             blacklist_PermBan.Text = "Permanent";
             blacklist_PermBan.TextAlign = ContentAlignment.MiddleCenter;
             blacklist_PermBan.UseVisualStyleBackColor = true;
+            blacklist_PermBan.Click += Blacklist_BanTypeToggle_Click;
             // 
             // blacklist_DateBoxes
             // 
@@ -788,7 +781,7 @@
             tableLayoutPanel7.Controls.Add(dgPlayerAddressWhitelist, 1, 0);
             tableLayoutPanel7.Controls.Add(dgPlayerNamesWhitelist, 0, 0);
             tableLayoutPanel7.Controls.Add(tableLayoutPanel9, 3, 0);
-            tableLayoutPanel7.Controls.Add(panel2, 3, 1);
+            tableLayoutPanel7.Controls.Add(WhitelistForm, 3, 1);
             tableLayoutPanel7.Dock = DockStyle.Fill;
             tableLayoutPanel7.Location = new Point(3, 3);
             tableLayoutPanel7.Name = "tableLayoutPanel7";
@@ -807,9 +800,9 @@
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel8.Controls.Add(wlControlClose, 0, 0);
             tableLayoutPanel8.Controls.Add(wlControlDelete, 2, 0);
             tableLayoutPanel8.Controls.Add(wlControlSave, 4, 0);
-            tableLayoutPanel8.Controls.Add(wlControlReset, 0, 0);
             tableLayoutPanel8.Dock = DockStyle.Fill;
             tableLayoutPanel8.Location = new Point(620, 348);
             tableLayoutPanel8.Margin = new Padding(0);
@@ -818,6 +811,22 @@
             tableLayoutPanel8.RowStyles.Add(new RowStyle());
             tableLayoutPanel8.Size = new Size(312, 40);
             tableLayoutPanel8.TabIndex = 3;
+            // 
+            // wlControlClose
+            // 
+            wlControlClose.Dock = DockStyle.Fill;
+            wlControlClose.IconChar = FontAwesome.Sharp.IconChar.Close;
+            wlControlClose.IconColor = Color.Black;
+            wlControlClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlClose.IconSize = 32;
+            wlControlClose.Location = new Point(3, 3);
+            wlControlClose.Name = "wlControlClose";
+            wlControlClose.Padding = new Padding(0, 3, 0, 0);
+            wlControlClose.Size = new Size(56, 34);
+            wlControlClose.TabIndex = 13;
+            toolTip1.SetToolTip(wlControlClose, "Close Record");
+            wlControlClose.UseVisualStyleBackColor = true;
+            wlControlClose.Click += Whitelist_btnClose_Click;
             // 
             // wlControlDelete
             // 
@@ -833,6 +842,7 @@
             wlControlDelete.TabIndex = 10;
             toolTip1.SetToolTip(wlControlDelete, "Delete Record(s)");
             wlControlDelete.UseVisualStyleBackColor = true;
+            wlControlDelete.Click += wlControlDelete_Click;
             // 
             // wlControlSave
             // 
@@ -848,21 +858,7 @@
             wlControlSave.TabIndex = 9;
             toolTip1.SetToolTip(wlControlSave, "Save");
             wlControlSave.UseVisualStyleBackColor = true;
-            // 
-            // wlControlReset
-            // 
-            wlControlReset.Dock = DockStyle.Fill;
-            wlControlReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
-            wlControlReset.IconColor = Color.Black;
-            wlControlReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            wlControlReset.IconSize = 32;
-            wlControlReset.Location = new Point(3, 3);
-            wlControlReset.Name = "wlControlReset";
-            wlControlReset.Padding = new Padding(0, 3, 0, 0);
-            wlControlReset.Size = new Size(56, 34);
-            wlControlReset.TabIndex = 11;
-            toolTip1.SetToolTip(wlControlReset, "Reset");
-            wlControlReset.UseVisualStyleBackColor = true;
+            wlControlSave.Click += Whitelist_Save_Click;
             // 
             // dgPlayerAddressWhitelist
             // 
@@ -882,6 +878,7 @@
             dgPlayerAddressWhitelist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerAddressWhitelist.Size = new Size(294, 382);
             dgPlayerAddressWhitelist.TabIndex = 1;
+            dgPlayerAddressWhitelist.CellDoubleClick += Whitelist_IPGrid_CellDoubleClick;
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -919,6 +916,7 @@
             dgPlayerNamesWhitelist.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgPlayerNamesWhitelist.Size = new Size(294, 382);
             dgPlayerNamesWhitelist.TabIndex = 0;
+            dgPlayerNamesWhitelist.CellDoubleClick += Whitelist_NameGrid_CellDoubleClick;
             // 
             // dataGridViewTextBoxColumn4
             // 
@@ -946,7 +944,6 @@
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel9.Controls.Add(wlControlClose, 4, 0);
             tableLayoutPanel9.Controls.Add(wlControlRefresh, 0, 0);
             tableLayoutPanel9.Controls.Add(wlControl3, 3, 0);
             tableLayoutPanel9.Controls.Add(wlControl2, 2, 0);
@@ -959,21 +956,6 @@
             tableLayoutPanel9.RowStyles.Add(new RowStyle());
             tableLayoutPanel9.Size = new Size(312, 40);
             tableLayoutPanel9.TabIndex = 2;
-            // 
-            // wlControlClose
-            // 
-            wlControlClose.Dock = DockStyle.Fill;
-            wlControlClose.IconChar = FontAwesome.Sharp.IconChar.Close;
-            wlControlClose.IconColor = Color.Black;
-            wlControlClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            wlControlClose.IconSize = 32;
-            wlControlClose.Location = new Point(251, 3);
-            wlControlClose.Name = "wlControlClose";
-            wlControlClose.Padding = new Padding(0, 3, 0, 0);
-            wlControlClose.Size = new Size(58, 34);
-            wlControlClose.TabIndex = 12;
-            toolTip1.SetToolTip(wlControlClose, "Close Record");
-            wlControlClose.UseVisualStyleBackColor = true;
             // 
             // wlControlRefresh
             // 
@@ -989,6 +971,7 @@
             wlControlRefresh.TabIndex = 0;
             toolTip1.SetToolTip(wlControlRefresh, "Whitelist Refresh");
             wlControlRefresh.UseVisualStyleBackColor = true;
+            wlControlRefresh.Click += RefreshBlacklistWhitelist;
             // 
             // wlControl3
             // 
@@ -1004,6 +987,7 @@
             wlControl3.TabIndex = 0;
             toolTip1.SetToolTip(wlControl3, "New Record Both");
             wlControl3.UseVisualStyleBackColor = true;
+            wlControl3.Click += Whitelist_AddBoth_Click;
             // 
             // wlControl2
             // 
@@ -1019,6 +1003,7 @@
             wlControl2.TabIndex = 0;
             toolTip1.SetToolTip(wlControl2, "New Address Record");
             wlControl2.UseVisualStyleBackColor = true;
+            wlControl2.Click += Whitelist_AddIPOnly_Click;
             // 
             // wlControl1
             // 
@@ -1034,20 +1019,21 @@
             wlControl1.TabIndex = 0;
             toolTip1.SetToolTip(wlControl1, "New Player Name Record");
             wlControl1.UseVisualStyleBackColor = true;
+            wlControl1.Click += Whitelist_AddNameOnly_Click;
             // 
-            // panel2
+            // WhitelistForm
             // 
-            panel2.Controls.Add(groupBox6);
-            panel2.Controls.Add(groupBox7);
-            panel2.Controls.Add(groupBox8);
-            panel2.Controls.Add(groupBox9);
-            panel2.Controls.Add(groupBox10);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(620, 40);
-            panel2.Margin = new Padding(0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(312, 308);
-            panel2.TabIndex = 4;
+            WhitelistForm.Controls.Add(groupBox6);
+            WhitelistForm.Controls.Add(groupBox7);
+            WhitelistForm.Controls.Add(groupBox8);
+            WhitelistForm.Controls.Add(groupBox9);
+            WhitelistForm.Controls.Add(groupBox10);
+            WhitelistForm.Dock = DockStyle.Fill;
+            WhitelistForm.Location = new Point(620, 40);
+            WhitelistForm.Margin = new Padding(0);
+            WhitelistForm.Name = "WhitelistForm";
+            WhitelistForm.Size = new Size(312, 308);
+            WhitelistForm.TabIndex = 4;
             // 
             // groupBox6
             // 
@@ -1110,6 +1096,7 @@
             checkBox_tempWL.Text = "Temporary";
             checkBox_tempWL.TextAlign = ContentAlignment.MiddleCenter;
             checkBox_tempWL.UseVisualStyleBackColor = true;
+            checkBox_tempWL.Click += Whitelist_ExemptTypeToggle_Click;
             // 
             // checkBox_permWL
             // 
@@ -1123,6 +1110,7 @@
             checkBox_permWL.Text = "Permanent";
             checkBox_permWL.TextAlign = ContentAlignment.MiddleCenter;
             checkBox_permWL.UseVisualStyleBackColor = true;
+            checkBox_permWL.Click += Whitelist_ExemptTypeToggle_Click;
             // 
             // groupBox8
             // 
@@ -1306,6 +1294,7 @@
             dgProxyCountryBlockList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgProxyCountryBlockList.Size = new Size(244, 352);
             dgProxyCountryBlockList.TabIndex = 5;
+            dgProxyCountryBlockList.CellDoubleClick += dgProxyCountryBlockList_CellDoubleClick;
             // 
             // geo_recordID
             // 
@@ -1377,6 +1366,7 @@
             btn_proxyAddCountry.TabIndex = 2;
             btn_proxyAddCountry.Text = "Add";
             btn_proxyAddCountry.UseVisualStyleBackColor = true;
+            btn_proxyAddCountry.Click += btn_proxyAddCountry_Click;
             // 
             // tabControl1
             // 
@@ -1476,6 +1466,7 @@
             cb_serviceIP2LocationIO.Text = "IP2Location.io";
             cb_serviceIP2LocationIO.TextAlign = ContentAlignment.MiddleRight;
             cb_serviceIP2LocationIO.UseVisualStyleBackColor = true;
+            cb_serviceIP2LocationIO.Click += ProxyCheck_CBServicesChanged;
             // 
             // cb_serviceProxyCheckIO
             // 
@@ -1489,6 +1480,7 @@
             cb_serviceProxyCheckIO.Text = "ProxyCheck.io";
             cb_serviceProxyCheckIO.TextAlign = ContentAlignment.MiddleRight;
             cb_serviceProxyCheckIO.UseVisualStyleBackColor = true;
+            cb_serviceProxyCheckIO.Click += ProxyCheck_CBServicesChanged;
             // 
             // panel3
             // 
@@ -1543,6 +1535,7 @@
             checkBox_GeoAllow.Text = "Allow";
             checkBox_GeoAllow.TextAlign = ContentAlignment.MiddleRight;
             checkBox_GeoAllow.UseVisualStyleBackColor = true;
+            checkBox_GeoAllow.Click += ProxyCheck_CBGEOChange;
             // 
             // checkBox_GeoBlock
             // 
@@ -1556,6 +1549,7 @@
             checkBox_GeoBlock.Text = "Block";
             checkBox_GeoBlock.TextAlign = ContentAlignment.MiddleRight;
             checkBox_GeoBlock.UseVisualStyleBackColor = true;
+            checkBox_GeoBlock.Click += ProxyCheck_CBGEOChange;
             // 
             // checkBox_GeoOff
             // 
@@ -1571,6 +1565,7 @@
             checkBox_GeoOff.Text = "Off";
             checkBox_GeoOff.TextAlign = ContentAlignment.MiddleRight;
             checkBox_GeoOff.UseVisualStyleBackColor = true;
+            checkBox_GeoOff.Click += ProxyCheck_CBGEOChange;
             // 
             // groupBox14
             // 
@@ -1617,6 +1612,7 @@
             btn_proxyTest.TabIndex = 2;
             toolTip1.SetToolTip(btn_proxyTest, "Validate and Test");
             btn_proxyTest.UseVisualStyleBackColor = true;
+            btn_proxyTest.Click += ProxyCheck_TestService_Click;
             // 
             // btn_proxyReset
             // 
@@ -1632,6 +1628,7 @@
             btn_proxyReset.TabIndex = 1;
             toolTip1.SetToolTip(btn_proxyReset, "Reset");
             btn_proxyReset.UseVisualStyleBackColor = true;
+            btn_proxyReset.Click += ProxyCheck_ResetChanges;
             // 
             // btn_proxySave
             // 
@@ -1647,6 +1644,7 @@
             btn_proxySave.TabIndex = 0;
             toolTip1.SetToolTip(btn_proxySave, "Save");
             btn_proxySave.UseVisualStyleBackColor = true;
+            btn_proxySave.Click += ProxyCheck_SaveSettings;
             // 
             // groupBox13
             // 
@@ -1768,7 +1766,7 @@
             checkBox_proxyBlock.Size = new Size(42, 17);
             checkBox_proxyBlock.TabIndex = 7;
             checkBox_proxyBlock.UseVisualStyleBackColor = true;
-
+            checkBox_proxyBlock.Click += ProxyCheck_CBProxyChange;
             // 
             // checkBox_vpnBlock
             // 
@@ -1780,7 +1778,7 @@
             checkBox_vpnBlock.Size = new Size(42, 17);
             checkBox_vpnBlock.TabIndex = 8;
             checkBox_vpnBlock.UseVisualStyleBackColor = true;
-
+            checkBox_vpnBlock.Click += ProxyCheck_CBVPNChange;
             // 
             // checkBox_torBlock
             // 
@@ -1792,7 +1790,7 @@
             checkBox_torBlock.Size = new Size(45, 17);
             checkBox_torBlock.TabIndex = 9;
             checkBox_torBlock.UseVisualStyleBackColor = true;
-
+            checkBox_torBlock.Click += ProxyCheck_CBTORChange;
             // 
             // checkBox_proxyKick
             // 
@@ -1804,7 +1802,7 @@
             checkBox_proxyKick.Size = new Size(42, 17);
             checkBox_proxyKick.TabIndex = 10;
             checkBox_proxyKick.UseVisualStyleBackColor = true;
-
+            checkBox_proxyKick.Click += ProxyCheck_CBProxyChange;
             // 
             // checkBox_vpnKick
             // 
@@ -1816,7 +1814,7 @@
             checkBox_vpnKick.Size = new Size(42, 17);
             checkBox_vpnKick.TabIndex = 11;
             checkBox_vpnKick.UseVisualStyleBackColor = true;
-
+            checkBox_vpnKick.Click += ProxyCheck_CBVPNChange;
             // 
             // checkBox_torKick
             // 
@@ -1828,7 +1826,7 @@
             checkBox_torKick.Size = new Size(45, 17);
             checkBox_torKick.TabIndex = 12;
             checkBox_torKick.UseVisualStyleBackColor = true;
-
+            checkBox_torKick.Click += ProxyCheck_CBTORChange;
             // 
             // checkBox_proxyNone
             // 
@@ -1842,7 +1840,7 @@
             checkBox_proxyNone.Size = new Size(42, 20);
             checkBox_proxyNone.TabIndex = 13;
             checkBox_proxyNone.UseVisualStyleBackColor = true;
-
+            checkBox_proxyNone.Click += ProxyCheck_CBProxyChange;
             // 
             // checkBox_vpnNone
             // 
@@ -1856,7 +1854,7 @@
             checkBox_vpnNone.Size = new Size(42, 20);
             checkBox_vpnNone.TabIndex = 14;
             checkBox_vpnNone.UseVisualStyleBackColor = true;
-
+            checkBox_vpnNone.Click += ProxyCheck_CBVPNChange;
             // 
             // checkBox_torNone
             // 
@@ -1870,7 +1868,7 @@
             checkBox_torNone.Size = new Size(45, 20);
             checkBox_torNone.TabIndex = 15;
             checkBox_torNone.UseVisualStyleBackColor = true;
-
+            checkBox_torNone.Click += ProxyCheck_CBTORChange;
             // 
             // groupBox11
             // 
@@ -2188,6 +2186,7 @@
             btn_netLimiterRefresh.Size = new Size(48, 30);
             btn_netLimiterRefresh.TabIndex = 1;
             btn_netLimiterRefresh.UseVisualStyleBackColor = true;
+            btn_netLimiterRefresh.Click += NetLimiter_RefreshFilters;
             // 
             // label9
             // 
@@ -2275,6 +2274,7 @@
             iconButton3.TabIndex = 1;
             toolTip1.SetToolTip(iconButton3, "Reset");
             iconButton3.UseVisualStyleBackColor = true;
+            iconButton3.Click += NetLimiter_ResetForm;
             // 
             // btn_netLimiterSave
             // 
@@ -2291,6 +2291,7 @@
             btn_netLimiterSave.TabIndex = 0;
             toolTip1.SetToolTip(btn_netLimiterSave, "Save");
             btn_netLimiterSave.UseVisualStyleBackColor = true;
+            btn_netLimiterSave.Click += NetLimiter_SaveSettings;
             // 
             // groupBox17
             // 
@@ -2414,7 +2415,7 @@
             ((System.ComponentModel.ISupportInitialize)dgPlayerAddressWhitelist).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgPlayerNamesWhitelist).EndInit();
             tableLayoutPanel9.ResumeLayout(false);
-            panel2.ResumeLayout(false);
+            WhitelistForm.ResumeLayout(false);
             groupBox6.ResumeLayout(false);
             groupBox6.PerformLayout();
             groupBox7.ResumeLayout(false);
@@ -2521,7 +2522,7 @@
         private FontAwesome.Sharp.IconButton wlControl3;
         private FontAwesome.Sharp.IconButton wlControl2;
         private FontAwesome.Sharp.IconButton wlControl1;
-        private Panel panel2;
+        private Panel WhitelistForm;
         private GroupBox groupBox6;
         private TextBox textBox_notesWL;
         private GroupBox groupBox7;
@@ -2539,9 +2540,7 @@
         private GroupBox groupBox10;
         private TextBox textBox_playerNameWL;
         private FontAwesome.Sharp.IconButton blacklist_btnSave;
-        private FontAwesome.Sharp.IconButton blacklist_btnReset;
         private FontAwesome.Sharp.IconButton wlControlSave;
-        private FontAwesome.Sharp.IconButton wlControlReset;
         private Label label1;
         private TableLayoutPanel tableLayoutPanel16;
         private TableLayoutPanel tableLayoutPanel17;
@@ -2613,10 +2612,8 @@
         private FontAwesome.Sharp.IconButton btn_netLimiterSave;
         private FontAwesome.Sharp.IconButton blControlRefresh;
         private FontAwesome.Sharp.IconButton wlControlRefresh;
-        private FontAwesome.Sharp.IconButton blacklist_btnClose;
         private FontAwesome.Sharp.IconButton blacklist_btnDelete;
         private FontAwesome.Sharp.IconButton wlControlDelete;
-        private FontAwesome.Sharp.IconButton wlControlClose;
         private FontAwesome.Sharp.IconButton btn_proxyTest;
         private DataGridViewTextBoxColumn geo_recordID;
         private DataGridViewTextBoxColumn proxy_countyCode;
@@ -2630,5 +2627,7 @@
         private DataGridViewTextBoxColumn NL_numCons;
         private DataGridViewTextBoxColumn NL_vpnStatus;
         private DataGridViewTextBoxColumn NL_notes;
+        private FontAwesome.Sharp.IconButton blacklist_btnClose;
+        private FontAwesome.Sharp.IconButton wlControlClose;
     }
 }

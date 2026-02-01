@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.DTOs;
+﻿using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
+using HawkSyncShared.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -137,6 +138,38 @@ public class ProfileController : ControllerBase
         });
     }
 
+   [HttpPost("proxycheck")]
+    public ActionResult<CommandResult> SaveProxyCheckSettings([FromBody] ProxyCheckSettingsRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
+        }
+
+        // Map DTO to record
+        var proxySettings = new ProxyCheckSettings(
+            Enabled: request.ProxyCheckEnabled,
+            ApiKey: request.ProxyAPIKey ?? string.Empty,
+            CacheTime: request.ProxyCacheDays,
+            ProxyAction: request.ProxyAction,
+            VpnAction: request.VPNAction,
+            TorAction: request.TORAction,
+            GeoMode: request.GeoMode,
+            ServiceProvider: request.ServiceProvider
+        );
+
+        // Save to disk or database
+        var result = banInstanceManager.SaveProxyCheckSettings(proxySettings);
+
+        CommonCore.instanceBans!.ForceUIUpdates = true;
+
+        return Ok(new CommandResult
+        {
+            Success = result.Success,
+            Message = result.Message
+        });
+    }
+
     // ================================================================================
     // HELPER METHODS
     // ================================================================================
@@ -202,5 +235,139 @@ public class ProfileController : ControllerBase
                 serverUI.ProfileTab?.methodFunction_loadSettings();
             });
         }
+    }
+
+    [HttpPost("proxycheck/test")]
+    public async Task<ActionResult<ProxyCheckTestResult>> TestProxyCheck([FromBody] ProxyCheckTestRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.ApiKey) || string.IsNullOrWhiteSpace(request.IPAddress))
+        {
+            return BadRequest(new ProxyCheckTestResult { Success = false, ErrorMessage = "Invalid request." });
+        }
+
+        if (!IPAddress.TryParse(request.IPAddress, out var ip))
+        {
+            return BadRequest(new ProxyCheckTestResult { Success = false, ErrorMessage = "Invalid IP address." });
+        }
+
+        // Call your existing manager logic
+        var (success, result, errorMessage) = await banInstanceManager.TestProxyService(
+            request.ApiKey, request.ServiceProvider, ip);
+
+        if (!success || result == null)
+        {
+            return Ok(new ProxyCheckTestResult
+            {
+                Success = false,
+                ErrorMessage = errorMessage ?? "Unknown error"
+            });
+        }
+
+        return Ok(new ProxyCheckTestResult
+        {
+            Success = true,
+            IsVpn = result.IsVpn,
+            IsProxy = result.IsProxy,
+            IsTor = result.IsTor,
+            RiskScore = result.RiskScore,
+            CountryName = result.CountryName,
+            CountryCode = result.CountryCode,
+            Region = result.Region,
+            City = result.City,
+            Provider = result.Provider
+        });
+    }
+
+    [HttpPost("netlimiter")]
+    public ActionResult<CommandResult> SaveNetLimiterSettings([FromBody] NetLimiterSettingsRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
+        }
+
+        // Map DTO to internal model
+        var netLimiterSettings = new NetLimiterSettings(
+            Enabled: request.NetLimiterEnabled,
+            Host: request.NetLimiterHost ?? string.Empty,
+            Port: request.NetLimiterPort,
+            Username: request.NetLimiterUsername ?? string.Empty,
+            Password: request.NetLimiterPassword ?? string.Empty,
+            FilterName: request.NetLimiterFilterName ?? string.Empty,
+            EnableConLimit: request.NetLimiterEnableConLimit,
+            ConThreshold: request.NetLimiterConThreshold
+        );
+
+        // Save to disk or database as needed
+        var result = banInstanceManager.SaveNetLimiterSettings(netLimiterSettings);
+
+        CommonCore.instanceBans!.ForceUIUpdates = true;
+
+        return Ok(new CommandResult
+        {
+            Success = result.Success,
+            Message = result.Message
+        });
+    }
+
+    [HttpGet("netlimiter/filters")]
+    public ActionResult<NetLimiterFiltersResponse> GetNetLimiterFilters()
+    {
+        // You may need to adjust this to your actual manager/service logic
+        bool success = true;
+        string? errorMessage = string.Empty;
+        List<string>? filters = Program.ServerManagerUI!.BanTab.comboBox_NetLimiterFilterName.Items.Cast<string>()
+            .ToList() ?? new List<string>();
+
+        return Ok(new NetLimiterFiltersResponse
+        {
+            Success = success,
+            Message = errorMessage,
+            Filters = filters ?? new List<string>()
+        });
+    }
+
+    /// <summary>
+    /// DTO for NetLimiter filters response.
+    /// </summary>
+    public class NetLimiterFiltersResponse
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public List<string>? Filters { get; set; }
+    }
+    [HttpPost("proxycheck/add-country")]
+    public ActionResult<CommandResult> AddBlockedCountry([FromBody] AddBlockedCountryRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.CountryCode) || string.IsNullOrWhiteSpace(req.CountryName))
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
+
+        var result = banInstanceManager.AddBlockedCountry(req.CountryCode, req.CountryName);
+        CommonCore.instanceBans!.ForceUIUpdates = true;
+        return Ok(new CommandResult { Success = result.Success, Message = result.Message });
+    }
+
+    [HttpPost("proxycheck/remove-country")]
+    public ActionResult<CommandResult> RemoveBlockedCountry([FromBody] RemoveBlockedCountryRequest req)
+    {
+        if (req == null || req.RecordID <= 0)
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
+
+        var result = banInstanceManager.RemoveBlockedCountry(req.RecordID);
+        CommonCore.instanceBans!.ForceUIUpdates = true;
+        return Ok(new CommandResult { Success = result.Success, Message = result.Message });
+    }
+
+    /// <summary>
+    /// DTOs for add/remove country requests.
+    /// </summary>
+    public class AddBlockedCountryRequest
+    {
+        public string CountryCode { get; set; } = string.Empty;
+        public string CountryName { get; set; } = string.Empty;
+    }
+    public class RemoveBlockedCountryRequest
+    {
+        public int RecordID { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace HawkSyncShared.Instances
@@ -14,6 +15,19 @@ namespace HawkSyncShared.Instances
         public List<banInstancePlayerIP>      IPConnectionHistory   { get; set; } = new();
         public List<proxyRecord>              ProxyRecords          { get; set; } = new();
         public List<proxyCountry>             ProxyBlockedCountries { get; set; } = new();
+        public List<netLimiterConnLogEntry>   NetLimiterConnectionLogs { get; set; } = new();
+
+        public bool ForceUIUpdates { get; set; } = false;
+
+    }
+
+    public class netLimiterConnLogEntry
+    {
+        public required int         NL_rowID        { get; set; }
+        public required string      NL_ipAddress    { get; set; }
+        public required int         NL_numCons      { get; set; }
+        public required string      NL_vpnStatus    { get; set; }
+        public required string      NL_notes        { get; set; }
 	}
 
     public class banInstancePlayerName
@@ -34,6 +48,7 @@ namespace HawkSyncShared.Instances
     {
         public required int             RecordID            { get; set; }
         public int					    MatchID             { get; set; } = 0;
+        [JsonConverter(typeof(IPAddressConverter))]
         public required IPAddress       PlayerIP            { get; set; }
         public required int			    SubnetMask          { get; set; }
 		public DateTime 			    Date                { get; set; }
@@ -47,6 +62,7 @@ namespace HawkSyncShared.Instances
     public class proxyRecord
     {
         public required int             RecordID            { get; set; }
+        [JsonConverter(typeof(IPAddressConverter))]
 		public required IPAddress       IPAddress           { get; set; }
         public bool                     IsVpn               { get; set; }
         public bool                     IsProxy             { get; set; }
@@ -81,4 +97,3 @@ namespace HawkSyncShared.Instances
         ConnectionHistory = 2
 	}
 }
-

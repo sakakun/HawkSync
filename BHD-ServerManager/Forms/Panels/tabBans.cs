@@ -70,6 +70,18 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 banInstanceManager.InitializeProxyService();
             }
+
+            if (instanceBans!.ForceUIUpdates)
+            {
+                instanceBans!.ForceUIUpdates = false;
+
+                Blacklist_Refresh_Click(null!,null!);
+                Whitelist_Refresh_Click(null!, null!);
+                ProxyCheck_LoadSettings(null!, null!);
+                NetLimiter_LoadSettings(null!, null!);
+
+            }
+
         }
 
         /// <summary>
@@ -172,7 +184,6 @@ namespace BHD_ServerManager.Forms.Panels
             blacklist_btnClose.Visible = false;
             blacklist_btnDelete.Visible = false;
             blacklist_btnSave.Visible = false;
-            blacklist_btnReset.Visible = false;
         }
 
         /// <summary>
@@ -238,32 +249,6 @@ namespace BHD_ServerManager.Forms.Panels
             blacklist_btnClose.Visible = true;
             blacklist_btnDelete.Visible = true;
             blacklist_btnSave.Visible = true;
-            blacklist_btnReset.Visible = true;
-        }
-
-        /// <summary>
-        /// Handle click event to reset all blacklist form fields to default values.
-        /// </summary>
-        private void Blacklist_Reset_Click(object sender, EventArgs e)
-        {
-            // Player Name
-            blacklist_PlayerNameTxt.Text = String.Empty;
-            // IP Address
-            blacklist_IPAddressTxt.Text = String.Empty;
-            blacklist_IPSubnetTxt.Text = "32";
-            // Ban Dates
-            blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
-            blacklist_DateStart.MaxDate = DateTime.Today.AddYears(1);
-            blacklist_DateStart.Value = DateTime.Now;
-            blacklist_DateEnd.MinDate = DateTime.Today.AddYears(-1);
-            blacklist_DateEnd.MaxDate = DateTime.Today.AddYears(1);
-            blacklist_DateEnd.Value = DateTime.Now;
-            blacklist_DateEnd.Enabled = false;
-            // Ban Type
-            blacklist_TempBan.Checked = false;
-            blacklist_PermBan.Checked = true;
-            // Notes
-            blacklist_notes.Text = String.Empty;
         }
 
         /// <summary>
@@ -560,12 +545,10 @@ namespace BHD_ServerManager.Forms.Panels
                 // Reset selection IDs and form
                 _blacklistSelectedRecordIDName = -1;
                 _blacklistSelectedRecordIDIP = -1;
-                Blacklist_Reset_Click(sender, e);
                 blacklistForm.Visible = false;
 
                 blacklist_btnDelete.Visible = false;
                 blacklist_btnSave.Visible = false;
-                blacklist_btnReset.Visible = false;
                 blacklist_btnClose.Visible = false;
 
                 MessageBox.Show("Ban record saved successfully.", "Success",
@@ -608,14 +591,11 @@ namespace BHD_ServerManager.Forms.Panels
             // Reset selection IDs
             _blacklistSelectedRecordIDName = -1;
             _blacklistSelectedRecordIDIP = -1;
-            // Reset and Hide
-            Blacklist_Reset_Click(sender, e);
 
             // Control Buttons
             blacklist_btnClose.Visible = false;
             blacklist_btnSave.Visible = false;
             blacklist_btnDelete.Visible = false;
-            blacklist_btnReset.Visible = false;
 
             blacklistForm.Visible = false;
         }
@@ -721,7 +701,6 @@ namespace BHD_ServerManager.Forms.Panels
                 // Reset form
                 _blacklistSelectedRecordIDName = -1;
                 _blacklistSelectedRecordIDIP = -1;
-                Blacklist_Reset_Click(sender, e);
                 blacklistForm.Visible = false;
 
                 // Refresh the data
@@ -731,7 +710,6 @@ namespace BHD_ServerManager.Forms.Panels
                 blacklist_btnClose.Visible = false;
                 blacklist_btnSave.Visible = false;
                 blacklist_btnDelete.Visible = false;
-                blacklist_btnReset.Visible = false;
 
                 MessageBox.Show("Record(s) deleted successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -978,7 +956,6 @@ namespace BHD_ServerManager.Forms.Panels
             // Show control buttons
             blacklist_btnDelete.Visible = true;
             blacklist_btnSave.Visible = true;
-            blacklist_btnReset.Visible = true;
             blacklist_btnClose.Visible = true;
         }
 
@@ -1066,7 +1043,6 @@ namespace BHD_ServerManager.Forms.Panels
             wlControlClose.Visible = false;
             wlControlDelete.Visible = false;
             wlControlSave.Visible = false;
-            wlControlReset.Visible = false;
         }
 
         /// <summary>
@@ -1132,7 +1108,6 @@ namespace BHD_ServerManager.Forms.Panels
             wlControlClose.Visible = true;
             wlControlDelete.Visible = true;
             wlControlSave.Visible = true;
-            wlControlReset.Visible = true;
         }
 
         /// <summary>
@@ -1461,7 +1436,6 @@ namespace BHD_ServerManager.Forms.Panels
                 wlControlClose.Visible = false;
                 wlControlSave.Visible = false;
                 wlControlDelete.Visible = false;
-                wlControlReset.Visible = false;
 
                 MessageBox.Show("Whitelist record saved successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1510,7 +1484,6 @@ namespace BHD_ServerManager.Forms.Panels
             wlControlClose.Visible = false;
             wlControlSave.Visible = false;
             wlControlDelete.Visible = false;
-            wlControlReset.Visible = false;
 
             panel2.Visible = false;
         }
@@ -1867,7 +1840,6 @@ namespace BHD_ServerManager.Forms.Panels
             // Show control buttons
             wlControlDelete.Visible = true;
             wlControlSave.Visible = true;
-            wlControlReset.Visible = true;
             wlControlClose.Visible = true;
         }
 

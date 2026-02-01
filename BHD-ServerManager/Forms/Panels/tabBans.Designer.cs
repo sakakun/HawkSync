@@ -36,9 +36,9 @@
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
+            blacklist_btnClose = new FontAwesome.Sharp.IconButton();
             blacklist_btnDelete = new FontAwesome.Sharp.IconButton();
             blacklist_btnSave = new FontAwesome.Sharp.IconButton();
-            blacklist_btnReset = new FontAwesome.Sharp.IconButton();
             dgPlayerAddressBlacklist = new DataGridView();
             blplayerip_recordID = new DataGridViewTextBoxColumn();
             blplayerip_address = new DataGridViewTextBoxColumn();
@@ -48,7 +48,6 @@
             blplayername_name = new DataGridViewTextBoxColumn();
             blplayername_datetime = new DataGridViewTextBoxColumn();
             tableLayoutPanel2 = new TableLayoutPanel();
-            blacklist_btnClose = new FontAwesome.Sharp.IconButton();
             blControlRefresh = new FontAwesome.Sharp.IconButton();
             blControl3 = new FontAwesome.Sharp.IconButton();
             blControl2 = new FontAwesome.Sharp.IconButton();
@@ -73,9 +72,9 @@
             tabWhitelist = new TabPage();
             tableLayoutPanel7 = new TableLayoutPanel();
             tableLayoutPanel8 = new TableLayoutPanel();
+            wlControlClose = new FontAwesome.Sharp.IconButton();
             wlControlDelete = new FontAwesome.Sharp.IconButton();
             wlControlSave = new FontAwesome.Sharp.IconButton();
-            wlControlReset = new FontAwesome.Sharp.IconButton();
             dgPlayerAddressWhitelist = new DataGridView();
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
@@ -85,7 +84,6 @@
             dataGridViewTextBoxColumn5 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn6 = new DataGridViewTextBoxColumn();
             tableLayoutPanel9 = new TableLayoutPanel();
-            wlControlClose = new FontAwesome.Sharp.IconButton();
             wlControlRefresh = new FontAwesome.Sharp.IconButton();
             wlControl3 = new FontAwesome.Sharp.IconButton();
             wlControl2 = new FontAwesome.Sharp.IconButton();
@@ -316,9 +314,9 @@
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel3.Controls.Add(blacklist_btnClose, 0, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnDelete, 2, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnSave, 4, 0);
-            tableLayoutPanel3.Controls.Add(blacklist_btnReset, 0, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(620, 348);
             tableLayoutPanel3.Margin = new Padding(0);
@@ -328,6 +326,22 @@
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel3.Size = new Size(312, 40);
             tableLayoutPanel3.TabIndex = 3;
+            // 
+            // blacklist_btnClose
+            // 
+            blacklist_btnClose.Dock = DockStyle.Fill;
+            blacklist_btnClose.IconChar = FontAwesome.Sharp.IconChar.Close;
+            blacklist_btnClose.IconColor = Color.Black;
+            blacklist_btnClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnClose.IconSize = 32;
+            blacklist_btnClose.Location = new Point(3, 3);
+            blacklist_btnClose.Name = "blacklist_btnClose";
+            blacklist_btnClose.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnClose.Size = new Size(56, 34);
+            blacklist_btnClose.TabIndex = 12;
+            toolTip1.SetToolTip(blacklist_btnClose, "Close Record");
+            blacklist_btnClose.UseVisualStyleBackColor = true;
+            blacklist_btnClose.Click += Blacklist_Close_Click;
             // 
             // blacklist_btnDelete
             // 
@@ -360,22 +374,6 @@
             toolTip1.SetToolTip(blacklist_btnSave, "Save");
             blacklist_btnSave.UseVisualStyleBackColor = true;
             blacklist_btnSave.Click += Blacklist_Save_Click;
-            // 
-            // blacklist_btnReset
-            // 
-            blacklist_btnReset.Dock = DockStyle.Fill;
-            blacklist_btnReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
-            blacklist_btnReset.IconColor = Color.Black;
-            blacklist_btnReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blacklist_btnReset.IconSize = 32;
-            blacklist_btnReset.Location = new Point(3, 3);
-            blacklist_btnReset.Name = "blacklist_btnReset";
-            blacklist_btnReset.Padding = new Padding(0, 3, 0, 0);
-            blacklist_btnReset.Size = new Size(56, 34);
-            blacklist_btnReset.TabIndex = 10;
-            toolTip1.SetToolTip(blacklist_btnReset, "Reset");
-            blacklist_btnReset.UseVisualStyleBackColor = true;
-            blacklist_btnReset.Click += Blacklist_Reset_Click;
             // 
             // dgPlayerAddressBlacklist
             // 
@@ -461,7 +459,6 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel2.Controls.Add(blacklist_btnClose, 4, 0);
             tableLayoutPanel2.Controls.Add(blControlRefresh, 0, 0);
             tableLayoutPanel2.Controls.Add(blControl3, 3, 0);
             tableLayoutPanel2.Controls.Add(blControl2, 2, 0);
@@ -484,22 +481,6 @@
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel2.Size = new Size(312, 40);
             tableLayoutPanel2.TabIndex = 2;
-            // 
-            // blacklist_btnClose
-            // 
-            blacklist_btnClose.Dock = DockStyle.Fill;
-            blacklist_btnClose.IconChar = FontAwesome.Sharp.IconChar.Close;
-            blacklist_btnClose.IconColor = Color.Black;
-            blacklist_btnClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            blacklist_btnClose.IconSize = 32;
-            blacklist_btnClose.Location = new Point(251, 3);
-            blacklist_btnClose.Name = "blacklist_btnClose";
-            blacklist_btnClose.Padding = new Padding(0, 3, 0, 0);
-            blacklist_btnClose.Size = new Size(58, 34);
-            blacklist_btnClose.TabIndex = 11;
-            toolTip1.SetToolTip(blacklist_btnClose, "Close Record");
-            blacklist_btnClose.UseVisualStyleBackColor = true;
-            blacklist_btnClose.Click += Blacklist_Close_Click;
             // 
             // blControlRefresh
             // 
@@ -819,9 +800,9 @@
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel8.Controls.Add(wlControlClose, 0, 0);
             tableLayoutPanel8.Controls.Add(wlControlDelete, 2, 0);
             tableLayoutPanel8.Controls.Add(wlControlSave, 4, 0);
-            tableLayoutPanel8.Controls.Add(wlControlReset, 0, 0);
             tableLayoutPanel8.Dock = DockStyle.Fill;
             tableLayoutPanel8.Location = new Point(620, 348);
             tableLayoutPanel8.Margin = new Padding(0);
@@ -830,6 +811,22 @@
             tableLayoutPanel8.RowStyles.Add(new RowStyle());
             tableLayoutPanel8.Size = new Size(312, 40);
             tableLayoutPanel8.TabIndex = 3;
+            // 
+            // wlControlClose
+            // 
+            wlControlClose.Dock = DockStyle.Fill;
+            wlControlClose.IconChar = FontAwesome.Sharp.IconChar.Close;
+            wlControlClose.IconColor = Color.Black;
+            wlControlClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlClose.IconSize = 32;
+            wlControlClose.Location = new Point(3, 3);
+            wlControlClose.Name = "wlControlClose";
+            wlControlClose.Padding = new Padding(0, 3, 0, 0);
+            wlControlClose.Size = new Size(56, 34);
+            wlControlClose.TabIndex = 13;
+            toolTip1.SetToolTip(wlControlClose, "Close Record");
+            wlControlClose.UseVisualStyleBackColor = true;
+            wlControlClose.Click += Whitelist_Close_Click;
             // 
             // wlControlDelete
             // 
@@ -862,22 +859,6 @@
             toolTip1.SetToolTip(wlControlSave, "Save");
             wlControlSave.UseVisualStyleBackColor = true;
             wlControlSave.Click += Whitelist_Save_Click;
-            // 
-            // wlControlReset
-            // 
-            wlControlReset.Dock = DockStyle.Fill;
-            wlControlReset.IconChar = FontAwesome.Sharp.IconChar.Reply;
-            wlControlReset.IconColor = Color.Black;
-            wlControlReset.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            wlControlReset.IconSize = 32;
-            wlControlReset.Location = new Point(3, 3);
-            wlControlReset.Name = "wlControlReset";
-            wlControlReset.Padding = new Padding(0, 3, 0, 0);
-            wlControlReset.Size = new Size(56, 34);
-            wlControlReset.TabIndex = 11;
-            toolTip1.SetToolTip(wlControlReset, "Reset");
-            wlControlReset.UseVisualStyleBackColor = true;
-            wlControlReset.Click += Whitelist_Reset_Click;
             // 
             // dgPlayerAddressWhitelist
             // 
@@ -963,7 +944,6 @@
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel9.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel9.Controls.Add(wlControlClose, 4, 0);
             tableLayoutPanel9.Controls.Add(wlControlRefresh, 0, 0);
             tableLayoutPanel9.Controls.Add(wlControl3, 3, 0);
             tableLayoutPanel9.Controls.Add(wlControl2, 2, 0);
@@ -976,22 +956,6 @@
             tableLayoutPanel9.RowStyles.Add(new RowStyle());
             tableLayoutPanel9.Size = new Size(312, 40);
             tableLayoutPanel9.TabIndex = 2;
-            // 
-            // wlControlClose
-            // 
-            wlControlClose.Dock = DockStyle.Fill;
-            wlControlClose.IconChar = FontAwesome.Sharp.IconChar.Close;
-            wlControlClose.IconColor = Color.Black;
-            wlControlClose.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            wlControlClose.IconSize = 32;
-            wlControlClose.Location = new Point(251, 3);
-            wlControlClose.Name = "wlControlClose";
-            wlControlClose.Padding = new Padding(0, 3, 0, 0);
-            wlControlClose.Size = new Size(58, 34);
-            wlControlClose.TabIndex = 12;
-            toolTip1.SetToolTip(wlControlClose, "Close Record");
-            wlControlClose.UseVisualStyleBackColor = true;
-            wlControlClose.Click += Whitelist_Close_Click;
             // 
             // wlControlRefresh
             // 
@@ -2576,9 +2540,7 @@
         private GroupBox groupBox10;
         private TextBox textBox_playerNameWL;
         private FontAwesome.Sharp.IconButton blacklist_btnSave;
-        private FontAwesome.Sharp.IconButton blacklist_btnReset;
         private FontAwesome.Sharp.IconButton wlControlSave;
-        private FontAwesome.Sharp.IconButton wlControlReset;
         private Label label1;
         private TableLayoutPanel tableLayoutPanel16;
         private TableLayoutPanel tableLayoutPanel17;
@@ -2636,7 +2598,6 @@
         private TextBox textBox_NetLimiterUsername;
         private TextBox textBox_NetLimiterPassword;
         private TableLayoutPanel tableLayoutPanel25;
-        private ComboBox comboBox_NetLimiterFilterName;
         private FontAwesome.Sharp.IconButton btn_netLimiterRefresh;
         private Label label9;
         private CheckBox checkBox_NetLimiterEnableConLimit;
@@ -2650,10 +2611,8 @@
         private FontAwesome.Sharp.IconButton btn_netLimiterSave;
         private FontAwesome.Sharp.IconButton blControlRefresh;
         private FontAwesome.Sharp.IconButton wlControlRefresh;
-        private FontAwesome.Sharp.IconButton blacklist_btnClose;
         private FontAwesome.Sharp.IconButton blacklist_btnDelete;
         private FontAwesome.Sharp.IconButton wlControlDelete;
-        private FontAwesome.Sharp.IconButton wlControlClose;
         private FontAwesome.Sharp.IconButton btn_proxyTest;
         private DataGridViewTextBoxColumn geo_recordID;
         private DataGridViewTextBoxColumn proxy_countyCode;
@@ -2667,5 +2626,8 @@
         private DataGridViewTextBoxColumn NL_numCons;
         private DataGridViewTextBoxColumn NL_vpnStatus;
         private DataGridViewTextBoxColumn NL_notes;
+        private FontAwesome.Sharp.IconButton blacklist_btnClose;
+        private FontAwesome.Sharp.IconButton wlControlClose;
+        public ComboBox comboBox_NetLimiterFilterName;
     }
 }

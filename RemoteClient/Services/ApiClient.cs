@@ -554,14 +554,208 @@ public class ApiClient : IDisposable
         return await response.Content.ReadFromJsonAsync<PlaylistCommandResult>() ?? new PlaylistCommandResult { Success = false, Message = "No response" };
     }
 
-    public async Task<List<MapDTO>?> RefreshAvailableMapsAsync()
+    public async Task<BanRecordSaveResult> SaveBlacklistRecordAsync(BanRecordSaveRequest req)
     {
-        var response = await _httpClient.PostAsync("/api/mapplaylist/refresh-available-maps", null);
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/ban/save-blacklist", req);
 
-        if (!response.IsSuccessStatusCode)
-            return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new BanRecordSaveResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
 
-        return await response.Content.ReadFromJsonAsync<List<MapDTO>>();
+            var result = await response.Content.ReadFromJsonAsync<BanRecordSaveResult>();
+            return result ?? new BanRecordSaveResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new BanRecordSaveResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
     }
 
+    public async Task<CommandResult> DeleteBlacklistRecordAsync(int recordId, bool isName)
+    {
+        try
+        {
+            var request = new
+            {
+                RecordID = recordId,
+                IsName = isName
+            };
+            var response = await _httpClient.PostAsJsonAsync("/api/ban/delete-blacklist", request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new CommandResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<CommandResult>();
+            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<BanRecordSaveResult> SaveWhitelistRecordAsync(BanRecordSaveRequest req)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/ban/save-whitelist", req);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new BanRecordSaveResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<BanRecordSaveResult>();
+            return result ?? new BanRecordSaveResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new BanRecordSaveResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<CommandResult> DeleteWhitelistRecordAsync(int recordId, bool isName)
+    {
+        try
+        {
+            var request = new
+            {
+                RecordID = recordId,
+                IsName = isName
+            };
+            var response = await _httpClient.PostAsJsonAsync("/api/ban/delete-whitelist", request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new CommandResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<CommandResult>();
+            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    public async Task<CommandResult> SaveProxyCheckSettingsAsync(ProxyCheckSettingsRequest settings)
+    {
+        // Change "/api/settings/proxycheck" to "/api/profile/proxycheck"
+        return await SendCommandAsync("/api/profile/proxycheck", settings);
+    }
+
+    public async Task<ProxyCheckTestResult?> TestProxyCheckServiceAsync(string apiKey, int serviceProvider, string ipAddress)
+    {
+        var request = new ProxyCheckTestRequest
+        {
+            ApiKey = apiKey,
+            ServiceProvider = serviceProvider,
+            IPAddress = ipAddress
+        };
+
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/profile/proxycheck/test", request);
+            if (!response.IsSuccessStatusCode)
+                return new ProxyCheckTestResult { Success = false, ErrorMessage = $"HTTP {response.StatusCode}" };
+
+            return await response.Content.ReadFromJsonAsync<ProxyCheckTestResult>();
+        }
+        catch (Exception ex)
+        {
+            return new ProxyCheckTestResult { Success = false, ErrorMessage = ex.Message };
+        }
+    }
+
+    public async Task<CommandResult> SaveNetLimiterSettingsAsync(NetLimiterSettingsRequest settings)
+    {
+        // Adjust the endpoint to match your server route
+        return await SendCommandAsync("/api/profile/netlimiter", settings);
+    }
+
+    /// <summary>
+    /// Get available NetLimiter filters from the server.
+    /// </summary>
+    public async Task<(bool Success, List<string> Filters, string? ErrorMessage)> GetNetLimiterFiltersAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("/api/profile/netlimiter/filters");
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return (false, new List<string>(), $"HTTP {response.StatusCode}: {error}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<NetLimiterFiltersResponse>();
+            if (result == null || !result.Success)
+                return (false, new List<string>(), result?.Message ?? "Unknown error");
+
+            return (true, result.Filters ?? new List<string>(), null);
+        }
+        catch (Exception ex)
+        {
+            return (false, new List<string>(), ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// DTO for NetLimiter filters response.
+    /// </summary>
+    public class NetLimiterFiltersResponse
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public List<string>? Filters { get; set; }
+    }
+    /// <summary>
+    /// Add a blocked country to the server.
+    /// </summary>
+    public async Task<CommandResult> AddBlockedCountryAsync(string countryCode, string countryName)
+    {
+        var request = new
+        {
+            CountryCode = countryCode,
+            CountryName = countryName
+        };
+        return await SendCommandAsync("/api/profile/proxycheck/add-country", request);
+    }
+
+    /// <summary>
+    /// Remove a blocked country from the server.
+    /// </summary>
+    public async Task<CommandResult> RemoveBlockedCountryAsync(int recordId)
+    {
+        var request = new
+        {
+            RecordID = recordId
+        };
+        return await SendCommandAsync("/api/profile/proxycheck/remove-country", request);
+    }
 }

@@ -486,8 +486,9 @@ namespace BHD_ServerManager.Classes.Tickers
 
             // Clear existing rows
             thisServer.BanTab.dg_NetlimiterConnectionLog.Rows.Clear();
+            banInstance.NetLimiterConnectionLogs.Clear();
 
-            int rowIndex = 0;
+			int rowIndex = 0;
             foreach (var ipGroup in ipGroups)
             {
                 string ip = ipGroup.Key!;
@@ -516,9 +517,20 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Check whitelist/blacklist status
                 string listStatus = GetListStatus(ip, now);
         
+                int recordID = rowIndex++;
+
                 // Add row to DataGridView: RowID, IP Address, # Cons, VPN Status, Notes
-                thisServer.BanTab.dg_NetlimiterConnectionLog.Rows.Add(
-                    rowIndex++,  // NL_rowID
+                banInstance.NetLimiterConnectionLogs.Add(new netLimiterConnLogEntry
+                {
+                    NL_rowID = recordID,
+                    NL_ipAddress = ip,
+                    NL_numCons = count,
+                    NL_vpnStatus = vpnStatus,
+                    NL_notes = listStatus
+                });
+
+				thisServer.BanTab.dg_NetlimiterConnectionLog.Rows.Add(
+                    recordID,    // NL_rowID
                     ip,          // NL_ipAddress
                     count,       // NL_numCons
                     vpnStatus,   // NL_vpnStatus
