@@ -51,17 +51,32 @@ public partial class ServerManagerUI : Form
 
     private void functionEvent_loadPanels()
     {
-        // Load the User Controls into the TabPages
-        tabProfile.Controls.Add(ProfileTab = new tabProfile());
-        tabGamePlay.Controls.Add(ServerTab = new tabGamePlay());
-        tabMaps.Controls.Add(MapsTab = new tabMaps());
-        tabPlayers.Controls.Add(PlayersTab = new tabPlayers());
-        tabChat.Controls.Add(ChatTab = new tabChat());
-        tabBans.Controls.Add(BanTab = new tabBans());
-        tabStats.Controls.Add(StatsTab = new tabStats());
-        tabAdmin.Controls.Add(AdminTab = new tabAdmin());
-    }
+        var tabPermissionPairs = new (TabPage tab, string name, string text, string permission, UserControl control)[]
+        {
+            (tabProfile,   "tabProfile",   "Profile",   "profile",   new tabProfile()),
+            (tabGamePlay,  "tabGamePlay",  "Gameplay",  "gameplay",  new tabGamePlay()),
+            (tabMaps,      "tabMaps",      "Maps",      "maps",      new tabMaps()),
+            (tabPlayers,   "tabPlayers",   "Players",   "players",   new tabPlayers()),
+            (tabChat,      "tabChat",      "Chat",      "chat",      new tabChat()),
+            (tabBans,      "tabBans",      "Bans",      "bans",      new tabBans()),
+            (tabStats,     "tabStats",     "Stats",     "stats",     new tabStats()),
+            (tabAdmin,     "tabAdmin",     "Admin",     "users",     new tabAdmin())
+        };
 
+        tabControl.TabPages.Clear(); // Remove all tabs first
+
+        foreach (var (tab, name, text, permission, control) in tabPermissionPairs)
+        {
+            tab.Name = name;
+            tab.Text = text;
+            if (ApiCore.HasPermission(permission))
+            {
+                tab.Controls.Clear();
+                tab.Controls.Add(control);
+                tabControl.TabPages.Add(tab);
+            }
+        }
+    }
 
     // EVENT HANDLER - Connection state changed
     private void OnConnectionStateChanged(string state)

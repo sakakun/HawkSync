@@ -93,4 +93,9 @@ public static class ApiCore
         
         ApiClient?.Dispose();
     }
+
+    public static bool HasPermission(string permission)
+    {
+        return CurrentUser?.Permissions?.Any(p => string.Equals(p, permission, StringComparison.OrdinalIgnoreCase)) == true;
+    }
 }

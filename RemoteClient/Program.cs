@@ -1,4 +1,5 @@
 using HawkSyncShared;
+using HawkSyncShared.DTOs;
 using RemoteClient.Core;
 using RemoteClient.Forms;
 
@@ -6,6 +7,7 @@ namespace RemoteClient;
 
 internal static class Program
 {
+
     [STAThread]
     static void Main()
     {
@@ -25,7 +27,7 @@ internal static class Program
                 loginForm.JwtToken!,
                 loginForm.User!
             );
-            
+
             // Show loading message
             var loadingForm = new Form
             {

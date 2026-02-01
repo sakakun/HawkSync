@@ -12,7 +12,8 @@ public class BanController : ControllerBase
     [HttpPost("save-blacklist")]
     public ActionResult<BanRecordSaveResult> SaveBlacklistRecord([FromBody] BanRecordSaveRequest req)
     {
-        
+        if (!HasPermission("bans")) return Forbid();
+
         IPAddress? ip = null;
         if (req.IsIP && !string.IsNullOrWhiteSpace(req.IPAddress))
         {
@@ -88,6 +89,8 @@ public class BanController : ControllerBase
     [HttpPost("delete-blacklist")]
     public ActionResult<CommandResult> DeleteBlacklistRecord([FromBody] DeleteBanRecordRequest req)
     {
+        if (!HasPermission("bans")) return Forbid();
+
         if (req == null || req.RecordID <= 0)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
@@ -107,7 +110,8 @@ public class BanController : ControllerBase
     [HttpPost("save-whitelist")]
     public ActionResult<BanRecordSaveResult> SaveWhitelistRecord([FromBody] BanRecordSaveRequest req)
     {
-        
+        if (!HasPermission("bans")) return Forbid();
+
         IPAddress? ip = null;
         if (req.IsIP && !string.IsNullOrWhiteSpace(req.IPAddress))
         {
@@ -183,6 +187,8 @@ public class BanController : ControllerBase
     [HttpPost("delete-whitelist")]
     public ActionResult<CommandResult> DeleteWhitelistRecord([FromBody] DeleteBanRecordRequest req)
     {
+        if (!HasPermission("bans")) return Forbid();
+
         if (req == null || req.RecordID <= 0)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
@@ -197,6 +203,12 @@ public class BanController : ControllerBase
 
         CommonCore.instanceBans!.ForceUIUpdates = true;
         return Ok(new CommandResult { Success = true, Message = "Record deleted." });
+    }
+
+    private bool HasPermission(string permission)
+    {
+        var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
+        return permissions.Contains(permission);
     }
 
 }

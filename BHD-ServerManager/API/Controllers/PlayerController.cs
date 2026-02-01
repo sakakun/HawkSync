@@ -16,6 +16,8 @@ public class PlayerController : ControllerBase
     [HttpPost("arm")]
     public ActionResult<CommandResult> ArmPlayer([FromBody] ArmPlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         var result = playerInstanceManager.ArmPlayer(command.PlayerSlot, command.PlayerName);
 
         return Ok(new CommandResult
@@ -27,6 +29,8 @@ public class PlayerController : ControllerBase
     [HttpPost("disarm")]
     public ActionResult<CommandResult> DisarmPlayer([FromBody] DisarmPlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         var result = playerInstanceManager.DisarmPlayer(command.PlayerSlot, command.PlayerName);
 
         return Ok(new CommandResult
@@ -39,6 +43,8 @@ public class PlayerController : ControllerBase
     [HttpPost("togglegodmode")]
     public ActionResult<CommandResult> ToggleGodMode([FromBody] GodModePlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         bool IsGod = CommonCore.instancePlayers!.PlayerList[command.PlayerSlot].IsGod;
 
         var result = playerInstanceManager.ToggleGodMode(command.PlayerSlot, command.PlayerName, !IsGod);
@@ -52,6 +58,8 @@ public class PlayerController : ControllerBase
     [HttpPost("switchteam")]
     public ActionResult<CommandResult> SwitchTeamPlayer([FromBody] SwitchTeamPlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         var result = playerInstanceManager.SwitchPlayerTeam(command.PlayerSlot, command.PlayerName, command.TeamNum);
 
         return Ok(new CommandResult
@@ -64,6 +72,8 @@ public class PlayerController : ControllerBase
     [HttpPost("kick")]
     public ActionResult<CommandResult> KickPlayer([FromBody] KickPlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         var result = playerInstanceManager.KickPlayer(command.PlayerSlot, command.PlayerName);
 
         return Ok(new CommandResult
@@ -76,6 +86,8 @@ public class PlayerController : ControllerBase
     [HttpPost("ban")]
     public async Task<ActionResult<CommandResult>> BanPlayer([FromBody] BanPlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         string playerName = command.PlayerName;
         string playerIP = command.PlayerIP;
         int playerSlot = command.PlayerSlot;
@@ -149,6 +161,8 @@ public class PlayerController : ControllerBase
     [HttpPost("warn")]
     public ActionResult<CommandResult> WarnPlayer([FromBody] WarnPlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         var result = playerInstanceManager.WarnPlayer(
             command.PlayerSlot,
             command.PlayerName,
@@ -164,6 +178,8 @@ public class PlayerController : ControllerBase
     [HttpPost("kill")]
     public ActionResult<CommandResult> KillPlayer([FromBody] KillPlayerCommand command)
     {
+        if(!HasPermission("players")) return Forbid();
+
         var result = playerInstanceManager.KillPlayer(command.PlayerSlot, command.PlayerName);
 
         return Ok(new CommandResult
@@ -171,6 +187,12 @@ public class PlayerController : ControllerBase
             Success = result.Success,
             Message = result.Message
         });
+    }
+
+    private bool HasPermission(string permission)
+    {
+        var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
+        return permissions.Contains(permission);
     }
 
 }

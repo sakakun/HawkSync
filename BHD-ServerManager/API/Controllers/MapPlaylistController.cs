@@ -4,6 +4,7 @@ using HawkSyncShared;
 using HawkSyncShared.DTOs;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -15,6 +16,8 @@ public class MapPlaylistController : ControllerBase
     [HttpGet("available-maps")]
     public ActionResult<List<MapDTO>> GetAvailableMaps()
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var result = mapInstanceManager.LoadAvailableMaps();
         var allMaps = result.DefaultMaps.Concat(result.CustomMaps)
             .Select(m => new MapDTO
@@ -31,6 +34,8 @@ public class MapPlaylistController : ControllerBase
     [HttpGet("playlists")]
     public ActionResult<AllPlaylistsDTO> GetAllPlaylists()
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var instance = CommonCore.instanceMaps!;
         var dto = new AllPlaylistsDTO
         {
@@ -54,6 +59,8 @@ public class MapPlaylistController : ControllerBase
     [HttpGet("playlist/{id}")]
     public ActionResult<PlaylistDTO> GetPlaylist(int id)
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var (success, maps, error) = mapInstanceManager.GetPlaylistMaps(id);
         if (!success)
             return BadRequest(new PlaylistCommandResult { Success = false, Message = error });
@@ -75,6 +82,8 @@ public class MapPlaylistController : ControllerBase
     [HttpPost("playlist/save")]
     public ActionResult<PlaylistCommandResult> SavePlaylist([FromBody] PlaylistDTO playlist)
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var maps = playlist.Maps.Select(m => new HawkSyncShared.ObjectClasses.mapFileInfo
         {
             MapID = m.MapID,
@@ -100,6 +109,8 @@ public class MapPlaylistController : ControllerBase
     [HttpPost("playlist/set-active")]
     public ActionResult<PlaylistCommandResult> SetActivePlaylist([FromBody] PlaylistDTO playlist)
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var saveResult = mapInstanceManager.SavePlaylist(playlist.PlaylistID, playlist.Maps.Select(m => new HawkSyncShared.ObjectClasses.mapFileInfo
         {
             MapID = m.MapID,
@@ -124,6 +135,8 @@ public class MapPlaylistController : ControllerBase
     [HttpPost("playlist/import")]
     public ActionResult<PlaylistCommandResult> ImportPlaylist([FromBody] PlaylistDTO playlist)
     {
+        if(!HasPermission("maps")) return Forbid();
+
         // Overwrite playlist with imported maps
         var result = mapInstanceManager.SavePlaylist(playlist.PlaylistID, playlist.Maps.Select(m => new HawkSyncShared.ObjectClasses.mapFileInfo
         {
@@ -147,6 +160,8 @@ public class MapPlaylistController : ControllerBase
     [HttpGet("playlist/export/{id}")]
     public ActionResult<PlaylistDTO> ExportPlaylist(int id)
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var (success, maps, error) = mapInstanceManager.GetPlaylistMaps(id);
         if (!success)
             return BadRequest(new PlaylistCommandResult { Success = false, Message = error });
@@ -169,6 +184,8 @@ public class MapPlaylistController : ControllerBase
     [HttpPost("server/skip-map")]
     public ActionResult<PlaylistCommandResult> SkipMap()
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var result = mapInstanceManager.SkipMap();
         return Ok(new PlaylistCommandResult { Success = result.Success, Message = result.Message });
     }
@@ -176,6 +193,8 @@ public class MapPlaylistController : ControllerBase
     [HttpPost("server/score-map")]
     public ActionResult<PlaylistCommandResult> ScoreMap()
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var result = mapInstanceManager.ScoreMap();
         return Ok(new PlaylistCommandResult { Success = result.Success, Message = result.Message });
     }
@@ -183,6 +202,8 @@ public class MapPlaylistController : ControllerBase
     [HttpPost("server/play-next")]
     public ActionResult<PlaylistCommandResult> PlayNext([FromBody] int mapIndex)
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var result = mapInstanceManager.SetNextMap(mapIndex);
         return Ok(new PlaylistCommandResult { Success = result.Success, Message = result.Message });
     }
@@ -190,6 +211,8 @@ public class MapPlaylistController : ControllerBase
     [HttpPost("refresh-available-maps")]
     public ActionResult<List<MapDTO>> RefreshAvailableMaps()
     {
+        if(!HasPermission("maps")) return Forbid();
+
         var result = mapInstanceManager.LoadAvailableMaps();
         var allMaps = result.DefaultMaps.Concat(result.CustomMaps)
             .Select(m => new MapDTO
@@ -214,6 +237,15 @@ public class MapPlaylistController : ControllerBase
                 serverUI.MapsTab?.actionClick_refeshMapLists(null!,null!);
             });
         }
+    }
+
+    private bool HasPermission(string permission)
+    {
+        var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
+        AppDebug.Log("MapPlaylistController", $"Checking user permissions, {permission} from user { User.Identity!.Name}");
+        AppDebug.Log("MapPlaylistController", $"User permissions: {string.Join(", ", permissions)}");
+        AppDebug.Log("MapPlaylistController", $"Has Permission: {permissions.Contains(permission).ToString()}");
+        return permissions.Contains(permission);
     }
 
 }

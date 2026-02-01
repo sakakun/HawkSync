@@ -19,6 +19,8 @@ public class GamePlayController : ControllerBase
     [HttpGet("settings")]
     public ActionResult<GamePlaySettingsResponse> GetSettings()
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         var result = theInstanceManager.LoadGamePlaySettings();
         
         if (!result.Success)
@@ -47,6 +49,8 @@ public class GamePlayController : ControllerBase
     [HttpPost("settings")]
     public ActionResult<CommandResult> SaveSettings([FromBody] GamePlaySettingsRequest request)
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         // Convert DTO to GamePlaySettings
         var options = new ServerOptions(
             request.Options.AutoBalance, request.Options.ShowTracers,
@@ -112,6 +116,8 @@ public class GamePlayController : ControllerBase
     [HttpPost("validate")]
     public ActionResult<ValidationResult> ValidateSettings([FromBody] GamePlaySettingsRequest request)
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         // For gameplay, basic validation can be done here
         var errors = new List<string>();
 
@@ -232,6 +238,8 @@ public class GamePlayController : ControllerBase
     [HttpPost("update-server")]
     public ActionResult<CommandResult> UpdateGameServer()
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         try
         {
             // Check if server is running
@@ -269,6 +277,8 @@ public class GamePlayController : ControllerBase
     [HttpPost("lock-lobby")]
     public ActionResult<CommandResult> LockLobby()
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         try
         {
             // Check if server is running
@@ -306,6 +316,8 @@ public class GamePlayController : ControllerBase
     [HttpGet("export")]
     public ActionResult<GamePlaySettingsExportResponse> ExportSettings()
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         try
         {
             var result = theInstanceManager.LoadGamePlaySettings();
@@ -394,6 +406,8 @@ public class GamePlayController : ControllerBase
     [HttpPost("import")]
     public ActionResult<CommandResult> ImportSettings([FromBody] GamePlaySettingsImportRequest request)
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         try
         {
             // Deserialize JSON
@@ -449,6 +463,8 @@ public class GamePlayController : ControllerBase
     [HttpPost("start-server")]
     public ActionResult<CommandResult> StartServer()
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         try
         {
             var instance = CommonCore.theInstance;
@@ -523,6 +539,8 @@ public class GamePlayController : ControllerBase
     [HttpPost("stop-server")]
     public ActionResult<CommandResult> StopServer()
     {
+        if(!HasPermission("gameplay")) return Forbid();
+
         try
         {
             var instance = CommonCore.theInstance;
@@ -565,5 +583,9 @@ public class GamePlayController : ControllerBase
             });
         }
     }
-
+    private bool HasPermission(string permission)
+    {
+        var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
+        return permissions.Contains(permission);
+    }
 }

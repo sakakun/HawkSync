@@ -14,6 +14,8 @@ public class AdminController : ControllerBase
     [HttpPost("create")]
     public ActionResult<AdminCommandResult> CreateUser([FromBody] CreateUserRequest request)
     {
+        if(!HasPermission("users")) return Forbid();
+
         var result = adminInstanceManager.CreateUser(request);
         CommonCore.instanceAdmin!.ForceUIUpdate = true;
         return Ok(new AdminCommandResult
@@ -26,6 +28,7 @@ public class AdminController : ControllerBase
     [HttpPost("update")]
     public ActionResult<AdminCommandResult> UpdateUser([FromBody] UpdateUserRequest request)
     {
+        if(!HasPermission("users")) return Forbid();
         var result = adminInstanceManager.UpdateUser(request);
         CommonCore.instanceAdmin!.ForceUIUpdate = true;
         return Ok(new AdminCommandResult
@@ -38,6 +41,7 @@ public class AdminController : ControllerBase
     [HttpPost("delete")]
     public ActionResult<AdminCommandResult> DeleteUser([FromBody] DeleteUserRequest request)
     {
+        if(!HasPermission("users")) return Forbid();
         var result = adminInstanceManager.DeleteUser(request.UserID);
         CommonCore.instanceAdmin!.ForceUIUpdate = true;
         return Ok(new AdminCommandResult
@@ -46,4 +50,11 @@ public class AdminController : ControllerBase
             Message = result.Message
         });
     }
+
+    private bool HasPermission(string permission)
+    {
+        var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
+        return permissions.Contains(permission);
+    }
+
 }

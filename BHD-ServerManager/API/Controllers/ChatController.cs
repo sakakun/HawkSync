@@ -22,6 +22,7 @@ public class ChatController : ControllerBase
     [HttpPost("auto/add")]
     public ActionResult<CommandResult> AddAutoMessage([FromBody] AutoMessageRequest request)
     {
+        if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.AddAutoMessage(request.Message!, request.Interval);
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
@@ -29,6 +30,7 @@ public class ChatController : ControllerBase
     [HttpPost("auto/remove")]
     public ActionResult<CommandResult> RemoveAutoMessage([FromBody] RemoveMessageRequest request)
     {
+        if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.RemoveAutoMessage(int.Parse(request.Id!));
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
@@ -36,6 +38,7 @@ public class ChatController : ControllerBase
     [HttpPost("slap/add")]
     public ActionResult<CommandResult> AddSlapMessage([FromBody] SlapMessageRequest request)
     {
+        if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.AddSlapMessage(request.Message!);
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
@@ -43,6 +46,7 @@ public class ChatController : ControllerBase
     [HttpPost("slap/remove")]
     public ActionResult<CommandResult> RemoveSlapMessage([FromBody] RemoveMessageRequest request)
     {
+        if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.RemoveSlapMessage(int.Parse(request.Id!));
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }

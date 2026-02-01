@@ -15,6 +15,7 @@ public class FileSystemController : ControllerBase
     [HttpGet("drives")]
     public ActionResult<DirectoryListingResponse> GetDrives()
     {
+        if(!HasPermission("profile")) return Forbid();
         try
         {
             var drives = DriveInfo.GetDrives()
@@ -47,6 +48,8 @@ public class FileSystemController : ControllerBase
     [HttpPost("list")]
     public ActionResult<DirectoryListingResponse> GetDirectoryListing([FromBody] DirectoryListingRequest request)
     {
+        if(!HasPermission("profile")) return Forbid();
+
         try
         {
             // Default to drives if no path specified
@@ -166,6 +169,8 @@ public class FileSystemController : ControllerBase
     [HttpPost("validate-path")]
     public ActionResult<CommandResult> ValidatePath([FromBody] DirectoryListingRequest request)
     {
+        if(!HasPermission("profile")) return Forbid();
+
         try
         {
             if (string.IsNullOrWhiteSpace(request.Path))
@@ -193,5 +198,11 @@ public class FileSystemController : ControllerBase
                 Message = $"Error validating path: {ex.Message}"
             });
         }
+
+    }
+    private bool HasPermission(string permission)
+    {
+        var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
+        return permissions.Contains(permission);
     }
 }

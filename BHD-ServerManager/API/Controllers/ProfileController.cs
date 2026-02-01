@@ -19,6 +19,7 @@ public class ProfileController : ControllerBase
     [HttpGet("settings")]
     public ActionResult<ProfileSettingsResponse> GetSettings()
     {
+        if(!HasPermission("profile")) return Forbid();
 
         var result = theInstanceManager.LoadProfileSettings();
         
@@ -48,7 +49,7 @@ public class ProfileController : ControllerBase
     [HttpPost("settings")]
     public ActionResult<CommandResult> SaveSettings([FromBody] ProfileSettingsRequest request)
     {
-        
+        if(!HasPermission("profile")) return Forbid();
 
         // Convert DTO to ProfileSettings
         var settings = new ProfileSettings(
@@ -106,6 +107,7 @@ public class ProfileController : ControllerBase
     [HttpPost("validate")]
     public ActionResult<ValidationResult> ValidateSettings([FromBody] ProfileSettingsRequest request)
     {
+        if(!HasPermission("profile")) return Forbid();
 
         // Convert to ProfileSettings for validation
         var settings = new ProfileSettings(
@@ -142,6 +144,8 @@ public class ProfileController : ControllerBase
    [HttpPost("proxycheck")]
     public ActionResult<CommandResult> SaveProxyCheckSettings([FromBody] ProxyCheckSettingsRequest request)
     {
+        if(!HasPermission("bans")) return Forbid();
+
         if (request == null)
         {
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
@@ -241,6 +245,8 @@ public class ProfileController : ControllerBase
     [HttpPost("proxycheck/test")]
     public async Task<ActionResult<ProxyCheckTestResult>> TestProxyCheck([FromBody] ProxyCheckTestRequest request)
     {
+        if(!HasPermission("bans")) return Forbid();
+
         if (request == null || string.IsNullOrWhiteSpace(request.ApiKey) || string.IsNullOrWhiteSpace(request.IPAddress))
         {
             return BadRequest(new ProxyCheckTestResult { Success = false, ErrorMessage = "Invalid request." });
@@ -282,6 +288,8 @@ public class ProfileController : ControllerBase
     [HttpPost("netlimiter")]
     public ActionResult<CommandResult> SaveNetLimiterSettings([FromBody] NetLimiterSettingsRequest request)
     {
+        if(!HasPermission("bans")) return Forbid();
+
         if (request == null)
         {
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
@@ -314,6 +322,8 @@ public class ProfileController : ControllerBase
     [HttpGet("netlimiter/filters")]
     public ActionResult<NetLimiterFiltersResponse> GetNetLimiterFilters()
     {
+        if(!HasPermission("bans")) return Forbid();
+
         // You may need to adjust this to your actual manager/service logic
         bool success = true;
         string? errorMessage = string.Empty;
@@ -340,6 +350,8 @@ public class ProfileController : ControllerBase
     [HttpPost("proxycheck/add-country")]
     public ActionResult<CommandResult> AddBlockedCountry([FromBody] AddBlockedCountryRequest req)
     {
+        if(!HasPermission("bans")) return Forbid();
+
         if (req == null || string.IsNullOrWhiteSpace(req.CountryCode) || string.IsNullOrWhiteSpace(req.CountryName))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
@@ -351,6 +363,8 @@ public class ProfileController : ControllerBase
     [HttpPost("proxycheck/remove-country")]
     public ActionResult<CommandResult> RemoveBlockedCountry([FromBody] RemoveBlockedCountryRequest req)
     {
+        if(!HasPermission("bans")) return Forbid();
+
         if (req == null || req.RecordID <= 0)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
@@ -375,6 +389,8 @@ public class ProfileController : ControllerBase
     [HttpPost("webstats")]
     public ActionResult<CommandResult> SaveWebStatsSettings([FromBody] WebStatsSettings settings)
     {
+        if(!HasPermission("stats")) return Forbid();
+
         if (settings == null)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
@@ -389,6 +405,8 @@ public class ProfileController : ControllerBase
     [HttpPost("webstats/validate")]
     public async Task<ActionResult<CommandResult>> ValidateWebStatsConnection([FromBody] WebStatsValidateRequest req)
     {
+        if(!HasPermission("stats")) return Forbid();
+
         if (req == null || string.IsNullOrWhiteSpace(req.ServerPath))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
@@ -408,4 +426,11 @@ public class ProfileController : ControllerBase
     {
         public string ServerPath { get; set; } = string.Empty;
     }
+
+    private bool HasPermission(string permission)
+    {
+        var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
+        return permissions.Contains(permission);
+    }
+
 }
