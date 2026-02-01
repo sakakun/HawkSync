@@ -18,6 +18,10 @@ namespace HawkSyncShared.ObjectClasses
         public DateTime PlayerJoined { get; set; } = DateTime.Now;
         public DateTime PlayerLastSeen { get; set; } = DateTime.Now;
 
+        // God Mode
+        public bool IsGod { get; set; } = false;
+        public bool IsProxyDetected { get; set; } = false;
+
         // Character Information
         public int RoleID { get; set; }
         public string RoleName { get; set; } = string.Empty;

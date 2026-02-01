@@ -28,8 +28,6 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         private playerObject? LastPlayerData = null;
         private bool LastVisible = true;
 
-        private bool IsGod = false;
-
         public PlayerCard(int slotNum)
         {
             InitializeComponent();
@@ -63,7 +61,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             // Update god mode text
             if (ContextMenu.Items[11] is ToolStripMenuItem godModeItem)
             {
-                godModeItem.Text = IsGod ? "Disable God Mode" : "Enable God Mode";
+                godModeItem.Text = Player.IsGod ? "Disable God Mode" : "Enable God Mode";
             }
         }
 
@@ -318,19 +316,19 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
         private ToolStripMenuItem CreateGodModeMenuItem()
         {
-            var command = new ToolStripMenuItem(IsGod ? "Disable God Mode" : "Enable God Mode");
+            var command = new ToolStripMenuItem(Player.IsGod ? "Disable God Mode" : "Enable God Mode");
             command.Click += (sender, e) =>
             {
                 var result = playerInstanceManager.ToggleGodMode(
                     Player.PlayerSlot, 
                     Player.PlayerName, 
-                    !IsGod
+                    !Player.IsGod
                 );
 
                 if (result.Success)
                 {
-                    IsGod = !IsGod;
-                    command.Text = IsGod ? "Disable God Mode" : "Enable God Mode";
+                    Player.IsGod = !Player.IsGod;
+                    command.Text = Player.IsGod ? "Disable God Mode" : "Enable God Mode";
                 }
                 
                 MessageBox.Show(
@@ -404,9 +402,10 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         /// </summary>
         private async Task UpdatePlayerIconAsync(string ipAddress, int team)
         {
-            bool isProxyDetected = await IsProxyDetectedAsync(ipAddress);
+            Player.IsProxyDetected = await IsProxyDetectedAsync(ipAddress);
 
-            if (isProxyDetected)
+
+            if (Player.IsProxyDetected)
             {
                 // Show warning icon for proxy/VPN/TOR
                 playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonCircleExclamation;

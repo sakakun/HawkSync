@@ -10,7 +10,8 @@ internal static class Program
     static void Main()
     {
         ApplicationConfiguration.Initialize();
-
+        // Encoding for legacy code pages
+		System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         CommonCore.InitializeCore();
 
         // Show login form

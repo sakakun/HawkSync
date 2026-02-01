@@ -129,6 +129,28 @@ public class ApiClient : IDisposable
         return await SendCommandAsync("/api/player/kill", command);
     }
 
+    public async Task<CommandResult> ArmPlayerAsync(int playerSlot, string playerName)
+    {
+        var command = new ArmPlayerCommand(playerSlot, playerName);
+        return await SendCommandAsync("/api/player/arm", command);
+    }
+
+    public async Task<CommandResult> DisarmPlayerAsync(int playerSlot, string playerName)
+    {
+        var command = new DisarmPlayerCommand(playerSlot, playerName);
+        return await SendCommandAsync("/api/player/disarm", command);
+    }
+    public async Task<CommandResult> ToggleGodPlayerAsync(int playerSlot, string playerName)
+    {
+        var command = new GodModePlayerCommand(playerSlot, playerName);
+        return await SendCommandAsync("/api/player/togglegodmode", command);
+    }
+    public async Task<CommandResult> SwitchTeamPlayerAsync(int playerSlot, string playerName, int teamNum)
+    {
+        var command = new SwitchTeamPlayerCommand(playerSlot, playerName, teamNum);
+        return await SendCommandAsync("/api/player/switchteam", command);
+    }
+
     // ================================================================================
     // CHAT COMMANDS
     // ================================================================================

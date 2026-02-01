@@ -167,15 +167,22 @@ namespace RemoteClient.Forms.Panels
 
         public void methodFunction_loadSettings()
         {
-            tb_serverID.Text = theInstance!.WebStatsProfileID;
-            cb_enableWebStats.Checked = theInstance.WebStatsEnabled;
-            tb_webStatsServerPath.Text = theInstance.WebStatsServerPath;
-            cb_enableAnnouncements.Checked = theInstance.WebStatsAnnouncements;
-            num_WebStatsReport.Value = theInstance.WebStatsReportInterval;
-            num_WebStatsUpdates.Value = theInstance.WebStatsUpdateInterval;
+            _suppressStatsChangeTracking = true;
+            try
+            {
+                tb_serverID.Text = theInstance!.WebStatsProfileID;
+                cb_enableWebStats.Checked = theInstance.WebStatsEnabled;
+                tb_webStatsServerPath.Text = theInstance.WebStatsServerPath;
+                cb_enableAnnouncements.Checked = theInstance.WebStatsAnnouncements;
+                num_WebStatsReport.Value = theInstance.WebStatsReportInterval;
+                num_WebStatsUpdates.Value = theInstance.WebStatsUpdateInterval;
 
-            UpdateControlStates();
-
+                UpdateControlStates();
+            }
+            finally
+            {
+                _suppressStatsChangeTracking = false;
+            }
         }
 
         /// <summary>

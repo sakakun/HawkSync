@@ -22,7 +22,7 @@ namespace BHD_ServerManager.Forms.Panels
         private playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // --- Class Variables ---
-        private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
+        private bool _firstLoadComplete = false;
 
         private PlayerCard[] playerCards = new PlayerCard[50];
 
