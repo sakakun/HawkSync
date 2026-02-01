@@ -62,7 +62,9 @@ jobs:
       shell: pwsh
       run: |
         $version = "${{ steps.get_version.outputs.version }}"
-        if ($version -notmatch '^\d+\.\d+\.\d+$') {
+        $refType = "${{ github.ref_type }}"
+        # Only enforce strict version format for tags
+        if ($refType -eq "tag" -and $version -notmatch '^\d+\.\d+\.\d+$') {
           Write-Error "Invalid version format: $version (expected: X.Y.Z)"
           exit 1
         }
