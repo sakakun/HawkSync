@@ -18,7 +18,7 @@ env:
   NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
   HAWKSYNCSHARED_PROJECT_PATH: HawkSyncShared/HawkSyncShared.csproj
   OUTPUT_NAME: HawkSync-ServerManager
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '10.0.x'
 
 jobs:
   validate:
@@ -114,8 +114,8 @@ jobs:
           /p:PlatformTarget=x64 `
           /p:RestorePackagesPath=../packages
 
-    # Build ServerManager (.NET 8.0)
-    - name: Build ServerManager (.NET 8.0)
+    # Build ServerManager (.NET 10.0)
+    - name: Build ServerManager (.NET 10.0)
       run: |
         dotnet build ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
@@ -128,8 +128,8 @@ jobs:
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
           /p:FileVersion="${{ needs.validate.outputs.version }}"
 
-    # Build RemoteClient (.NET 8.0)
-    - name: Build RemoteClient (.NET 8.0)
+    # Build RemoteClient (.NET 10.0)
+    - name: Build RemoteClient (.NET 10.0)
       run: |
         dotnet build ${{ env.REMOTECLIENT_PROJECT_PATH }} `
           --configuration Release `
@@ -205,18 +205,18 @@ jobs:
 
         Components
         ----------
-        - ServerManager (.NET 8.0)
-        - RemoteClient (.NET 8.0)
+        - ServerManager (.NET 10.0)
+        - RemoteClient (.NET 10.0)
         - NetLimiterBridge (.NET Framework 4.8.1)
-        - HawkSyncShared (.NET Standard/.NET 8.0)
+        - HawkSyncShared (.NET Standard/.NET 10.0)
 
         Requirements
         ------------
         Framework-Dependent Edition:
-        - .NET 8.0 Runtime
+        - .NET 10.0 Runtime
         - .NET Framework 4.8.1 Runtime
         - Windows 10/11 (x64)
-        - Download .NET 8.0: https://dotnet.microsoft.com/download/dotnet/8.0
+        - Download .NET 10.0: https://dotnet.microsoft.com/download/dotnet/10.0
         - Download .NET Framework 4.8.1: https://dotnet.microsoft.com/download/dotnet-framework/net481
 
         Self-Contained Edition:
@@ -311,21 +311,21 @@ jobs:
           
           ### 📦 Download Options
           
-          - **ServerManager Framework-Dependent** - Requires .NET 8.0 Runtime
-          - **RemoteClient Framework-Dependent** - Requires .NET 8.0 Runtime
+          - **ServerManager Framework-Dependent** - Requires .NET 10.0 Runtime
+          - **RemoteClient Framework-Dependent** - Requires .NET 10.0 Runtime
           
           ### 🔧 Components
           
-          - **ServerManager**: Main application (.NET 8.0)
-          - **RemoteClient**: Remote client (.NET 8.0)
+          - **ServerManager**: Main application (.NET 10.0)
+          - **RemoteClient**: Remote client (.NET 10.0)
           - **NetLimiterBridge**: Network limiting bridge (.NET Framework 4.8.1)
-          - **HawkSyncShared**: Shared library (.NET Standard/.NET 8.0)
+          - **HawkSyncShared**: Shared library (.NET Standard/.NET 10.0)
           
           ### ✅ Requirements
           
           **Framework-Dependent Editions:**
           - Windows 10/11 (x64)
-          - [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+          - [.NET 10.0 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
           - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
                    
           ### 📝 Installation
