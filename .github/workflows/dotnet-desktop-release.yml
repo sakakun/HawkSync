@@ -55,11 +55,8 @@ jobs:
       id: gen_tag
       shell: pwsh
       run: |
-        $latestTag = git describe --tags --abbrev=0 2>$null
-        if (-not $latestTag) { $latestTag = "v0.0.0" }
-        $now = Get-Date -Format "MMddHHmm"
-        $commit = git rev-parse --short HEAD
-        $tag = "$latestTag-$now-$commit"
+        $version = "${{ steps.get_version.outputs.version }}"
+        $tag = "v$version"
         echo "tag=$tag" >> $env:GITHUB_OUTPUT
         Write-Host "Generated tag: $tag"
 
