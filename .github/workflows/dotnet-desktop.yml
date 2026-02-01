@@ -1,5 +1,4 @@
-name: Development Build and Publish
-# Description: Build and publish development builds for HawkSync-ServerManager and its components.
+﻿name: Development Build and Publish
 on:
   push:
     branches: [ master, main ]
@@ -22,16 +21,64 @@ env:
   DOTNET_VERSION: '8.0.x'
 
 jobs:
-  build:
+  validate:
+    name: Validate Release
     runs-on: windows-latest
-
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      dynamic_tag: ${{ steps.gen_tag.outputs.tag }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Setup .NET 8.0
+    - name: Get version
+      id: get_version
+      shell: pwsh
+      run: |
+        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          $version = "${{ github.event.inputs.version }}"
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+        } else {
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+        }
+        echo "Release version: $version"
+
+    - name: Generate dynamic tag
+      id: gen_tag
+      shell: pwsh
+      run: |
+        $latestTag = git describe --tags --abbrev=0
+        $now = Get-Date -Format "MMddHHmm"
+        $commit = git rev-parse --short HEAD
+        $tag = "$latestTag-$now-$commit"
+        echo "tag=$tag" >> $env:GITHUB_OUTPUT
+        Write-Host "Generated tag: $tag"
+
+    - name: Validate version format
+      shell: pwsh
+      run: |
+        $version = "${{ steps.get_version.outputs.version }}"
+        if ($version -notmatch '^\d+\.\d+\.\d+$') {
+          Write-Error "Invalid version format: $version (expected: X.Y.Z)"
+          exit 1
+        }
+
+  build-and-test:
+    name: Build and Test
+    needs: validate
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
@@ -39,15 +86,22 @@ jobs:
     - name: Setup .NET Framework Build Tools
       uses: microsoft/setup-msbuild@v2
 
+    # Restore and build HawkSyncShared
     - name: Restore HawkSyncShared dependencies
       run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
 
     - name: Build HawkSyncShared
       run: dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} --configuration Release
 
+    # Restore and build ServerManager
     - name: Restore ServerManager dependencies
       run: dotnet restore ${{ env.SERVERMANAGER_PROJECT_PATH }}
 
+    # Restore and build RemoteClient
+    - name: Restore RemoteClient dependencies
+      run: dotnet restore ${{ env.REMOTECLIENT_PROJECT_PATH }}
+
+    # Restore and build NetLimiterBridge
     - name: Restore and Build NetLimiterBridge (.NET Framework 4.8.1)
       run: |
         msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
@@ -58,6 +112,7 @@ jobs:
           /p:PlatformTarget=x64 `
           /p:RestorePackagesPath=../packages
 
+    # Build ServerManager (.NET 8.0)
     - name: Build ServerManager (.NET 8.0)
       run: |
         dotnet build ${{ env.SERVERMANAGER_PROJECT_PATH }} `
@@ -66,11 +121,12 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
-          /p:Platform="Any CPU"
+          /p:Platform="Any CPU" `
+          /p:Version="${{ needs.validate.outputs.version }}" `
+          /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
+          /p:FileVersion="${{ needs.validate.outputs.version }}"
 
-    - name: Restore RemoteClient dependencies
-      run: dotnet restore ${{ env.REMOTECLIENT_PROJECT_PATH }}
-
+    # Build RemoteClient (.NET 8.0)
     - name: Build RemoteClient (.NET 8.0)
       run: |
         dotnet build ${{ env.REMOTECLIENT_PROJECT_PATH }} `
@@ -79,95 +135,213 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
-          /p:Platform="Any CPU"
+          /p:Platform="Any CPU" `
+          /p:Version="${{ needs.validate.outputs.version }}" `
+          /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
+          /p:FileVersion="${{ needs.validate.outputs.version }}"
 
-    - name: Publish ServerManager
+    # Publish ServerManager
+    - name: Publish ServerManager (Framework-Dependent)
       run: |
         dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained false `
-          --output ./publish/ServerManager `
-          /p:UseCommonOutputDirectory=false
+          --output ./publish/framework-dependent/ServerManager `
+          /p:UseCommonOutputDirectory=false `
+          /p:Version="${{ needs.validate.outputs.version }}" `
+          /p:PublishReadyToRun=true
 
-    - name: Publish RemoteClient
+    # Publish RemoteClient
+    - name: Publish RemoteClient (Framework-Dependent)
       run: |
         dotnet publish ${{ env.REMOTECLIENT_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained false `
-          --output ./publish/RemoteClient `
-          /p:UseCommonOutputDirectory=false
+          --output ./publish/framework-dependent/RemoteClient `
+          /p:UseCommonOutputDirectory=false `
+          /p:Version="${{ needs.validate.outputs.version }}" `
+          /p:PublishReadyToRun=true
 
-    - name: Copy NetLimiterBridge to ServerManager output
+    # Copy NetLimiterBridge to both outputs (ServerManager only)
+    - name: Copy NetLimiterBridge to Framework-Dependent output
       shell: pwsh
       run: |
-        New-Item -ItemType Directory -Force -Path ./publish/ServerManager/NetLimiterBridge
+        New-Item -ItemType Directory -Force -Path ./publish/framework-dependent/ServerManager/NetLimiterBridge
         Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/ServerManager/NetLimiterBridge/ `
+          -Destination ./publish/framework-dependent/ServerManager/NetLimiterBridge/ `
           -Recurse -Force
 
-    - name: Create version info
+    # Copy HawkSyncShared to both outputs (for both ServerManager and RemoteClient)
+    - name: Copy HawkSyncShared to Framework-Dependent output
       shell: pwsh
       run: |
-        $version = "dev-$(git rev-parse --short HEAD)"
-        echo "VERSION=$version" >> $env:GITHUB_ENV
-        
-        @"
+        # ServerManager
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+          -Destination ./publish/framework-dependent/ServerManager/ `
+          -Recurse -Force
+        # RemoteClient
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+          -Destination ./publish/framework-dependent/RemoteClient/ `
+          -Recurse -Force
+
+    - name: Create release info files
+      shell: pwsh
+      run: |
+        $version = "${{ needs.validate.outputs.version }}"
+        $releaseNotes = @"
+        HawkSync Server Manager v$version
+        ==================================
+
         Build Information
-        =================
+        -----------------
         Version: $version
         Build Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
         Commit: $(git rev-parse HEAD)
-        Branch: $($env:GITHUB_REF -replace 'refs/heads/', '')
-        
-        Components:
+        Branch: $(git branch --show-current)
+
+        Components
+        ----------
         - ServerManager (.NET 8.0)
         - RemoteClient (.NET 8.0)
         - NetLimiterBridge (.NET Framework 4.8.1)
         - HawkSyncShared (.NET Standard/.NET 8.0)
-        
-        Requirements:
+
+        Requirements
+        ------------
+        Framework-Dependent Edition:
         - .NET 8.0 Runtime
         - .NET Framework 4.8.1 Runtime
         - Windows 10/11 (x64)
-        
-        Download .NET 8.0 Runtime:
-        https://dotnet.microsoft.com/download/dotnet/8.0
-        
-        Download .NET Framework 4.8.1 Runtime:
-        https://dotnet.microsoft.com/download/dotnet-framework/net481
-        "@ | Out-File -FilePath ./publish/BUILD_INFO.txt
+        - Download .NET 8.0: https://dotnet.microsoft.com/download/dotnet/8.0
+        - Download .NET Framework 4.8.1: https://dotnet.microsoft.com/download/dotnet-framework/net481
 
-    - name: Copy LICENSE to output
+        Self-Contained Edition:
+        - .NET Framework 4.8.1 Runtime (for NetLimiterBridge)
+        - Windows 10/11 (x64)
+        - Download .NET Framework 4.8.1: https://dotnet.microsoft.com/download/dotnet-framework/net481
+
+        Installation
+        ------------
+        1. Download your preferred edition below
+        2. Extract the ZIP file
+        3. Run ServerManager.exe or RemoteClient.exe
+
+        "@
+
+        $releaseNotes | Out-File -FilePath ./publish/framework-dependent/RELEASE_NOTES.txt
+
+    - name: Copy LICENSE
       shell: pwsh
       run: |
         if (Test-Path "LICENSE.txt") {
-          Copy-Item LICENSE.txt ./publish/
+          Copy-Item LICENSE.txt ./publish/framework-dependent/
         }
 
-    - name: Create ZIP archive
+    - name: Create release archives
       shell: pwsh
       run: |
-        Compress-Archive -Path ./publish/* `
-          -DestinationPath "./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}.zip"
+        $version = "${{ needs.validate.outputs.version }}"
 
-    - name: Upload Build Artifact
+        # ServerManager Framework-dependent
+        Compress-Archive -Path ./publish/framework-dependent/ServerManager/* `
+          -DestinationPath "./HawkSync-ServerManager-v$version-FrameworkDependent.zip"
+
+        # RemoteClient Framework-dependent
+        Compress-Archive -Path ./publish/framework-dependent/RemoteClient/* `
+          -DestinationPath "./HawkSync-RemoteClient-v$version-FrameworkDependent.zip"
+
+    - name: Generate checksums
+      shell: pwsh
+      run: |
+        $version = "${{ needs.validate.outputs.version }}"
+        $files = @(
+          "HawkSync-ServerManager-v$version-FrameworkDependent.zip",
+          "HawkSync-RemoteClient-v$version-FrameworkDependent.zip"
+        )
+
+        $checksums = @()
+        foreach ($file in $files) {
+          $hash = (Get-FileHash $file -Algorithm SHA256).Hash
+          $checksums += "$hash  $file"
+        }
+
+        $checksums | Out-File -FilePath "checksums.txt"
+
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.OUTPUT_NAME }}-${{ env.VERSION }}
-        path: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}.zip
-        retention-days: 30
+        name: release-packages-v${{ needs.validate.outputs.version }}
+        path: |
+          ./HawkSync-ServerManager-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./HawkSync-RemoteClient-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./checksums.txt
+        retention-days: 90
 
-    - name: Create GitHub Pre-release
-      uses: softprops/action-gh-release@v2
-      if: github.event_name != 'pull_request'
+  create-release:
+    name: Create GitHub Release
+    needs: [validate, build-and-test]
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
       with:
-        tag_name: ${{ env.VERSION }}
-        name: Pre-release Development Build ${{ env.VERSION }}
+        fetch-depth: 0
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: release-packages-v${{ needs.validate.outputs.version }}
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ needs.validate.outputs.dynamic_tag }}
+        name: Release ${{ needs.validate.outputs.dynamic_tag }}
+        files: |
+          ./HawkSync-ServerManager-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./HawkSync-RemoteClient-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
+          ./checksums.txt
         body: |
-          This is an automated pre-release development build for commit ${{ env.VERSION }}.
+          ## 🚀 HawkSync Server Manager v${{ needs.validate.outputs.version }}
+          
+          ### 📦 Download Options
+          
+          - **ServerManager Framework-Dependent** - Requires .NET 8.0 Runtime
+          - **RemoteClient Framework-Dependent** - Requires .NET 8.0 Runtime
+          
+          ### 🔧 Components
+          
+          - **ServerManager**: Main application (.NET 8.0)
+          - **RemoteClient**: Remote client (.NET 8.0)
+          - **NetLimiterBridge**: Network limiting bridge (.NET Framework 4.8.1)
+          - **HawkSyncShared**: Shared library (.NET Standard/.NET 8.0)
+          
+          ### ✅ Requirements
+          
+          **Framework-Dependent Editions:**
+          - Windows 10/11 (x64)
+          - [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+          - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
+                   
+          ### 📝 Installation
+          
+          1. Download your preferred edition
+          2. Extract the ZIP file
+          3. Run `ServerManager.exe` or `RemoteClient.exe`
+          
+          ### 🔐 Verification
+          
+          Verify your download using the SHA256 checksums in `checksums.txt`
+          
+          ### 📋 Changes
+          
+          See the [full changelog](https://github.com/${{ github.repository }}/compare/v${{ needs.validate.outputs.version }}...HEAD)
+        draft: false
         prerelease: true
-        files: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}.zip
+        make_latest: true
+        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
