@@ -52,9 +52,8 @@ jobs:
       id: gen_tag
       shell: pwsh
       run: |
-        $now = Get-Date -Format "MMddHHmm"
         $commit = git rev-parse --short HEAD
-        $tag = "dev-$now-$commit"
+        $tag = "dev-$commit"
         echo "tag=$tag" >> $env:GITHUB_OUTPUT
         Write-Host "Generated tag: $tag"
 
@@ -301,7 +300,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ needs.validate.outputs.dynamic_tag }}
-        name: Release ${{ needs.validate.outputs.dynamic_tag }}
+        name: Pre-release Development Build ${{ needs.validate.outputs.dynamic_tag }}
         files: |
           ./HawkSync-ServerManager-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
           ./HawkSync-RemoteClient-v${{ needs.validate.outputs.version }}-FrameworkDependent.zip
