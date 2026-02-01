@@ -52,7 +52,8 @@ jobs:
       id: gen_tag
       shell: pwsh
       run: |
-        $latestTag = git describe --tags --abbrev=0
+        $latestTag = git describe --tags --abbrev=0 2>$null
+        if (-not $latestTag) { $latestTag = "v0.0.0" }
         $now = Get-Date -Format "MMddHHmm"
         $commit = git rev-parse --short HEAD
         $tag = "$latestTag-$now-$commit"
