@@ -9,7 +9,6 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
 
-# Add permissions block
 permissions:
   contents: write
   packages: write
@@ -111,11 +110,7 @@ jobs:
     - name: Create version info
       shell: pwsh
       run: |
-        $version = if ($env:GITHUB_REF -match 'refs/tags/v(.*)') { 
-          $matches[1] 
-        } else { 
-          "dev-$(git rev-parse --short HEAD)" 
-        }
+        $version = "dev-$(git rev-parse --short HEAD)"
         echo "VERSION=$version" >> $env:GITHUB_ENV
         
         @"
