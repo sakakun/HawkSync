@@ -16,14 +16,16 @@ permissions:
 
 env:
   SERVERMANAGER_PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
+  REMOTECLIENT_PROJECT_PATH: RemoteClient/RemoteClient.csproj
   NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
+  HAWKSYNCSHARED_PROJECT_PATH: HawkSyncShared/HawkSyncShared.csproj
   OUTPUT_NAME: HawkSync-ServerManager
   DOTNET_VERSION: '8.0.x'
 
 jobs:
   build:
     runs-on: windows-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -37,6 +39,12 @@ jobs:
 
     - name: Setup .NET Framework Build Tools
       uses: microsoft/setup-msbuild@v2
+
+    - name: Restore HawkSyncShared dependencies
+      run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
+
+    - name: Build HawkSyncShared
+      run: dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} --configuration Release
 
     - name: Restore ServerManager dependencies
       run: dotnet restore ${{ env.SERVERMANAGER_PROJECT_PATH }}
@@ -61,24 +69,43 @@ jobs:
           /p:BaseOutputPath=bin/ `
           /p:Platform="Any CPU"
 
+    - name: Restore RemoteClient dependencies
+      run: dotnet restore ${{ env.REMOTECLIENT_PROJECT_PATH }}
+
+    - name: Build RemoteClient (.NET 8.0)
+      run: |
+        dotnet build ${{ env.REMOTECLIENT_PROJECT_PATH }} `
+          --configuration Release `
+          --no-restore `
+          /p:UseCommonOutputDirectory=false `
+          /p:OutputPath=bin/Release/ `
+          /p:BaseOutputPath=bin/ `
+          /p:Platform="Any CPU"
+
     - name: Publish ServerManager
       run: |
         dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained false `
-          --output ./publish `
+          --output ./publish/ServerManager `
+          /p:UseCommonOutputDirectory=false
+
+    - name: Publish RemoteClient
+      run: |
+        dotnet publish ${{ env.REMOTECLIENT_PROJECT_PATH }} `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained false `
+          --output ./publish/RemoteClient `
           /p:UseCommonOutputDirectory=false
 
     - name: Copy NetLimiterBridge to ServerManager output
       shell: pwsh
       run: |
-        # Create NetLimiterBridge subfolder
-        New-Item -ItemType Directory -Force -Path ./publish/NetLimiterBridge
-        
-        # Copy NetLimiterBridge binaries
+        New-Item -ItemType Directory -Force -Path ./publish/ServerManager/NetLimiterBridge
         Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/NetLimiterBridge/ `
+          -Destination ./publish/ServerManager/NetLimiterBridge/ `
           -Recurse -Force
 
     - name: Create version info
@@ -101,7 +128,9 @@ jobs:
         
         Components:
         - ServerManager (.NET 8.0)
+        - RemoteClient (.NET 8.0)
         - NetLimiterBridge (.NET Framework 4.8.1)
+        - HawkSyncShared (.NET Standard/.NET 8.0)
         
         Requirements:
         - .NET 8.0 Runtime
@@ -134,38 +163,3 @@ jobs:
         name: ${{ env.OUTPUT_NAME }}-${{ env.VERSION }}
         path: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}.zip
         retention-days: 30
-
-    - name: Create Release
-      if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('dev-{0}', env.VERSION) }}
-        name: ${{ startsWith(github.ref, 'refs/tags/v') && format('Release {0}', github.ref_name) || format('Development Build {0}', env.VERSION) }}
-        files: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}.zip
-        body: |
-          ## HawkSync Server Manager ${{ env.VERSION }}
-          
-          ### Requirements
-          - Windows 10/11 (x64)
-          - [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
-          - [.NET Framework 4.8.1 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net481)
-          
-          ### Installation
-          1. Install .NET 8.0 Runtime if not already installed
-          2. Install .NET Framework 4.8.1 Runtime if not already installed
-          3. Download the ZIP file below
-          4. Extract to your desired location
-          5. Run `ServerManager.exe`
-          
-          ### Components
-          - **ServerManager**: Main application (.NET 8.0)
-          - **NetLimiterBridge**: Network limiting bridge (.NET Framework 4.8.1)
-          
-          ### Changes
-          See [commit history](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}) for details.
-        draft: false
-        prerelease: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        generate_release_notes: true
-        make_latest: ${{ startsWith(github.ref, 'refs/tags/v') }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
