@@ -1,13 +1,13 @@
-# Add steps to generate a new tag based on the latest tag, timestamp, and commit hash,
-# then use that tag for the release.
-
-name: Release Build and Publish
+name: Development Build and Publish
 
 on:
-  workflow_dispatch:
   push:
+    branches: [ master, main ]
     tags:
       - 'v*'
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -38,35 +38,6 @@ jobs:
 
     - name: Setup .NET Framework Build Tools
       uses: microsoft/setup-msbuild@v2
-
-    # --- Tag Generation Section ---
-    - name: Get latest tag
-      id: get_tag
-      shell: bash
-      run: |
-        latest_tag=$(git describe --tags --abbrev=0)
-        echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
-
-    - name: Generate timestamped tag
-      id: gen_tag
-      shell: bash
-      run: |
-        timestamp=$(date -u +"%m%d%H%M")
-        commit=$(git rev-parse --short HEAD)
-        new_tag="${LATEST_TAG}.${timestamp}-${commit}"
-        echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
-
-    - name: Create and push new tag
-      shell: bash
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-        git tag $NEW_TAG
-        git push origin $NEW_TAG
-
-    - name: Set release version
-      run: echo "VERSION=$NEW_TAG" >> $GITHUB_ENV
-    # --- End Tag Generation Section ---
 
     - name: Restore HawkSyncShared dependencies
       run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
@@ -139,7 +110,7 @@ jobs:
     - name: Create version info
       shell: pwsh
       run: |
-        $version = "${{ env.VERSION }}"
+        $version = "dev-$(git rev-parse --short HEAD)"
         echo "VERSION=$version" >> $env:GITHUB_ENV
         
         @"
@@ -188,14 +159,15 @@ jobs:
         path: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}.zip
         retention-days: 30
 
-    - name: Create GitHub Release
+    - name: Create GitHub Pre-release
       uses: softprops/action-gh-release@v2
+      if: github.event_name != 'pull_request'
       with:
         tag_name: ${{ env.VERSION }}
-        name: Release ${{ env.VERSION }}
+        name: Pre-release Development Build ${{ env.VERSION }}
         body: |
-          This is an automated release build for ${{ env.VERSION }}.
-        prerelease: false
+          This is an automated pre-release development build for commit ${{ env.VERSION }}.
+        prerelease: true
         files: ./${{ env.OUTPUT_NAME }}-${{ env.VERSION }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
