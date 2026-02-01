@@ -17,7 +17,9 @@ permissions:
 
 env:
   SERVERMANAGER_PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
+  REMOTECLIENT_PROJECT_PATH: RemoteClient/RemoteClient.csproj
   NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
+  HAWKSYNCSHARED_PROJECT_PATH: HawkSyncShared/HawkSyncShared.csproj
   OUTPUT_NAME: HawkSync-ServerManager
   DOTNET_VERSION: '8.0.x'
 
@@ -75,9 +77,22 @@ jobs:
     - name: Setup .NET Framework Build Tools
       uses: microsoft/setup-msbuild@v2
 
+    # Restore and build HawkSyncShared
+    - name: Restore HawkSyncShared dependencies
+      run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
+
+    - name: Build HawkSyncShared
+      run: dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} --configuration Release
+
+    # Restore and build ServerManager
     - name: Restore ServerManager dependencies
       run: dotnet restore ${{ env.SERVERMANAGER_PROJECT_PATH }}
 
+    # Restore and build RemoteClient
+    - name: Restore RemoteClient dependencies
+      run: dotnet restore ${{ env.REMOTECLIENT_PROJECT_PATH }}
+
+    # Restore and build NetLimiterBridge
     - name: Restore and Build NetLimiterBridge (.NET Framework 4.8.1)
       run: |
         msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
@@ -88,6 +103,7 @@ jobs:
           /p:PlatformTarget=x64 `
           /p:RestorePackagesPath=../packages
 
+    # Build ServerManager (.NET 8.0)
     - name: Build ServerManager (.NET 8.0)
       run: |
         dotnet build ${{ env.SERVERMANAGER_PROJECT_PATH }} `
@@ -101,28 +117,39 @@ jobs:
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
           /p:FileVersion="${{ needs.validate.outputs.version }}"
 
-    # Uncomment if you have tests
-    # - name: Run tests
-    #   run: dotnet test --configuration Release --no-build --verbosity normal
+    # Build RemoteClient (.NET 8.0)
+    - name: Build RemoteClient (.NET 8.0)
+      run: |
+        dotnet build ${{ env.REMOTECLIENT_PROJECT_PATH }} `
+          --configuration Release `
+          --no-restore `
+          /p:UseCommonOutputDirectory=false `
+          /p:OutputPath=bin/Release/ `
+          /p:BaseOutputPath=bin/ `
+          /p:Platform="Any CPU" `
+          /p:Version="${{ needs.validate.outputs.version }}" `
+          /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
+          /p:FileVersion="${{ needs.validate.outputs.version }}"
 
-    - name: Publish Framework-Dependent
+    # Publish ServerManager
+    - name: Publish ServerManager (Framework-Dependent)
       run: |
         dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained false `
-          --output ./publish/framework-dependent `
+          --output ./publish/framework-dependent/ServerManager `
           /p:UseCommonOutputDirectory=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
-    - name: Publish Self-Contained
+    - name: Publish ServerManager (Self-Contained)
       run: |
         dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --runtime win-x64 `
           --self-contained true `
-          --output ./publish/self-contained `
+          --output ./publish/self-contained/ServerManager `
           /p:PublishSingleFile=true `
           /p:IncludeNativeLibrariesForSelfExtract=true `
           /p:EnableCompressionInSingleFile=true `
@@ -130,26 +157,72 @@ jobs:
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
+    # Publish RemoteClient
+    - name: Publish RemoteClient (Framework-Dependent)
+      run: |
+        dotnet publish ${{ env.REMOTECLIENT_PROJECT_PATH }} `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained false `
+          --output ./publish/framework-dependent/RemoteClient `
+          /p:UseCommonOutputDirectory=false `
+          /p:Version="${{ needs.validate.outputs.version }}" `
+          /p:PublishReadyToRun=true
+
+    - name: Publish RemoteClient (Self-Contained)
+      run: |
+        dotnet publish ${{ env.REMOTECLIENT_PROJECT_PATH }} `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          --output ./publish/self-contained/RemoteClient `
+          /p:PublishSingleFile=true `
+          /p:IncludeNativeLibrariesForSelfExtract=true `
+          /p:EnableCompressionInSingleFile=true `
+          /p:UseCommonOutputDirectory=false `
+          /p:Version="${{ needs.validate.outputs.version }}" `
+          /p:PublishReadyToRun=true
+
+    # Copy NetLimiterBridge to both outputs
     - name: Copy NetLimiterBridge to Framework-Dependent output
       shell: pwsh
       run: |
-        # Create NetLimiterBridge subfolder
-        New-Item -ItemType Directory -Force -Path ./publish/framework-dependent/NetLimiterBridge
-        
-        # Copy NetLimiterBridge binaries
+        New-Item -ItemType Directory -Force -Path ./publish/framework-dependent/ServerManager/NetLimiterBridge
         Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/framework-dependent/NetLimiterBridge/ `
+          -Destination ./publish/framework-dependent/ServerManager/NetLimiterBridge/ `
           -Recurse -Force
 
     - name: Copy NetLimiterBridge to Self-Contained output
       shell: pwsh
       run: |
-        # Create NetLimiterBridge subfolder
-        New-Item -ItemType Directory -Force -Path ./publish/self-contained/NetLimiterBridge
-        
-        # Copy NetLimiterBridge binaries
+        New-Item -ItemType Directory -Force -Path ./publish/self-contained/ServerManager/NetLimiterBridge
         Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/self-contained/NetLimiterBridge/ `
+          -Destination ./publish/self-contained/ServerManager/NetLimiterBridge/ `
+          -Recurse -Force
+
+    # Copy HawkSyncShared to both outputs (for both ServerManager and RemoteClient)
+    - name: Copy HawkSyncShared to Framework-Dependent output
+      shell: pwsh
+      run: |
+        # ServerManager
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+          -Destination ./publish/framework-dependent/ServerManager/ `
+          -Recurse -Force
+        # RemoteClient
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+          -Destination ./publish/framework-dependent/RemoteClient/ `
+          -Recurse -Force
+
+    - name: Copy HawkSyncShared to Self-Contained output
+      shell: pwsh
+      run: |
+        # ServerManager
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+          -Destination ./publish/self-contained/ServerManager/ `
+          -Recurse -Force
+        # RemoteClient
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+          -Destination ./publish/self-contained/RemoteClient/ `
           -Recurse -Force
 
     - name: Create release info files
@@ -159,19 +232,21 @@ jobs:
         $releaseNotes = @"
         HawkSync Server Manager v$version
         ==================================
-        
+
         Build Information
         -----------------
         Version: $version
         Build Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
         Commit: $(git rev-parse HEAD)
         Branch: $(git branch --show-current)
-        
+
         Components
         ----------
         - ServerManager (.NET 8.0)
+        - RemoteClient (.NET 8.0)
         - NetLimiterBridge (.NET Framework 4.8.1)
-        
+        - HawkSyncShared (.NET Standard/.NET 8.0)
+
         Requirements
         ------------
         Framework-Dependent Edition:
@@ -180,20 +255,20 @@ jobs:
         - Windows 10/11 (x64)
         - Download .NET 8.0: https://dotnet.microsoft.com/download/dotnet/8.0
         - Download .NET Framework 4.8.1: https://dotnet.microsoft.com/download/dotnet-framework/net481
-        
+
         Self-Contained Edition:
         - .NET Framework 4.8.1 Runtime (for NetLimiterBridge)
         - Windows 10/11 (x64)
         - Download .NET Framework 4.8.1: https://dotnet.microsoft.com/download/dotnet-framework/net481
-        
+
         Installation
         ------------
         1. Download your preferred edition below
         2. Extract the ZIP file
-        3. Run ServerManager.exe
-        
+        3. Run ServerManager.exe or RemoteClient.exe
+
         "@
-        
+
         $releaseNotes | Out-File -FilePath ./publish/framework-dependent/RELEASE_NOTES.txt
         $releaseNotes | Out-File -FilePath ./publish/self-contained/RELEASE_NOTES.txt
 
@@ -209,11 +284,11 @@ jobs:
       shell: pwsh
       run: |
         $version = "${{ needs.validate.outputs.version }}"
-        
+
         # Framework-dependent
         Compress-Archive -Path ./publish/framework-dependent/* `
           -DestinationPath "./${{ env.OUTPUT_NAME }}-v$version-FrameworkDependent.zip"
-        
+
         # Self-contained
         Compress-Archive -Path ./publish/self-contained/* `
           -DestinationPath "./${{ env.OUTPUT_NAME }}-v$version-SelfContained.zip"
@@ -226,13 +301,13 @@ jobs:
           "${{ env.OUTPUT_NAME }}-v$version-FrameworkDependent.zip",
           "${{ env.OUTPUT_NAME }}-v$version-SelfContained.zip"
         )
-        
+
         $checksums = @()
         foreach ($file in $files) {
           $hash = (Get-FileHash $file -Algorithm SHA256).Hash
           $checksums += "$hash  $file"
         }
-        
+
         $checksums | Out-File -FilePath "checksums.txt"
 
     - name: Upload artifacts
@@ -279,7 +354,9 @@ jobs:
           ### 🔧 Components
           
           - **ServerManager**: Main application (.NET 8.0)
+          - **RemoteClient**: Remote client (.NET 8.0)
           - **NetLimiterBridge**: Network limiting bridge (.NET Framework 4.8.1)
+          - **HawkSyncShared**: Shared library (.NET Standard/.NET 8.0)
           
           ### ✅ Requirements
           
@@ -296,7 +373,7 @@ jobs:
           
           1. Download your preferred edition
           2. Extract the ZIP file
-          3. Run `ServerManager.exe`
+          3. Run `ServerManager.exe` or `RemoteClient.exe`
           
           ### 🔐 Verification
           
