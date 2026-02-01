@@ -4,6 +4,7 @@ using HawkSyncShared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using static BHD_ServerManager.Classes.InstanceManagers.theInstanceManager;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -369,5 +370,42 @@ public class ProfileController : ControllerBase
     public class RemoveBlockedCountryRequest
     {
         public int RecordID { get; set; }
+    }
+
+    [HttpPost("webstats")]
+    public ActionResult<CommandResult> SaveWebStatsSettings([FromBody] WebStatsSettings settings)
+    {
+        if (settings == null)
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
+
+        var result = theInstanceManager.SaveWebStatsSettings(settings);
+        CommonCore.instanceStats!.ForceUIUpdate = true;
+        return Ok(new CommandResult
+        {
+            Success = result.Success,
+            Message = result.Message
+        });
+    }
+    [HttpPost("webstats/validate")]
+    public async Task<ActionResult<CommandResult>> ValidateWebStatsConnection([FromBody] WebStatsValidateRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.ServerPath))
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
+
+        var result = await theInstanceManager.TestWebStatsConnectionAsync(req.ServerPath);
+
+        return Ok(new CommandResult
+        {
+            Success = result.Success,
+            Message = result.Message
+        });
+    }
+
+    /// <summary>
+    /// DTO for web stats validation request.
+    /// </summary>
+    public class WebStatsValidateRequest
+    {
+        public string ServerPath { get; set; } = string.Empty;
     }
 }

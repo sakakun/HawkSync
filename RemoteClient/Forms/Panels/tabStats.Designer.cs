@@ -204,6 +204,7 @@
             btn_SaveSettings.TabIndex = 10;
             btn_SaveSettings.Text = "Save";
             btn_SaveSettings.UseVisualStyleBackColor = true;
+            btn_SaveSettings.Click += btnSaveWebStats_Click;
             // 
             // groupBox3
             // 
@@ -285,6 +286,7 @@
             cb_enableAnnouncements.TabIndex = 5;
             cb_enableAnnouncements.Text = "Enable Announcements";
             cb_enableAnnouncements.UseVisualStyleBackColor = true;
+            cb_enableAnnouncements.Click += ActionEvent_EnableAnnouncements;
             // 
             // cb_enableWebStats
             // 
@@ -296,6 +298,7 @@
             cb_enableWebStats.TabIndex = 0;
             cb_enableWebStats.Text = "Enable Babstats";
             cb_enableWebStats.UseVisualStyleBackColor = true;
+            cb_enableWebStats.Click += ActionEvent_EnableBabStats;
             // 
             // groupBox1
             // 
@@ -329,6 +332,7 @@
             btn_validate.TabIndex = 4;
             btn_validate.Text = "Validate";
             btn_validate.UseVisualStyleBackColor = true;
+            btn_validate.Click += btn_validate_Click;
             // 
             // tb_webStatsServerPath
             // 

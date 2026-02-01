@@ -1,4 +1,5 @@
 ﻿using HawkSyncShared;
+using HawkSyncShared.DTOs;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using HawkSyncShared.Instances;
@@ -1258,18 +1259,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // ================================================================================
         // WEB STATS SETTINGS MANAGEMENT
         // ================================================================================
-
-        /// <summary>
-        /// Web stats configuration settings
-        /// </summary>
-        public record WebStatsSettings(
-            string ProfileID,
-            bool Enabled,
-            string ServerPath,
-            bool Announcements,
-            int ReportInterval,
-            int UpdateInterval
-        );
 
         /// <summary>
         /// Load web stats settings

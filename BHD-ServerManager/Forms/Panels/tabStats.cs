@@ -1,4 +1,5 @@
 ﻿using HawkSyncShared;
+using HawkSyncShared.DTOs;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
@@ -20,7 +21,8 @@ namespace BHD_ServerManager.Forms.Panels
     {
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
-        
+        private statInstance instanceStats => CommonCore.instanceStats!;
+
         // --- Class Variables ---
         private new string Name = "StatsTab";
         private bool _firstLoadComplete = false;
@@ -133,6 +135,12 @@ namespace BHD_ServerManager.Forms.Panels
                 _firstLoadComplete = true;
                 methodFunction_loadSettings();
                 return;
+            }
+
+            if (instanceStats.ForceUIUpdate)
+            {
+                instanceStats.ForceUIUpdate = false;
+                methodFunction_loadSettings();
             }
 
             // Additional ticker logic can go here if needed

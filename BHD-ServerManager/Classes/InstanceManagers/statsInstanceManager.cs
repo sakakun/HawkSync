@@ -353,7 +353,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
                     AppDebug.Log("StatsManager", $"Babstats Import Response: {responseData}");
-                    AddStatsLogRowSafe(thisServer, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), responseData);
+                    AddStatsLogRowSafe(thisServer, DateTime.Now, responseData);
                 }
             }
             catch (Exception ex)
@@ -379,7 +379,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
                     AppDebug.Log("StatsManager", $"Babstats Update Response: {responseData}");
-                    AddStatsLogRowSafe(thisServer, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), responseData);
+                    AddStatsLogRowSafe(thisServer, DateTime.Now, responseData);
                 }
             }
             catch (Exception ex)
@@ -407,7 +407,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     string[] messages = response.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var message in messages)
                     {
-                        AddStatsLogRowSafe(thisServer, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), message);
+                        AddStatsLogRowSafe(thisServer, DateTime.Now, message);
                     }
                     return response;
                 }
@@ -487,18 +487,31 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         // --- UI THREAD-SAFE HELPERS ---
 
-        private static void AddStatsLogRowSafe(ServerManagerUI thisServer, string dateTime, string message)
+        private static void AddStatsLogRowSafe(ServerManagerUI thisServer, DateTime dateTime, string message)
         {
+            var logRecord = new StatReportObject
+                {
+                    ReportDate = dateTime,
+                    ReportContent = message
+                };
+
+            string dateTimeString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            CommonCore.instanceStats!.WebStatsLog.Add(logRecord);
+
             if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
             {
                 thisServer.StatsTab.dg_statsLog.Invoke(new Action(() =>
-                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTime, message)
+                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message)
                 ));
             }
             else
             {
-                thisServer.StatsTab.dg_statsLog.Rows.Add(dateTime, message);
+                thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message);
             }
+
+            
+
         }
 
         public static void PopulatePlayerStatsGrid()

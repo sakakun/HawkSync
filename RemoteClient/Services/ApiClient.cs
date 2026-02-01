@@ -758,4 +758,39 @@ public class ApiClient : IDisposable
         };
         return await SendCommandAsync("/api/profile/proxycheck/remove-country", request);
     }
+
+    /// <summary>
+    /// Save web stats settings to the server.
+    /// </summary>
+    public async Task<CommandResult> SaveWebStatsSettingsAsync(WebStatsSettings settings)
+    {
+        return await SendCommandAsync("/api/profile/webstats", settings);
+    }
+
+    /// <summary>
+    /// Validate the web stats connection on the server.
+    /// </summary>
+    public async Task<CommandResult> ValidateWebStatsConnectionAsync(string serverPath)
+    {
+        var request = new { ServerPath = serverPath };
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/profile/webstats/validate", request);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new CommandResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+            var result = await response.Content.ReadFromJsonAsync<CommandResult>();
+            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
 }
