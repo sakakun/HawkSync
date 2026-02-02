@@ -1,11 +1,12 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.Instances;
+﻿using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.Services;
 using BHD_ServerManager.Classes.Services.NetLimiter;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Tickers;
+using HawkSyncShared;
+using HawkSyncShared.DTOs;
+using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,9 +15,11 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Windows.Services.Maps;
+using RecordDeleteAction = BHD_ServerManager.Classes.InstanceManagers.RecordDeleteAction;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -29,6 +32,9 @@ namespace BHD_ServerManager.Forms.Panels
         public tabBans()
         {
             InitializeComponent();
+
+            dgPlayerNamesBlacklist.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            dgPlayerNamesWhitelist.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
 
             banInstanceManager.LoadSettings();
 
@@ -81,7 +87,6 @@ namespace BHD_ServerManager.Forms.Panels
                 NetLimiter_LoadSettings(null!, null!);
 
             }
-
         }
 
         /// <summary>
@@ -233,11 +238,11 @@ namespace BHD_ServerManager.Forms.Panels
             blacklist_IPAddressTxt.Text = String.Empty;
             blacklist_IPSubnetTxt.Text = "32";
             // Ban Dates
-            blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
-            blacklist_DateStart.MaxDate = DateTime.Today.AddYears(1);
+            blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
+            blacklist_DateStart.MaxDate = DateTimePicker.MaximumDateTime;
             blacklist_DateStart.Value = DateTime.Now;
-            blacklist_DateEnd.MinDate = DateTime.Today.AddYears(-1);
-            blacklist_DateEnd.MaxDate = DateTime.Today.AddYears(1);
+            blacklist_DateEnd.MinDate = DateTimePicker.MinimumDateTime;
+            blacklist_DateEnd.MaxDate = DateTimePicker.MaximumDateTime;
             blacklist_DateEnd.Value = DateTime.Now;
             blacklist_DateEnd.Enabled = false;
             // Ban Type
@@ -906,8 +911,8 @@ namespace BHD_ServerManager.Forms.Panels
 
             if (nameRecord != null)
             {
-                blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
-                blacklist_DateStart.MaxDate = DateTime.Today.AddYears(1);
+                blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
+                blacklist_DateStart.MaxDate = DateTimePicker.MaximumDateTime;
                 blacklist_DateStart.Value = nameRecord.Date;
 
                 if (nameRecord.RecordType == banInstanceRecordType.Temporary && nameRecord.ExpireDate.HasValue)
@@ -915,8 +920,8 @@ namespace BHD_ServerManager.Forms.Panels
                     blacklist_TempBan.Checked = true;
                     blacklist_PermBan.Checked = false;
                     blacklist_DateEnd.Enabled = true;
-                    blacklist_DateEnd.MinDate = DateTime.Today.AddYears(-1);
-                    blacklist_DateEnd.MaxDate = DateTime.Today.AddYears(1);
+                    blacklist_DateEnd.MinDate = DateTimePicker.MinimumDateTime;
+                    blacklist_DateEnd.MaxDate = DateTimePicker.MaximumDateTime;
                     blacklist_DateEnd.Value = nameRecord.ExpireDate.Value;
                 }
                 else
@@ -930,8 +935,8 @@ namespace BHD_ServerManager.Forms.Panels
             }
             else if (ipRecord != null)
             {
-                blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
-                blacklist_DateStart.MaxDate = DateTime.Today.AddYears(1);
+                blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
+                blacklist_DateStart.MaxDate = DateTimePicker.MaximumDateTime;
                 blacklist_DateStart.Value = ipRecord.Date;
 
                 if (ipRecord.RecordType == banInstanceRecordType.Temporary && ipRecord.ExpireDate.HasValue)
@@ -939,8 +944,8 @@ namespace BHD_ServerManager.Forms.Panels
                     blacklist_TempBan.Checked = true;
                     blacklist_PermBan.Checked = false;
                     blacklist_DateEnd.Enabled = true;
-                    blacklist_DateEnd.MinDate = DateTime.Today.AddYears(-1);
-                    blacklist_DateEnd.MaxDate = DateTime.Today.AddYears(1);
+                    blacklist_DateEnd.MinDate = DateTimePicker.MinimumDateTime;
+                    blacklist_DateEnd.MaxDate = DateTimePicker.MaximumDateTime;
                     blacklist_DateEnd.Value = ipRecord.ExpireDate.Value;
                 }
                 else
@@ -957,6 +962,308 @@ namespace BHD_ServerManager.Forms.Panels
             blacklist_btnDelete.Visible = true;
             blacklist_btnSave.Visible = true;
             blacklist_btnClose.Visible = true;
+        }
+
+        private void btnExportBlacklist_Click(object sender, EventArgs e)
+        {
+            using (var saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Title = "Export Blacklist to JSON";
+                saveDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+                saveDialog.FileName = "BlacklistExport.json";
+                saveDialog.OverwritePrompt = true;
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ExportBlacklistToJson(saveDialog.FileName);
+                }
+            }
+        }
+
+        // Add this method to your tabBans class
+        private void ExportBlacklistToJson(string filePath)
+        {
+            if (instanceBans == null)
+            {
+                MessageBox.Show("No ban data available to export.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var exportData = new BlacklistImportModel();
+            exportData.BannedPlayerIPs = instanceBans.BannedPlayerIPs;
+            exportData.BannedPlayerNames = instanceBans.BannedPlayerNames;
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            try
+            {
+                File.WriteAllText(filePath, JsonSerializer.Serialize(exportData, options));
+                MessageBox.Show("Blacklist exported successfully.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error exporting blacklist: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnImportBlacklist_Click(object sender, EventArgs e)
+        {
+            using (var openDialog = new OpenFileDialog())
+            {
+                openDialog.Title = "Import Blacklist";
+                openDialog.Filter = "JSON/INI Files (*.json;*.ini)|*.json;*.ini|JSON Files (*.json)|*.json|INI Files (*.ini)|*.ini|All Files (*.*)|*.*";
+                openDialog.Multiselect = false;
+
+                if (openDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                try
+                {
+                    string filePath = openDialog.FileName;
+                    string firstLine = File.ReadLines(filePath).FirstOrDefault()?.Trim() ?? "";
+
+                    if (firstLine.Equals("[IpAddresses]", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ImportLegacyBannedIps(filePath, sender, e);
+                        return;
+                    }
+                    else if (firstLine.Equals("[Players]", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ImportLegacyBannedNames(filePath, sender, e);
+                        return;
+                    }
+                    else
+                    {
+                        string json = File.ReadAllText(openDialog.FileName);
+                        var importData = JsonSerializer.Deserialize<BlacklistImportModel>(json);
+
+                        if (importData == null)
+                        {
+                            MessageBox.Show("No data found in the selected file.", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        // Track processed associations to avoid duplicates
+                        var processedNameIds = new HashSet<int>();
+                        var processedIpIds = new HashSet<int>();
+
+                        // Process name records (handle both and name-only)
+                        if (importData.BannedPlayerNames != null)
+                        {
+                            foreach (var nameRecord in importData.BannedPlayerNames)
+                            {
+                                if (nameRecord.AssociatedIP.HasValue && nameRecord.AssociatedIP.Value > 0)
+                                {
+                                    // Only process if not already handled
+                                    if (!processedNameIds.Contains(nameRecord.RecordID) && !processedIpIds.Contains(nameRecord.AssociatedIP.Value))
+                                    {
+                                        var ipRecord = importData.BannedPlayerIPs?.FirstOrDefault(ip => ip.RecordID == nameRecord.AssociatedIP.Value);
+                                        if (ipRecord != null)
+                                        {
+                                            var result = banInstanceManager.AddBlacklistBothRecords(
+                                                nameRecord.PlayerName,
+                                                ipRecord.PlayerIP,
+                                                ipRecord.SubnetMask,
+                                                nameRecord.Date,
+                                                nameRecord.ExpireDate,
+                                                nameRecord.RecordType,
+                                                nameRecord.Notes,
+                                                true
+                                            );
+                                            if (!result.Success)
+                                            {
+                                                MessageBox.Show($"Error importing name/IP pair '{nameRecord.PlayerName}/{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            }
+                                            processedNameIds.Add(nameRecord.RecordID);
+                                            processedIpIds.Add(ipRecord.RecordID);
+                                            continue;
+                                        }
+                                    }
+                                }
+                                // Name only
+                                if (!processedNameIds.Contains(nameRecord.RecordID))
+                                {
+                                    var result = banInstanceManager.AddBlacklistNameRecord(
+                                        nameRecord.PlayerName,
+                                        nameRecord.Date,
+                                        nameRecord.ExpireDate,
+                                        nameRecord.RecordType,
+                                        nameRecord.Notes,
+                                        0,
+                                        true
+                                    );
+                                    if (!result.Success)
+                                    {
+                                        MessageBox.Show($"Error importing name record '{nameRecord.PlayerName}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    }
+                                    processedNameIds.Add(nameRecord.RecordID);
+                                }
+                            }
+                        }
+
+                        // Process IP-only records
+                        if (importData.BannedPlayerIPs != null)
+                        {
+                            foreach (var ipRecord in importData.BannedPlayerIPs)
+                            {
+                                if (ipRecord.AssociatedName.HasValue && ipRecord.AssociatedName.Value > 0)
+                                {
+                                    // Already processed as part of a name/IP pair
+                                    if (processedIpIds.Contains(ipRecord.RecordID))
+                                        continue;
+                                }
+                                // IP only
+                                if (!processedIpIds.Contains(ipRecord.RecordID))
+                                {
+                                    var result = banInstanceManager.AddBlacklistIPRecord(
+                                        ipRecord.PlayerIP,
+                                        ipRecord.SubnetMask,
+                                        ipRecord.Date,
+                                        ipRecord.ExpireDate,
+                                        ipRecord.RecordType,
+                                        ipRecord.Notes,
+                                        0,
+                                        true
+                                    );
+                                    if (!result.Success)
+                                    {
+                                        MessageBox.Show($"Error importing IP record '{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    }
+                                    processedIpIds.Add(ipRecord.RecordID);
+                                }
+                            }
+                        }
+
+                        // Refresh UI
+                        Blacklist_Refresh_Click(sender, e);
+
+                        MessageBox.Show($"Blacklist imported successfully. {CommonCore.instanceBans!.BannedPlayerNames.Count} Records", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error importing blacklist: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void ImportLegacyBannedIps(string filePath, object sender, EventArgs e)
+        {
+            var lines = File.ReadAllLines(filePath);
+            int importedCount = 0;
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("["))
+                    continue;
+
+                var parts = line.Split('=');
+                if (parts.Length != 2)
+                    continue;
+
+                string ipPattern = parts[0].Trim();
+                string dateStr = parts[1].Trim();
+
+                // Determine subnet mask based on wildcard position
+                int subnetMask = 32;
+                string ipBase = ipPattern;
+
+                if (ipPattern.EndsWith(".*"))
+                {
+                    int periodCount = ipPattern.Count(c => c == '.');
+                    switch (periodCount)
+                    {
+                        case 1: // e.g., 10.*
+                            subnetMask = 8;
+                            ipBase = ipPattern.Replace(".*", ".0.0.0");
+                            break;
+                        case 2: // e.g., 10.0.*
+                            subnetMask = 16;
+                            ipBase = ipPattern.Replace(".*", ".0.0");
+                            break;
+                        case 3: // e.g., 10.0.0.*
+                            subnetMask = 24;
+                            ipBase = ipPattern.Replace(".*", ".0");
+                            break;
+                    }
+                }
+                else
+                {
+                    ipBase = ipPattern.Replace("*", "0");
+                }
+
+                if (!IPAddress.TryParse(ipBase, out var ipAddress))
+                    continue;
+
+                if (!DateTime.TryParse(dateStr, out var banDate))
+                    banDate = DateTime.Now;
+
+                var result = banInstanceManager.AddBlacklistIPRecord(
+                    ipAddress,
+                    subnetMask,
+                    banDate,
+                    null,
+                    banInstanceRecordType.Permanent,
+                    "Imported from legacy INI",
+                    0,
+                    true
+                );
+                if (result.Success)
+                    importedCount++;
+            }
+
+            Blacklist_Refresh_Click(sender, e);
+            MessageBox.Show($"Imported {importedCount} legacy IP bans.", "Legacy Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ImportLegacyBannedNames(string filePath, object sender, EventArgs e)
+        {
+            var lines = File.ReadAllLines(filePath, Encoding.GetEncoding(1252));
+            int importedCount = 0;
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("["))
+                    continue;
+
+                // Format: {PlayerName}[#]={DateTime}[-]{Notes}
+                var eqSplit = line.Split('=');
+                if (eqSplit.Length != 2)
+                    continue;
+
+                string namePart = eqSplit[0].Trim();
+                string rightPart = eqSplit[1].Trim();
+
+                // Extract player name (remove [#])
+                int bracketIdx = namePart.IndexOf('[');
+                string playerName = bracketIdx > 0 ? namePart.Substring(0, bracketIdx) : namePart;
+
+                // Extract date and notes
+                var dashSplit = rightPart.Split(new[] { "[-]" }, StringSplitOptions.None);
+                string dateStr = dashSplit.Length > 0 ? dashSplit[0].Trim() : "";
+                string notes = dashSplit.Length > 1 ? dashSplit[1].Trim() : "";
+
+                if (!DateTime.TryParse(dateStr, out var banDate))
+                    banDate = DateTime.Now;
+
+                var result = banInstanceManager.AddBlacklistNameRecord(
+                    playerName,
+                    banDate,
+                    null,
+                    banInstanceRecordType.Permanent,
+                    string.IsNullOrEmpty(notes) ? "Imported from legacy INI" : notes,
+                    0,
+                    true
+                );
+                if (result.Success)
+                    importedCount++;
+            }
+
+            Blacklist_Refresh_Click(sender, e);
+            MessageBox.Show($"Imported {importedCount} legacy name bans.", "Legacy Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // ================================================================================
@@ -1092,11 +1399,11 @@ namespace BHD_ServerManager.Forms.Panels
             textBox_addressWL.Text = String.Empty;
             cb_subnetWL.Text = "32";
             // Exempt Dates
-            dateTimePicker_WLstart.MinDate = DateTime.Today.AddYears(-1);
-            dateTimePicker_WLstart.MaxDate = DateTime.Today.AddYears(1);
+            dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
+            dateTimePicker_WLstart.MaxDate = DateTimePicker.MaximumDateTime;
             dateTimePicker_WLstart.Value = DateTime.Now;
-            dateTimePicker_WLend.MinDate = DateTime.Today.AddYears(-1);
-            dateTimePicker_WLend.MaxDate = DateTime.Today.AddYears(1);
+            dateTimePicker_WLend.MinDate = DateTimePicker.MinimumDateTime;
+            dateTimePicker_WLend.MaxDate = DateTimePicker.MaximumDateTime;
             dateTimePicker_WLend.Value = DateTime.Now;
             dateTimePicker_WLend.Enabled = false;
             // Exempt Type
@@ -1121,11 +1428,11 @@ namespace BHD_ServerManager.Forms.Panels
             textBox_addressWL.Text = String.Empty;
             cb_subnetWL.Text = "32";
             // Exempt Dates
-            dateTimePicker_WLstart.MinDate = DateTime.Today.AddYears(-1);
-            dateTimePicker_WLstart.MaxDate = DateTime.Today.AddYears(1);
+            dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
+            dateTimePicker_WLstart.MaxDate = DateTimePicker.MaximumDateTime;
             dateTimePicker_WLstart.Value = DateTime.Now;
-            dateTimePicker_WLend.MinDate = DateTime.Today.AddYears(-1);
-            dateTimePicker_WLend.MaxDate = DateTime.Today.AddYears(1);
+            dateTimePicker_WLend.MinDate = DateTimePicker.MinimumDateTime;
+            dateTimePicker_WLend.MaxDate = DateTimePicker.MaximumDateTime;
             dateTimePicker_WLend.Value = DateTime.Now;
             dateTimePicker_WLend.Enabled = false;
             // Exempt Type
@@ -1790,8 +2097,8 @@ namespace BHD_ServerManager.Forms.Panels
 
             if (nameRecord != null)
             {
-                dateTimePicker_WLstart.MinDate = DateTime.Today.AddYears(-1);
-                dateTimePicker_WLstart.MaxDate = DateTime.Today.AddYears(1);
+                dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
+                dateTimePicker_WLstart.MaxDate = DateTimePicker.MaximumDateTime;
                 dateTimePicker_WLstart.Value = nameRecord.Date;
 
                 if (nameRecord.RecordType == banInstanceRecordType.Temporary && nameRecord.ExpireDate.HasValue)
@@ -1799,8 +2106,8 @@ namespace BHD_ServerManager.Forms.Panels
                     checkBox_tempWL.Checked = true;
                     checkBox_permWL.Checked = false;
                     dateTimePicker_WLend.Enabled = true;
-                    dateTimePicker_WLend.MinDate = DateTime.Today.AddYears(-1);
-                    dateTimePicker_WLend.MaxDate = DateTime.Today.AddYears(1);
+                    dateTimePicker_WLend.MinDate = DateTimePicker.MinimumDateTime;
+                    dateTimePicker_WLend.MaxDate = DateTimePicker.MaximumDateTime;
                     dateTimePicker_WLend.Value = nameRecord.ExpireDate.Value;
                 }
                 else
@@ -1814,8 +2121,8 @@ namespace BHD_ServerManager.Forms.Panels
             }
             else if (ipRecord != null)
             {
-                dateTimePicker_WLstart.MinDate = DateTime.Today.AddYears(-1);
-                dateTimePicker_WLstart.MaxDate = DateTime.Today.AddYears(1);
+                dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
+                dateTimePicker_WLstart.MaxDate = DateTimePicker.MaximumDateTime;
                 dateTimePicker_WLstart.Value = ipRecord.Date;
 
                 if (ipRecord.RecordType == banInstanceRecordType.Temporary && ipRecord.ExpireDate.HasValue)
@@ -1823,8 +2130,8 @@ namespace BHD_ServerManager.Forms.Panels
                     checkBox_tempWL.Checked = true;
                     checkBox_permWL.Checked = false;
                     dateTimePicker_WLend.Enabled = true;
-                    dateTimePicker_WLend.MinDate = DateTime.Today.AddYears(-1);
-                    dateTimePicker_WLend.MaxDate = DateTime.Today.AddYears(1);
+                    dateTimePicker_WLend.MinDate = DateTimePicker.MinimumDateTime;
+                    dateTimePicker_WLend.MaxDate = DateTimePicker.MaximumDateTime;
                     dateTimePicker_WLend.Value = ipRecord.ExpireDate.Value;
                 }
                 else
@@ -1841,6 +2148,177 @@ namespace BHD_ServerManager.Forms.Panels
             wlControlDelete.Visible = true;
             wlControlSave.Visible = true;
             wlControlClose.Visible = true;
+        }
+
+        private void btnExportWhitelist_Click(object sender, EventArgs e)
+        {
+            using (var saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Title = "Export Whitelist to JSON";
+                saveDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+                saveDialog.FileName = "WhitelistExport.json";
+                saveDialog.OverwritePrompt = true;
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ExportWhitelistToJson(saveDialog.FileName);
+                }
+            }
+        }
+
+        private void ExportWhitelistToJson(string filePath)
+        {
+            if (instanceBans == null)
+            {
+                MessageBox.Show("No whitelist data available to export.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var exportData = new BlacklistImportModel
+            {
+                BannedPlayerNames = instanceBans.WhitelistedNames,
+                BannedPlayerIPs = instanceBans.WhitelistedIPs
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            try
+            {
+                File.WriteAllText(filePath, JsonSerializer.Serialize(exportData, options));
+                MessageBox.Show("Whitelist exported successfully.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error exporting whitelist: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnImportWhitelist_Click(object sender, EventArgs e)
+        {
+            using (var openDialog = new OpenFileDialog())
+            {
+                openDialog.Title = "Import Blacklist from JSON";
+                openDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+                openDialog.Multiselect = false;
+
+                if (openDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                try
+                {
+                    string json = File.ReadAllText(openDialog.FileName);
+                    var importData = JsonSerializer.Deserialize<BlacklistImportModel>(json);
+
+                    if (importData == null)
+                    {
+                        MessageBox.Show("No data found in the selected file.", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Track processed associations to avoid duplicates
+                    var processedNameIds = new HashSet<int>();
+                    var processedIpIds = new HashSet<int>();
+
+                    // Process name records (handle both and name-only)
+                    if (importData.BannedPlayerNames != null)
+                    {
+                        foreach (var nameRecord in importData.BannedPlayerNames)
+                        {
+                            if (nameRecord.AssociatedIP.HasValue && nameRecord.AssociatedIP.Value > 0)
+                            {
+                                // Only process if not already handled
+                                if (!processedNameIds.Contains(nameRecord.RecordID) && !processedIpIds.Contains(nameRecord.AssociatedIP.Value))
+                                {
+                                    var ipRecord = importData.BannedPlayerIPs?.FirstOrDefault(ip => ip.RecordID == nameRecord.AssociatedIP.Value);
+                                    if (ipRecord != null)
+                                    {
+                                        var result = banInstanceManager.AddWhitelistBothRecords(
+                                            nameRecord.PlayerName,
+                                            ipRecord.PlayerIP,
+                                            ipRecord.SubnetMask,
+                                            nameRecord.Date,
+                                            nameRecord.ExpireDate,
+                                            nameRecord.RecordType,
+                                            nameRecord.Notes,
+                                            true
+                                        );
+                                        if (!result.Success)
+                                        {
+                                            MessageBox.Show($"Error importing name/IP pair '{nameRecord.PlayerName}/{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        }
+                                        processedNameIds.Add(nameRecord.RecordID);
+                                        processedIpIds.Add(ipRecord.RecordID);
+                                        continue;
+                                    }
+                                }
+                            }
+                            // Name only
+                            if (!processedNameIds.Contains(nameRecord.RecordID))
+                            {
+                                var result = banInstanceManager.AddWhitelistNameRecord(
+                                    nameRecord.PlayerName,
+                                    nameRecord.Date,
+                                    nameRecord.ExpireDate,
+                                    nameRecord.RecordType,
+                                    nameRecord.Notes,
+                                    0,
+                                    true
+                                );
+                                if (!result.Success)
+                                {
+                                    MessageBox.Show($"Error importing name record '{nameRecord.PlayerName}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                                processedNameIds.Add(nameRecord.RecordID);
+                            }
+                        }
+                    }
+
+                    // Process IP-only records
+                    if (importData.BannedPlayerIPs != null)
+                    {
+                        foreach (var ipRecord in importData.BannedPlayerIPs)
+                        {
+                            if (ipRecord.AssociatedName.HasValue && ipRecord.AssociatedName.Value > 0)
+                            {
+                                // Already processed as part of a name/IP pair
+                                if (processedIpIds.Contains(ipRecord.RecordID))
+                                    continue;
+                            }
+                            // IP only
+                            if (!processedIpIds.Contains(ipRecord.RecordID))
+                            {
+                                var result = banInstanceManager.AddWhitelistIPRecord(
+                                    ipRecord.PlayerIP,
+                                    ipRecord.SubnetMask,
+                                    ipRecord.Date,
+                                    ipRecord.ExpireDate,
+                                    ipRecord.RecordType,
+                                    ipRecord.Notes,
+                                    0,
+                                    true
+                                );
+                                if (!result.Success)
+                                {
+                                    MessageBox.Show($"Error importing IP record '{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                                processedIpIds.Add(ipRecord.RecordID);
+                            }
+                        }
+                    }
+
+                    // Refresh UI
+                    Whitelist_Refresh_Click(sender, e);
+
+                    MessageBox.Show($"Blacklist imported successfully. {CommonCore.instanceBans!.BannedPlayerNames.Count} Records", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error importing blacklist: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         // ================================================================================

@@ -1,4 +1,5 @@
-﻿using HawkSyncShared.Instances;
+﻿using HawkSyncShared.DTOs;
+using HawkSyncShared.Instances;
 using HawkSyncShared.ObjectClasses;
 using HawkSyncShared.SupportClasses;
 using Microsoft.Data.Sqlite;
@@ -6,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -2,6 +2,12 @@ using HawkSyncShared.Instances;
 
 namespace HawkSyncShared.DTOs;
 
+
+public class ImportExportRecords
+{
+    public List<banInstancePlayerName>? Names { get; set; }
+    public List<banInstancePlayerIP>? IPs { get; set; }
+}
 public class BanRecordSaveRequest
 {
     public int? NameRecordID { get; set; }
@@ -65,4 +71,11 @@ public class NetLimiterSettingsRequest
     public string NetLimiterFilterName { get; set; } = string.Empty;
     public bool NetLimiterEnableConLimit { get; set; }
     public int NetLimiterConThreshold { get; set; }
+}
+
+// DTO for import/export
+public class BlacklistImportModel
+{
+    public List<banInstancePlayerName>? BannedPlayerNames { get; set; }
+    public List<banInstancePlayerIP>? BannedPlayerIPs { get; set; }
 }

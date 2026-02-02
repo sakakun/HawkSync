@@ -98,7 +98,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             DateTime? expireDate,
             banInstanceRecordType recordType,
             string notes,
-            int associatedIPID = 0)
+            int associatedIPID = 0, 
+            bool ignoreValidation = false)
         {
             try
             {
@@ -108,7 +109,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (recordType == banInstanceRecordType.Temporary && expireDate.HasValue)
                 {
-                    if (expireDate.Value <= DateTime.Now)
+                    if (expireDate.Value <= DateTime.Now && !ignoreValidation)
                         return new OperationResult(false, "Temporary ban end date must be in the future.");
                 }
 
@@ -153,7 +154,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             DateTime? expireDate,
             banInstanceRecordType recordType,
             string notes,
-            int associatedNameID = 0)
+            int associatedNameID = 0,
+            bool ignorevalidation = false)
         {
             try
             {
@@ -166,7 +168,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (recordType == banInstanceRecordType.Temporary && expireDate.HasValue)
                 {
-                    if (expireDate.Value <= DateTime.Now)
+                    if (expireDate.Value <= DateTime.Now && !ignorevalidation)
                         return new OperationResult(false, "Temporary ban end date must be in the future.");
                 }
 
@@ -218,17 +220,18 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             DateTime banDate,
             DateTime? expireDate,
             banInstanceRecordType recordType,
-            string notes)
+            string notes,
+            bool ignorevalidation = false)
         {
             try
             {
                 // Add name record first
-                var nameResult = AddBlacklistNameRecord(playerName, banDate, expireDate, recordType, notes);
+                var nameResult = AddBlacklistNameRecord(playerName, banDate, expireDate, recordType, notes, 0, ignorevalidation);
                 if (!nameResult.Success)
                     return new DualRecordResult(false, nameResult.Message, 0, 0, nameResult.Exception);
 
                 // Add IP record with association
-                var ipResult = AddBlacklistIPRecord(ipAddress, subnetMask, banDate, expireDate, recordType, notes, nameResult.RecordID);
+                var ipResult = AddBlacklistIPRecord(ipAddress, subnetMask, banDate, expireDate, recordType, notes, nameResult.RecordID, ignorevalidation);
                 if (!ipResult.Success)
                 {
                     // Rollback name record
@@ -510,7 +513,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             DateTime? expireDate,
             banInstanceRecordType recordType,
             string notes,
-            int associatedIPID = 0)
+            int associatedIPID = 0,
+            bool ignorevalidation = false)
         {
             try
             {
@@ -519,7 +523,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (recordType == banInstanceRecordType.Temporary && expireDate.HasValue)
                 {
-                    if (expireDate.Value <= DateTime.Now)
+                    if (expireDate.Value <= DateTime.Now && !ignorevalidation)
                         return new OperationResult(false, "Temporary whitelist end date must be in the future.");
                 }
 
@@ -560,7 +564,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             DateTime? expireDate,
             banInstanceRecordType recordType,
             string notes,
-            int associatedNameID = 0)
+            int associatedNameID = 0,
+            bool ignorevalidation = false)
         {
             try
             {
@@ -572,7 +577,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (recordType == banInstanceRecordType.Temporary && expireDate.HasValue)
                 {
-                    if (expireDate.Value <= DateTime.Now)
+                    if (expireDate.Value <= DateTime.Now && !ignorevalidation)
                         return new OperationResult(false, "Temporary whitelist end date must be in the future.");
                 }
 
@@ -614,15 +619,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             DateTime exemptDate,
             DateTime? expireDate,
             banInstanceRecordType recordType,
-            string notes)
+            string notes,
+            bool ignorevalidation = false)
         {
             try
             {
-                var nameResult = AddWhitelistNameRecord(playerName, exemptDate, expireDate, recordType, notes);
+                var nameResult = AddWhitelistNameRecord(playerName, exemptDate, expireDate, recordType, notes, 0, ignorevalidation);
                 if (!nameResult.Success)
                     return new DualRecordResult(false, nameResult.Message, 0, 0, nameResult.Exception);
 
-                var ipResult = AddWhitelistIPRecord(ipAddress, subnetMask, exemptDate, expireDate, recordType, notes, nameResult.RecordID);
+                var ipResult = AddWhitelistIPRecord(ipAddress, subnetMask, exemptDate, expireDate, recordType, notes, nameResult.RecordID, ignorevalidation);
                 if (!ipResult.Success)
                 {
                     DeleteWhitelistNameRecord(nameResult.RecordID);
