@@ -1,10 +1,11 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
-using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
+﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
+using HawkSyncShared;
+using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
+using HawkSyncShared.SupportClasses;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using Windows.Gaming.Input;
@@ -65,8 +66,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             try
             {
+                mapInstance.DefaultMaps.Clear();
+                mapInstance.CustomMaps.Clear();
+
                 var defaultMaps = DatabaseManager.GetDefaultMaps();
                 var customMapsResult = ScanCustomMaps(defaultMaps.Count);
+
+                mapInstance.DefaultMaps.AddRange(defaultMaps);
+                mapInstance.CustomMaps.AddRange(customMapsResult.Maps);
 
                 var allMaps = new List<mapFileInfo>();
                 allMaps.AddRange(defaultMaps.Where(m => m.ModType == 0));

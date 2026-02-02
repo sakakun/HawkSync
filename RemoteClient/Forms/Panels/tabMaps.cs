@@ -1,8 +1,10 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.DTOs;
 using HawkSyncShared.Instances;
+using HawkSyncShared.ObjectClasses;
 using HawkSyncShared.SupportClasses;
 using RemoteClient.Core;
+using System.Text;
 
 namespace RemoteClient.Forms.Panels
 {
@@ -367,29 +369,117 @@ namespace RemoteClient.Forms.Panels
 
         private async Task ImportPlaylist()
         {
-            using var openDialog = new OpenFileDialog
+            OpenFileDialog openDialog = new OpenFileDialog
             {
-                Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*"
+                Filter = "JSON or MPL Files (*.json;*.mpl)|*.json;*.mpl|JSON Files (*.json)|*.json|MPL Files (*.mpl)|*.mpl|All Files (*.*)|*.*",
+                DefaultExt = "json"
             };
+
             if (openDialog.ShowDialog() == DialogResult.OK)
             {
+                string filePath = openDialog.FileName;
+                string extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+                if (extension == ".mpl")
+                {
+                    // --- MPL Import Logic ---
+                    var lines = File.ReadAllLines(filePath, Encoding.GetEncoding(1252));
+                    var DefaultMaps = mapInstance.DefaultMaps;
+                    var CustomMaps = mapInstance.CustomMaps;
+                    var mapList = new List<MapDTO>();
+                    int importedCount = 0, skippedCount = 0;
+
+                    int mapId = 1;
+                    foreach (var line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+
+                        var parts = line.Split(new[] { "[-]" }, StringSplitOptions.None);
+                        if (parts.Length != 3)
+                        {
+                            skippedCount++;
+                            continue;
+                        }
+
+                        if (!int.TryParse(parts[0], out int mapType)) { skippedCount++; continue; }
+                        if (!int.TryParse(parts[1], out int modType)) { skippedCount++; continue; }
+                        string fileName = parts[2].Trim();
+
+                        // Try to find in default or custom maps
+                        var map1 = DefaultMaps.FirstOrDefault(m =>
+                            m.MapType == mapType &&
+                            string.Equals(m.MapFile, fileName, StringComparison.OrdinalIgnoreCase));
+
+                        var map2 = CustomMaps.FirstOrDefault(m =>
+                            m.MapType == mapType &&
+                            string.Equals(m.MapFile, fileName, StringComparison.OrdinalIgnoreCase));
+
+                        var map = map1 ?? map2;
+                        if (map == null)
+                        {
+                            skippedCount++;
+                            continue;
+                        }
+
+                        mapList.Add(new MapDTO
+                        {
+                            MapID = mapId++,
+                            MapName = map.MapName,
+                            MapFile = map.MapFile,
+                            ModType = map.ModType,
+                            MapType = map.MapType
+                        });
+                        importedCount++;
+                    }
+
+                    if (mapList.Count == 0)
+                    {
+                        MessageBox.Show("No valid maps found in MPL file.", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    var playlist1 = new PlaylistDTO
+                    {
+                        PlaylistID = _selectedPlaylist,
+                        Maps = mapList
+                    };
+
+                    var result = await ApiCore.ApiClient!.ImportPlaylistAsync(playlist1);
+                    if (result.Success)
+                    {
+                        await LoadPlaylist(_selectedPlaylist);
+                        string msg = $"MPL Import complete.\n\nImported: {importedCount} maps";
+                        if (skippedCount > 0)
+                            msg += $"\nSkipped: {skippedCount} unavailable or invalid maps";
+                        msg += "\n\nRemember to save to apply changes.";
+                        MessageBox.Show(msg, "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show(result.Message, "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    return;
+                }
+
+                // --- JSON Import Logic ---
                 var json = await File.ReadAllTextAsync(openDialog.FileName);
-                var playlist = System.Text.Json.JsonSerializer.Deserialize<PlaylistDTO>(json);
-                if (playlist == null)
+                var playlist2 = System.Text.Json.JsonSerializer.Deserialize<PlaylistDTO>(json);
+                if (playlist2 == null)
                 {
                     MessageBox.Show("Invalid playlist file.", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                playlist.PlaylistID = _selectedPlaylist;
-                var result = await ApiCore.ApiClient!.ImportPlaylistAsync(playlist);
-                if (result.Success)
+
+                playlist2.PlaylistID = _selectedPlaylist;
+                var jsonResult = await ApiCore.ApiClient!.ImportPlaylistAsync(playlist2);
+                if (jsonResult.Success)
                 {
                     await LoadPlaylist(_selectedPlaylist);
                     MessageBox.Show("Playlist imported and loaded. Remember to save to apply changes.", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show(result.Message, "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(jsonResult.Message, "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

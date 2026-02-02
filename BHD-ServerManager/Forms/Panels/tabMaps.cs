@@ -643,52 +643,121 @@ namespace BHD_ServerManager.Forms.Panels
         {
             OpenFileDialog openDialog = new OpenFileDialog
             {
-                Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*",
+                Filter = "JSON or MPL Files (*.json;*.mpl)|*.json;*.mpl|JSON Files (*.json)|*.json|MPL Files (*.mpl)|*.mpl|All Files (*.*)|*.*",
                 DefaultExt = "json"
             };
 
-            if (openDialog.ShowDialog() == DialogResult.OK)
+            if (openDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            string filePath = openDialog.FileName;
+            string extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+            if (extension == ".mpl")
             {
-                var (success, maps, importedCount, skippedCount, errorMessage) =
-                    mapInstanceManager.ImportPlaylistFromJson(openDialog.FileName);
-
-                if (!success)
-                {
-                    MessageBox.Show(errorMessage, "Import Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                // Clear current playlist
-                dataGridView_currentMaps.Rows.Clear();
-
-                // Add imported maps to grid
-                foreach (var map in maps)
-                {
-                    int rowIndex = dataGridView_currentMaps.Rows.Add(
-                        dataGridView_currentMaps.Rows.Count + 1,
-                        map.MapName,
-                        map.MapFile,
-                        map.ModType,
-                        map.MapType,
-                        objectGameTypes.GetShortName(map.MapType)
-                    );
-
-                    DataGridViewRow newRow = dataGridView_currentMaps.Rows[rowIndex];
-                    newRow.Cells[1].ToolTipText = $"Map File: {map.MapFile}";
-                }
-
-                // Show results
-                string message = $"Import complete.\n\nImported: {importedCount} maps";
-                if (skippedCount > 0)
-                {
-                    message += $"\nSkipped: {skippedCount} unavailable maps";
-                }
-                message += "\n\nRemember to save the playlist to apply changes.";
-
-                MessageBox.Show(message, "Import Complete",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ImportMplPlaylist(filePath);
+                return;
             }
+
+            // Default: JSON import
+            var (success, maps, importedCount, skippedCount, errorMessage) =
+                mapInstanceManager.ImportPlaylistFromJson(filePath);
+
+            if (!success)
+            {
+                MessageBox.Show(errorMessage, "Import Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            dataGridView_currentMaps.Rows.Clear();
+
+            foreach (var map in maps)
+            {
+                int rowIndex = dataGridView_currentMaps.Rows.Add(
+                    dataGridView_currentMaps.Rows.Count + 1,
+                    map.MapName,
+                    map.MapFile,
+                    map.ModType,
+                    map.MapType,
+                    objectGameTypes.GetShortName(map.MapType)
+                );
+
+                DataGridViewRow newRow = dataGridView_currentMaps.Rows[rowIndex];
+                newRow.Cells[1].ToolTipText = $"Map File: {map.MapFile}";
+            }
+
+            string message = $"Import complete.\n\nImported: {importedCount} maps";
+            if (skippedCount > 0)
+            {
+                message += $"\nSkipped: {skippedCount} unavailable maps";
+            }
+            message += "\n\nRemember to save the playlist to apply changes.";
+
+            MessageBox.Show(message, "Import Complete",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // Helper for MPL import
+        private void ImportMplPlaylist(string filePath)
+        {
+            var lines = File.ReadAllLines(filePath, Encoding.GetEncoding(1252));
+            var DefaultMaps = mapInstance.DefaultMaps;
+            var CustomMaps = mapInstance.CustomMaps;
+            int importedCount = 0, skippedCount = 0;
+
+            dataGridView_currentMaps.Rows.Clear();
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                var parts = line.Split(new[] { "[-]" }, StringSplitOptions.None);
+                if (parts.Length != 3)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                if (!int.TryParse(parts[0], out int mapType)) { skippedCount++; continue; }
+                if (!int.TryParse(parts[1], out int modType)) { skippedCount++; continue; }
+                string fileName = parts[2].Trim();
+            
+                var map1 = DefaultMaps.FirstOrDefault(m =>
+                    m.MapType == mapType &&
+                    string.Equals(m.MapFile, fileName, StringComparison.OrdinalIgnoreCase));
+            
+                var map2 = CustomMaps.FirstOrDefault(m =>
+                    m.MapType == mapType &&
+                    string.Equals(m.MapFile, fileName, StringComparison.OrdinalIgnoreCase));
+
+                if (map1 == null && map2 == null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                var map = map1 ?? map2!;
+
+                int rowIndex = dataGridView_currentMaps.Rows.Add(
+                    dataGridView_currentMaps.Rows.Count + 1,
+                    map.MapName,
+                    map.MapFile,
+                    map.ModType,
+                    map.MapType,
+                    objectGameTypes.GetShortName(map.MapType)
+                );
+
+                dataGridView_currentMaps.Rows[rowIndex].Cells[1].ToolTipText = $"Map File: {map.MapFile}";
+                importedCount++;
+            }
+
+            string message = $"MPL Import complete.\n\nImported: {importedCount} maps";
+            if (skippedCount > 0)
+                message += $"\nSkipped: {skippedCount} unavailable or invalid maps";
+            message += "\n\nRemember to save the playlist to apply changes.";
+
+            MessageBox.Show(message, "MPL Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
