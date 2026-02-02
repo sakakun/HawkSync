@@ -30,7 +30,7 @@ public class EmbeddedApiHost
         _host = Host.CreateDefaultBuilder()
             .ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseUrls($"http://localhost:{port}");
+                webBuilder.UseUrls($"http://0.0.0.0:{port}");
                 webBuilder.ConfigureServices(services =>
                 {
                     services.AddControllers();
@@ -98,7 +98,7 @@ public class EmbeddedApiHost
 
         _runTask = _host.RunAsync(_cts.Token);
 
-        AppDebug.Log("EmbeddedApiHost", $"API server started on http://localhost:{port}");
+        AppDebug.Log("EmbeddedApiHost", $"API server started on http://0.0.0.0:{port}");
     }
 
     /// <summary>
