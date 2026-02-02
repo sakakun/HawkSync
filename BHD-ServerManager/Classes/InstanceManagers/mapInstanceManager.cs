@@ -172,7 +172,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             
                     try
                     {
-                        first_line = File.ReadLines(filePath, Encoding.Default).First().ToString();
+                        first_line = File.ReadLines(filePath, Encoding.GetEncoding(1252)).First().ToString();
                     }
                     catch (Exception e)
                     {
