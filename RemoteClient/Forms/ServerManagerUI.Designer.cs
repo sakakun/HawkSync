@@ -236,7 +236,7 @@ namespace RemoteClient.Forms
             Name = "ServerManagerUI";
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Black Hawk Down Server Manager";
+            Text = "Black Hawk Down Remote Client";
             toolStrip.ResumeLayout(false);
             toolStrip.PerformLayout();
             mainPanel.ResumeLayout(false);
