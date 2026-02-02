@@ -210,7 +210,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             string timer = timerSeconds.ToString();
             string date = DateTime.Now.ToString("yyyy-M-d HH:mm:ss");
-            string gametype = objectGameTypes.GetShortName(theInstance.gameInfoGameType) ?? "0";
+            string gametype = instanceMaps.CurrentGameType.ToString() ?? "0";
             string dedicated = theInstance.gameDedicated ? "1" : "0";
             string servername = theInstance.gameServerName;
             string mapname = instanceMaps.CurrentMapName;
