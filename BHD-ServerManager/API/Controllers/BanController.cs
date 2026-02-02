@@ -29,7 +29,7 @@ public class BanController : ControllerBase
             {
                 // Use DualRecordResult for both-record creation
                 var dualResult = banInstanceManager.AddBlacklistBothRecords(
-                    req.PlayerName!, ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes
+                    req.PlayerName!, ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes, req.IgnoreValidation
                 );
                 result = new BanRecordSaveResult
                 {
@@ -49,7 +49,7 @@ public class BanController : ControllerBase
             // Use OperationResult for name-only
             var opResult = req.NameRecordID == null
                 ? banInstanceManager.AddBlacklistNameRecord(
-                    req.PlayerName!, req.BanDate, req.ExpireDate, req.RecordType, req.Notes)
+                    req.PlayerName!, req.BanDate, req.ExpireDate, req.RecordType, req.Notes, 0, req.IgnoreValidation)
                 : banInstanceManager.UpdateBlacklistNameRecord(
                     req.NameRecordID.Value, req.PlayerName!, req.BanDate, req.ExpireDate, req.RecordType, req.Notes);
 
@@ -65,7 +65,7 @@ public class BanController : ControllerBase
             // Use OperationResult for IP-only
             var opResult = req.IPRecordID == null
                 ? banInstanceManager.AddBlacklistIPRecord(
-                    ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes)
+                    ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes, 0, req.IgnoreValidation)
                 : banInstanceManager.UpdateBlacklistIPRecord(
                     req.IPRecordID.Value, ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes);
 
@@ -127,7 +127,7 @@ public class BanController : ControllerBase
             {
                 // Use DualRecordResult for both-record creation
                 var dualResult = banInstanceManager.AddWhitelistBothRecords(
-                    req.PlayerName!, ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes
+                    req.PlayerName!, ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes, req.IgnoreValidation
                 );
                 result = new BanRecordSaveResult
                 {
@@ -147,7 +147,7 @@ public class BanController : ControllerBase
             // Use OperationResult for name-only
             var opResult = req.NameRecordID == null
                 ? banInstanceManager.AddWhitelistNameRecord(
-                    req.PlayerName!, req.BanDate, req.ExpireDate, req.RecordType, req.Notes)
+                    req.PlayerName!, req.BanDate, req.ExpireDate, req.RecordType, req.Notes,0,req.IgnoreValidation)
                 : banInstanceManager.UpdateWhitelistNameRecord(
                     req.NameRecordID.Value, req.PlayerName!, req.BanDate, req.ExpireDate, req.RecordType, req.Notes);
 
@@ -163,7 +163,7 @@ public class BanController : ControllerBase
             // Use OperationResult for IP-only
             var opResult = req.IPRecordID == null
                 ? banInstanceManager.AddWhitelistIPRecord(
-                    ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes)
+                    ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes,0,req.IgnoreValidation)
                 : banInstanceManager.UpdateWhitelistIPRecord(
                     req.IPRecordID.Value, ip!, req.SubnetMask ?? 32, req.BanDate, req.ExpireDate, req.RecordType, req.Notes);
 

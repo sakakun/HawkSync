@@ -21,6 +21,7 @@ public class BanRecordSaveRequest
     public string Notes { get; set; } = string.Empty;
     public bool IsName { get; set; }
     public bool IsIP { get; set; }
+    public bool IgnoreValidation { get; set; } = false;
 }
 
 public class BanRecordSaveResult

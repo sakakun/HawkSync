@@ -12,6 +12,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -743,6 +744,321 @@ namespace RemoteClient.Forms.Panels
             }
         }
 
+        private void btnImportBlacklist_Click(object sender, EventArgs e)
+        {
+            _ = ImportBlacklist();
+        }
+
+        private void btnExportBlacklist_Click(object sender, EventArgs e)
+        {
+            using (var saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Title = "Export Blacklist to JSON";
+                saveDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+                saveDialog.FileName = "BlacklistExport.json";
+                saveDialog.OverwritePrompt = true;
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ExportBlacklistToJson(saveDialog.FileName);
+                }
+            }
+        }
+
+        // Add this method to your tabBans class
+        private void ExportBlacklistToJson(string filePath)
+        {
+            if (banInstance == null)
+            {
+                MessageBox.Show("No ban data available to export.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var exportData = new BlacklistImportModel();
+            exportData.BannedPlayerIPs = banInstance.BannedPlayerIPs;
+            exportData.BannedPlayerNames = banInstance.BannedPlayerNames;
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            try
+            {
+                File.WriteAllText(filePath, JsonSerializer.Serialize(exportData, options));
+                MessageBox.Show("Blacklist exported successfully.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error exporting blacklist: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task ImportBlacklist()
+        {
+            using (var openDialog = new OpenFileDialog())
+            {
+                openDialog.Title = "Import Blacklist";
+                openDialog.Filter = "JSON/INI Files (*.json;*.ini)|*.json;*.ini|JSON Files (*.json)|*.json|INI Files (*.ini)|*.ini|All Files (*.*)|*.*";
+                openDialog.Multiselect = false;
+
+                if (openDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                try
+                {
+                    string filePath = openDialog.FileName;
+                    string firstLine = File.ReadLines(filePath).FirstOrDefault()?.Trim() ?? "";
+
+                    if (firstLine.Equals("[IpAddresses]", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await ImportLegacyBannedIps(filePath);
+                        return;
+                    }
+                    else if (firstLine.Equals("[Players]", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await ImportLegacyBannedNames(filePath);
+                        return;
+                    }
+                    else
+                    {
+                        string json = File.ReadAllText(openDialog.FileName);
+                        var importData = JsonSerializer.Deserialize<BlacklistImportModel>(json);
+
+                        if (importData == null)
+                        {
+                            MessageBox.Show("No data found in the selected file.", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        // Track processed associations to avoid duplicates
+                        var processedNameIds = new HashSet<int>();
+                        var processedIpIds = new HashSet<int>();
+
+                        // Process name records (handle both and name-only)
+                        if (importData.BannedPlayerNames != null)
+                        {
+                            foreach (var nameRecord in importData.BannedPlayerNames)
+                            {
+                                if (nameRecord.AssociatedIP.HasValue && nameRecord.AssociatedIP.Value > 0)
+                                {
+                                    // Only process if not already handled
+                                    if (!processedNameIds.Contains(nameRecord.RecordID) && !processedIpIds.Contains(nameRecord.AssociatedIP.Value))
+                                    {
+                                        var ipRecord = importData.BannedPlayerIPs?.FirstOrDefault(ip => ip.RecordID == nameRecord.AssociatedIP.Value);
+                                        if (ipRecord != null)
+                                        {
+                                            BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                            request.PlayerName = nameRecord.PlayerName;
+                                            request.IPAddress = ipRecord.PlayerIP.ToString();
+                                            request.SubnetMask = ipRecord.SubnetMask;
+                                            request.BanDate = nameRecord.Date;
+                                            request.ExpireDate = nameRecord.ExpireDate;
+                                            request.RecordType = nameRecord.RecordType;
+                                            request.Notes = nameRecord.Notes;
+                                            request.IsName = true;
+                                            request.IsIP = true;
+                                            request.IgnoreValidation = true;
+
+                                            var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+
+                                            if (!result.Success)
+                                            {
+                                                MessageBox.Show($"Error importing name/IP pair '{nameRecord.PlayerName}/{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            }
+                                            processedNameIds.Add(nameRecord.RecordID);
+                                            processedIpIds.Add(ipRecord.RecordID);
+                                            continue;
+                                        }
+                                    }
+                                }
+                                // Name only
+                                if (!processedNameIds.Contains(nameRecord.RecordID))
+                                {
+                                    BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                    request.PlayerName = nameRecord.PlayerName;
+                                    request.BanDate = nameRecord.Date;
+                                    request.ExpireDate = nameRecord.ExpireDate;
+                                    request.RecordType = nameRecord.RecordType;
+                                    request.Notes = nameRecord.Notes;
+                                    request.IsName = true;
+                                    request.IsIP = false;
+                                    request.IgnoreValidation = true;
+
+                                    var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+                                    if (!result.Success)
+                                    {
+                                        MessageBox.Show($"Error importing name record '{nameRecord.PlayerName}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    }
+                                    processedNameIds.Add(nameRecord.RecordID);
+                                }
+                            }
+                        }
+
+                        // Process IP-only records
+                        if (importData.BannedPlayerIPs != null)
+                        {
+                            foreach (var ipRecord in importData.BannedPlayerIPs)
+                            {
+                                if (ipRecord.AssociatedName.HasValue && ipRecord.AssociatedName.Value > 0)
+                                {
+                                    // Already processed as part of a name/IP pair
+                                    if (processedIpIds.Contains(ipRecord.RecordID))
+                                        continue;
+                                }
+                                // IP only
+                                if (!processedIpIds.Contains(ipRecord.RecordID))
+                                {
+                                    BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                    request.IPAddress = ipRecord.PlayerIP.ToString();
+                                    request.SubnetMask = ipRecord.SubnetMask;
+                                    request.BanDate = ipRecord.Date;
+                                    request.ExpireDate = ipRecord.ExpireDate;
+                                    request.RecordType = ipRecord.RecordType;
+                                    request.Notes = ipRecord.Notes;
+                                    request.IsName = false;
+                                    request.IsIP = true;
+                                    request.IgnoreValidation = true;
+
+                                    var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+
+                                    if (!result.Success)
+                                    {
+                                        MessageBox.Show($"Error importing IP record '{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    }
+                                    processedIpIds.Add(ipRecord.RecordID);
+                                }
+                            }
+                        }
+
+                        MessageBox.Show($"Blacklist imported successfully. {CommonCore.instanceBans!.BannedPlayerNames.Count} Records", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error importing blacklist: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private async Task ImportLegacyBannedIps(string filePath)
+        {
+            var lines = File.ReadAllLines(filePath);
+            int importedCount = 0;
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("["))
+                    continue;
+
+                var parts = line.Split('=');
+                if (parts.Length != 2)
+                    continue;
+
+                string ipPattern = parts[0].Trim();
+                string dateStr = parts[1].Trim();
+
+                // Determine subnet mask based on wildcard position
+                int subnetMask = 32;
+                string ipBase = ipPattern;
+
+                if (ipPattern.EndsWith(".*"))
+                {
+                    int periodCount = ipPattern.Count(c => c == '.');
+                    switch (periodCount)
+                    {
+                        case 1: // e.g., 10.*
+                            subnetMask = 8;
+                            ipBase = ipPattern.Replace(".*", ".0.0.0");
+                            break;
+                        case 2: // e.g., 10.0.*
+                            subnetMask = 16;
+                            ipBase = ipPattern.Replace(".*", ".0.0");
+                            break;
+                        case 3: // e.g., 10.0.0.*
+                            subnetMask = 24;
+                            ipBase = ipPattern.Replace(".*", ".0");
+                            break;
+                    }
+                }
+                else
+                {
+                    ipBase = ipPattern.Replace("*", "0");
+                }
+
+                if (!IPAddress.TryParse(ipBase, out var ipAddress))
+                    continue;
+
+                if (!DateTime.TryParse(dateStr, out var banDate))
+                    banDate = DateTime.Now;
+
+                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                request.IPAddress = ipAddress.ToString();
+                request.SubnetMask = subnetMask;
+                request.BanDate = banDate;
+                request.RecordType = banInstanceRecordType.Permanent;
+                request.Notes = "Imported from legacy INI";
+                request.IsName = false;
+                request.IsIP = true;
+                request.IgnoreValidation = true;
+
+                var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+
+                if (result.Success)
+                    importedCount++;
+            }
+
+            MessageBox.Show($"Imported {importedCount} legacy IP bans.", "Legacy Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private async Task ImportLegacyBannedNames(string filePath)
+        {
+            var lines = File.ReadAllLines(filePath, Encoding.GetEncoding(1252));
+            int importedCount = 0;
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("["))
+                    continue;
+
+                // Format: {PlayerName}[#]={DateTime}[-]{Notes}
+                var eqSplit = line.Split('=');
+                if (eqSplit.Length != 2)
+                    continue;
+
+                string namePart = eqSplit[0].Trim();
+                string rightPart = eqSplit[1].Trim();
+
+                // Extract player name (remove [#])
+                int bracketIdx = namePart.IndexOf('[');
+                string playerName = bracketIdx > 0 ? namePart.Substring(0, bracketIdx) : namePart;
+
+                // Extract date and notes
+                var dashSplit = rightPart.Split(new[] { "[-]" }, StringSplitOptions.None);
+                string dateStr = dashSplit.Length > 0 ? dashSplit[0].Trim() : "";
+                string notes = dashSplit.Length > 1 ? dashSplit[1].Trim() : "";
+
+                if (!DateTime.TryParse(dateStr, out var banDate))
+                    banDate = DateTime.Now;
+
+                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                request.PlayerName = playerName;
+                request.BanDate = banDate;
+                request.RecordType = banInstanceRecordType.Permanent;
+                request.Notes = string.IsNullOrEmpty(notes) ? "Imported from legacy INI" : notes;
+                request.IsName = true;
+                request.IsIP = false;
+                request.IgnoreValidation = true;
+
+                var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+
+                if (result.Success)
+                    importedCount++;
+            }
+
+            MessageBox.Show($"Imported {importedCount} legacy name bans.", "Legacy Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         // ================================================================================
         // WHITELIST FUNCTIONALITY
         // ================================================================================
@@ -1230,11 +1546,189 @@ namespace RemoteClient.Forms.Panels
                 MessageBox.Show("Record(s) deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 // Hide the whitelist form
                 WhitelistForm.Visible = false;
-                methodFunction_HideBlacklistButtons();
+                methodFunction_HideWhitelistButtons();
             }
             else
             {
                 MessageBox.Show(errorMessages.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnExportWhitelist_Click(object sender, EventArgs e)
+        {
+            using (var saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Title = "Export Whitelist to JSON";
+                saveDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+                saveDialog.FileName = "WhitelistExport.json";
+                saveDialog.OverwritePrompt = true;
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ExportWhitelistToJson(saveDialog.FileName);
+                }
+            }
+        }
+
+        private void ExportWhitelistToJson(string filePath)
+        {
+            if (banInstance == null)
+            {
+                MessageBox.Show("No whitelist data available to export.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var exportData = new BlacklistImportModel
+            {
+                BannedPlayerNames = banInstance.WhitelistedNames,
+                BannedPlayerIPs = banInstance.WhitelistedIPs
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            try
+            {
+                File.WriteAllText(filePath, JsonSerializer.Serialize(exportData, options));
+                MessageBox.Show("Whitelist exported successfully.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error exporting whitelist: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void btnImportWhitelist_Click(object sender, EventArgs e)
+        {
+            ImportWhitelist();
+        }
+        private async void ImportWhitelist()
+        {
+            using (var openDialog = new OpenFileDialog())
+            {
+                openDialog.Title = "Import Whitelist from JSON";
+                openDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+                openDialog.Multiselect = false;
+
+                if (openDialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                try
+                {
+                    string json = File.ReadAllText(openDialog.FileName);
+                    var importData = JsonSerializer.Deserialize<BlacklistImportModel>(json);
+
+                    if (importData == null)
+                    {
+                        MessageBox.Show("No data found in the selected file.", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Track processed associations to avoid duplicates
+                    var processedNameIds = new HashSet<int>();
+                    var processedIpIds = new HashSet<int>();
+
+                    // Process name records (handle both and name-only)
+                    if (importData.BannedPlayerNames != null)
+                    {
+                        foreach (var nameRecord in importData.BannedPlayerNames)
+                        {
+                            if (nameRecord.AssociatedIP.HasValue && nameRecord.AssociatedIP.Value > 0)
+                            {
+                                // Only process if not already handled
+                                if (!processedNameIds.Contains(nameRecord.RecordID) && !processedIpIds.Contains(nameRecord.AssociatedIP.Value))
+                                {
+                                    var ipRecord = importData.BannedPlayerIPs?.FirstOrDefault(ip => ip.RecordID == nameRecord.AssociatedIP.Value);
+                                    if (ipRecord != null)
+                                    {
+                                        BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                        request.PlayerName = nameRecord.PlayerName;
+                                        request.IPAddress = ipRecord.PlayerIP.ToString();
+                                        request.SubnetMask = ipRecord.SubnetMask;
+                                        request.BanDate = nameRecord.Date;
+                                        request.ExpireDate = nameRecord.ExpireDate;
+                                        request.RecordType = nameRecord.RecordType;
+                                        request.Notes = nameRecord.Notes;
+                                        request.IsName = true;
+                                        request.IsIP = true;
+                                        request.IgnoreValidation = true;
+
+                                        var result = await ApiCore.ApiClient!.SaveWhitelistRecordAsync(request);
+                                        if (!result.Success)
+                                        {
+                                            MessageBox.Show($"Error importing name/IP pair '{nameRecord.PlayerName}/{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        }
+                                        processedNameIds.Add(nameRecord.RecordID);
+                                        processedIpIds.Add(ipRecord.RecordID);
+                                        continue;
+                                    }
+                                }
+                            }
+                            // Name only
+                            if (!processedNameIds.Contains(nameRecord.RecordID))
+                            {
+                                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                request.PlayerName = nameRecord.PlayerName;
+                                request.BanDate = nameRecord.Date;
+                                request.ExpireDate = nameRecord.ExpireDate;
+                                request.RecordType = nameRecord.RecordType;
+                                request.Notes = nameRecord.Notes;
+                                request.IsName = true;
+                                request.IsIP = false;
+                                request.IgnoreValidation = true;
+
+                                var result = await ApiCore.ApiClient!.SaveWhitelistRecordAsync(request);
+                                if (!result.Success)
+                                {
+                                    MessageBox.Show($"Error importing name record '{nameRecord.PlayerName}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                                processedNameIds.Add(nameRecord.RecordID);
+                            }
+                        }
+                    }
+
+                    // Process IP-only records
+                    if (importData.BannedPlayerIPs != null)
+                    {
+                        foreach (var ipRecord in importData.BannedPlayerIPs)
+                        {
+                            if (ipRecord.AssociatedName.HasValue && ipRecord.AssociatedName.Value > 0)
+                            {
+                                // Already processed as part of a name/IP pair
+                                if (processedIpIds.Contains(ipRecord.RecordID))
+                                    continue;
+                            }
+                            // IP only
+                            if (!processedIpIds.Contains(ipRecord.RecordID))
+                            {
+                                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                request.IPAddress = ipRecord.PlayerIP.ToString();
+                                request.SubnetMask = ipRecord.SubnetMask;
+                                request.BanDate = ipRecord.Date;
+                                request.ExpireDate = ipRecord.ExpireDate;
+                                request.RecordType = ipRecord.RecordType;
+                                request.Notes = ipRecord.Notes;
+                                request.IsName = false;
+                                request.IsIP = true;
+                                request.IgnoreValidation = true;
+
+                                var result = await ApiCore.ApiClient!.SaveWhitelistRecordAsync(request);
+                                if (!result.Success)
+                                {
+                                    MessageBox.Show($"Error importing IP record '{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                                processedIpIds.Add(ipRecord.RecordID);
+                            }
+                        }
+                    }
+
+                    MessageBox.Show($"Whitelist imported successfully. {CommonCore.instanceBans!.WhitelistedNames.Count} Records", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error importing whitelist: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 

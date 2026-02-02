@@ -2200,7 +2200,7 @@ namespace BHD_ServerManager.Forms.Panels
         {
             using (var openDialog = new OpenFileDialog())
             {
-                openDialog.Title = "Import Blacklist from JSON";
+                openDialog.Title = "Import Whitelist from JSON";
                 openDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
                 openDialog.Multiselect = false;
 

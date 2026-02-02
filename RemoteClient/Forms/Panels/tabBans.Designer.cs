@@ -36,6 +36,8 @@
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel3 = new TableLayoutPanel();
+            blacklist_btnExport = new FontAwesome.Sharp.IconButton();
+            blacklist_btnImport = new FontAwesome.Sharp.IconButton();
             blacklist_btnClose = new FontAwesome.Sharp.IconButton();
             blacklist_btnDelete = new FontAwesome.Sharp.IconButton();
             blacklist_btnSave = new FontAwesome.Sharp.IconButton();
@@ -72,6 +74,8 @@
             tabWhitelist = new TabPage();
             tableLayoutPanel7 = new TableLayoutPanel();
             tableLayoutPanel8 = new TableLayoutPanel();
+            wlControlDownload = new FontAwesome.Sharp.IconButton();
+            wlControlUpload = new FontAwesome.Sharp.IconButton();
             wlControlClose = new FontAwesome.Sharp.IconButton();
             wlControlDelete = new FontAwesome.Sharp.IconButton();
             wlControlSave = new FontAwesome.Sharp.IconButton();
@@ -314,6 +318,8 @@
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel3.Controls.Add(blacklist_btnExport, 3, 0);
+            tableLayoutPanel3.Controls.Add(blacklist_btnImport, 1, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnClose, 0, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnDelete, 2, 0);
             tableLayoutPanel3.Controls.Add(blacklist_btnSave, 4, 0);
@@ -326,6 +332,38 @@
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel3.Size = new Size(312, 40);
             tableLayoutPanel3.TabIndex = 3;
+            // 
+            // blacklist_btnExport
+            // 
+            blacklist_btnExport.Dock = DockStyle.Fill;
+            blacklist_btnExport.IconChar = FontAwesome.Sharp.IconChar.Download;
+            blacklist_btnExport.IconColor = Color.Black;
+            blacklist_btnExport.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnExport.IconSize = 32;
+            blacklist_btnExport.Location = new Point(189, 3);
+            blacklist_btnExport.Name = "blacklist_btnExport";
+            blacklist_btnExport.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnExport.Size = new Size(56, 34);
+            blacklist_btnExport.TabIndex = 15;
+            toolTip1.SetToolTip(blacklist_btnExport, "Export");
+            blacklist_btnExport.UseVisualStyleBackColor = true;
+            blacklist_btnExport.Click += btnExportBlacklist_Click;
+            // 
+            // blacklist_btnImport
+            // 
+            blacklist_btnImport.Dock = DockStyle.Fill;
+            blacklist_btnImport.IconChar = FontAwesome.Sharp.IconChar.Upload;
+            blacklist_btnImport.IconColor = Color.Black;
+            blacklist_btnImport.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            blacklist_btnImport.IconSize = 32;
+            blacklist_btnImport.Location = new Point(65, 3);
+            blacklist_btnImport.Name = "blacklist_btnImport";
+            blacklist_btnImport.Padding = new Padding(0, 3, 0, 0);
+            blacklist_btnImport.Size = new Size(56, 34);
+            blacklist_btnImport.TabIndex = 14;
+            toolTip1.SetToolTip(blacklist_btnImport, "Import");
+            blacklist_btnImport.UseVisualStyleBackColor = true;
+            blacklist_btnImport.Click += btnImportBlacklist_Click;
             // 
             // blacklist_btnClose
             // 
@@ -800,6 +838,8 @@
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanel8.Controls.Add(wlControlDownload, 3, 0);
+            tableLayoutPanel8.Controls.Add(wlControlUpload, 1, 0);
             tableLayoutPanel8.Controls.Add(wlControlClose, 0, 0);
             tableLayoutPanel8.Controls.Add(wlControlDelete, 2, 0);
             tableLayoutPanel8.Controls.Add(wlControlSave, 4, 0);
@@ -811,6 +851,38 @@
             tableLayoutPanel8.RowStyles.Add(new RowStyle());
             tableLayoutPanel8.Size = new Size(312, 40);
             tableLayoutPanel8.TabIndex = 3;
+            // 
+            // wlControlDownload
+            // 
+            wlControlDownload.Dock = DockStyle.Fill;
+            wlControlDownload.IconChar = FontAwesome.Sharp.IconChar.Download;
+            wlControlDownload.IconColor = Color.Black;
+            wlControlDownload.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlDownload.IconSize = 32;
+            wlControlDownload.Location = new Point(189, 3);
+            wlControlDownload.Name = "wlControlDownload";
+            wlControlDownload.Padding = new Padding(0, 3, 0, 0);
+            wlControlDownload.Size = new Size(56, 34);
+            wlControlDownload.TabIndex = 15;
+            toolTip1.SetToolTip(wlControlDownload, "Export");
+            wlControlDownload.UseVisualStyleBackColor = true;
+            wlControlDownload.Click += btnExportWhitelist_Click;
+            // 
+            // wlControlUpload
+            // 
+            wlControlUpload.Dock = DockStyle.Fill;
+            wlControlUpload.IconChar = FontAwesome.Sharp.IconChar.Upload;
+            wlControlUpload.IconColor = Color.Black;
+            wlControlUpload.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlUpload.IconSize = 32;
+            wlControlUpload.Location = new Point(65, 3);
+            wlControlUpload.Name = "wlControlUpload";
+            wlControlUpload.Padding = new Padding(0, 3, 0, 0);
+            wlControlUpload.Size = new Size(56, 34);
+            wlControlUpload.TabIndex = 14;
+            toolTip1.SetToolTip(wlControlUpload, "Import");
+            wlControlUpload.UseVisualStyleBackColor = true;
+            wlControlUpload.Click += btnImportWhitelist_Click;
             // 
             // wlControlClose
             // 
@@ -2629,5 +2701,9 @@
         private DataGridViewTextBoxColumn NL_notes;
         private FontAwesome.Sharp.IconButton blacklist_btnClose;
         private FontAwesome.Sharp.IconButton wlControlClose;
+        private FontAwesome.Sharp.IconButton blacklist_btnImport;
+        private FontAwesome.Sharp.IconButton wlControlUpload;
+        private FontAwesome.Sharp.IconButton blacklist_btnExport;
+        private FontAwesome.Sharp.IconButton wlControlDownload;
     }
 }
