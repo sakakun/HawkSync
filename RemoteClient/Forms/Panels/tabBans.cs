@@ -286,11 +286,11 @@ namespace RemoteClient.Forms.Panels
             blacklist_IPAddressTxt.Text = String.Empty;
             blacklist_IPSubnetTxt.Text = "32";
             // Ban Dates
-            blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
-            blacklist_DateStart.MaxDate = DateTime.Today.AddYears(1);
+            blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
+            blacklist_DateStart.MaxDate = DateTimePicker.MaximumDateTime;
             blacklist_DateStart.Value = DateTime.Now;
-            blacklist_DateEnd.MinDate = DateTime.Today.AddYears(-1);
-            blacklist_DateEnd.MaxDate = DateTime.Today.AddYears(1);
+            blacklist_DateEnd.MinDate = DateTimePicker.MinimumDateTime;
+            blacklist_DateEnd.MaxDate = DateTimePicker.MaximumDateTime;
             blacklist_DateEnd.Value = DateTime.Now;
             blacklist_DateEnd.Enabled = false;
             // Ban Type
@@ -445,8 +445,8 @@ namespace RemoteClient.Forms.Panels
 
             if (nameRecord != null)
             {
-                blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
-                blacklist_DateStart.MaxDate = DateTime.Today.AddYears(1);
+                blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
+                blacklist_DateStart.MaxDate = DateTimePicker.MaximumDateTime;
                 blacklist_DateStart.Value = nameRecord.Date;
 
                 if (nameRecord.RecordType == banInstanceRecordType.Temporary && nameRecord.ExpireDate.HasValue)
@@ -454,8 +454,8 @@ namespace RemoteClient.Forms.Panels
                     blacklist_TempBan.Checked = true;
                     blacklist_PermBan.Checked = false;
                     blacklist_DateEnd.Enabled = true;
-                    blacklist_DateEnd.MinDate = DateTime.Today.AddYears(-1);
-                    blacklist_DateEnd.MaxDate = DateTime.Today.AddYears(1);
+                    blacklist_DateEnd.MinDate = DateTimePicker.MinimumDateTime;
+                    blacklist_DateEnd.MaxDate = DateTimePicker.MaximumDateTime;
                     blacklist_DateEnd.Value = nameRecord.ExpireDate.Value;
                 }
                 else
@@ -469,8 +469,8 @@ namespace RemoteClient.Forms.Panels
             }
             else if (ipRecord != null)
             {
-                blacklist_DateStart.MinDate = DateTime.Today.AddYears(-1);
-                blacklist_DateStart.MaxDate = DateTime.Today.AddYears(1);
+                blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
+                blacklist_DateStart.MaxDate = DateTimePicker.MaximumDateTime;
                 blacklist_DateStart.Value = ipRecord.Date;
 
                 if (ipRecord.RecordType == banInstanceRecordType.Temporary && ipRecord.ExpireDate.HasValue)
@@ -478,8 +478,8 @@ namespace RemoteClient.Forms.Panels
                     blacklist_TempBan.Checked = true;
                     blacklist_PermBan.Checked = false;
                     blacklist_DateEnd.Enabled = true;
-                    blacklist_DateEnd.MinDate = DateTime.Today.AddYears(-1);
-                    blacklist_DateEnd.MaxDate = DateTime.Today.AddYears(1);
+                    blacklist_DateEnd.MinDate = DateTimePicker.MinimumDateTime;
+                    blacklist_DateEnd.MaxDate = DateTimePicker.MaximumDateTime;
                     blacklist_DateEnd.Value = ipRecord.ExpireDate.Value;
                 }
                 else
@@ -1098,11 +1098,11 @@ namespace RemoteClient.Forms.Panels
             textBox_addressWL.Text = String.Empty;
             cb_subnetWL.Text = "32";
             // Exempt Dates
-            dateTimePicker_WLstart.MinDate = DateTime.Today.AddYears(-1);
-            dateTimePicker_WLstart.MaxDate = DateTime.Today.AddYears(1);
+            dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
+            dateTimePicker_WLstart.MaxDate = DateTimePicker.MaximumDateTime;
             dateTimePicker_WLstart.Value = DateTime.Now;
-            dateTimePicker_WLend.MinDate = DateTime.Today.AddYears(-1);
-            dateTimePicker_WLend.MaxDate = DateTime.Today.AddYears(1);
+            dateTimePicker_WLend.MinDate = DateTimePicker.MinimumDateTime;
+            dateTimePicker_WLend.MaxDate = DateTimePicker.MaximumDateTime;
             dateTimePicker_WLend.Value = DateTime.Now;
             dateTimePicker_WLend.Enabled = false;
             // Exempt Type
@@ -1257,8 +1257,8 @@ namespace RemoteClient.Forms.Panels
 
             if (nameRecord != null)
             {
-                dateTimePicker_WLstart.MinDate = DateTime.Today.AddYears(-1);
-                dateTimePicker_WLstart.MaxDate = DateTime.Today.AddYears(1);
+                dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
+                dateTimePicker_WLstart.MaxDate = DateTimePicker.MaximumDateTime;
                 dateTimePicker_WLstart.Value = nameRecord.Date;
 
                 if (nameRecord.RecordType == banInstanceRecordType.Temporary && nameRecord.ExpireDate.HasValue)
@@ -1266,8 +1266,8 @@ namespace RemoteClient.Forms.Panels
                     checkBox_tempWL.Checked = true;
                     checkBox_permWL.Checked = false;
                     dateTimePicker_WLend.Enabled = true;
-                    dateTimePicker_WLend.MinDate = DateTime.Today.AddYears(-1);
-                    dateTimePicker_WLend.MaxDate = DateTime.Today.AddYears(1);
+                    dateTimePicker_WLend.MinDate = DateTimePicker.MinimumDateTime;
+                    dateTimePicker_WLend.MaxDate = DateTimePicker.MaximumDateTime;
                     dateTimePicker_WLend.Value = nameRecord.ExpireDate.Value;
                 }
                 else
@@ -1281,8 +1281,8 @@ namespace RemoteClient.Forms.Panels
             }
             else if (ipRecord != null)
             {
-                dateTimePicker_WLstart.MinDate = DateTime.Today.AddYears(-1);
-                dateTimePicker_WLstart.MaxDate = DateTime.Today.AddYears(1);
+                dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
+                dateTimePicker_WLstart.MaxDate = DateTimePicker.MaximumDateTime;
                 dateTimePicker_WLstart.Value = ipRecord.Date;
 
                 if (ipRecord.RecordType == banInstanceRecordType.Temporary && ipRecord.ExpireDate.HasValue)
@@ -1290,8 +1290,8 @@ namespace RemoteClient.Forms.Panels
                     checkBox_tempWL.Checked = true;
                     checkBox_permWL.Checked = false;
                     dateTimePicker_WLend.Enabled = true;
-                    dateTimePicker_WLend.MinDate = DateTime.Today.AddYears(-1);
-                    dateTimePicker_WLend.MaxDate = DateTime.Today.AddYears(1);
+                    dateTimePicker_WLend.MinDate = DateTimePicker.MinimumDateTime;
+                    dateTimePicker_WLend.MaxDate = DateTimePicker.MaximumDateTime;
                     dateTimePicker_WLend.Value = ipRecord.ExpireDate.Value;
                 }
                 else
