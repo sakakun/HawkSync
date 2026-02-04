@@ -1,6 +1,8 @@
 using HawkSyncShared.DTOs;
+using HawkSyncShared.SupportClasses;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
 using System.Threading.Channels;
 using System.Windows.Forms;
 
@@ -107,47 +109,55 @@ public class ApiClient : IDisposable
 
     public async Task<CommandResult> KickPlayerAsync(int playerSlot, string playerName)
     {
-        var command = new KickPlayerCommand(playerSlot, playerName);
+        var PlayerName = Func.TB64(playerName);
+        var command = new KickPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/kick", command);
     }
 
     public async Task<CommandResult> BanPlayerAsync(int playerSlot, string playerName, string playerIP, bool banIP)
     {
-        var command = new BanPlayerCommand(playerSlot, playerName, playerIP, banIP);
+        var PlayerName = Func.TB64(playerName);
+        var command = new BanPlayerCommand(playerSlot, PlayerName, playerIP, banIP);
         return await SendCommandAsync("/api/player/ban", command);
     }
 
     public async Task<CommandResult> WarnPlayerAsync(int playerSlot, string playerName, string message)
     {
-        var command = new WarnPlayerCommand(playerSlot, playerName, message);
+        var PlayerName = Func.TB64(playerName);
+        var command = new WarnPlayerCommand(playerSlot, PlayerName, message);
         return await SendCommandAsync("/api/player/warn", command);
     }
 
     public async Task<CommandResult> KillPlayerAsync(int playerSlot, string playerName)
     {
-        var command = new KillPlayerCommand(playerSlot, playerName);
+        var PlayerName = Func.TB64(playerName);
+        var command = new KillPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/kill", command);
     }
 
     public async Task<CommandResult> ArmPlayerAsync(int playerSlot, string playerName)
     {
-        var command = new ArmPlayerCommand(playerSlot, playerName);
+        var PlayerName = Func.TB64(playerName);
+        var command = new ArmPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/arm", command);
     }
 
     public async Task<CommandResult> DisarmPlayerAsync(int playerSlot, string playerName)
     {
-        var command = new DisarmPlayerCommand(playerSlot, playerName);
+        var PlayerName = Func.TB64(playerName);
+        var command = new DisarmPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/disarm", command);
     }
     public async Task<CommandResult> ToggleGodPlayerAsync(int playerSlot, string playerName)
     {
-        var command = new GodModePlayerCommand(playerSlot, playerName);
+        var PlayerName = Func.TB64(playerName);
+        var command = new GodModePlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/togglegodmode", command);
     }
     public async Task<CommandResult> SwitchTeamPlayerAsync(int playerSlot, string playerName, int teamNum)
     {
-        var command = new SwitchTeamPlayerCommand(playerSlot, playerName, teamNum);
+        var PlayerName = Func.TB64(playerName);
+        var command = new SwitchTeamPlayerCommand(playerSlot, PlayerName, teamNum);
         return await SendCommandAsync("/api/player/switchteam", command);
     }
 
@@ -157,7 +167,8 @@ public class ApiClient : IDisposable
 
     public async Task<CommandResult> SendChatAsync(string message, int channel = 1)
     {
-        var command = new SendChatCommand(message, channel);
+        var Message = Func.TB64(message);
+        var command = new SendChatCommand(Message, channel);
         return await SendCommandAsync("/api/chat/send", command);
     }
 
