@@ -16,7 +16,8 @@ public static class InstanceMapper
         chatInstance chat,
         banInstance bans,
         mapInstance maps,
-        adminInstance admin)
+        adminInstance admin,
+        statInstance stats)
     {
         return new ServerSnapshot
         {
@@ -26,6 +27,7 @@ public static class InstanceMapper
             Bans = bans,
             Maps = maps,
             Admins = admin,
+            Stats = stats,
             SnapshotTime = DateTime.UtcNow
         };
     }

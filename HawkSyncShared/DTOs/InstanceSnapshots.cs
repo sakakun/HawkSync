@@ -10,6 +10,7 @@ public record ServerSnapshot
     public banInstance Bans { get; init; } = new();
     public mapInstance Maps { get; init; } = new();
     public adminInstance Admins { get; init; } = new();
+    public statInstance Stats { get; init; } = new();
     public DateTime SnapshotTime { get; init; } = DateTime.UtcNow;
 }
 

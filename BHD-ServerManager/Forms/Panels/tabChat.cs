@@ -25,7 +25,6 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Class Variables ---
         private bool _firstLoadComplete = false;
         private DateTime _lastGridUpdate;
-        private bool _chatGridFirstLoad = true;
         // Add this class variable:
         private bool _autoScrollChat = true;
 

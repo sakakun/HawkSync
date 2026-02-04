@@ -22,7 +22,6 @@ namespace RemoteClient.Forms.Panels
         private chatInstance? chatInstance => CommonCore.instanceChat;
         // --- Class Variables ---
         private DateTime _lastGridUpdate;
-        private bool _chatGridFirstLoad = true;
         // Add this class variable:
         private bool _autoScrollChat = true;
 

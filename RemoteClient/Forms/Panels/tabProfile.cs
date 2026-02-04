@@ -180,8 +180,6 @@ public partial class tabProfile : UserControl
         // Enable/disable profile controls based on server status
         btn_profileBrowse1.Enabled = currentState;
         btn_profileBrowse2.Enabled = currentState;
-        btn_resetProfile.Enabled = currentState;
-        btn_saveProfile.Enabled = currentState;
 
     }
 

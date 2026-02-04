@@ -37,7 +37,8 @@ public class InstanceBroadcastService : BackgroundService
                     CommonCore.instanceChat ?? new(),
                     CommonCore.instanceBans ?? new(),
                     CommonCore.instanceMaps ?? new(),
-                    CommonCore.instanceAdmin ?? new()
+                    CommonCore.instanceAdmin ?? new(),
+                    CommonCore.instanceStats ?? new()
                 );
 
                 await _hubContext.Clients.Group("ServerUpdates")
