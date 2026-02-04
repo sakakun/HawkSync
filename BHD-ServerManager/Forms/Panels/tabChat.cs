@@ -158,15 +158,6 @@ namespace BHD_ServerManager.Forms.Panels
             var dgv = dataGridView_chatMessages;
             var chatLogs = chatInstance!.ChatLog;
 
-            // If status is SCORING or LOADING, clear and reload everything
-            if (theInstance?.instanceStatus == InstanceStatus.SCORING ||
-                theInstance?.instanceStatus == InstanceStatus.LOADINGMAP)
-            {
-                dgv.Rows.Clear();
-                _autoScrollChat = true; // Reset auto-scroll on reload
-                return;
-            }
-
             // Only add new messages
             int existingRows = dgv.Rows.Count;
             for (int i = existingRows; i < chatLogs.Count; i++)
@@ -211,6 +202,16 @@ namespace BHD_ServerManager.Forms.Panels
                 // Update chat messages grid
                 functionEvent_UpdateChatMessagesGrid();
             }
+
+            // If status is SCORING or LOADING, clear and reload everything
+            if (theInstance?.instanceStatus == InstanceStatus.SCORING ||
+                theInstance?.instanceStatus == InstanceStatus.LOADINGMAP)
+            {
+                dataGridView_chatMessages.Rows.Clear();
+                _autoScrollChat = true; // Reset auto-scroll on reload
+                return;
+            }
+
         }
 
         /// <summary>
