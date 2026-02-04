@@ -121,7 +121,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             var Pointer = baseAddr + 0x005ED600;
             ReadProcessMemory((int)processHandle, Pointer, PointerAddr, PointerAddr.Length, ref buffer);
             int buffer2 = 0;
-            byte[] Hostname = Encoding.Default.GetBytes(thisInstance.gameHostName + "\0");
+            byte[] Hostname = Encoding.GetEncoding(1252).GetBytes(thisInstance.gameHostName + "\0");
             var Address2HostName = BitConverter.ToInt32(PointerAddr, 0);
             WriteProcessMemory((int)processHandle, Address2HostName + 0x3C, Hostname, Hostname.Length, ref buffer2);
 
@@ -619,7 +619,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] ServerName = new byte[31];
             int ServerNamePtrRead = 0;
             ReadProcessMemory((int)processHandle, Ptr2 + 0x4, ServerName, ServerName.Length, ref ServerNamePtrRead);
-            string ServerNameQuery = Encoding.Default.GetString(ServerName).Replace("\0", "");
+            string ServerNameQuery = Encoding.GetEncoding(1252).GetString(ServerName).Replace("\0", "");
             // end Server Query Name
 
             // Server Name Display
@@ -631,11 +631,11 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] ServerNameDisplay = new byte[31];
             int ServerNameRead = 0;
             ReadProcessMemory((int)processHandle, ServerDisplayerName + 0x30, ServerNameDisplay, ServerNameDisplay.Length, ref ServerNameRead);
-            string ServerDisplayName = Encoding.Default.GetString(ServerNameDisplay).Replace("\0", "");
+            string ServerDisplayName = Encoding.GetEncoding(1252).GetString(ServerNameDisplay).Replace("\0", "");
             // end Server Name Display
 
             // since either one or the other isn't what it should be.. just update them both. Call it a day.
-            byte[] ServerNameBytes = Encoding.Default.GetBytes(thisInstance.gameServerName);
+            byte[] ServerNameBytes = Encoding.GetEncoding(1252).GetBytes(thisInstance.gameServerName);
             int bytesWritten = 0;
             WriteProcessMemory((int)processHandle, ServerDisplayerName, ServerNameBytes, ServerNameBytes.Length, ref bytesWritten);
             WriteProcessMemory((int)processHandle, Ptr2 + 0x4, ServerNameBytes, ServerNameBytes.Length, ref bytesWritten);
@@ -655,10 +655,10 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] MOTDBytes = new byte[85];
             int MOTDRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, MOTDBytes, MOTDBytes.Length, ref MOTDRead);
-            string MOTD = Encoding.Default.GetString(MOTDBytes).Replace("\0", "");
+            string MOTD = Encoding.GetEncoding(1252).GetString(MOTDBytes).Replace("\0", "");
 
             int MOTDWritten = 0;
-            byte[] MOTDWrite = Encoding.Default.GetBytes(thisInstance.gameMOTD);
+            byte[] MOTDWrite = Encoding.GetEncoding(1252).GetBytes(thisInstance.gameMOTD);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MOTDWrite, MOTDWrite.Length, ref MOTDWritten);
 
 
@@ -1437,7 +1437,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             // Write to cmdConsole
             int bytesWritten = 0;
-            byte[] buffer = Encoding.Default.GetBytes($"{Command}\0"); // '\0' marks the end of string
+            byte[] buffer = Encoding.GetEncoding(1252).GetBytes($"{Command}\0"); // '\0' marks the end of string
 
             WriteProcessMemory((int)processHandle, 0x00879A14, buffer, buffer.Length, ref bytesWritten);
             Thread.Sleep(100);
@@ -1558,7 +1558,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int bytesRead = 0;
             byte[] buffer = new byte[26];
             ReadProcessMemory((int)processHandle, 0x0071569C, buffer, buffer.Length, ref bytesRead);
-            string MissionName = Encoding.Default.GetString(buffer);
+            string MissionName = Encoding.GetEncoding(1252).GetString(buffer);
             mapInstance.CurrentMapName = MissionName.Replace("\0", "");
 
 
@@ -1960,7 +1960,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             // Weapons
             byte[] read_weapons = new byte[250];
             ReadProcessMemory((int)processHandle, beginaddr + 0x000ADB70, read_weapons, read_weapons.Length, ref bytesread);
-            var MemoryWeapons = Encoding.Default.GetString(read_weapons).Replace("\0", "|");
+            var MemoryWeapons = Encoding.GetEncoding(1252).GetString(read_weapons).Replace("\0", "|");
             string[] weapons = MemoryWeapons.Split('|');
             List<string> WeaponList = new List<string>();
 
@@ -2035,7 +2035,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] Message = new byte[74];
             int MessageRead = 0;
             ReadProcessMemory((int)processHandle, ChatLogAddr, Message, Message.Length, ref MessageRead);
-            string LastMessage = Encoding.Default.GetString(Message).Replace("\0", "");
+            string LastMessage = Encoding.GetEncoding(1252).GetString(Message).Replace("\0", "");
 
             int msgTypeAddr = ChatLogAddr + 0x78;
             byte[] msgType = new byte[4];
