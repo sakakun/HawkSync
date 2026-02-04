@@ -2,8 +2,7 @@
   "profiles": {
     "RemoteClient": {
       "commandName": "Project",
-      "workingDirectory": "\\\\VM-DEV\\ServerData\\Development\\HawkSync\\RemoteClient",
-      "remoteDebugEnabled": true,
+      "remoteDebugEnabled": false,
       "remoteDebugMachine": "VM-DEV",
       "authenticationMode": "Windows"
     }

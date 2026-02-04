@@ -18,6 +18,13 @@ public partial class tabAdmin : UserControl
     private int _selectedUserID = -1;
     private bool _isEditMode = false;
 
+    // Add these fields to your class
+    private DateTime _lastUserListRefresh = DateTime.MinValue;
+    private const int UserListRefreshIntervalSeconds = 10;
+    // Add this field to your class to persist the last selected user ID
+    private int? _lastSelectedUserId = null;
+    private int _lastScrollIndex = 0;
+
     private enum FormMode
     {
         View,
@@ -35,10 +42,27 @@ public partial class tabAdmin : UserControl
         InitializeEvents();
         LoadUserList();
         SetFormMode(FormMode.View);
+        dataGridView1.SelectionChanged += DataGridView1_SelectionChanged;
 
         // Subscribe to server updates
         ApiCore.OnSnapshotReceived += OnSnapshotReceived;
 
+    }
+
+    private void DataGridView1_SelectionChanged(object? sender, EventArgs e)
+    {
+        if (dataGridView1.CurrentRow != null)
+        {
+            var val = dataGridView1.CurrentRow.Cells[0].Value;
+            if (val != null && int.TryParse(val.ToString(), out int id) && id > 0)
+                _lastSelectedUserId = id;
+            else
+                _lastSelectedUserId = null;
+        }
+        else
+        {
+            _lastSelectedUserId = null;
+        }
     }
 
     private void OnSnapshotReceived(ServerSnapshot snapshot)
@@ -78,6 +102,10 @@ public partial class tabAdmin : UserControl
     /// </summary>
     private void LoadUserList()
     {
+        // Store scroll position before updating
+        if (dataGridView1.Rows.Count > 0)
+            _lastScrollIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
+
         var users = CommonCore.instanceAdmin!.Users.OrderBy(u => u.UserID).ToList();
 
         // Build a lookup for quick access
@@ -85,33 +113,20 @@ public partial class tabAdmin : UserControl
 
         // Track which user IDs are present in the grid
         var gridUserIds = new HashSet<int>();
-
-        // Update or remove existing rows
-        for (int i = dataGridView1.Rows.Count - 1; i >= 0; i--)
+        foreach (DataGridViewRow row in dataGridView1.Rows)
         {
-            var row = dataGridView1.Rows[i];
             if (row.IsNewRow) continue;
-
             int userId = Convert.ToInt32(row.Cells[0].Value);
+            gridUserIds.Add(userId);
 
-            if (!userDict.TryGetValue(userId, out var user))
+            if (userDict.TryGetValue(userId, out var user))
             {
-                // User no longer exists, remove row
-                dataGridView1.Rows.RemoveAt(i);
-            }
-            else
-            {
-                // User exists, check if data matches
-                string username = row.Cells[1].Value?.ToString() ?? "";
-                string status = row.Cells[2].Value?.ToString() ?? "";
-                string created = row.Cells[3].Value?.ToString() ?? "";
-                string lastLogin = row.Cells[4].Value?.ToString() ?? "";
-
+                // Update row if any data has changed
                 bool needsUpdate =
-                    username != user.Username ||
-                    status != (user.IsActive ? "Active" : "Disabled") ||
-                    created != user.Created.ToString("yyyy-MM-dd") ||
-                    lastLogin != (user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never");
+                    row.Cells[1].Value?.ToString() != user.Username ||
+                    row.Cells[2].Value?.ToString() != (user.IsActive ? "Active" : "Disabled") ||
+                    row.Cells[3].Value?.ToString() != user.Created.ToString("yyyy-MM-dd") ||
+                    row.Cells[4].Value?.ToString() != (user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never");
 
                 if (needsUpdate)
                 {
@@ -120,8 +135,11 @@ public partial class tabAdmin : UserControl
                     row.Cells[3].Value = user.Created.ToString("yyyy-MM-dd");
                     row.Cells[4].Value = user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never";
                 }
-
-                gridUserIds.Add(userId);
+            }
+            else
+            {
+                // User no longer exists, remove row
+                dataGridView1.Rows.Remove(row);
             }
         }
 
@@ -140,7 +158,28 @@ public partial class tabAdmin : UserControl
             }
         }
 
-        AppDebug.Log("tabAdmin", $"Synchronized {users.Count} users with grid");
+        // Restore selection if possible
+        dataGridView1.ClearSelection();
+        if (_lastSelectedUserId.HasValue)
+        {
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                if (Convert.ToInt32(row.Cells[0].Value) == _lastSelectedUserId.Value)
+                {
+                    row.Selected = true;
+                    dataGridView1.CurrentCell = row.Cells[1];
+                    break;
+                }
+            }
+        }
+
+        // Restore scroll position if possible
+        if (dataGridView1.RowCount > 0 && _lastScrollIndex >= 0 && _lastScrollIndex < dataGridView1.RowCount)
+        {
+            dataGridView1.FirstDisplayedScrollingRowIndex = _lastScrollIndex;
+        }
+
+        AppDebug.Log("tabAdmin", $"Loaded {users.Count} users from cache (differential update)");
     }
 
     // ================================================================================

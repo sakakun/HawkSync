@@ -19,19 +19,11 @@
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
     <PackageOutputPath>\bin\$(AssemblyName)</PackageOutputPath>
     <Platforms>AnyCPU</Platforms>
-    <Configurations>Debug;Release;Debug Homelab</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <GenerateDocumentationFile>False</GenerateDocumentationFile> <!-- This line is crucial -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <IsPublishable>True</IsPublishable>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
-    <DebugType>portable</DebugType>
-    <WarningLevel>8</WarningLevel>
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Homelab|AnyCPU'">
     <IsPublishable>True</IsPublishable>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <DebugType>portable</DebugType>

@@ -19,6 +19,13 @@ public partial class tabAdmin : UserControl
     private int _selectedUserID = -1;
     private bool _isEditMode = false;
 
+    // Add these fields to your class
+    private DateTime _lastUserListRefresh = DateTime.MinValue;
+    private const int UserListRefreshIntervalSeconds = 10;
+    // Add this field to your class to persist the last selected user ID
+    private int? _lastSelectedUserId = null;
+    private int _lastScrollIndex = 0;
+
     private enum FormMode
     {
         View,
@@ -34,29 +41,65 @@ public partial class tabAdmin : UserControl
     {
         InitializeComponent();
         InitializeEvents();
-
+        dataGridView1.SelectionChanged += DataGridView1_SelectionChanged;
         adminInstanceManager.LoadUsersCache();
         LoadUserList();
 
         SetFormMode(FormMode.View);
     }
 
+    private void DataGridView1_SelectionChanged(object? sender, EventArgs e)
+    {
+        if (dataGridView1.CurrentRow != null)
+        {
+            var val = dataGridView1.CurrentRow.Cells[0].Value;
+            if (val != null && int.TryParse(val.ToString(), out int id) && id > 0)
+                _lastSelectedUserId = id;
+            else
+                _lastSelectedUserId = null;
+        }
+        else
+        {
+            _lastSelectedUserId = null;
+        }
+    }
+
     public void tickerAdmin_Tick()
     {
-        if(InvokeRequired)
+        if (InvokeRequired)
         {
             Invoke(new Action(tickerAdmin_Tick));
             return;
         }
 
-        //Periodic tasks can be added here if needed
+        bool shouldRefresh = false;
+
+        // Check if 10 seconds have passed since last refresh
+        if ((DateTime.Now - _lastUserListRefresh).TotalSeconds >= UserListRefreshIntervalSeconds)
+        {
+            shouldRefresh = true;
+        }
+
+        // Or if forced by the adminInstance
         if (adminInstance.ForceUIUpdate)
         {
-            adminInstanceManager.LoadUsersCache();
-            LoadUserList();
+            shouldRefresh = true;
             adminInstance.ForceUIUpdate = false;
         }
 
+        if (shouldRefresh)
+        {
+            // Store current selection and scroll position for restoration in LoadUserList
+            if (dataGridView1.CurrentRow != null)
+                _lastSelectedUserId = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value);
+            else
+                _lastSelectedUserId = null;
+
+            _lastUserListRefresh = DateTime.Now;
+
+            adminInstanceManager.LoadUsersCache();
+            LoadUserList();
+        }
     }
 
     private void InitializeEvents()
@@ -79,28 +122,86 @@ public partial class tabAdmin : UserControl
     // DATA LOADING
     // ================================================================================
 
-    /// <summary>
-    /// Load all users into the DataGridView from cache
-    /// </summary>
     private void LoadUserList()
     {
-        dataGridView1.Rows.Clear();
+        // Store scroll position before updating
+        if (dataGridView1.Rows.Count > 0)
+            _lastScrollIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
 
-        // Get users from cache (adminInstance.Users)
-        var users = CommonCore.instanceAdmin!.Users;
+        var users = CommonCore.instanceAdmin!.Users.OrderBy(u => u.UserID).ToList();
 
-        foreach (var user in users.OrderBy(u => u.UserID))
+        // Build a lookup for quick access
+        var userDict = users.ToDictionary(u => u.UserID);
+
+        // Track which user IDs are present in the grid
+        var gridUserIds = new HashSet<int>();
+        foreach (DataGridViewRow row in dataGridView1.Rows)
         {
-            dataGridView1.Rows.Add(
-                user.UserID,
-                user.Username,
-                user.IsActive ? "Active" : "Disabled",
-                user.Created.ToString("yyyy-MM-dd"),
-                user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never"
-            );
+            if (row.IsNewRow) continue;
+            int userId = Convert.ToInt32(row.Cells[0].Value);
+            gridUserIds.Add(userId);
+
+            if (userDict.TryGetValue(userId, out var user))
+            {
+                // Update row if any data has changed
+                bool needsUpdate =
+                    row.Cells[1].Value?.ToString() != user.Username ||
+                    row.Cells[2].Value?.ToString() != (user.IsActive ? "Active" : "Disabled") ||
+                    row.Cells[3].Value?.ToString() != user.Created.ToString("yyyy-MM-dd") ||
+                    row.Cells[4].Value?.ToString() != (user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never");
+
+                if (needsUpdate)
+                {
+                    row.Cells[1].Value = user.Username;
+                    row.Cells[2].Value = user.IsActive ? "Active" : "Disabled";
+                    row.Cells[3].Value = user.Created.ToString("yyyy-MM-dd");
+                    row.Cells[4].Value = user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never";
+                }
+            }
+            else
+            {
+                // User no longer exists, remove row
+                dataGridView1.Rows.Remove(row);
+            }
         }
 
-        AppDebug.Log("tabAdmin", $"Loaded {users.Count} users from cache");
+        // Add new users not present in the grid
+        foreach (var user in users)
+        {
+            if (!gridUserIds.Contains(user.UserID))
+            {
+                dataGridView1.Rows.Add(
+                    user.UserID,
+                    user.Username,
+                    user.IsActive ? "Active" : "Disabled",
+                    user.Created.ToString("yyyy-MM-dd"),
+                    user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never"
+                );
+            }
+        }
+
+        // Restore selection if possible
+        dataGridView1.ClearSelection();
+        if (_lastSelectedUserId.HasValue)
+        {
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                if (Convert.ToInt32(row.Cells[0].Value) == _lastSelectedUserId.Value)
+                {
+                    row.Selected = true;
+                    dataGridView1.CurrentCell = row.Cells[1];
+                    break;
+                }
+            }
+        }
+
+        // Restore scroll position if possible
+        if (dataGridView1.RowCount > 0 && _lastScrollIndex >= 0 && _lastScrollIndex < dataGridView1.RowCount)
+        {
+            dataGridView1.FirstDisplayedScrollingRowIndex = _lastScrollIndex;
+        }
+
+        AppDebug.Log("tabAdmin", $"Loaded {users.Count} users from cache (differential update)");
     }
 
     // ================================================================================
