@@ -167,8 +167,9 @@ public class ApiClient : IDisposable
 
     public async Task<CommandResult> SendChatAsync(string message, int channel = 1)
     {
-        var Message = Func.TB64(message);
-        var command = new SendChatCommand(Message, channel);
+        string chatMessage = Func.TB64(message);
+
+        var command = new SendChatCommand(chatMessage, channel);
         return await SendCommandAsync("/api/chat/send", command);
     }
 

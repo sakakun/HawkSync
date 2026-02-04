@@ -23,10 +23,14 @@ namespace RemoteClient.Forms.Panels
         // --- Class Variables ---
         private DateTime _lastGridUpdate;
         private bool _chatGridFirstLoad = true;
+        // Add this class variable:
+        private bool _autoScrollChat = true;
 
         public tabChat()
         {
             InitializeComponent();
+
+            dataGridView_chatMessages.Scroll += dataGridView_chatMessages_Scroll;
 
             // Wire up Enter key for chat message send
             tb_chatMessage.KeyDown += (s, e) =>
@@ -66,6 +70,16 @@ namespace RemoteClient.Forms.Panels
 
             // OPTIONALLY: Subscribe to snapshots for server info panel
             ApiCore.OnSnapshotReceived += OnSnapshotReceived;
+        }
+
+        // Scroll event handler to track if user is at the bottom
+        private void dataGridView_chatMessages_Scroll(object? sender, ScrollEventArgs e)
+        {
+            var dgv = dataGridView_chatMessages;
+            int firstDisplayedRow = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
+            int visibleRows = dgv.DisplayedRowCount(false);
+            bool atBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
+            _autoScrollChat = atBottom;
         }
 
         private void OnSnapshotReceived(ServerSnapshot snapshot)
@@ -190,21 +204,23 @@ namespace RemoteClient.Forms.Panels
             _lastGridUpdate = DateTime.UtcNow;
 
             var dgv = dataGridView_chatMessages;
-
-            // Save scroll position
-            int firstDisplayedRow = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
-            int visibleRows = dgv.DisplayedRowCount(false);
-            bool wasAtBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
-
-            // Clear and repopulate from manager
-            dgv.Rows.Clear();
-            
             var chatLogs = chatInstance!.ChatLog;
-            
-            foreach (ChatLogObject entry in chatLogs)
-            {
-                DateTime TimeStamp = entry.MessageTimeStamp;
 
+            // If status is SCORING or LOADING, clear and reload everything
+            if (theInstance?.instanceStatus == InstanceStatus.SCORING ||
+                theInstance?.instanceStatus == InstanceStatus.LOADINGMAP)
+            {
+                dgv.Rows.Clear();
+                _autoScrollChat = true; // Reset auto-scroll on reload
+                return;
+            }
+
+            // Only add new messages
+            int existingRows = dgv.Rows.Count;
+            for (int i = existingRows; i < chatLogs.Count; i++)
+            {
+                var entry = chatLogs[i];
+                DateTime TimeStamp = entry.MessageTimeStamp;
                 dgv.Rows.Add(
                     TimeStamp.ToString("HH:mm:ss"),
                     entry.TeamDisplay,
@@ -213,54 +229,40 @@ namespace RemoteClient.Forms.Panels
                 );
             }
 
-            // Restore scroll position safely
-            if (dgv.Rows.Count > 0)
+            // Auto-scroll to bottom if enabled
+            if (_autoScrollChat && dgv.Rows.Count > 10)
             {
-                int targetRow;
-                if (_chatGridFirstLoad)
-                {
-                    // Always scroll to bottom on first load
-                    targetRow = dgv.Rows.Count - visibleRows;
-                    if (targetRow < 0) targetRow = 0;
-                    _chatGridFirstLoad = false;
-                }
-                else if (wasAtBottom)
-                {
-                    if (visibleRows >= dgv.Rows.Count)
-                    {
-                        targetRow = 0;
-                    }
-                    else
-                    {
-                        targetRow = dgv.Rows.Count - visibleRows;
-                        if (targetRow < 0) targetRow = 0;
-                    }
-                }
-                else
-                {
-                    targetRow = firstDisplayedRow;
-                    if (targetRow >= dgv.Rows.Count) targetRow = dgv.Rows.Count - 1;
-                    if (targetRow < 0) targetRow = 0;
-                }
-
-                // Only set scroll index if valid
-                if (targetRow >= 0 && targetRow < dgv.Rows.Count)
-                {
-                    dgv.FirstDisplayedScrollingRowIndex = targetRow;
-                }
+                int visibleRows = dgv.DisplayedRowCount(false);
+                dgv.FirstDisplayedScrollingRowIndex = Math.Min(dgv.Rows.Count - 1, Math.Max(30, dgv.Rows.Count - visibleRows));
             }
         }
 
         private async void SendChatMessage()
         {
             string message = tb_chatMessage.Text.Trim();
-            int channel = comboBox_chatGroup.SelectedIndex;
+            int channel = MapChannelIndexToChannel(comboBox_chatGroup.SelectedIndex);
             if (string.IsNullOrEmpty(message)) return;
 
             var result = await ApiCore.ApiClient!.SendChatAsync(message, channel);
             if (result.Success) tb_chatMessage.Clear();
             else MessageBox.Show($"Failed to send: {result.Message}");
         }
+
+        /// <summary>
+        /// Map UI channel dropdown index to actual channel number
+        /// </summary>
+        public static int MapChannelIndexToChannel(int selectedIndex)
+        {
+            return selectedIndex switch
+            {
+                1 => 1, // Global
+                2 => 2, // Blue
+                3 => 3, // Red
+                0 => 0, // Server
+                _ => 0  // Default to server
+            };
+        }
+
 
         private async void AddAutoMessage()
         {

@@ -26,10 +26,26 @@ namespace BHD_ServerManager.Forms.Panels
         private bool _firstLoadComplete = false;
         private DateTime _lastGridUpdate;
         private bool _chatGridFirstLoad = true;
+        // Add this class variable:
+        private bool _autoScrollChat = true;
 
         public tabChat()
         {
             InitializeComponent();
+
+            dataGridView_chatMessages.Scroll += dataGridView_chatMessages_Scroll;
+
+        }
+
+
+        // Scroll event handler to track if user is at the bottom
+        private void dataGridView_chatMessages_Scroll(object? sender, ScrollEventArgs e)
+        {
+            var dgv = dataGridView_chatMessages;
+            int firstDisplayedRow = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
+            int visibleRows = dgv.DisplayedRowCount(false);
+            bool atBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
+            _autoScrollChat = atBottom;
         }
 
         /// <summary>
@@ -140,21 +156,23 @@ namespace BHD_ServerManager.Forms.Panels
             _lastGridUpdate = DateTime.UtcNow;
 
             var dgv = dataGridView_chatMessages;
-
-            // Save scroll position
-            int firstDisplayedRow = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
-            int visibleRows = dgv.DisplayedRowCount(false);
-            bool wasAtBottom = (firstDisplayedRow + visibleRows) >= dgv.Rows.Count;
-
-            // Clear and repopulate from manager
-            dgv.Rows.Clear();
-            
             var chatLogs = chatInstance!.ChatLog;
-            
-            foreach (ChatLogObject entry in chatLogs)
-            {
-                DateTime TimeStamp = entry.MessageTimeStamp;
 
+            // If status is SCORING or LOADING, clear and reload everything
+            if (theInstance?.instanceStatus == InstanceStatus.SCORING ||
+                theInstance?.instanceStatus == InstanceStatus.LOADINGMAP)
+            {
+                dgv.Rows.Clear();
+                _autoScrollChat = true; // Reset auto-scroll on reload
+                return;
+            }
+
+            // Only add new messages
+            int existingRows = dgv.Rows.Count;
+            for (int i = existingRows; i < chatLogs.Count; i++)
+            {
+                var entry = chatLogs[i];
+                DateTime TimeStamp = entry.MessageTimeStamp;
                 dgv.Rows.Add(
                     TimeStamp.ToString("HH:mm:ss"),
                     entry.TeamDisplay,
@@ -163,41 +181,11 @@ namespace BHD_ServerManager.Forms.Panels
                 );
             }
 
-            // Restore scroll position safely
-            if (dgv.Rows.Count > 0)
+            // Auto-scroll to bottom if enabled
+            if (_autoScrollChat && dgv.Rows.Count > 10)
             {
-                int targetRow;
-                if (_chatGridFirstLoad)
-                {
-                    // Always scroll to bottom on first load
-                    targetRow = dgv.Rows.Count - visibleRows;
-                    if (targetRow < 0) targetRow = 0;
-                    _chatGridFirstLoad = false;
-                }
-                else if (wasAtBottom)
-                {
-                    if (visibleRows >= dgv.Rows.Count)
-                    {
-                        targetRow = 0;
-                    }
-                    else
-                    {
-                        targetRow = dgv.Rows.Count - visibleRows;
-                        if (targetRow < 0) targetRow = 0;
-                    }
-                }
-                else
-                {
-                    targetRow = firstDisplayedRow;
-                    if (targetRow >= dgv.Rows.Count) targetRow = dgv.Rows.Count - 1;
-                    if (targetRow < 0) targetRow = 0;
-                }
-
-                // Only set scroll index if valid
-                if (targetRow >= 0 && targetRow < dgv.Rows.Count)
-                {
-                    dgv.FirstDisplayedScrollingRowIndex = targetRow;
-                }
+                int visibleRows = dgv.DisplayedRowCount(false);
+                dgv.FirstDisplayedScrollingRowIndex = Math.Min(dgv.Rows.Count - 1, Math.Max(30, dgv.Rows.Count - visibleRows));
             }
         }
 
@@ -385,5 +373,6 @@ namespace BHD_ServerManager.Forms.Panels
                 }
             }
         }
+
     }
 }
