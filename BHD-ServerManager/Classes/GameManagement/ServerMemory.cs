@@ -1280,7 +1280,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             Thread.Sleep(50);
             int bytesWritten = 0;
             byte[] buffer;
-            buffer = Encoding.Default.GetBytes($"{Msg}\0"); // '\0' marks the end of string
+            buffer = Encoding.GetEncoding(1252).GetBytes($"{Msg}\0"); // '\0' marks the end of string
             WriteProcessMemory((int)processHandle, 0x00879A14, buffer, buffer.Length, ref bytesWritten);
             Thread.Sleep(50);
             PostMessage(windowHandle, (ushort)WM_KEYDOWN, VK_ENTER, 0);

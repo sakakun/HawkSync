@@ -77,7 +77,7 @@ namespace RemoteClient.Forms.Panels
             }
 
             // Update chat instance
-            fuctionEvent_UpdateSlapMessages();
+            functionEvent_UpdateSlapMessages();
             functionEvent_UpdateAutoMessages();
             functionEvent_UpdateChatMessagesGrid();
         }
@@ -85,28 +85,100 @@ namespace RemoteClient.Forms.Panels
         /// <summary>
         /// Update slap messages grid from manager
         /// </summary>
-        public void fuctionEvent_UpdateSlapMessages()
+        public void functionEvent_UpdateSlapMessages()
         {
-            dg_slapMessages.Rows.Clear();
-            
-            foreach (var slapMsg in chatInstance!.SlapMessages)
+            var slapMessages = CommonCore.instanceChat!.SlapMessages;
+            var dgv = dg_slapMessages;
+
+            // Preserve scroll position
+            int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
+
+            // Build lookup for fast access
+            var managerDict = slapMessages.ToDictionary(x => x.SlapMessageId);
+
+            // Remove rows not in manager
+            for (int i = dgv.Rows.Count - 1; i >= 0; i--)
             {
-                dg_slapMessages.Rows.Add(slapMsg.SlapMessageId, slapMsg.SlapMessageText);
+                int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
+                if (!managerDict.ContainsKey(id))
+                    dgv.Rows.RemoveAt(i);
             }
+
+            // Update existing rows and add new ones
+            foreach (var msg in slapMessages)
+            {
+                bool found = false;
+                for (int i = 0; i < dgv.Rows.Count; i++)
+                {
+                    int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
+                    if (id == msg.SlapMessageId)
+                    {
+                        // Update if text changed
+                        if (!Equals(dgv.Rows[i].Cells[1].Value, msg.SlapMessageText))
+                            dgv.Rows[i].Cells[1].Value = msg.SlapMessageText;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    dgv.Rows.Add(msg.SlapMessageId, msg.SlapMessageText);
+                }
+            }
+
+            // Restore scroll position
+            if (dgv.Rows.Count > 0 && scrollIndex < dgv.Rows.Count)
+                dgv.FirstDisplayedScrollingRowIndex = scrollIndex;
         }
-        /// <summary>
-        /// Update auto messages grid from manager
-        /// </summary>
+
         public void functionEvent_UpdateAutoMessages()
         {
-            dg_autoMessages.Rows.Clear();
-            
-            foreach (var autoMsg in chatInstance!.AutoMessages)
+            var autoMessages = CommonCore.instanceChat!.AutoMessages;
+            var dgv = dg_autoMessages;
+
+            // Preserve scroll position
+            int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
+
+            var managerDict = autoMessages.ToDictionary(x => x.AutoMessageId);
+
+            // Remove rows not in manager
+            for (int i = dgv.Rows.Count - 1; i >= 0; i--)
             {
-                dg_autoMessages.Rows.Add(autoMsg.AutoMessageId, autoMsg.AutoMessageTigger, autoMsg.AutoMessageText);
+                int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
+                if (!managerDict.ContainsKey(id))
+                    dgv.Rows.RemoveAt(i);
             }
+
+            // Update existing rows and add new ones
+            foreach (var msg in autoMessages)
+            {
+                bool found = false;
+                for (int i = 0; i < dgv.Rows.Count; i++)
+                {
+                    int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
+                    if (id == msg.AutoMessageId)
+                    {
+                        // Update if changed
+                        if (!Equals(dgv.Rows[i].Cells[1].Value, msg.AutoMessageTigger))
+                            dgv.Rows[i].Cells[1].Value = msg.AutoMessageTigger;
+                        if (!Equals(dgv.Rows[i].Cells[2].Value, msg.AutoMessageText))
+                            dgv.Rows[i].Cells[2].Value = msg.AutoMessageText;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    dgv.Rows.Add(msg.AutoMessageId, msg.AutoMessageTigger, msg.AutoMessageText);
+                }
+            }
+
+            // Restore scroll position
+            if (dgv.Rows.Count > 0 && scrollIndex < dgv.Rows.Count)
+                dgv.FirstDisplayedScrollingRowIndex = scrollIndex;
         }
-                /// <summary>
+        
+        /// <summary>
         /// Update chat messages grid from in-memory logs
         /// </summary>
         public void functionEvent_UpdateChatMessagesGrid()
