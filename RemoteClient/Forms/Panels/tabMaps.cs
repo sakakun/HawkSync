@@ -52,8 +52,8 @@ namespace RemoteClient.Forms.Panels
 
         public void methodFunction_UpdateMapControls()
         {
-            bool isActivePlaylist = mapInstance.ActivePlaylist == mapInstance!.SelectedPlaylist;
-            bool isServerOnline = theInstance!.instanceStatus != InstanceStatus.OFFLINE;
+            bool isActivePlaylist = (mapInstance.ActivePlaylist == _selectedPlaylist);
+            bool isServerOnline = (theInstance!.instanceStatus != InstanceStatus.OFFLINE);
 
             btn_mapControl1.Enabled = isActivePlaylist && isServerOnline;
             btn_mapControl2.Enabled = isActivePlaylist && isServerOnline;
