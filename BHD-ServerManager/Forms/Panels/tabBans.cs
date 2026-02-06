@@ -113,7 +113,7 @@ namespace BHD_ServerManager.Forms.Panels
         private int _blacklistSelectedRecordIDIP = -1;
 
         /// <summary>
-        /// Load blacklist data from instanceBans into DataGridViews
+        /// Load blacklist data from banInstance into DataGridViews
         /// </summary>
         private void LoadBlacklistGrids()
         {
@@ -1274,7 +1274,7 @@ namespace BHD_ServerManager.Forms.Panels
         private int _whitelistSelectedRecordIDIP = -1;
 
         /// <summary>
-        /// Load whitelist data from instanceBans into DataGridViews
+        /// Load whitelist data from banInstance into DataGridViews
         /// </summary>
         private void LoadWhitelistGrids()
         {

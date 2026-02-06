@@ -10,7 +10,7 @@ using System.Windows.Navigation;
 namespace BHD_ServerManager.Classes.SupportClasses
 {
     /// <summary>
-    /// Static manager for proxy checking with in-memory caching using CommonCore.instanceBans.ProxyRecords.
+    /// Static manager for proxy checking with in-memory caching using CommonCore.banInstance.ProxyRecords.
     /// Reduces database I/O by checking memory first, then database, then API.
     /// </summary>
     public static class ProxyCheckManager
@@ -41,7 +41,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         public static int ReloadCacheFromDatabase(bool replaceExisting = true)
         {
             if (CommonCore.instanceBans == null)
-                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+                throw new InvalidOperationException("CommonCore.banInstance is not initialized.");
 
             var dbRecords = DatabaseManager.GetProxyRecords();
             int addedCount = 0;
@@ -142,7 +142,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             AppDebug.Log("CheckIPAsync", $"Attempting to check: {ipAddress.ToString()}");
 
             if (CommonCore.instanceBans == null)
-                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+                throw new InvalidOperationException("CommonCore.banInstance is not initialized.");
 
             if (_proxyService == null)
                 throw new InvalidOperationException("ProxyCheckManager is not initialized. Call Initialize() first.");
@@ -330,7 +330,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         public static void InvalidateCache(IPAddress ipAddress)
         {
             if (CommonCore.instanceBans == null)
-                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+                throw new InvalidOperationException("CommonCore.banInstance is not initialized.");
 
             lock (_lock)
             {
@@ -349,7 +349,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         public static int CleanupExpiredCache(bool removeFromDatabase = false)
         {
             if (CommonCore.instanceBans == null)
-                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+                throw new InvalidOperationException("CommonCore.banInstance is not initialized.");
 
             int removedCount = 0;
 
@@ -385,7 +385,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         public static CacheStatistics GetCacheStatistics()
         {
             if (CommonCore.instanceBans == null)
-                throw new InvalidOperationException("CommonCore.instanceBans is not initialized.");
+                throw new InvalidOperationException("CommonCore.banInstance is not initialized.");
 
             lock (_lock)
             {

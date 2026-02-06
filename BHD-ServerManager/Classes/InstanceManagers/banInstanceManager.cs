@@ -1093,7 +1093,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// </summary>
         public static List<proxyCountry> LoadBlockedCountries()
         {
-            // Assuming instanceBans.ProxyBlockedCountries is already loaded from database
+            // Assuming banInstance.ProxyBlockedCountries is already loaded from database
             // If not, add database call here
             AppDebug.Log("banInstanceManager", $"Loaded {instanceBans.ProxyBlockedCountries.Count} blocked countries");
             return instanceBans.ProxyBlockedCountries;

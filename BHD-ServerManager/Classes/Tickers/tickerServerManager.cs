@@ -13,13 +13,13 @@ namespace BHD_ServerManager.Classes.Tickers
     public class tickerServerManager
     {
         // The Instances (Data)
-        private static theInstance theInstance => CommonCore.theInstance!;
-        private static mapInstance mapInstance => CommonCore.instanceMaps!;
-        private static chatInstance instanceChat => CommonCore.instanceChat!;
-        private static banInstance instanceBans => CommonCore.instanceBans!;
-        private static statInstance instanceStats => CommonCore.instanceStats!;
-        private static ServerManagerUI? thisServer => Program.ServerManagerUI;
-        private static playerInstance playerInstance => CommonCore.instancePlayers!;
+        private static ServerManagerUI?     thisServer      => Program.ServerManagerUI;
+        private static theInstance          theInstance     => CommonCore.theInstance!;
+        private static mapInstance          mapInstance     => CommonCore.instanceMaps!;
+        private static chatInstance         chatInstance    => CommonCore.instanceChat!;
+        private static banInstance          banInstance     => CommonCore.instanceBans!;
+        private static statInstance         statsInstance   => CommonCore.instanceStats!;
+        private static playerInstance       playerInstance  => CommonCore.instancePlayers!;
 
         // Lock for thread safety (if needed for shared resources)
         private static int isTickerRunning = 0;
@@ -75,9 +75,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 // UI updates that should always run
                 SafeInvoke(thisServer, () =>
                 {
-                    // Server UI Updates
-                    thisServer.functionEvent_tickerServerGUI();                                     // Ticker for the Main Server GUI
-
                     // --- UI Update Hooks ---
                     thisServer.ServerTab.tickerServerHook();                                        // Toggle Server Lock based on server status
                     thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
@@ -144,17 +141,17 @@ namespace BHD_ServerManager.Classes.Tickers
                     // WebStats Updates and Reports
                     if (theInstance.WebStatsEnabled)
                     {
-                        if (DateTime.Now > instanceStats.lastPlayerStatsUpdate.AddSeconds(theInstance.WebStatsUpdateInterval))
+                        if (DateTime.Now > statsInstance.lastPlayerStatsUpdate.AddSeconds(theInstance.WebStatsUpdateInterval))
                         {
-                            instanceStats.lastPlayerStatsUpdate = DateTime.Now;
+                            statsInstance.lastPlayerStatsUpdate = DateTime.Now;
                             Task.Run(() => statsInstanceManager.SendUpdateData(thisServer));
                         
                         }
-                        if (DateTime.Now > instanceStats.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval) && theInstance.WebStatsAnnouncements)
+                        if (DateTime.Now > statsInstance.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval) && theInstance.WebStatsAnnouncements)
                         {
                             Task.Run(async () =>
                             {
-                                instanceStats.lastPlayerStatsReport = DateTime.Now;
+                                statsInstance.lastPlayerStatsReport = DateTime.Now;
                                 string ReportResults = await statsInstanceManager.SendReportData(thisServer);
                                 // handle ReportResults if needed
                             });
@@ -187,8 +184,8 @@ namespace BHD_ServerManager.Classes.Tickers
                 theInstance.instancePreGameProcRun = false;   
                 
                 // Resets
-                instanceChat.AutoMessageCounter = 0;
-                instanceChat.ChatLog?.Clear();
+                chatInstance.AutoMessageCounter = 0;
+                chatInstance.ChatLog?.Clear();
                 playerInstance.PlayerList.Clear();
                 statsInstanceManager.ResetPlayerStats();
 

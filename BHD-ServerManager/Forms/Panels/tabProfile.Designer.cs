@@ -527,7 +527,7 @@
             btn_profileBrowse2.TabIndex = 5;
             btn_profileBrowse2.Text = "Browse";
             btn_profileBrowse2.UseVisualStyleBackColor = true;
-            btn_profileBrowse2.Click += actionClick_profileOpenFileDialog;
+            btn_profileBrowse2.Click += Profile_ClickOpenFileDialog;
             // 
             // groupBox2
             // 
@@ -566,7 +566,7 @@
             btn_profileBrowse1.TabIndex = 2;
             btn_profileBrowse1.Text = "Browse";
             btn_profileBrowse1.UseVisualStyleBackColor = true;
-            btn_profileBrowse1.Click += actionClick_profileOpenFolderDialog;
+            btn_profileBrowse1.Click += Profile_ClickOpenFolderDialog;
             // 
             // tb_profileServerPath
             // 
@@ -973,7 +973,7 @@
             btn_resetProfile.TabIndex = 1;
             btn_resetProfile.Text = "Reset";
             btn_resetProfile.UseVisualStyleBackColor = true;
-            btn_resetProfile.Click += actionClick_ResetProfile;
+            btn_resetProfile.Click += Profile_ClickResetSettings;
             // 
             // btn_saveProfile
             // 
@@ -984,7 +984,7 @@
             btn_saveProfile.TabIndex = 0;
             btn_saveProfile.Text = "Save";
             btn_saveProfile.UseVisualStyleBackColor = true;
-            btn_saveProfile.Click += actionClick_SaveProfile;
+            btn_saveProfile.Click += Profile_ClickSaveSettings;
             // 
             // openFileDialog1
             // 

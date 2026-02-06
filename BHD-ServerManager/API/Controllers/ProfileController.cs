@@ -241,7 +241,7 @@ public class ProfileController : ControllerBase
         {
             serverUI.Invoke(() =>
             {
-                serverUI.ProfileTab?.methodFunction_loadSettings();
+                serverUI.ProfileTab?.Profile_LoadSettings();
             });
         }
     }

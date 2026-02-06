@@ -21,13 +21,13 @@ namespace HawkSyncShared
         // INSTANCE OBJECTS
         // ================================================================================
         
-        public static theInstance? theInstance { get; set; }
-        public static chatInstance? instanceChat { get; set; }
-        public static statInstance? instanceStats { get; set; }
-        public static playerInstance? instancePlayers { get; set; }
-        public static adminInstance? instanceAdmin { get; set; } 
-        public static mapInstance? instanceMaps { get; set; }
-        public static banInstance? instanceBans { get; set; }
+        public static theInstance?      theInstance         { get; set; }
+        public static chatInstance?     instanceChat        { get; set; }
+        public static statInstance?     instanceStats       { get; set; }
+        public static playerInstance?   instancePlayers     { get; set; }
+        public static adminInstance?    instanceAdmin       { get; set; } 
+        public static mapInstance?      instanceMaps        { get; set; }
+        public static banInstance?      instanceBans        { get; set; }
 
         // ================================================================================
         // INFRASTRUCTURE
@@ -36,7 +36,7 @@ namespace HawkSyncShared
         /// <summary>
         /// Ticker for periodic tasks
         /// </summary>
-        public static Ticker? Ticker { get; set; }
+        public static Ticker?           Ticker              { get; set; }
 
         // ================================================================================
         // INITIALIZATION

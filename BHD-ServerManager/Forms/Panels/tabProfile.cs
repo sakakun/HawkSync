@@ -24,51 +24,34 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
         
-        // --- UI Objects ---
-        private ServerManagerUI theServer => Program.ServerManagerUI!;
-        
-        // --- Class Variables ---
-        private new string Name = "ProfileTab";
-        
         public tabProfile()
         {
+            // Initialize the form components
             InitializeComponent();
-            tickerProfileInit();
+            // Initialize the profile tab with current settings
+            Profile_LoadSettings();
+
+            // Start a ticker to update the profile tab every 5 seconds (5000 milliseconds)
+            CommonCore.Ticker?.Start("ProfileTabTicker", 5000, Ticker_ProfileTab);
         }
 
         // --- Form Functions ---
-        
+
         /// <summary>
         /// Initialize profile tab on load
         /// </summary>
-        public void tickerProfileInit()
+        public void Ticker_ProfileTab()
         {
-            methodFunction_loadSettings();
-
-            // If the profileServerPath is not set or does not exist, switch to the Profile tab and show a message box.
-            if (theInstance!.profileServerPath == string.Empty || !Directory.Exists(theInstance.profileServerPath))
-            {
-                theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[0];
-                MessageBox.Show("Please set the Server Path in the Profile tab.", "Server Path Not Set", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                theServer.tabControl.SelectedTab = theServer.tabControl.TabPages[1];
-            }
-
-            bool currentState = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
-
             // Enable/disable profile controls based on server status
+            bool currentState = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
             btn_profileBrowse1.Enabled = currentState;
             btn_profileBrowse2.Enabled = currentState;
-            btn_resetProfile.Enabled = currentState;
-            btn_saveProfile.Enabled = currentState;
         }
 
         /// <summary>
         /// Load profile settings via manager
         /// </summary>
-        public void methodFunction_loadSettings()
+        public void Profile_LoadSettings()
         {
             // Load via manager
             var result = theInstanceManager.LoadProfileSettings();
@@ -87,7 +70,7 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Save profile settings via manager
         /// </summary>
-        public void methodFunction_saveSettings()
+        public void Profile_SaveSettings()
         {
             // Build settings from UI
             var settings = BuildProfileSettingsFromUI();
@@ -120,82 +103,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        /// <summary>
-        /// Export profile settings to JSON
-        /// </summary>
-        public void methodFunction_exportSettings()
-        {
-            try
-            {
-                using SaveFileDialog saveFileDialog = new()
-                {
-                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                    FilterIndex = 1,
-                    RestoreDirectory = true,
-                    FileName = $"ProfileSettings_{DateTime.Now:yyyyMMdd_HHmmss}.json"
-                };
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    var result = theInstanceManager.ExportProfileSettings(saveFileDialog.FileName);
-
-                    if (result.Success)
-                    {
-                        MessageBox.Show($"Profile settings exported successfully to:\n{saveFileDialog.FileName}", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Failed to export profile settings:\n\n{result.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log(Name, $"Error exporting settings: {ex.Message}");
-                MessageBox.Show($"Failed to export settings: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Import profile settings from JSON
-        /// </summary>
-        public void methodFunction_importSettings()
-        {
-            try
-            {
-                using OpenFileDialog openFileDialog = new()
-                {
-                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                    FilterIndex = 1,
-                    RestoreDirectory = true
-                };
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    var (success, settings, errorMessage) = theInstanceManager.ImportProfileSettings(openFileDialog.FileName);
-
-                    if (!success || settings == null)
-                    {
-                        MessageBox.Show($"Failed to import profile settings:\n\n{errorMessage}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // Update UI from imported settings
-                    ApplyProfileSettingsToUI(settings);
-
-                    MessageBox.Show("Profile settings imported successfully!\n\nClick 'Save Profile' to apply these settings.", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    AppDebug.Log(Name, $"Settings imported from: {openFileDialog.FileName}");
-                }
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log(Name, $"Error importing settings: {ex.Message}");
-                MessageBox.Show($"Failed to import settings: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         // --- Helper Methods ---
-
         /// <summary>
         /// Update UI controls from theInstance
         /// </summary>
@@ -219,7 +127,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 cb_serverIP.SelectedIndex = 0; // Default to "0.0.0.0"
             }
-    
+
             num_serverPort.Value = theInstance.profileBindPort;
             tb_serverPassword.Text = theInstance.gamePasswordLobby;
             cb_serverDedicated.Checked = theInstance.gameDedicated;
@@ -236,28 +144,29 @@ namespace BHD_ServerManager.Forms.Panels
             num_minPing.Value = theInstance.gameMinPingValue;
             num_maxPing.Value = theInstance.gameMaxPingValue;
 
-            // Application Commandline Arguments
-            profileServerAttribute01.Checked = theInstance.profileServerAttribute01;
-            profileServerAttribute02.Checked = theInstance.profileServerAttribute02;
-            profileServerAttribute03.Checked = theInstance.profileServerAttribute03;
-            profileServerAttribute04.Checked = theInstance.profileServerAttribute04;
-            profileServerAttribute05.Checked = theInstance.profileServerAttribute05;
-            profileServerAttribute06.Checked = theInstance.profileServerAttribute06;
-            profileServerAttribute07.Checked = theInstance.profileServerAttribute07;
-            profileServerAttribute08.Checked = theInstance.profileServerAttribute08;
-            profileServerAttribute09.Checked = theInstance.profileServerAttribute09;
-            profileServerAttribute10.Checked = theInstance.profileServerAttribute10;
-            profileServerAttribute11.Checked = theInstance.profileServerAttribute11;
-            profileServerAttribute12.Checked = theInstance.profileServerAttribute12;
-            profileServerAttribute13.Checked = theInstance.profileServerAttribute13;
-            profileServerAttribute14.Checked = theInstance.profileServerAttribute14;
-            profileServerAttribute15.Checked = theInstance.profileServerAttribute15;
-            profileServerAttribute16.Checked = theInstance.profileServerAttribute16;
-            profileServerAttribute17.Checked = theInstance.profileServerAttribute17;
-            profileServerAttribute18.Checked = theInstance.profileServerAttribute18;
-            profileServerAttribute19.Checked = theInstance.profileServerAttribute19;
-            profileServerAttribute20.Checked = theInstance.profileServerAttribute20;
-            profileServerAttribute21.Checked = theInstance.profileServerAttribute21;
+            // Application Commandline Arguments (refactored)
+            var profileAttributes = new[]
+            {
+                profileServerAttribute01, profileServerAttribute02, profileServerAttribute03, profileServerAttribute04, profileServerAttribute05,
+                profileServerAttribute06, profileServerAttribute07, profileServerAttribute08, profileServerAttribute09, profileServerAttribute10,
+                profileServerAttribute11, profileServerAttribute12, profileServerAttribute13, profileServerAttribute14, profileServerAttribute15,
+                profileServerAttribute16, profileServerAttribute17, profileServerAttribute18, profileServerAttribute19, profileServerAttribute20,
+                profileServerAttribute21
+            };
+
+            var instanceAttributes = new[]
+            {
+                theInstance.profileServerAttribute01, theInstance.profileServerAttribute02, theInstance.profileServerAttribute03, theInstance.profileServerAttribute04, theInstance.profileServerAttribute05,
+                theInstance.profileServerAttribute06, theInstance.profileServerAttribute07, theInstance.profileServerAttribute08, theInstance.profileServerAttribute09, theInstance.profileServerAttribute10,
+                theInstance.profileServerAttribute11, theInstance.profileServerAttribute12, theInstance.profileServerAttribute13, theInstance.profileServerAttribute14, theInstance.profileServerAttribute15,
+                theInstance.profileServerAttribute16, theInstance.profileServerAttribute17, theInstance.profileServerAttribute18, theInstance.profileServerAttribute19, theInstance.profileServerAttribute20,
+                theInstance.profileServerAttribute21
+            };
+
+            for (int i = 0; i < profileAttributes.Length; i++)
+            {
+                profileAttributes[i].Checked = instanceAttributes[i];
+            }
         }
 
         /// <summary>
@@ -311,109 +220,25 @@ namespace BHD_ServerManager.Forms.Panels
             );
         }
 
-
-        /// <summary>
-        /// Apply ProfileSettings DTO to UI controls
-        /// </summary>
-        private void ApplyProfileSettingsToUI(ProfileSettings settings)
-        {
-            // File Path Textbox Fields
-            tb_profileServerPath.Text = settings.ServerPath;
-            tb_modFile.Text = settings.ModFileName;
-
-            // Host Information
-            tb_hostName.Text = settings.HostName;
-            tb_serverName.Text = settings.ServerName;
-            tb_serverMessage.Text = settings.MOTD;
-
-            // Server Details
-            if (!string.IsNullOrEmpty(settings.BindIP) && cb_serverIP.Items.Contains(settings.BindIP))
-            {
-                cb_serverIP.SelectedItem = settings.BindIP;
-            }
-            else
-            {
-                cb_serverIP.SelectedIndex = 0;
-            }
-    
-            num_serverPort.Value = settings.BindPort;
-            tb_serverPassword.Text = settings.LobbyPassword;
-            cb_serverDedicated.Checked = settings.Dedicated;
-            cb_requireNova.Checked = settings.RequireNova;
-            serverCountryCode.Text = settings.CountryCode;
-
-            // Remote Connection Settings
-            checkBox_enableRemote.Checked = settings.EnableRemote;
-            num_remotePort.Value = settings.RemotePort;
-
-            // Ping Checking
-            cb_enableMinCheck.Checked = settings.MinPingEnabled;
-            cb_enableMaxCheck.Checked = settings.MaxPingEnabled;
-            num_minPing.Value = settings.MinPingValue;
-            num_maxPing.Value = settings.MaxPingValue;
-
-            // Application Commandline Arguments
-            profileServerAttribute01.Checked = settings.Attributes.Flag01;
-            profileServerAttribute02.Checked = settings.Attributes.Flag02;
-            profileServerAttribute03.Checked = settings.Attributes.Flag03;
-            profileServerAttribute04.Checked = settings.Attributes.Flag04;
-            profileServerAttribute05.Checked = settings.Attributes.Flag05;
-            profileServerAttribute06.Checked = settings.Attributes.Flag06;
-            profileServerAttribute07.Checked = settings.Attributes.Flag07;
-            profileServerAttribute08.Checked = settings.Attributes.Flag08;
-            profileServerAttribute09.Checked = settings.Attributes.Flag09;
-            profileServerAttribute10.Checked = settings.Attributes.Flag10;
-            profileServerAttribute11.Checked = settings.Attributes.Flag11;
-            profileServerAttribute12.Checked = settings.Attributes.Flag12;
-            profileServerAttribute13.Checked = settings.Attributes.Flag13;
-            profileServerAttribute14.Checked = settings.Attributes.Flag14;
-            profileServerAttribute15.Checked = settings.Attributes.Flag15;
-            profileServerAttribute16.Checked = settings.Attributes.Flag16;
-            profileServerAttribute17.Checked = settings.Attributes.Flag17;
-            profileServerAttribute18.Checked = settings.Attributes.Flag18;
-            profileServerAttribute19.Checked = settings.Attributes.Flag19;
-            profileServerAttribute20.Checked = settings.Attributes.Flag20;
-            profileServerAttribute21.Checked = settings.Attributes.Flag21;
-        }
-
-        // --- Action Click Events ---
-
         /// <summary>
         /// Save Profile Button Clicked
         /// </summary>
-        private void actionClick_SaveProfile(object sender, EventArgs e)
+        private void Profile_ClickSaveSettings(object sender, EventArgs e)
         {
-            methodFunction_saveSettings();
+            Profile_SaveSettings();
         }
-
         /// <summary>
         /// Reset Profile Button Clicked
         /// </summary>
-        private void actionClick_ResetProfile(object sender, EventArgs e)
+        private void Profile_ClickResetSettings(object sender, EventArgs e)
         {
-            methodFunction_loadSettings();
-        }
-
-        /// <summary>
-        /// Export Profile Settings Button Clicked
-        /// </summary>
-        private void actionClick_ExportProfile(object sender, EventArgs e)
-        {
-            methodFunction_exportSettings();
-        }
-
-        /// <summary>
-        /// Import Profile Settings Button Clicked
-        /// </summary>
-        private void actionClick_ImportProfile(object sender, EventArgs e)
-        {
-            methodFunction_importSettings();
+            Profile_LoadSettings();
         }
 
         /// <summary>
         /// Open Profile Folder Button Clicked
         /// </summary>
-        private void actionClick_profileOpenFolderDialog(object sender, EventArgs e)
+        private void Profile_ClickOpenFolderDialog(object sender, EventArgs e)
         {
             try
             {
@@ -437,7 +262,7 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Open Profile File Button Clicked
         /// </summary>
-        private void actionClick_profileOpenFileDialog(object sender, EventArgs e)
+        private void Profile_ClickOpenFileDialog(object sender, EventArgs e)
         {
             try
             {
