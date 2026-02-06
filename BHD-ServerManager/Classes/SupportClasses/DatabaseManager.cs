@@ -1,6 +1,7 @@
 ﻿using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.tabAdmin;
+using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using HawkSyncShared.SupportClasses;
 using Microsoft.Data.Sqlite;
 using System;
@@ -150,12 +151,12 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static List<mapFileInfo> GetDefaultMaps()
+        public static List<MapObject> GetDefaultMaps()
         {
             if (!IsInitialized)
                 throw new InvalidOperationException("DatabaseManager is not initialized.");
 
-            var maps = new List<mapFileInfo>();
+            var maps = new List<MapObject>();
 
             using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
             conn.Open();
@@ -170,7 +171,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                maps.Add(new mapFileInfo
+                maps.Add(new MapObject
                 {
                     MapID   = reader.GetInt32(0),
                     MapName = reader.GetString(1),
@@ -191,12 +192,12 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// <param name="playlistID"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static List<mapFileInfo> GetPlaylistMaps(int playlistID)
+        public static List<MapObject> GetPlaylistMaps(int playlistID)
         {
             if (!IsInitialized)
                 throw new InvalidOperationException("DatabaseManager is not initialized.");
 
-            var maps = new List<mapFileInfo>();
+            var maps = new List<MapObject>();
 
             using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
             conn.Open();
@@ -214,7 +215,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                maps.Add(new mapFileInfo
+                maps.Add(new MapObject
                 {
                     MapID   = reader.GetInt32(0),
                     MapName = reader.GetString(1),
@@ -229,7 +230,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             return maps;
         }
 
-        public static void SavePlaylist(int playlistID, List<mapFileInfo> maps)
+        public static void SavePlaylist(int playlistID, List<MapObject> maps)
         {
             if (!IsInitialized)
                 throw new InvalidOperationException("DatabaseManager is not initialized.");

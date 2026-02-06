@@ -1,8 +1,9 @@
 using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using HawkSyncShared.DTOs.API;
 using HawkSyncShared.SupportClasses;
+using HawkSyncShared.DTOs.tabPlayers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -17,7 +18,7 @@ public class ChatController : ControllerBase
         if (command.Channel < 0 || command.Channel > 3)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid channel." });
 
-        string chatMessage = Func.FB64(command.Message);
+        string chatMessage = AppFunc.FB64(command.Message);
 
         var result = chatInstanceManager.SendChatMessage(chatMessage, command.Channel);
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });

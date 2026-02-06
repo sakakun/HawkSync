@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HawkSyncShared.SupportClasses
 {
-    public static class Func
+    public static class AppFunc
     {
         private const string Base64Marker = "__B64__";
 

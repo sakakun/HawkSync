@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabProfile;
 
 namespace BHD_ServerManager.API.Controllers;
 

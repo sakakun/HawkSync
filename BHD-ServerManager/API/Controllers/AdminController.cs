@@ -1,6 +1,6 @@
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.tabAdmin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +12,7 @@ namespace BHD_ServerManager.API.Controllers;
 public class AdminController : ControllerBase
 {
     [HttpPost("create")]
-    public ActionResult<AdminCommandResult> CreateUser([FromBody] CreateUserRequest request)
+    public ActionResult<AdminCommandResult> CreateUser([FromBody] CreateUserRequestDTO request)
     {
         if(!HasPermission("users")) return Forbid();
 
@@ -26,7 +26,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("update")]
-    public ActionResult<AdminCommandResult> UpdateUser([FromBody] UpdateUserRequest request)
+    public ActionResult<AdminCommandResult> UpdateUser([FromBody] UpdateUserRequestDTO request)
     {
         if(!HasPermission("users")) return Forbid();
         var result = adminInstanceManager.UpdateUser(request);
@@ -39,7 +39,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("delete")]
-    public ActionResult<AdminCommandResult> DeleteUser([FromBody] DeleteUserRequest request)
+    public ActionResult<AdminCommandResult> DeleteUser([FromBody] DeleteUserRequestDTO request)
     {
         if(!HasPermission("users")) return Forbid();
         var result = adminInstanceManager.DeleteUser(request.UserID);

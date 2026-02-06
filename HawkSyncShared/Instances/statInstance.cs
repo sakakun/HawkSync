@@ -1,4 +1,4 @@
-﻿using HawkSyncShared.ObjectClasses;
+﻿using HawkSyncShared.DTOs.tabPlayers;
 using System;
 using System.Collections.Generic;
 
@@ -21,8 +21,8 @@ namespace HawkSyncShared.Instances
 
     public class PlayerStatObject
     {
-        public required playerObject PlayerStatsCurrent { get; set; }
-        public required playerObject PlayerStatsPrevious { get; set; }
+        public required PlayerObject PlayerStatsCurrent { get; set; }
+        public required PlayerObject PlayerStatsPrevious { get; set; }
         public required List<WeaponStatObject> PlayerWeaponStats { get; set; }
     }
 

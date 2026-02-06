@@ -3,12 +3,12 @@ using BHD_ServerManager.Forms.Panels;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using System.Data;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using BHD_ServerManager.Classes.Services.NetLimiter;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Forms
 {
@@ -97,7 +97,7 @@ namespace BHD_ServerManager.Forms
             string blueScore = string.Empty;
             string redScore = string.Empty;
             string playerName = string.Empty;
-            playerObject? topPlayer = null;
+            PlayerObject? topPlayer = null;
             string winConditions = string.Empty;
 
             // Player Online Label

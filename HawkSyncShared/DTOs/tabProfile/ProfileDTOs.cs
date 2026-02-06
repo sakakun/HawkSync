@@ -1,4 +1,4 @@
-namespace HawkSyncShared.DTOs;
+namespace HawkSyncShared.DTOs.tabProfile;
 
 /// <summary>
 /// Profile settings request for updates

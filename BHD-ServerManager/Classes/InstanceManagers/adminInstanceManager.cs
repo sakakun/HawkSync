@@ -3,7 +3,7 @@ using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.tabAdmin;
 
 namespace BHD_ServerManager.Classes.InstanceManagers;
 
@@ -139,7 +139,7 @@ public static class adminInstanceManager
     /// <summary>
     /// Create a new user account
     /// </summary>
-    public static OperationResult CreateUser(CreateUserRequest request)
+    public static OperationResult CreateUser(CreateUserRequestDTO request)
     {
         try
         {
@@ -206,7 +206,7 @@ public static class adminInstanceManager
     /// <summary>
     /// Update an existing user account
     /// </summary>
-    public static OperationResult UpdateUser(UpdateUserRequest request)
+    public static OperationResult UpdateUser(UpdateUserRequestDTO request)
     {
         try
         {
@@ -514,10 +514,10 @@ public static class adminInstanceManager
     // ================================================================================
 
     /// <summary>
-    /// Validate a CreateUserRequest
+    /// Validate a CreateUserRequestDTO
     /// </summary>
     public static (bool isValid, List<string> errors) ValidateCreateUserRequest(
-        CreateUserRequest request)
+        CreateUserRequestDTO request)
     {
         var errors = new List<string>();
 
@@ -630,7 +630,7 @@ public static class adminInstanceManager
             }
 
             // Create default admin
-            var request = new CreateUserRequest
+            var request = new CreateUserRequestDTO
             {
                 Username = "admin",
                 Password = "admin",

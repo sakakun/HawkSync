@@ -3,11 +3,11 @@ using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.Services.NetLimiter;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
 using System.Net;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -394,7 +394,7 @@ namespace BHD_ServerManager.Classes.Tickers
             foreach (var kvp in playerInstance.PlayerList)
             {
                 int slotNum = kvp.Key;
-                playerObject player = kvp.Value;
+                PlayerObject player = kvp.Value;
 
                 // Only check players who were seen in the last 6 seconds (active players)
                 if ((now - player.PlayerLastSeen).TotalSeconds <= 4)
@@ -825,7 +825,7 @@ namespace BHD_ServerManager.Classes.Tickers
             foreach (var kvp in playerInstance.PlayerList)
             {
                 int slotNum = kvp.Key;
-                playerObject player = kvp.Value;
+                PlayerObject player = kvp.Value;
 
                 if ((now - player.PlayerLastSeen).TotalSeconds > 4)
                     continue;
@@ -988,7 +988,7 @@ namespace BHD_ServerManager.Classes.Tickers
             foreach (var kvp in playerInstance.PlayerList)
             {
                 int slotNum = kvp.Key;
-                playerObject player = kvp.Value;
+                PlayerObject player = kvp.Value;
 
                 if ((now - player.PlayerLastSeen).TotalSeconds > 4)
                     continue;

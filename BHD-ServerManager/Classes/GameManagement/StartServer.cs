@@ -2,7 +2,6 @@
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms.Panels;
 using Salaros.Configuration;

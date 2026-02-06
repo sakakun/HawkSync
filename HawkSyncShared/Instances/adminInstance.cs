@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.tabAdmin;
 
 namespace HawkSyncShared.Instances;
 

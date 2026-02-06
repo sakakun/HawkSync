@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HawkSyncShared.DTOs
+namespace HawkSyncShared.DTOs.tabStats
 {
     /// <summary>
     /// Web stats configuration settings

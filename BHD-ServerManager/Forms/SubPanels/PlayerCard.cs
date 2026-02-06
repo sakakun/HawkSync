@@ -3,13 +3,13 @@ using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Services;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
 using UserControl = System.Windows.Forms.UserControl;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.PlayerManagementClasses
 {
@@ -21,11 +21,11 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
         private static chatInstance ChatInstance = CommonCore.instanceChat!;
         private static theInstance TheInstance = CommonCore.theInstance!;
-        private playerObject Player { get; set; } = new playerObject();
+        private PlayerObject Player { get; set; } = new PlayerObject();
         private int SlotNumber = 0;
         private new ContextMenuStrip ContextMenu;
 
-        private playerObject? LastPlayerData = null;
+        private PlayerObject? LastPlayerData = null;
         private bool LastVisible = true;
 
         public PlayerCard(int slotNum)
@@ -428,7 +428,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         // PLAYER CARD UI UPDATE METHODS
         // ================================================================================
 
-        public async void UpdateStatus(playerObject playerInfo)
+        public async void UpdateStatus(PlayerObject playerInfo)
         {
             Player = playerInfo;
 
@@ -454,7 +454,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
         public void ResetStatus()
         {
-            Player = new playerObject
+            Player = new PlayerObject
             {
                 PlayerSlot = SlotNumber,
                 PlayerName = "Slot Empty",
@@ -484,7 +484,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             Visible = visible;
         }
 
-        public void UpdateCard(playerObject? playerInfo, bool visible)
+        public void UpdateCard(PlayerObject? playerInfo, bool visible)
         {
             // Only update visibility if it changes
             if (Visible != visible)
@@ -508,7 +508,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             }
         }
 
-        private static bool IsSamePlayer(playerObject? a, playerObject? b)
+        private static bool IsSamePlayer(PlayerObject? a, PlayerObject? b)
         {
             if (a == null || b == null) return false;
             return a.PlayerSlot == b.PlayerSlot &&

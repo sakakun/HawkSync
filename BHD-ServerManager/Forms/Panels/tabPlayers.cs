@@ -1,18 +1,6 @@
 ﻿using BHD_ServerManager.Classes.PlayerManagementClasses;
 using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BHD_ServerManager.Forms.Panels
 {

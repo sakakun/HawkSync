@@ -1,4 +1,4 @@
-﻿namespace HawkSyncShared.DTOs;
+﻿namespace HawkSyncShared.DTOs.API;
 
 public record LoginRequest(string Username, string Password);
 

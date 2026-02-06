@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HawkSyncShared.DTOs
+namespace HawkSyncShared.DTOs.tabAdmin
 {
     public record UserDTO
     {
@@ -17,7 +17,7 @@ namespace HawkSyncShared.DTOs
         public string Notes { get; init; } = string.Empty;
     }
 
-    public class CreateUserRequest
+    public class CreateUserRequestDTO
     {
         public string Username { get; set; } = "";
         public string Password { get; set; } = "";
@@ -26,7 +26,7 @@ namespace HawkSyncShared.DTOs
         public string Notes { get; set; } = "";
     }
 
-    public class UpdateUserRequest
+    public class UpdateUserRequestDTO
     {
         public int UserID { get; set; }
         public string Username { get; set; } = "";
@@ -36,7 +36,7 @@ namespace HawkSyncShared.DTOs
         public string Notes { get; set; } = "";
     }
 
-    public class DeleteUserRequest
+    public class DeleteUserRequestDTO
     {
         public int UserID { get; set; }
     }

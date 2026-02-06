@@ -1,7 +1,9 @@
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabGameplay;
+using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.Instances;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

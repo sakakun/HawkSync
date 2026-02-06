@@ -1,9 +1,7 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.DTOs;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Tickers;
 using BHD_ServerManager.Forms;
@@ -15,6 +13,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Storage;
+using HawkSyncShared.DTOs.tabStats;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -1107,7 +1107,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 foreach (var playerRecord in playerInstance.PlayerList)
                 {
-                    playerObject playerObj = playerRecord.Value;
+                    PlayerObject playerObj = playerRecord.Value;
                     playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
                     {
                         slotNum = playerObj.PlayerSlot,
@@ -1136,7 +1136,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 }
                 foreach (var playerRecord in playerInstance.PlayerList)
                 {
-                    playerObject player = playerRecord.Value;
+                    PlayerObject player = playerRecord.Value;
                     bool found = false;
                     foreach (playerTeamObject previousPlayer in playerInstance.PlayerPreviousTeamList)
                     {

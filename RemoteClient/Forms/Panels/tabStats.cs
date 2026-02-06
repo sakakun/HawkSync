@@ -1,7 +1,8 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabPlayers;
+using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using RemoteClient.Core;
 
 namespace RemoteClient.Forms.Panels

@@ -1,10 +1,10 @@
-﻿using HawkSyncShared.DTOs;
-using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
+﻿using HawkSyncShared.Instances;
 using HawkSyncShared;
 using RemoteClient.Core;
 using RemoteClient.Forms.Panels;
 using HawkSyncShared.SupportClasses;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace RemoteClient.Forms;
 
@@ -163,7 +163,7 @@ public partial class ServerManagerUI : Form
         string blueScore = string.Empty;
         string redScore = string.Empty;
         string playerName = string.Empty;
-        playerObject? topPlayer = null;
+        PlayerObject? topPlayer = null;
         string winConditions = string.Empty;
 
         // Player Online Label

@@ -1,6 +1,7 @@
-﻿using HawkSyncShared.Instances;
+﻿using HawkSyncShared.DTOs.tabMaps;
+using HawkSyncShared.Instances;
 
-namespace HawkSyncShared.DTOs;
+namespace HawkSyncShared.DTOs.API;
 
 public record ServerSnapshot
 {

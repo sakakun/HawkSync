@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.tabMaps;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
@@ -84,7 +84,7 @@ public class MapPlaylistController : ControllerBase
     {
         if(!HasPermission("maps")) return Forbid();
 
-        var maps = playlist.Maps.Select(m => new HawkSyncShared.ObjectClasses.mapFileInfo
+        var maps = playlist.Maps.Select(m => new MapObject
         {
             MapID = m.MapID,
             MapName = m.MapName,
@@ -111,7 +111,7 @@ public class MapPlaylistController : ControllerBase
     {
         if(!HasPermission("maps")) return Forbid();
 
-        var saveResult = mapInstanceManager.SavePlaylist(playlist.PlaylistID, playlist.Maps.Select(m => new HawkSyncShared.ObjectClasses.mapFileInfo
+        var saveResult = mapInstanceManager.SavePlaylist(playlist.PlaylistID, playlist.Maps.Select(m => new MapObject
         {
             MapID = m.MapID,
             MapName = m.MapName,
@@ -138,7 +138,7 @@ public class MapPlaylistController : ControllerBase
         if(!HasPermission("maps")) return Forbid();
 
         // Overwrite playlist with imported maps
-        var result = mapInstanceManager.SavePlaylist(playlist.PlaylistID, playlist.Maps.Select(m => new HawkSyncShared.ObjectClasses.mapFileInfo
+        var result = mapInstanceManager.SavePlaylist(playlist.PlaylistID, playlist.Maps.Select(m => new MapObject
         {
             MapID = m.MapID,
             MapName = m.MapName,

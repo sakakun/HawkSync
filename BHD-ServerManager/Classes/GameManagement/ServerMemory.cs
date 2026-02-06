@@ -2,13 +2,14 @@
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Storage;
+using HawkSyncShared.DTOs.tabMaps;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.GameManagement
 {
@@ -851,7 +852,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, mapCycleServerAddress, mapCycleListAddress, mapCycleListAddress.Length, ref mapCycleListAddressRead);
             int mapCycleList = BitConverter.ToInt32(mapCycleListAddress, 0);
 
-            foreach (mapFileInfo entry in mapInstance.Playlists[0])
+            foreach (MapObject entry in mapInstance.Playlists[0])
             {
                 int mapFileIndexLocation = mapCycleList;
 
@@ -1628,7 +1629,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return;
             }
 
-            Dictionary<int, playerObject> currentPlayerList = new Dictionary<int, playerObject>();
+            Dictionary<int, PlayerObject> currentPlayerList = new Dictionary<int, PlayerObject>();
             int NumPlayers = thisInstance.gameInfoNumPlayers;
 
             if (NumPlayers > 0)
@@ -1678,7 +1679,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     int playerTeam = BitConverter.ToInt32(playerTeamBytes, 0);
                     string playerIP = ReadMemoryGrabPlayerIPAddress(formattedPlayerName).ToString();
 
-                    playerObject PlayerStats = ReadMemoryPlayerStats(playerSlot);
+                    PlayerObject PlayerStats = ReadMemoryPlayerStats(playerSlot);
                     CharacterClass PlayerCharacterClass = (CharacterClass)PlayerStats.RoleID;
                     WeaponStack PlayerSelectedWeapon = (WeaponStack)PlayerStats.SelectedWeaponID;
 
@@ -1799,7 +1800,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             return playerIp.ToString();
         }
         // Function: ReadMemoryPlayerStats
-        public static playerObject ReadMemoryPlayerStats(int reqslot)
+        public static PlayerObject ReadMemoryPlayerStats(int reqslot)
         {
 
 
@@ -1844,7 +1845,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
 
                 AppDebug.Log("ServerMemory", "Something went wrong here. We can't find any player names.");
-                return new playerObject();
+                return new PlayerObject();
             }
 
             byte[] read_ping = new byte[4];
@@ -1984,7 +1985,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
             }
 
-            return new playerObject
+            return new PlayerObject
             {
                 PlayerName = Encoding.GetEncoding("Windows-1252").GetString(read_name),
                 PlayerPing = BitConverter.ToInt32(read_ping, 0),

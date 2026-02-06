@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.DTOs;
 using System.Net;
 using HawkSyncShared;
+using HawkSyncShared.DTOs.API;
 using HawkSyncShared.SupportClasses;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -19,7 +20,7 @@ public class PlayerController : ControllerBase
     {
         if(!HasPermission("players")) return Forbid();
 
-        string playerName = Func.FB64(command.PlayerName);
+        string playerName = AppFunc.FB64(command.PlayerName);
 
         var result = playerInstanceManager.ArmPlayer(command.PlayerSlot, playerName);
 
@@ -34,7 +35,7 @@ public class PlayerController : ControllerBase
     {
         if(!HasPermission("players")) return Forbid();
 
-        string playerName = Func.FB64(command.PlayerName);
+        string playerName = AppFunc.FB64(command.PlayerName);
 
         var result = playerInstanceManager.DisarmPlayer(command.PlayerSlot, playerName);
 
@@ -52,7 +53,7 @@ public class PlayerController : ControllerBase
 
         bool IsGod = CommonCore.instancePlayers!.PlayerList[command.PlayerSlot].IsGod;
 
-        string playerName = Func.FB64(command.PlayerName);
+        string playerName = AppFunc.FB64(command.PlayerName);
 
         var result = playerInstanceManager.ToggleGodMode(command.PlayerSlot, playerName, !IsGod);
 
@@ -67,7 +68,7 @@ public class PlayerController : ControllerBase
     {
         if(!HasPermission("players")) return Forbid();
 
-        string playerName = Func.FB64(command.PlayerName);
+        string playerName = AppFunc.FB64(command.PlayerName);
 
         var result = playerInstanceManager.SwitchPlayerTeam(command.PlayerSlot, playerName, command.TeamNum);
 
@@ -82,7 +83,7 @@ public class PlayerController : ControllerBase
     public ActionResult<CommandResult> KickPlayer([FromBody] KickPlayerCommand command)
     {
         if(!HasPermission("players")) return Forbid();
-        var PlayerName = Func.FB64(command.PlayerName);
+        var PlayerName = AppFunc.FB64(command.PlayerName);
         var result = playerInstanceManager.KickPlayer(command.PlayerSlot, PlayerName);
 
         return Ok(new CommandResult
@@ -97,7 +98,7 @@ public class PlayerController : ControllerBase
     {
         if(!HasPermission("players")) return Forbid();
 
-        string playerName = Func.FB64(command.PlayerName);
+        string playerName = AppFunc.FB64(command.PlayerName);
         string playerIP = command.PlayerIP;
         int playerSlot = command.PlayerSlot;
         bool banIP = command.BanIP;
@@ -172,7 +173,7 @@ public class PlayerController : ControllerBase
     {
         if(!HasPermission("players")) return Forbid();
 
-        string playerName = Func.FB64(command.PlayerName);
+        string playerName = AppFunc.FB64(command.PlayerName);
 
         var result = playerInstanceManager.WarnPlayer(
             command.PlayerSlot,
@@ -191,7 +192,7 @@ public class PlayerController : ControllerBase
     {
         if(!HasPermission("players")) return Forbid();
 
-        string playerName = Func.FB64(command.PlayerName);
+        string playerName = AppFunc.FB64(command.PlayerName);
 
         var result = playerInstanceManager.KillPlayer(command.PlayerSlot, playerName);
 

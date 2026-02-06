@@ -2,9 +2,8 @@
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
+using HawkSyncShared.DTOs.tabPlayers;
 using BHD_ServerManager.Classes.Services.NetLimiter;
-using BHD_ServerManager.Classes.SupportClasses;
 using System.Net;
 
 namespace BHD_ServerManager.Classes.InstanceManagers

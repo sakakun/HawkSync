@@ -2,9 +2,9 @@
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
-using HawkSyncShared.DTOs;
 using static BHD_ServerManager.Classes.InstanceManagers.adminInstanceManager;
 using HawkSyncShared.Instances;
+using HawkSyncShared.DTOs.tabAdmin;
 
 namespace BHD_ServerManager.Forms.Panels;
 
@@ -437,7 +437,7 @@ public partial class tabAdmin : UserControl
         }
 
         // Build request
-        var request = new CreateUserRequest
+        var request = new CreateUserRequestDTO
         {
             Username = textBox_username.Text.Trim(),
             Password = textBox_password.Text,
@@ -469,7 +469,7 @@ public partial class tabAdmin : UserControl
     private void UpdateUser()
     {
         // Build request
-        var request = new UpdateUserRequest
+        var request = new UpdateUserRequestDTO
         {
             UserID = _selectedUserID,
             Username = textBox_username.Text.Trim(),

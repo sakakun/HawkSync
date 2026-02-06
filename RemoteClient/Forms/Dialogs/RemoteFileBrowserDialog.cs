@@ -1,4 +1,4 @@
-﻿using HawkSyncShared.DTOs;
+﻿using HawkSyncShared.DTOs.tabProfile;
 using RemoteClient.Core;
 
 namespace RemoteClient.Forms.Dialogs;

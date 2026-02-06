@@ -4,7 +4,7 @@ using BHD_ServerManager.Classes.Services.NetLimiter;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Tickers;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using System;

@@ -1,6 +1,10 @@
 ﻿using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabBans;
+using HawkSyncShared.DTOs.tabBans.Service;
+using HawkSyncShared.DTOs.tabProfile;
+using HawkSyncShared.DTOs.tabStats;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -142,7 +146,7 @@ public class ProfileController : ControllerBase
     }
 
    [HttpPost("proxycheck")]
-    public ActionResult<CommandResult> SaveProxyCheckSettings([FromBody] ProxyCheckSettingsRequest request)
+    public ActionResult<CommandResult> SaveProxyCheckSettings([FromBody] ProxyCheck request)
     {
         if(!HasPermission("bans")) return Forbid();
 

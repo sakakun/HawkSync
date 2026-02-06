@@ -1,6 +1,6 @@
-﻿using HawkSyncShared.ObjectClasses;
-using HawkSyncShared.Instances;
+﻿using HawkSyncShared.Instances;
 using System.Collections.Generic;
+using HawkSyncShared.DTOs.tabMaps;
 
 namespace HawkSyncShared.Instances;
 
@@ -16,17 +16,17 @@ public class mapInstance
     /// <summary>
     /// All available default maps shipped with the game
     /// </summary>
-    public List<mapFileInfo> DefaultMaps { get; set; } = new();
+    public List<MapObject> DefaultMaps { get; set; } = new();
     
     /// <summary>
     /// All available custom maps found in the server directory
     /// </summary>
-    public List<mapFileInfo> CustomMaps { get; set; } = new();
+    public List<MapObject> CustomMaps { get; set; } = new();
     
     /// <summary>
     /// Combined list of all available maps (for quick access)
     /// </summary>
-    public List<mapFileInfo> AllAvailableMaps => 
+    public List<MapObject> AllAvailableMaps => 
         DefaultMaps.Concat(CustomMaps).OrderBy(m => m.MapName).ToList();
     
     // ================================================================================
@@ -38,13 +38,13 @@ public class mapInstance
     /// Key: Playlist number (1-5)
     /// Value: List of maps in that playlist
     /// </summary>
-    public Dictionary<int, List<mapFileInfo>> Playlists { get; set; } = new()
+    public Dictionary<int, List<MapObject>> Playlists { get; set; } = new()
     {
-        { 1, new List<mapFileInfo>() },
-        { 2, new List<mapFileInfo>() },
-        { 3, new List<mapFileInfo>() },
-        { 4, new List<mapFileInfo>() },
-        { 5, new List<mapFileInfo>() }
+        { 1, new List<MapObject>() },
+        { 2, new List<MapObject>() },
+        { 3, new List<MapObject>() },
+        { 4, new List<MapObject>() },
+        { 5, new List<MapObject>() }
     };
     
     // ================================================================================
@@ -119,7 +119,7 @@ public class mapInstance
     /// <summary>
     /// Get the next map object from the active playlist
     /// </summary>
-    public mapFileInfo? GetNextMap()
+    public MapObject? GetNextMap()
     {
         if (!Playlists.ContainsKey(ActivePlaylist)) 
             return null;
@@ -135,7 +135,7 @@ public class mapInstance
     /// <summary>
     /// Get the current map object from the active playlist
     /// </summary>
-    public mapFileInfo? GetCurrentMap()
+    public MapObject? GetCurrentMap()
     {
         if (!Playlists.ContainsKey(ActivePlaylist)) 
             return null;

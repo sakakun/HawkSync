@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HawkSyncShared.ObjectClasses
+namespace HawkSyncShared.DTOs.tabPlayers
 {
-    public class playerObject
+    public class PlayerObject
     {
         // Player Specific Information
         public int PlayerSlot { get; set; }

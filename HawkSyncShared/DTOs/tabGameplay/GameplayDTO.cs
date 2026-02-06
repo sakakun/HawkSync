@@ -1,4 +1,4 @@
-namespace HawkSyncShared.DTOs;
+namespace HawkSyncShared.DTOs.tabGameplay;
 
 /// <summary>
 /// Server gameplay options DTO

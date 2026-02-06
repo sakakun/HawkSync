@@ -3,11 +3,11 @@ using BHD_ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -36,7 +36,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
         }
 
-        public static void UpdatePlayerStats(playerObject CurrentPlayerObject)
+        public static void UpdatePlayerStats(PlayerObject CurrentPlayerObject)
         {
             if (CurrentPlayerObject == null || string.IsNullOrEmpty(CurrentPlayerObject.PlayerNameBase64))
                 return;
@@ -60,7 +60,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
         }
 
-        private static void UpdateWeaponStats(PlayerStatObject statObj, playerObject player, bool isNew)
+        private static void UpdateWeaponStats(PlayerStatObject statObj, PlayerObject player, bool isNew)
         {
             if (isNew)
             {
@@ -93,12 +93,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
         }
 
-        public static playerObject ComparePlayerStats(playerObject CurrentPlayerObject, playerObject PreviousPlayerObject)
+        public static PlayerObject ComparePlayerStats(PlayerObject CurrentPlayerObject, PlayerObject PreviousPlayerObject)
         {
             if (CurrentPlayerObject == null || PreviousPlayerObject == null)
-                return new playerObject();
+                return new PlayerObject();
 
-            return new playerObject
+            return new PlayerObject
             {
                 PlayerSlot = CurrentPlayerObject.PlayerSlot,
                 PlayerName = CurrentPlayerObject.PlayerName,
@@ -142,10 +142,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             };
         }
 
-        private static playerObject ClonePlayerObject(playerObject obj)
+        private static PlayerObject ClonePlayerObject(PlayerObject obj)
         {
-            if (obj == null) return new playerObject();
-            return new playerObject
+            if (obj == null) return new PlayerObject();
+            return new PlayerObject
             {
                 PlayerSlot = obj.PlayerSlot,
                 PlayerName = obj.PlayerName,
@@ -235,14 +235,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public static string GeneratePlayerLines(PlayerStatObject playerStats)
         {
             string PlayerLines = string.Empty;
-            playerObject player = playerStats.PlayerStatsCurrent;
+            PlayerObject player = playerStats.PlayerStatsCurrent;
             PlayerLines = "  Player " + player.PlayerName + "__&__" + player.PlayerIPAddress + "\n";
             PlayerLines += GeneratePlayerStatLine(player);
             PlayerLines += GenerateWeaponStatLines(playerStats.PlayerWeaponStats);
             return PlayerLines;
         }
 
-        public static string GeneratePlayerStatLine(playerObject player)
+        public static string GeneratePlayerStatLine(PlayerObject player)
         {
             string PlayerStatLine = string.Empty;
             PlayerStatLine = "   PlayerStats ";
@@ -296,7 +296,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             updateData += GenerateGameLine() + "\n";
             foreach (var playerStat in instanceStats.playerStatsList.Values)
             {
-                playerObject Player = playerStat.PlayerStatsCurrent;
+                PlayerObject Player = playerStat.PlayerStatsCurrent;
                 updateData += "  Player " + Player.PlayerName + "\n";
                 updateData += "   PlayerStats " + Player.PlayerTimePlayed + " " + Player.PlayerTeam + " " + Player.SelectedWeaponID + "\n";
                 updateData += "\n";
@@ -312,7 +312,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             reportData += "DFBHD";
             foreach (var playerStat in instanceStats.playerStatsList.Values)
             {
-                playerObject Player = playerStat.PlayerStatsCurrent;
+                PlayerObject Player = playerStat.PlayerStatsCurrent;
                 reportData += GeneratePlayerLines(playerStat);
                 reportData += "\n";
             }

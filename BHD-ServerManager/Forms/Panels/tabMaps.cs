@@ -3,10 +3,10 @@ using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using System.Data;
 using System.Text;
+using HawkSyncShared.DTOs.tabMaps;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -72,7 +72,7 @@ namespace BHD_ServerManager.Forms.Panels
             var result = mapInstanceManager.LoadAvailableMaps();
 
             // Add all maps to grid
-            var allMaps = new List<mapFileInfo>();
+            var allMaps = new List<MapObject>();
             allMaps.AddRange(result.DefaultMaps);
             allMaps.AddRange(result.CustomMaps);
 
@@ -84,7 +84,7 @@ namespace BHD_ServerManager.Forms.Panels
                     map.MapFile,
                     map.ModType,
                     map.MapType,
-                    objectGameTypes.GetShortName(map.MapType)
+                    GameTypeObject.GetShortName(map.MapType)
                 );
 
                 DataGridViewRow row = dataGridView_availableMaps.Rows[rowIndex];
@@ -113,7 +113,7 @@ namespace BHD_ServerManager.Forms.Panels
                 row.Cells[2].Value!,
                 row.Cells[3].Value!,
                 row.Cells[4].Value!,
-                objectGameTypes.GetShortName((int)row.Cells[4].Value!)
+                GameTypeObject.GetShortName((int)row.Cells[4].Value!)
             );
 
             DataGridViewRow newRow = targetGrid.Rows[newRowIndex];
@@ -241,7 +241,7 @@ namespace BHD_ServerManager.Forms.Panels
                     map.MapFile,
                     map.ModType,
                     map.MapType,
-                    objectGameTypes.GetShortName(map.MapType)
+                    GameTypeObject.GetShortName(map.MapType)
                 );
 
                 DataGridViewRow row = dataGridView_currentMaps.Rows[rowIndex];
@@ -342,9 +342,9 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Build playlist from current DataGridView
         /// </summary>
-        private List<mapFileInfo> BuildPlaylistFromGrid()
+        private List<MapObject> BuildPlaylistFromGrid()
         {
-            var list = new List<mapFileInfo>();
+            var list = new List<MapObject>();
             DataGridView grid = dataGridView_currentMaps;
 
             foreach (DataGridViewRow row in grid.Rows)
@@ -352,7 +352,7 @@ namespace BHD_ServerManager.Forms.Panels
                 if (row.IsNewRow)
                     continue;
 
-                list.Add(new mapFileInfo
+                list.Add(new MapObject
                 {
                     MapID = (int)row.Cells[0].Value!,
                     MapName = row.Cells[1].Value?.ToString()!,
@@ -680,7 +680,7 @@ namespace BHD_ServerManager.Forms.Panels
                     map.MapFile,
                     map.ModType,
                     map.MapType,
-                    objectGameTypes.GetShortName(map.MapType)
+                    GameTypeObject.GetShortName(map.MapType)
                 );
 
                 DataGridViewRow newRow = dataGridView_currentMaps.Rows[rowIndex];
@@ -745,7 +745,7 @@ namespace BHD_ServerManager.Forms.Panels
                     map.MapFile,
                     map.ModType,
                     map.MapType,
-                    objectGameTypes.GetShortName(map.MapType)
+                    GameTypeObject.GetShortName(map.MapType)
                 );
 
                 dataGridView_currentMaps.Rows[rowIndex].Cells[1].ToolTipText = $"Map File: {map.MapFile}";
@@ -795,7 +795,7 @@ namespace BHD_ServerManager.Forms.Panels
                     map.MapFile,
                     map.ModType,
                     map.MapType,
-                    objectGameTypes.GetShortName(map.MapType)
+                    GameTypeObject.GetShortName(map.MapType)
                 );
 
                 dataGridView_currentMaps.Rows[rowIndex].Cells[1].ToolTipText = $"Map File: {map.MapFile}";

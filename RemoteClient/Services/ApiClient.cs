@@ -1,4 +1,12 @@
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabAdmin;
+using HawkSyncShared.DTOs.tabBans;
+using HawkSyncShared.DTOs.tabBans.Service;
+using HawkSyncShared.DTOs.tabGameplay;
+using HawkSyncShared.DTOs.tabMaps;
+using HawkSyncShared.DTOs.tabPlayers;
+using HawkSyncShared.DTOs.tabProfile;
+using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.SupportClasses;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -109,54 +117,54 @@ public class ApiClient : IDisposable
 
     public async Task<CommandResult> KickPlayerAsync(int playerSlot, string playerName)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new KickPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/kick", command);
     }
 
     public async Task<CommandResult> BanPlayerAsync(int playerSlot, string playerName, string playerIP, bool banIP)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new BanPlayerCommand(playerSlot, PlayerName, playerIP, banIP);
         return await SendCommandAsync("/api/player/ban", command);
     }
 
     public async Task<CommandResult> WarnPlayerAsync(int playerSlot, string playerName, string message)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new WarnPlayerCommand(playerSlot, PlayerName, message);
         return await SendCommandAsync("/api/player/warn", command);
     }
 
     public async Task<CommandResult> KillPlayerAsync(int playerSlot, string playerName)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new KillPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/kill", command);
     }
 
     public async Task<CommandResult> ArmPlayerAsync(int playerSlot, string playerName)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new ArmPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/arm", command);
     }
 
     public async Task<CommandResult> DisarmPlayerAsync(int playerSlot, string playerName)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new DisarmPlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/disarm", command);
     }
     public async Task<CommandResult> ToggleGodPlayerAsync(int playerSlot, string playerName)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new GodModePlayerCommand(playerSlot, PlayerName);
         return await SendCommandAsync("/api/player/togglegodmode", command);
     }
     public async Task<CommandResult> SwitchTeamPlayerAsync(int playerSlot, string playerName, int teamNum)
     {
-        var PlayerName = Func.TB64(playerName);
+        var PlayerName = AppFunc.TB64(playerName);
         var command = new SwitchTeamPlayerCommand(playerSlot, PlayerName, teamNum);
         return await SendCommandAsync("/api/player/switchteam", command);
     }
@@ -167,7 +175,7 @@ public class ApiClient : IDisposable
 
     public async Task<CommandResult> SendChatAsync(string message, int channel = 1)
     {
-        string chatMessage = Func.TB64(message);
+        string chatMessage = AppFunc.TB64(message);
 
         var command = new SendChatCommand(chatMessage, channel);
         return await SendCommandAsync("/api/chat/send", command);
@@ -588,7 +596,7 @@ public class ApiClient : IDisposable
         return await response.Content.ReadFromJsonAsync<PlaylistCommandResult>() ?? new PlaylistCommandResult { Success = false, Message = "No response" };
     }
 
-    public async Task<BanRecordSaveResult> SaveBlacklistRecordAsync(BanRecordSaveRequest req)
+    public async Task<BanRecordSaveResult> SaveBlacklistRecordAsync(BanDTOs req)
     {
         try
         {
@@ -643,7 +651,7 @@ public class ApiClient : IDisposable
         }
     }
 
-    public async Task<BanRecordSaveResult> SaveWhitelistRecordAsync(BanRecordSaveRequest req)
+    public async Task<BanRecordSaveResult> SaveWhitelistRecordAsync(BanDTOs req)
     {
         try
         {
@@ -698,7 +706,7 @@ public class ApiClient : IDisposable
         }
     }
 
-    public async Task<CommandResult> SaveProxyCheckSettingsAsync(ProxyCheckSettingsRequest settings)
+    public async Task<CommandResult> SaveProxyCheckSettingsAsync(ProxyCheck settings)
     {
         // Change "/api/settings/proxycheck" to "/api/profile/proxycheck"
         return await SendCommandAsync("/api/profile/proxycheck", settings);
@@ -828,13 +836,13 @@ public class ApiClient : IDisposable
         }
     }
 
-    public async Task<AdminCommandResult> CreateUserAsync(CreateUserRequest request)
+    public async Task<AdminCommandResult> CreateUserAsync(CreateUserRequestDTO request)
     {
         var result = await SendCommandAsync("/api/admin/create", request);
         return new AdminCommandResult { Success = result.Success, Message = result.Message };
     }
 
-    public async Task<AdminCommandResult> UpdateUserAsync(UpdateUserRequest request)
+    public async Task<AdminCommandResult> UpdateUserAsync(UpdateUserRequestDTO request)
     {
         var result = await SendCommandAsync("/api/admin/update", request);
         return new AdminCommandResult { Success = result.Success, Message = result.Message };
@@ -842,7 +850,7 @@ public class ApiClient : IDisposable
 
     public async Task<AdminCommandResult> DeleteUserAsync(int userId)
     {
-        var request = new DeleteUserRequest { UserID = userId };
+        var request = new DeleteUserRequestDTO { UserID = userId };
         var result = await SendCommandAsync("/api/admin/delete", request);
         return new AdminCommandResult { Success = result.Success, Message = result.Message };
     }

@@ -1,8 +1,6 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
-using HawkSyncShared.SupportClasses;
 using System.Text;
 
 namespace BHD_ServerManager.API.Services;

@@ -48,7 +48,7 @@ namespace HawkSyncShared.Instances
     {
         public required int             RecordID            { get; set; }
         public int					    MatchID             { get; set; } = 0;
-        [JsonConverter(typeof(IPAddressConverter))]
+        [JsonConverter(typeof(IPConvert))]
         public required IPAddress       PlayerIP            { get; set; }
         public required int			    SubnetMask          { get; set; }
 		public DateTime 			    Date                { get; set; }
@@ -62,7 +62,7 @@ namespace HawkSyncShared.Instances
     public class proxyRecord
     {
         public required int             RecordID            { get; set; }
-        [JsonConverter(typeof(IPAddressConverter))]
+        [JsonConverter(typeof(IPConvert))]
 		public required IPAddress       IPAddress           { get; set; }
         public bool                     IsVpn               { get; set; }
         public bool                     IsProxy             { get; set; }

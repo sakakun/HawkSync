@@ -1,5 +1,5 @@
 using RemoteClient.Services;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
 
 namespace RemoteClient.Core;
 

@@ -4,8 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.DTOs;
-using HawkSyncShared.ObjectClasses;
+using HawkSyncShared.DTOs.tabAdmin;
+using HawkSyncShared.DTOs.API;
 
 namespace BHD_ServerManager.API.Controllers;
 

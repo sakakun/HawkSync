@@ -1,15 +1,12 @@
 ﻿using BHD_ServerManager.Forms;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using static HawkSyncShared.DTOs.ChatDTOs;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {

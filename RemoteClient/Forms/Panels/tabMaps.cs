@@ -1,7 +1,7 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using HawkSyncShared.SupportClasses;
 using RemoteClient.Core;
 using System.Text;

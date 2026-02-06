@@ -1,5 +1,4 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.DTOs;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
@@ -14,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BHD_ServerManager.Classes.InstanceManagers.theInstanceManager;
+using HawkSyncShared.DTOs.tabStats;
 
 namespace BHD_ServerManager.Forms.Panels
 {

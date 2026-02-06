@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
 
 namespace RemoteClient.Services;
 

@@ -1,5 +1,8 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabBans;
+using HawkSyncShared.DTOs.tabBans.Service;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using RemoteClient.Core;
@@ -534,7 +537,7 @@ namespace RemoteClient.Forms.Panels
                     subnetMask = 32;
             }
 
-            var req = new BanRecordSaveRequest
+            var req = new BanDTOs
             {
                 NameRecordID = _blacklistSelectedRecordIDName == -1 ? null : _blacklistSelectedRecordIDName,
                 IPRecordID = _blacklistSelectedRecordIDIP == -1 ? null : _blacklistSelectedRecordIDIP,
@@ -848,7 +851,7 @@ namespace RemoteClient.Forms.Panels
                                         var ipRecord = importData.BannedPlayerIPs?.FirstOrDefault(ip => ip.RecordID == nameRecord.AssociatedIP.Value);
                                         if (ipRecord != null)
                                         {
-                                            BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                            BanDTOs request = new BanDTOs();
                                             request.PlayerName = nameRecord.PlayerName;
                                             request.IPAddress = ipRecord.PlayerIP.ToString();
                                             request.SubnetMask = ipRecord.SubnetMask;
@@ -875,7 +878,7 @@ namespace RemoteClient.Forms.Panels
                                 // Name only
                                 if (!processedNameIds.Contains(nameRecord.RecordID))
                                 {
-                                    BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                    BanDTOs request = new BanDTOs();
                                     request.PlayerName = nameRecord.PlayerName;
                                     request.BanDate = nameRecord.Date;
                                     request.ExpireDate = nameRecord.ExpireDate;
@@ -909,7 +912,7 @@ namespace RemoteClient.Forms.Panels
                                 // IP only
                                 if (!processedIpIds.Contains(ipRecord.RecordID))
                                 {
-                                    BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                    BanDTOs request = new BanDTOs();
                                     request.IPAddress = ipRecord.PlayerIP.ToString();
                                     request.SubnetMask = ipRecord.SubnetMask;
                                     request.BanDate = ipRecord.Date;
@@ -992,7 +995,7 @@ namespace RemoteClient.Forms.Panels
                 if (!DateTime.TryParse(dateStr, out var banDate))
                     banDate = DateTime.Now;
 
-                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                BanDTOs request = new BanDTOs();
                 request.IPAddress = ipAddress.ToString();
                 request.SubnetMask = subnetMask;
                 request.BanDate = banDate;
@@ -1041,7 +1044,7 @@ namespace RemoteClient.Forms.Panels
                 if (!DateTime.TryParse(dateStr, out var banDate))
                     banDate = DateTime.Now;
 
-                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                BanDTOs request = new BanDTOs();
                 request.PlayerName = playerName;
                 request.BanDate = banDate;
                 request.RecordType = banInstanceRecordType.Permanent;
@@ -1344,7 +1347,7 @@ namespace RemoteClient.Forms.Panels
                     subnetMask = 32;
             }
 
-            var req = new BanRecordSaveRequest
+            var req = new BanDTOs
             {
                 NameRecordID = _whitelistSelectedRecordIDName == -1 ? null : _whitelistSelectedRecordIDName,
                 IPRecordID = _whitelistSelectedRecordIDIP == -1 ? null : _whitelistSelectedRecordIDIP,
@@ -1642,7 +1645,7 @@ namespace RemoteClient.Forms.Panels
                                     var ipRecord = importData.BannedPlayerIPs?.FirstOrDefault(ip => ip.RecordID == nameRecord.AssociatedIP.Value);
                                     if (ipRecord != null)
                                     {
-                                        BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                        BanDTOs request = new BanDTOs();
                                         request.PlayerName = nameRecord.PlayerName;
                                         request.IPAddress = ipRecord.PlayerIP.ToString();
                                         request.SubnetMask = ipRecord.SubnetMask;
@@ -1668,7 +1671,7 @@ namespace RemoteClient.Forms.Panels
                             // Name only
                             if (!processedNameIds.Contains(nameRecord.RecordID))
                             {
-                                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                BanDTOs request = new BanDTOs();
                                 request.PlayerName = nameRecord.PlayerName;
                                 request.BanDate = nameRecord.Date;
                                 request.ExpireDate = nameRecord.ExpireDate;
@@ -1702,7 +1705,7 @@ namespace RemoteClient.Forms.Panels
                             // IP only
                             if (!processedIpIds.Contains(ipRecord.RecordID))
                             {
-                                BanRecordSaveRequest request = new BanRecordSaveRequest();
+                                BanDTOs request = new BanDTOs();
                                 request.IPAddress = ipRecord.PlayerIP.ToString();
                                 request.SubnetMask = ipRecord.SubnetMask;
                                 request.BanDate = ipRecord.Date;
@@ -1895,7 +1898,7 @@ namespace RemoteClient.Forms.Panels
         private async void ProxyCheck_SaveSettings(object sender, EventArgs e)
         {
             // Gather settings from UI
-            var settings = new ProxyCheckSettingsRequest
+            var settings = new ProxyCheck
             {
                 ProxyCheckEnabled = cb_enableProxyCheck.Checked,
                 ProxyAPIKey = textBox_ProxyAPIKey.Text.Trim(),

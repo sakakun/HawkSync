@@ -1,6 +1,7 @@
 ﻿using FontAwesome.Sharp;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.SupportClasses;
 using RemoteClient.Core;
 using System.Threading.Tasks;
@@ -415,7 +416,7 @@ public partial class tabAdmin : UserControl
             return;
         }
 
-        var request = new CreateUserRequest
+        var request = new CreateUserRequestDTO
         {
             Username = textBox_username.Text.Trim(),
             Password = textBox_password.Text,
@@ -446,7 +447,7 @@ public partial class tabAdmin : UserControl
     /// </summary>
     private async void UpdateUser()
     {
-        var request = new UpdateUserRequest
+        var request = new UpdateUserRequestDTO
         {
             UserID = _selectedUserID,
             Username = textBox_username.Text.Trim(),

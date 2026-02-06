@@ -2,8 +2,8 @@
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
 using HawkSyncShared;
+using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.Instances;
-using HawkSyncShared.ObjectClasses;
 using HawkSyncShared.SupportClasses;
 using System.Collections.Generic;
 using System.Text;
@@ -21,7 +21,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     /// </summary>
     public record MapScanResult(
         bool Success,
-        List<mapFileInfo> Maps,
+        List<MapObject> Maps,
         List<string> SkippedFiles,
         string ErrorMessage = ""
     );
@@ -41,8 +41,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     /// Available maps result
     /// </summary>
     public record AvailableMapsResult(
-        List<mapFileInfo> DefaultMaps,
-        List<mapFileInfo> CustomMaps,
+        List<MapObject> DefaultMaps,
+        List<MapObject> CustomMaps,
         int TotalCount
     );
 
@@ -75,7 +75,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 mapInstance.DefaultMaps.AddRange(defaultMaps);
                 mapInstance.CustomMaps.AddRange(customMapsResult.Maps);
 
-                var allMaps = new List<mapFileInfo>();
+                var allMaps = new List<MapObject>();
                 allMaps.AddRange(defaultMaps.Where(m => m.ModType == 0));
                 allMaps.AddRange(customMapsResult.Maps);
 
@@ -91,8 +91,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 AppDebug.Log("mapInstanceManager", $"Error loading available maps: {ex.Message}");
                 return new AvailableMapsResult(
-                    DefaultMaps: new List<mapFileInfo>(),
-                    CustomMaps: new List<mapFileInfo>(),
+                    DefaultMaps: new List<MapObject>(),
+                    CustomMaps: new List<MapObject>(),
                     TotalCount: 0
                 );
             }
@@ -103,7 +103,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// </summary>
         public static MapScanResult ScanCustomMaps(int DefaultCount)
         {
-            var customMaps = new List<mapFileInfo>();
+            var customMaps = new List<MapObject>();
             var skippedFiles = new List<string>();
 
             try
@@ -158,7 +158,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// </summary>
         private static MapScanResult ParseMapFile(string filePath, int mapID)
         {
-            var maps = new List<mapFileInfo>();
+            var maps = new List<MapObject>();
 
             try
             {
@@ -211,8 +211,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     var bitmapSum = binaryReader.ReadInt16();
 
                     // Get all possible BitmapBytes and Bitmap values (excluding 0)
-                    var bitmapBytesNumbers = objectGameTypes.All.Select(gt => gt.BitmapBytes).Where(b => b > 0).OrderByDescending(b => b).ToList();
-                    var bitmapNumbers = objectGameTypes.All.Select(gt => gt.Bitmap).Where(b => b > 0).OrderByDescending(b => b).ToList();
+                    var bitmapBytesNumbers = GameTypeObject.All.Select(gt => gt.BitmapBytes).Where(b => b > 0).OrderByDescending(b => b).ToList();
+                    var bitmapNumbers = GameTypeObject.All.Select(gt => gt.Bitmap).Where(b => b > 0).OrderByDescending(b => b).ToList();
 
                     // Find all game types for this map
                     var gameTypeBits = new List<int>();
@@ -234,13 +234,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             
                     foreach (var bit in gameTypeBits)
                     {
-                        var match = objectGameTypes.All.FirstOrDefault(gt => gt.Bitmap == bit || gt.BitmapBytes == bit);
+                        var match = GameTypeObject.All.FirstOrDefault(gt => gt.Bitmap == bit || gt.BitmapBytes == bit);
 
                         if (match != null)
                         {
                             gameTypes.Add(match.DatabaseId);
 
-                            var mapEntry = new mapFileInfo
+                            var mapEntry = new MapObject
                             {
                                 MapID = currentMapID++,
                                 MapFile = mapFile,
@@ -338,7 +338,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Save a playlist to database
         /// </summary>
-        public static PlaylistResult SavePlaylist(int playlistID, List<mapFileInfo> maps)
+        public static PlaylistResult SavePlaylist(int playlistID, List<MapObject> maps)
         {
             try
             {
@@ -387,22 +387,22 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Get maps in a playlist
         /// </summary>
-        public static (bool success, List<mapFileInfo> maps, string errorMessage) GetPlaylistMaps(int playlistID)
+        public static (bool success, List<MapObject> maps, string errorMessage) GetPlaylistMaps(int playlistID)
         {
             try
             {
                 if (playlistID < 0 || playlistID > 5)
-                    return (false, new List<mapFileInfo>(), "Invalid playlist ID.");
+                    return (false, new List<MapObject>(), "Invalid playlist ID.");
 
                 if (!mapInstance.Playlists.ContainsKey(playlistID))
-                    return (false, new List<mapFileInfo>(), $"Playlist {playlistID} not initialized.");
+                    return (false, new List<MapObject>(), $"Playlist {playlistID} not initialized.");
 
                 return (true, mapInstance.Playlists[playlistID], string.Empty);
             }
             catch (Exception ex)
             {
                 AppDebug.Log("mapInstanceManager", $"Error getting playlist maps: {ex.Message}");
-                return (false, new List<mapFileInfo>(), ex.Message);
+                return (false, new List<MapObject>(), ex.Message);
             }
         }
 
@@ -461,7 +461,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Randomize playlist order using Fisher-Yates shuffle
         /// </summary>
-        public static PlaylistResult RandomizePlaylist(List<mapFileInfo> maps)
+        public static PlaylistResult RandomizePlaylist(List<MapObject> maps)
         {
             try
             {
@@ -495,7 +495,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Validate playlist can be used (all maps still exist)
         /// </summary>
-        public static (bool isValid, List<string> missingMaps) ValidatePlaylist(List<mapFileInfo> playlist)
+        public static (bool isValid, List<string> missingMaps) ValidatePlaylist(List<MapObject> playlist)
         {
             var missingMaps = new List<string>();
 
@@ -513,7 +513,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     if (!availableMapLookup.Contains((map.MapFile, map.MapType)))
                     {
-                        missingMaps.Add($"{map.MapName} ({map.MapFile}) - Type: {objectGameTypes.GetShortName(map.MapType)}");
+                        missingMaps.Add($"{map.MapName} ({map.MapFile}) - Type: {GameTypeObject.GetShortName(map.MapType)}");
                     }
                 }
 
@@ -565,18 +565,18 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Import playlist from JSON file with validation
         /// </summary>
-        public static (bool success, List<mapFileInfo> maps, int importedCount, int skippedCount, string errorMessage) ImportPlaylistFromJson(string filePath)
+        public static (bool success, List<MapObject> maps, int importedCount, int skippedCount, string errorMessage) ImportPlaylistFromJson(string filePath)
         {
             try
             {
                 if (!File.Exists(filePath))
-                    return (false, new List<mapFileInfo>(), 0, 0, "File not found.");
+                    return (false, new List<MapObject>(), 0, 0, "File not found.");
 
                 string json = File.ReadAllText(filePath);
-                var importedMaps = JsonSerializer.Deserialize<List<mapFileInfo>>(json);
+                var importedMaps = JsonSerializer.Deserialize<List<MapObject>>(json);
 
                 if (importedMaps == null || importedMaps.Count == 0)
-                    return (false, new List<mapFileInfo>(), 0, 0, "The backup file contains no maps.");
+                    return (false, new List<MapObject>(), 0, 0, "The backup file contains no maps.");
 
                 // Build lookup of available maps
                 var availableMaps = LoadAvailableMaps();
@@ -588,7 +588,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     availableMapLookup.Add((map.MapFile, map.MapType));
 
                 // Filter to only available maps
-                var validMaps = new List<mapFileInfo>();
+                var validMaps = new List<MapObject>();
                 int skippedCount = 0;
 
                 foreach (var map in importedMaps)
@@ -617,7 +617,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             catch (Exception ex)
             {
                 AppDebug.Log("mapInstanceManager", $"Error importing playlist: {ex.Message}");
-                return (false, new List<mapFileInfo>(), 0, 0, ex.Message);
+                return (false, new List<MapObject>(), 0, 0, ex.Message);
             }
         }
 
@@ -743,7 +743,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Initialize playlist dictionaries
                 for (int i = 0; i <= 5; i++)
                 {
-                    mapInstance.Playlists[i] = new List<mapFileInfo>();
+                    mapInstance.Playlists[i] = new List<MapObject>();
                 }
 
                 // Load active playlist setting

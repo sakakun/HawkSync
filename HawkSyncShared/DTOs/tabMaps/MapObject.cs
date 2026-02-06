@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace HawkSyncShared.ObjectClasses
+namespace HawkSyncShared.DTOs.tabMaps
 {
 
-    public class mapFileInfo
+    public class MapObject
     {
         /// <summary>
         /// Map Identifier (ID)

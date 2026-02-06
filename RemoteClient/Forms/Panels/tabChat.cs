@@ -1,5 +1,5 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
 using System;

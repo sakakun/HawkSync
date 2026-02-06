@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HawkSyncShared.ObjectClasses
+namespace HawkSyncShared.DTOs.tabAdmin
 { 
     /// <summary>
     /// Represents a user record from the database.

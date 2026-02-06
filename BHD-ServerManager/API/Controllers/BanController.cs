@@ -1,6 +1,9 @@
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
 using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.tabBans;
+using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -10,7 +13,7 @@ using System.Net;
 public class BanController : ControllerBase
 {
     [HttpPost("save-blacklist")]
-    public ActionResult<BanRecordSaveResult> SaveBlacklistRecord([FromBody] BanRecordSaveRequest req)
+    public ActionResult<BanRecordSaveResult> SaveBlacklistRecord([FromBody] BanDTOs req)
     {
         if (!HasPermission("bans")) return Forbid();
 
@@ -108,7 +111,7 @@ public class BanController : ControllerBase
     }
 
     [HttpPost("save-whitelist")]
-    public ActionResult<BanRecordSaveResult> SaveWhitelistRecord([FromBody] BanRecordSaveRequest req)
+    public ActionResult<BanRecordSaveResult> SaveWhitelistRecord([FromBody] BanDTOs req)
     {
         if (!HasPermission("bans")) return Forbid();
 

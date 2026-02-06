@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HawkSyncShared.DTOs;
+namespace HawkSyncShared.DTOs.tabMaps;
 
 /// <summary>
 /// DTO for a single map in a playlist
