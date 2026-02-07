@@ -6,16 +6,7 @@ using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Windows.Storage;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -33,8 +24,28 @@ namespace BHD_ServerManager.Forms.Panels
         public tabGamePlay()
         {
             InitializeComponent();
-            functionEvent_InitializeWeaponCheckboxes();
-            methodFunction_loadSettings();
+
+            // Load Settings
+            LoadSettings();
+            InitializeWeaponCheckboxes();
+
+            // Start a ticker to update the profile tab every 1 second
+            CommonCore.Ticker?.Start("GamePlayTabTicker", 1000, Ticker_GamePlayTab);
+            
+        }
+
+        /// <summary>
+        /// Ticker hook for server updates
+        /// </summary>
+        public void Ticker_GamePlayTab()
+        {
+            if(InvokeRequired)
+            {
+                Invoke(new Action(Ticker_GamePlayTab));
+                return;
+            }
+
+            UpdateServerControls();
         }
 
         // --- Form Functions ---
@@ -42,9 +53,8 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Load gameplay settings via manager
         /// </summary>
-        public void methodFunction_loadSettings()
+        public void LoadSettings()
         {
-            // Load via manager
             var result = theInstanceManager.LoadGamePlaySettings();
 
             if (!result.Success)
@@ -59,32 +69,9 @@ namespace BHD_ServerManager.Forms.Panels
         }
 
         /// <summary>
-        /// Save gameplay settings via manager
-        /// </summary>
-        public void methodFunction_saveSettings()
-        {
-            // Build settings from UI
-            var settings = BuildGamePlaySettingsFromUI();
-
-            // Save via manager (includes validation)
-            var result = theInstanceManager.SaveGamePlaySettings(settings);
-
-            if (result.Success)
-            {
-                MessageBox.Show("Gameplay settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                AppDebug.Log(Name, "Gameplay settings saved successfully");
-            }
-            else
-            {
-                MessageBox.Show($"Failed to save gameplay settings:\n\n{result.Message}", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                AppDebug.Log(Name, $"Failed to save gameplay settings: {result.Message}");
-            }
-        }
-
-        /// <summary>
         /// Export gameplay settings to JSON
         /// </summary>
-        public void methodFunction_exportSettings()
+        public void ExportSettings()
         {
             try
             {
@@ -120,7 +107,7 @@ namespace BHD_ServerManager.Forms.Panels
         /// <summary>
         /// Import gameplay settings from JSON
         /// </summary>
-        public void methodFunction_importSettings()
+        public void ImportSettings()
         {
             try
             {
@@ -162,157 +149,9 @@ namespace BHD_ServerManager.Forms.Panels
         /// </summary>
         private void UpdateUIFromInstance()
         {
-            // Lobby Passwords
-            tb_bluePassword.Text = theInstance!.gamePasswordBlue;
-            tb_redPassword.Text = theInstance.gamePasswordRed;
-
-            // Match Win Conditions
-            num_scoresKOTH.Value = theInstance.gameScoreZoneTime;
-            num_scoresDM.Value = theInstance.gameScoreKills;
-            num_scoresFB.Value = theInstance.gameScoreFlags;
-
-            // Server Values
-            num_gameTimeLimit.Value = theInstance.gameTimeLimit;
-            cb_replayMaps.SelectedIndex = theInstance.gameLoopMaps;
-            num_gameStartDelay.Value = theInstance.gameStartDelay;
-            num_respawnTime.Value = theInstance.gameRespawnTime;
-            num_scoreBoardDelay.Value = theInstance.gameScoreBoardDelay;
-            num_maxPlayers.Value = theInstance.gameMaxSlots;
-            num_pspTakeoverTimer.Value = theInstance.gamePSPTOTimer;
-            num_flagReturnTime.Value = theInstance.gameFlagReturnTime;
-            num_maxTeamLives.Value = theInstance.gameMaxTeamLives;
-
-            // Server Options
-            cb_autoBalance.Checked = theInstance.gameOptionAutoBalance;
-            cb_customSkins.Checked = theInstance.gameCustomSkins;
-            cb_enableDistroyBuildings.Checked = theInstance.gameDestroyBuildings;
-            cb_enableFatBullets.Checked = theInstance.gameFatBullets;
-            cb_enableOneShotKills.Checked = theInstance.gameOneShotKills;
-            cb_enableLeftLean.Checked = theInstance.gameAllowLeftLeaning;
-            cb_showTracers.Checked = theInstance.gameOptionShowTracers;
-            cb_showClays.Checked = theInstance.gameShowTeamClays;
-            cb_autoRange.Checked = theInstance.gameOptionAutoRange;
-
-            // Friendly Fire
-            cb_enableFFkills.Checked = theInstance.gameOptionFF;
-            num_maxFFKills.Value = theInstance.gameFriendlyFireKills;
-            cb_warnFFkils.Checked = theInstance.gameOptionFFWarn;
-            cb_showTeamTags.Checked = theInstance.gameOptionFriendlyTags;
-
-            // Role Restrictions
-            cb_roleCQB.Checked = theInstance.roleCQB;
-            cb_roleGunner.Checked = theInstance.roleGunner;
-            cb_roleSniper.Checked = theInstance.roleSniper;
-            cb_roleMedic.Checked = theInstance.roleMedic;
-
-            // Weapon Restrictions
-            cb_weapColt45.Checked = theInstance.weaponColt45;
-            cb_weapM9Bereatta.Checked = theInstance.weaponM9Beretta;
-            cb_weapCAR15.Checked = theInstance.weaponCar15;
-            cb_weapCAR15203.Checked = theInstance.weaponCar15203;
-            cb_weapM16.Checked = theInstance.weaponM16;
-            cb_weapM16203.Checked = theInstance.weaponM16203;
-            cb_weapG3.Checked = theInstance.weaponG3;
-            cb_weapG36.Checked = theInstance.weaponG36;
-            cb_weapM60.Checked = theInstance.weaponM60;
-            cb_weapM240.Checked = theInstance.weaponM240;
-            cb_weapMP5.Checked = theInstance.weaponMP5;
-            cb_weapSaw.Checked = theInstance.weaponSAW;
-            cb_weap300Tact.Checked = theInstance.weaponMCRT300;
-            cb_weapM21.Checked = theInstance.weaponM21;
-            cb_weapM24.Checked = theInstance.weaponM24;
-            cb_weapBarret.Checked = theInstance.weaponBarrett;
-            cb_weapPSG1.Checked = theInstance.weaponPSG1;
-            cb_weapShotgun.Checked = theInstance.weaponShotgun;
-            cb_weapFragGrenade.Checked = theInstance.weaponFragGrenade;
-            cb_weapSmokeGrenade.Checked = theInstance.weaponSmokeGrenade;
-            cb_weapSatchel.Checked = theInstance.weaponSatchelCharges;
-            cb_weapAT4.Checked = theInstance.weaponAT4;
-            cb_weapFlashBang.Checked = theInstance.weaponFlashGrenade;
-            cb_weapClay.Checked = theInstance.weaponClaymore;
-
-            // Update select all/none checkboxes
-            UpdateWeaponSelectCheckboxes();
-        }
-
-        /// <summary>
-        /// Build GamePlaySettings DTO from UI controls
-        /// </summary>
-        private GamePlaySettings BuildGamePlaySettingsFromUI()
-        {
-            var options = new ServerOptions(
-                AutoBalance: cb_autoBalance.Checked,
-                ShowTracers: cb_showTracers.Checked,
-                ShowClays: cb_showClays.Checked,
-                AutoRange: cb_autoRange.Checked,
-                CustomSkins: cb_customSkins.Checked,
-                DestroyBuildings: cb_enableDistroyBuildings.Checked,
-                FatBullets: cb_enableFatBullets.Checked,
-                OneShotKills: cb_enableOneShotKills.Checked,
-                AllowLeftLeaning: cb_enableLeftLean.Checked
-            );
-
-            var friendlyFire = new FriendlyFireSettings(
-                Enabled: cb_enableFFkills.Checked,
-                MaxKills: (int)num_maxFFKills.Value,
-                WarnOnKill: cb_warnFFkils.Checked,
-                ShowFriendlyTags: cb_showTeamTags.Checked
-            );
-
-            var roles = new RoleRestrictions(
-                CQB: cb_roleCQB.Checked,
-                Gunner: cb_roleGunner.Checked,
-                Sniper: cb_roleSniper.Checked,
-                Medic: cb_roleMedic.Checked
-            );
-
-            var weapons = new WeaponRestrictions(
-                Colt45: cb_weapColt45.Checked,
-                M9Beretta: cb_weapM9Bereatta.Checked,
-                CAR15: cb_weapCAR15.Checked,
-                CAR15203: cb_weapCAR15203.Checked,
-                M16: cb_weapM16.Checked,
-                M16203: cb_weapM16203.Checked,
-                G3: cb_weapG3.Checked,
-                G36: cb_weapG36.Checked,
-                M60: cb_weapM60.Checked,
-                M240: cb_weapM240.Checked,
-                MP5: cb_weapMP5.Checked,
-                SAW: cb_weapSaw.Checked,
-                MCRT300: cb_weap300Tact.Checked,
-                M21: cb_weapM21.Checked,
-                M24: cb_weapM24.Checked,
-                Barrett: cb_weapBarret.Checked,
-                PSG1: cb_weapPSG1.Checked,
-                Shotgun: cb_weapShotgun.Checked,
-                FragGrenade: cb_weapFragGrenade.Checked,
-                SmokeGrenade: cb_weapSmokeGrenade.Checked,
-                Satchel: cb_weapSatchel.Checked,
-                AT4: cb_weapAT4.Checked,
-                FlashBang: cb_weapFlashBang.Checked,
-                Claymore: cb_weapClay.Checked
-            );
-
-            return new GamePlaySettings(
-                BluePassword: tb_bluePassword.Text,
-                RedPassword: tb_redPassword.Text,
-                ScoreKOTH: (int)num_scoresKOTH.Value,
-                ScoreDM: (int)num_scoresDM.Value,
-                ScoreFB: (int)num_scoresFB.Value,
-                TimeLimit: (int)num_gameTimeLimit.Value,
-                LoopMaps: cb_replayMaps.SelectedIndex,
-                StartDelay: (int)num_gameStartDelay.Value,
-                RespawnTime: (int)num_respawnTime.Value,
-                ScoreBoardDelay: (int)num_scoreBoardDelay.Value,
-                MaxSlots: (int)num_maxPlayers.Value,
-                PSPTakeoverTimer: (int)num_pspTakeoverTimer.Value,
-                FlagReturnTime: (int)num_flagReturnTime.Value,
-                MaxTeamLives: (int)num_maxTeamLives.Value,
-                Options: options,
-                FriendlyFire: friendlyFire,
-                Roles: roles,
-                Weapons: weapons
-            );
+            if (theInstance == null) return;
+            var settings = gamePlayInstanceManager.BuildGamePlaySettingsFromInstance(theInstance);
+            ApplyGamePlaySettingsToUI(settings);
         }
 
         /// <summary>
@@ -364,41 +203,47 @@ namespace BHD_ServerManager.Forms.Panels
             cb_roleMedic.Checked = settings.Roles.Medic;
 
             // Weapon Restrictions
-            cb_weapColt45.Checked = settings.Weapons.Colt45;
-            cb_weapM9Bereatta.Checked = settings.Weapons.M9Beretta;
-            cb_weapCAR15.Checked = settings.Weapons.CAR15;
-            cb_weapCAR15203.Checked = settings.Weapons.CAR15203;
-            cb_weapM16.Checked = settings.Weapons.M16;
-            cb_weapM16203.Checked = settings.Weapons.M16203;
-            cb_weapG3.Checked = settings.Weapons.G3;
-            cb_weapG36.Checked = settings.Weapons.G36;
-            cb_weapM60.Checked = settings.Weapons.M60;
-            cb_weapM240.Checked = settings.Weapons.M240;
-            cb_weapMP5.Checked = settings.Weapons.MP5;
-            cb_weapSaw.Checked = settings.Weapons.SAW;
-            cb_weap300Tact.Checked = settings.Weapons.MCRT300;
-            cb_weapM21.Checked = settings.Weapons.M21;
-            cb_weapM24.Checked = settings.Weapons.M24;
-            cb_weapBarret.Checked = settings.Weapons.Barrett;
-            cb_weapPSG1.Checked = settings.Weapons.PSG1;
-            cb_weapShotgun.Checked = settings.Weapons.Shotgun;
-            cb_weapFragGrenade.Checked = settings.Weapons.FragGrenade;
-            cb_weapSmokeGrenade.Checked = settings.Weapons.SmokeGrenade;
-            cb_weapSatchel.Checked = settings.Weapons.Satchel;
-            cb_weapAT4.Checked = settings.Weapons.AT4;
-            cb_weapFlashBang.Checked = settings.Weapons.FlashBang;
-            cb_weapClay.Checked = settings.Weapons.Claymore;
+            SetWeaponCheckboxes(settings.Weapons);
 
             // Update select all/none checkboxes
             UpdateWeaponSelectCheckboxes();
         }
 
-        // --- Weapon Checkbox Logic ---
+        /// <summary>
+        /// Helper to set all weapon checkboxes from WeaponRestrictions
+        /// </summary>
+        private void SetWeaponCheckboxes(WeaponRestrictions weapons)
+        {
+            cb_weapColt45.Checked = weapons.Colt45;
+            cb_weapM9Bereatta.Checked = weapons.M9Beretta;
+            cb_weapCAR15.Checked = weapons.CAR15;
+            cb_weapCAR15203.Checked = weapons.CAR15203;
+            cb_weapM16.Checked = weapons.M16;
+            cb_weapM16203.Checked = weapons.M16203;
+            cb_weapG3.Checked = weapons.G3;
+            cb_weapG36.Checked = weapons.G36;
+            cb_weapM60.Checked = weapons.M60;
+            cb_weapM240.Checked = weapons.M240;
+            cb_weapMP5.Checked = weapons.MP5;
+            cb_weapSaw.Checked = weapons.SAW;
+            cb_weap300Tact.Checked = weapons.MCRT300;
+            cb_weapM21.Checked = weapons.M21;
+            cb_weapM24.Checked = weapons.M24;
+            cb_weapBarret.Checked = weapons.Barrett;
+            cb_weapPSG1.Checked = weapons.PSG1;
+            cb_weapShotgun.Checked = weapons.Shotgun;
+            cb_weapFragGrenade.Checked = weapons.FragGrenade;
+            cb_weapSmokeGrenade.Checked = weapons.SmokeGrenade;
+            cb_weapSatchel.Checked = weapons.Satchel;
+            cb_weapAT4.Checked = weapons.AT4;
+            cb_weapFlashBang.Checked = weapons.FlashBang;
+            cb_weapClay.Checked = weapons.Claymore;
+        }
 
         /// <summary>
         /// Initialize weapon checkbox list
         /// </summary>
-        private void functionEvent_InitializeWeaponCheckboxes()
+        private void InitializeWeaponCheckboxes()
         {
             weaponCheckboxes = new()
             {
@@ -417,43 +262,25 @@ namespace BHD_ServerManager.Forms.Panels
             if (_updatingWeaponCheckboxes) return;
 
             _updatingWeaponCheckboxes = true;
-
             checkBox_selectAll.Checked = weaponCheckboxes.All(cb => cb.Checked);
             checkBox_selectNone.Checked = weaponCheckboxes.All(cb => !cb.Checked);
-
             _updatingWeaponCheckboxes = false;
         }
 
         /// <summary>
         /// Update server control button states
         /// </summary>
-        public void functionEvent_UpdateServerControls()
+        public void UpdateServerControls()
         {
-            bool isOffline = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
+            bool isOffline = (theInstance?.instanceStatus == InstanceStatus.OFFLINE);
 
             btn_serverControl.Text = isOffline ? "START" : "STOP";
             btn_ServerUpdate.Visible = !isOffline;
             btn_LockLobby.Visible = !isOffline;
         }
 
-        /// <summary>
-        /// Ticker hook for server updates
-        /// </summary>
-        public void tickerServerHook()
-        {
-            if (!_firstLoadComplete)
-            {
-                _firstLoadComplete = true;
-            }
-
-            functionEvent_UpdateServerControls();
-        }
-
         // --- Action Click Events ---
 
-        /// <summary>
-        /// Weapon checkbox changed
-        /// </summary>
         private void actionClick_WeaponCheckedChanged(object sender, EventArgs e)
         {
             if (_updatingWeaponCheckboxes) return;
@@ -462,7 +289,6 @@ namespace BHD_ServerManager.Forms.Panels
 
             if (sender == checkBox_selectAll && checkBox_selectAll.Checked)
             {
-                // Enable all weapons via manager
                 var result = theInstanceManager.EnableAllWeapons();
                 if (result.Success)
                 {
@@ -472,7 +298,6 @@ namespace BHD_ServerManager.Forms.Panels
             }
             else if (sender == checkBox_selectNone && checkBox_selectNone.Checked)
             {
-                // Disable all weapons via manager
                 var result = theInstanceManager.DisableAllWeapons();
                 if (result.Success)
                 {
@@ -482,7 +307,6 @@ namespace BHD_ServerManager.Forms.Panels
             }
             else if (weaponCheckboxes.Contains(sender))
             {
-                // Individual weapon changed - update select all/none
                 checkBox_selectAll.Checked = weaponCheckboxes.All(cb => cb.Checked);
                 checkBox_selectNone.Checked = weaponCheckboxes.All(cb => !cb.Checked);
             }
@@ -490,75 +314,75 @@ namespace BHD_ServerManager.Forms.Panels
             _updatingWeaponCheckboxes = false;
         }
 
-        /// <summary>
-        /// Save server settings button clicked
-        /// </summary>
         private void actionClick_SaveServerSettings(object sender, EventArgs e)
         {
-            methodFunction_saveSettings();
+            var settings = gamePlayInstanceManager.BuildGamePlaySettings(this);
+            var result = theInstanceManager.SaveGamePlaySettings(settings);
+
+            if (result.Success)
+            {
+                MessageBox.Show("Gameplay settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                AppDebug.Log(Name, "Gameplay settings saved successfully");
+            }
+            else
+            {
+                MessageBox.Show($"Failed to save gameplay settings:\n\n{result.Message}", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                AppDebug.Log(Name, $"Failed to save gameplay settings: {result.Message}");
+            }
         }
 
-        /// <summary>
-        /// Reset server settings button clicked
-        /// </summary>
         private void actionClick_ResetSettings(object sender, EventArgs e)
         {
-            methodFunction_loadSettings();
+            LoadSettings();
         }
 
-        /// <summary>
-        /// Export server settings button clicked
-        /// </summary>
         private void actionClick_ExportSettings(object sender, EventArgs e)
         {
-            methodFunction_exportSettings();
+            ExportSettings();
         }
 
-        /// <summary>
-        /// Import server settings button clicked
-        /// </summary>
         private void actionClick_ImportSettings(object sender, EventArgs e)
         {
-            methodFunction_importSettings();
+            ImportSettings();
         }
 
-        /// <summary>
-        /// Server control button clicked
-        /// </summary>
         private void actionClick_serverControl(object sender, EventArgs e)
         {
-            if (theInstanceManager.ValidateGameServerPath() && theInstance!.instanceStatus == InstanceStatus.OFFLINE)
+            if (theInstanceManager.ValidateGameServerPath() && theInstance?.instanceStatus == InstanceStatus.OFFLINE)
             {
                 if (StartServer.startGame())
                 {
                     ServerMemory.ReadMemoryServerStatus();
-                    functionEvent_UpdateServerControls();
                     Program.ServerManagerUI!.MapsTab.methodFunction_UpdateMapControls();
                 }
             }
             else
             {
                 StartServer.stopGame();
-                functionEvent_UpdateServerControls();
             }
         }
 
-        /// <summary>
-        /// Update game server settings
-        /// </summary>
         private void actionClick_GameServerUpdate(object sender, EventArgs e)
         {
             if (ServerMemory.ReadMemoryIsProcessAttached())
             {
-                methodFunction_saveSettings();
-                theInstanceManager.UpdateGameServer();
-                MessageBox.Show("Saved settings have been applied to the game server.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                var settings = gamePlayInstanceManager.BuildGamePlaySettings(this);
+                var result = theInstanceManager.SaveGamePlaySettings(settings);
+
+                if (result.Success)
+                {
+                    theInstanceManager.UpdateGameServer();
+                    MessageBox.Show("Gameplay settings saved and updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    AppDebug.Log(Name, "Gameplay settings saved and updated successfully.");
+                }
+                else
+                {
+                    MessageBox.Show($"Failed to save gameplay settings:\n\n{result.Message}", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    AppDebug.Log(Name, $"Failed to save gameplay settings: {result.Message}");
+                }
             }
         }
 
-        /// <summary>
-        /// Server lock lobby
-        /// </summary>
         private void actionClick_ServerLockLobby(object sender, EventArgs e)
         {
             ServerMemory.WriteMemorySendConsoleCommand("lockgame");

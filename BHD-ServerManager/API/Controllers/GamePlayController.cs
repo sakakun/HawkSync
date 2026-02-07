@@ -229,7 +229,7 @@ public class GamePlayController : ControllerBase
         {
             serverUI.Invoke(() =>
             {
-                serverUI.ServerTab?.methodFunction_loadSettings();
+                serverUI.GamePlayTab?.methodFunction_loadSettings();
             });
         }
     }
@@ -505,7 +505,6 @@ public class GamePlayController : ControllerBase
                 {
                     serverUI.Invoke(() =>
                     {
-                        serverUI.ServerTab?.functionEvent_UpdateServerControls();
                         serverUI.MapsTab?.methodFunction_UpdateMapControls();
                     });
                 }
@@ -559,16 +558,6 @@ public class GamePlayController : ControllerBase
 
             // Stop the server
             BHD_ServerManager.Classes.GameManagement.StartServer.stopGame();
-
-            // Trigger UI update on server manager
-            var serverUI = Program.ServerManagerUI;
-            if (serverUI != null)
-            {
-                serverUI.Invoke(() =>
-                {
-                    serverUI.ServerTab?.functionEvent_UpdateServerControls();
-                });
-            }
 
             return Ok(new CommandResult
             {
