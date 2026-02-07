@@ -229,7 +229,7 @@ public class GamePlayController : ControllerBase
         {
             serverUI.Invoke(() =>
             {
-                serverUI.GamePlayTab?.methodFunction_loadSettings();
+                serverUI.GamePlayTab?.LoadSettings();
             });
         }
     }

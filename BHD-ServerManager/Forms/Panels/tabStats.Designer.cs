@@ -204,7 +204,7 @@
             btn_SaveSettings.TabIndex = 10;
             btn_SaveSettings.Text = "Save";
             btn_SaveSettings.UseVisualStyleBackColor = true;
-            btn_SaveSettings.Click += actionClick_SaveStatSettings;
+            btn_SaveSettings.Click += OnSaveStatSettingsClick;
             // 
             // groupBox3
             // 
@@ -286,7 +286,7 @@
             cb_enableAnnouncements.TabIndex = 5;
             cb_enableAnnouncements.Text = "Enable Announcements";
             cb_enableAnnouncements.UseVisualStyleBackColor = true;
-            cb_enableAnnouncements.CheckedChanged += ActionEvent_EnableAnnouncements;
+            cb_enableAnnouncements.CheckedChanged += OnEnableAnnouncementsChanged;
             // 
             // cb_enableWebStats
             // 
@@ -298,7 +298,7 @@
             cb_enableWebStats.TabIndex = 0;
             cb_enableWebStats.Text = "Enable Babstats";
             cb_enableWebStats.UseVisualStyleBackColor = true;
-            cb_enableWebStats.CheckedChanged += ActionEvent_EnableBabStats;
+            cb_enableWebStats.CheckedChanged += OnEnableWebStatsChanged;
             // 
             // groupBox1
             // 
@@ -332,7 +332,7 @@
             btn_validate.TabIndex = 4;
             btn_validate.Text = "Validate";
             btn_validate.UseVisualStyleBackColor = true;
-            btn_validate.Click += ActionEvent_TestBabstatConnection;
+            btn_validate.Click += OnTestBabstatConnectionClick;
             // 
             // tb_webStatsServerPath
             // 
@@ -653,7 +653,6 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(tabControl1);
-            Name = "tabStats";
             Size = new Size(966, 422);
             tabControl1.ResumeLayout(false);
             tabBabstats.ResumeLayout(false);

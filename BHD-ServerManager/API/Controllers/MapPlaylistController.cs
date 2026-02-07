@@ -234,7 +234,7 @@ public class MapPlaylistController : ControllerBase
         {
             serverUI.Invoke(() =>
             {
-                serverUI.MapsTab?.actionClick_refeshMapLists(null!,null!);
+                serverUI.MapsTab?.OnRefreshMapLists(null!,null!);
             });
         }
     }

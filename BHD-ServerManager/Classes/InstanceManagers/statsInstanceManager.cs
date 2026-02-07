@@ -1,12 +1,20 @@
-﻿using BHD_ServerManager.Forms;
+﻿﻿using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Forms;
 using HawkSyncShared;
+using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
+using BHD_ServerManager.Classes.SupportClasses;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
     public static class statsInstanceManager
     {
+        private static theInstance theInstance => CommonCore.theInstance!;
+        private static mapInstance instanceMaps => CommonCore.instanceMaps!;
         private static statInstance instanceStats => CommonCore.instanceStats!;
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
@@ -265,6 +273,334 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         }
 
         // --- Other business logic and network methods remain unchanged ---
-        // (GenerateImportData, GenerateGameLine, GeneratePlayerLines, GeneratePlayerStatLine, GenerateWeaponStatLines, GenerateUpdateData, GenerateReportData, ResetPlayerStats, SendImportData, SendUpdateData, SendReportData, TestBabstatsConnectionAsync, SendBabstatsData, AddStatsLogRowSafe)
+        // (GeneratePlayerStatLine, GenerateWeaponStatLines, GenerateUpdateData, GenerateReportData, ResetPlayerStats, SendImportData, SendUpdateData, SendReportData, TestBabstatsConnectionAsync, SendBabstatsData, AddStatsLogRowSafe)
+
+        public static string GenerateImportData()
+        {
+            string importData = string.Empty;
+            importData += "ServerID " + theInstance.WebStatsProfileID + "\n";
+            importData += GenerateGameLine() + "\n";
+            foreach (var playerStat in instanceStats.playerStatsList.Values)
+            {
+                importData += GeneratePlayerLines(playerStat);
+            }
+            importData += "\n\n\n\n";
+            return importData;
+        }
+
+        public static string GenerateGameLine()
+        {
+            if (theInstance.instanceStatus == InstanceStatus.SCORING)
+                ServerMemory.ReadMemoryWinningTeam();
+
+            int totalSeconds = theInstance.gameTimeLimit * 60;
+            int timeRemainingSeconds = (int)theInstance.gameInfoTimeRemaining.TotalSeconds;
+            int timerSeconds = Math.Max(0, totalSeconds - timeRemainingSeconds);
+
+            string timer = timerSeconds.ToString();
+            string date = DateTime.Now.ToString("yyyy-M-d HH:mm:ss");
+            string gametype = instanceMaps.CurrentGameType.ToString() ?? "0";
+            string dedicated = theInstance.gameDedicated ? "1" : "0";
+            string servername = theInstance.gameServerName;
+            string mapname = instanceMaps.CurrentMapName;
+            string maxplayers = theInstance.gameMaxSlots.ToString() ?? "0";
+            string numplayers = playerInstance.PlayerList?.Count.ToString() ?? "0";
+            string winner = theInstance.gameMatchWinner.ToString();
+            string mod = (theInstance.profileServerType == 0) ? "7" : "8";
+
+            string gameLine = string.Empty;
+            if (theInstance.instanceStatus == InstanceStatus.SCORING)
+            {
+                gameLine = $" Game {timer}__&__{date}__&__{gametype}__&__{dedicated}__&__{servername}__&__{mapname}__&__{maxplayers}__&__{numplayers}__&__{winner}__&__{mod}";
+            }
+            else
+            {
+                gameLine = $" Game {timer}__&__{date}__&__{gametype}__&__{dedicated}__&__{servername}__&__{mapname}__&__{maxplayers}__&__{numplayers}__&__{mod}";
+            }
+            AppDebug.Log("StatsManager", $"Generated Game Line: {gameLine}");
+            return gameLine;
+        }
+        public static string GeneratePlayerLines(PlayerStatObject playerStats)
+        {
+            string PlayerLines = string.Empty;
+            PlayerObject player = playerStats.PlayerStatsCurrent;
+            PlayerLines = "  Player " + player.PlayerName + "__&__" + player.PlayerIPAddress + "\n";
+            PlayerLines += GeneratePlayerStatLine(player);
+            PlayerLines += GenerateWeaponStatLines(playerStats.PlayerWeaponStats);
+            return PlayerLines;
+        }
+        public static string GeneratePlayerStatLine(PlayerObject player)
+        {
+            string PlayerStatLine = string.Empty;
+            PlayerStatLine = "   PlayerStats ";
+            PlayerStatLine += player.stat_Suicides + " ";
+            PlayerStatLine += player.stat_Murders + " ";
+            PlayerStatLine += player.stat_Kills + " ";
+            PlayerStatLine += player.stat_Deaths + " ";
+            PlayerStatLine += player.stat_ZoneTime + " ";
+            PlayerStatLine += player.stat_FBCaptures + " ";
+            PlayerStatLine += player.stat_FlagSaves + " ";
+            PlayerStatLine += player.stat_SDADTargetsDestroyed + " ";
+            PlayerStatLine += player.stat_RevivesReceived + " ";
+            PlayerStatLine += player.stat_RevivesGiven + " ";
+            PlayerStatLine += player.stat_PSPAttempts + " ";
+            PlayerStatLine += player.stat_PSPTakeovers + " ";
+            PlayerStatLine += player.stat_FBCarrierKills + " ";
+            PlayerStatLine += player.stat_DoubleKills + " ";
+            PlayerStatLine += player.stat_Headshots + " ";
+            PlayerStatLine += player.stat_KnifeKills + " ";
+            PlayerStatLine += player.stat_SniperKills + " ";
+            PlayerStatLine += player.stat_TKOTHDefenseKills + " ";
+            PlayerStatLine += player.stat_TKOTHAttackKills + " ";
+            PlayerStatLine += player.stat_SDADDefenseKills + " ";
+            PlayerStatLine += "0 "; // sdadpolicekills
+            PlayerStatLine += player.stat_SDADAttackKills + " ";
+            PlayerStatLine += "0 "; // sdadsecurekills
+            PlayerStatLine += player.stat_Kills > 0 ? (player.stat_TotalShotsFired / player.stat_Kills).ToString() : "0";
+            PlayerStatLine += " "; // spacer for the SPK ratio
+            PlayerStatLine += player.stat_ExperiencePoints + " ";
+            PlayerStatLine += player.PlayerTeam + " ";
+            bool playerActive = playerInstance.PlayerList.Values.Any(p => p.PlayerName == player.PlayerName);
+            PlayerStatLine += playerActive ? "1 " : "0 ";
+            PlayerStatLine += player.PlayerTimePlayed;
+            return PlayerStatLine + "\n";
+        }
+
+        public static string GenerateWeaponStatLines(List<WeaponStatObject> weaponStatList)
+        {
+            string WeaponStatLines = string.Empty;
+            foreach (var weaponStat in weaponStatList)
+            {
+                WeaponStatLines += "   Weapon " + weaponStat.WeaponID + " " + weaponStat.TimeUsed + " " + weaponStat.Kills + " " + weaponStat.Shots + "\n";
+            }
+            return WeaponStatLines;
+        }
+
+        public static string GenerateUpdateData()
+        {
+            string updateData = string.Empty;
+            updateData += "ServerID " + theInstance.WebStatsProfileID + "\n";
+            updateData += GenerateGameLine() + "\n";
+            foreach (var playerStat in instanceStats.playerStatsList.Values)
+            {
+                PlayerObject Player = playerStat.PlayerStatsCurrent;
+                updateData += "  Player " + Player.PlayerName + "\n";
+                updateData += "   PlayerStats " + Player.PlayerTimePlayed + " " + Player.PlayerTeam + " " + Player.SelectedWeaponID + "\n";
+                updateData += "\n";
+            }
+            updateData += "End\n\n\n\n";
+            return updateData;
+        }
+
+        public static string GenerateReportData()
+        {
+            string reportData = string.Empty;
+            reportData += "1\n";
+            reportData += "DFBHD";
+            foreach (var playerStat in instanceStats.playerStatsList.Values)
+            {
+                PlayerObject Player = playerStat.PlayerStatsCurrent;
+                reportData += GeneratePlayerLines(playerStat);
+                reportData += "\n";
+            }
+            reportData += "End\n\n\n\n";
+            return reportData;
+        }
+
+        public static void ResetPlayerStats()
+        {
+            instanceStats.playerStatsList.Clear();
+            instanceStats.lastPlayerStatsUpdate = DateTime.MinValue;
+            instanceStats.lastPlayerStatsReport = DateTime.MinValue;
+        }
+
+// --- ASYNC NETWORK METHODS WITH UI INVOKE FIXES ---
+
+        public static async Task SendImportData(ServerManagerUI thisServer)
+
+        {
+            if (!theInstance.WebStatsEnabled || string.IsNullOrEmpty(theInstance.WebStatsProfileID) || string.IsNullOrEmpty(theInstance.WebStatsServerPath))
+            {
+                AppDebug.Log("StatsManager", "WebStats is not enabled or profile ID/server path is not set.");
+                return;
+            }
+
+            string POST_URL = theInstance.WebStatsServerPath + "stats_import.php";
+            Dictionary<string, string> DATA = new Dictionary<string, string>
+            {
+                ["serverid"] = theInstance.WebStatsProfileID,
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateImportData())),
+                ["BMT"] = "1"
+            };
+
+            try
+            {
+                var response = await SendBabstatsData(POST_URL, DATA);
+                if (!string.IsNullOrEmpty(response))
+                {
+                    string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
+                    AppDebug.Log("StatsManager", $"Babstats Import Response: {responseData}");
+                    AddStatsLogRowSafe(thisServer, DateTime.Now, responseData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending import data: {ex.Message}");
+            }
+        }
+
+        public static async Task SendUpdateData(ServerManagerUI thisServer)
+        {
+            string POST_URL = theInstance.WebStatsServerPath + "status_update.php";
+            Dictionary<string, string> DATA = new Dictionary<string, string>
+            {
+                ["serverid"] = theInstance.WebStatsProfileID,
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateUpdateData())),
+                ["BMT"] = "1"
+            };
+
+            try
+            {
+                var response = await SendBabstatsData(POST_URL, DATA);
+                if (!string.IsNullOrEmpty(response))
+                {
+                    string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
+                    AppDebug.Log("StatsManager", $"Babstats Update Response: {responseData}");
+                    AddStatsLogRowSafe(thisServer, DateTime.Now, responseData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending update data: {ex.Message}");
+            }
+        }
+
+        public static async Task<string> SendReportData(ServerManagerUI thisServer)
+        {
+            string POST_URL = theInstance.WebStatsServerPath + "status_report.php";
+            Dictionary<string, string> DATA = new Dictionary<string, string>
+            {
+                ["serverid"] = theInstance.WebStatsProfileID,
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateReportData())),
+                ["BMT"] = "1"
+            };
+
+            try
+            {
+                var response = await SendBabstatsData(POST_URL, DATA);
+                if (!string.IsNullOrEmpty(response))
+                {
+                    AppDebug.Log("StatsManager", $"Babstats Report Response: {response}");
+                    string[] messages = response.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var message in messages)
+                    {
+                        AddStatsLogRowSafe(thisServer, DateTime.Now, message);
+                    }
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending report data: {ex.Message}");
+            }
+            return string.Empty;
+        }
+
+        public static async Task<bool> TestBabstatsConnectionAsync(string WebURL)
+        {
+            var endpoints = new[]
+            {
+                "status_update.php",
+                "status_report.php",
+                "stats_import.php"
+            };
+
+            var baseUrl = WebURL;
+            var data = new Dictionary<string, string>();
+            int responseGood = 0;
+
+            foreach (var endpoint in endpoints)
+            {
+                string url = baseUrl + endpoint;
+                string response = await SendBabstatsData(url, data);
+
+                if (response.IndexOf("no data sent", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    responseGood++;
+                    AppDebug.Log("StatsManager", $"Babstats Test: {endpoint} - No data sent.");
+                }
+                else
+                {
+                    AppDebug.Log("StatsManager", $"Babstats Test: {url} - Response: {response}");
+                }
+            }
+            if (responseGood == 3)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static async Task<string> SendBabstatsData(string url, Dictionary<string, string> postData)
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+
+            using var httpClient = new HttpClient(handler);
+            using var content = new FormUrlEncodedContent(postData);
+
+            string postDataJson = JsonSerializer.Serialize(postData);
+            AppDebug.Log("StatsManager", $"Babstats POST Data {url} JSON: {postDataJson}");
+
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+
+            var response = await httpClient.PostAsync(url, content);
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                return $"Error sending data to Babstats server: {e.Message}";
+            }
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            AppDebug.Log("StatsManager", $"Babstats Response: {responseContent}");
+
+            return responseContent;
+        }
+
+        // --- UI THREAD-SAFE HELPERS ---
+
+        private static void AddStatsLogRowSafe(ServerManagerUI thisServer, DateTime dateTime, string message)
+        {
+            var logRecord = new StatReportObject
+                {
+                    ReportDate = dateTime,
+                    ReportContent = message
+                };
+
+            string dateTimeString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            CommonCore.instanceStats!.WebStatsLog.Add(logRecord);
+
+            if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
+            {
+                thisServer.StatsTab.dg_statsLog.Invoke(new Action(() =>
+                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message)
+                ));
+            }
+            else
+            {
+                thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message);
+            }
+
+            
+
+        }
+
     }
 }

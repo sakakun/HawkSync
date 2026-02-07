@@ -13,7 +13,6 @@ namespace BHD_ServerManager.Forms.Panels
         private statInstance? instanceStats => CommonCore.instanceStats;
 
         // --- Class Variables ---
-        private const string Name = "StatsTab";
         private bool _firstLoadComplete = false;
 
         public tabStats()

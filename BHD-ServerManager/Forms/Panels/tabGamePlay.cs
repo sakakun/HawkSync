@@ -17,7 +17,6 @@ namespace BHD_ServerManager.Forms.Panels
 
         // --- Class Variables ---
         private new string Name = "GamePlayTab";
-        private bool _firstLoadComplete = false;
         private bool _updatingWeaponCheckboxes = false;
         private List<CheckBox> weaponCheckboxes = new();
 

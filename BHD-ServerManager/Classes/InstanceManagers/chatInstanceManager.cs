@@ -57,14 +57,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             for (int i = dgv.Rows.Count - 1; i >= 0; i--)
             {
                 int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
-                if (!messages.Any(m => Convert.ToInt32(m.GetType().GetProperty("SlapMessageId")?.GetValue(m) ?? m.GetType().GetProperty("AutoMessageId")?.GetValue(m)) == id))
+                if (!messages.Any(m => Convert.ToInt32(m?.GetType().GetProperty("SlapMessageId")?.GetValue(m) ?? m.GetType().GetProperty("AutoMessageId")?.GetValue(m)) == id))
                     dgv.Rows.RemoveAt(i);
             }
 
             // Update existing rows and add new ones
             foreach (var msg in messages)
             {
-                int id = Convert.ToInt32(msg.GetType().GetProperty("SlapMessageId")?.GetValue(msg) ?? msg.GetType().GetProperty("AutoMessageId")?.GetValue(msg));
+                int id = Convert.ToInt32(msg?.GetType().GetProperty("SlapMessageId")?.GetValue(msg) ?? msg.GetType().GetProperty("AutoMessageId")?.GetValue(msg));
                 bool found = false;
                 for (int i = 0; i < dgv.Rows.Count; i++)
                 {
@@ -356,6 +356,40 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerMemory.WriteMemorySendChatMessage(channel, chunk);
 
                 System.Threading.Thread.Sleep(1000);
+            }
+        }
+
+        public static string GetTeamDisplayName(int messageType, int messageType2)
+        {
+            return messageType switch
+            {
+                0 => "Server",
+                1 => "Global",
+                2 => messageType2 switch
+                {
+                    1 => "Blue",
+                    2 => "Red",
+                    _ => "Unknown Team"
+                },
+                _ => "Unknown"
+            };
+        }
+        public static OperationResult SaveChatLogEntry(ChatLogObject chatLog)
+        {
+            try
+            {
+                if (chatLog == null)
+                    return new OperationResult(false, "Chat log entry cannot be null.");
+
+                DatabaseManager.SaveChatLog(chatLog);
+                
+                AppDebug.Log("chatInstanceManager", $"Saved chat log entry: {chatLog.PlayerName}: {chatLog.MessageText}");
+                return new OperationResult(true, "Chat log entry saved successfully.");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("chatInstanceManager", $"Error saving chat log entry: {ex.Message}");
+                return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
     }

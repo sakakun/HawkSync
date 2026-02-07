@@ -170,7 +170,7 @@
             btn_mapTypeSD.TabIndex = 6;
             btn_mapTypeSD.Text = "SD";
             btn_mapTypeSD.UseVisualStyleBackColor = false;
-            btn_mapTypeSD.Click += actionClick_filterMapType5;
+            btn_mapTypeSD.Click += OnFilterMapType5;
             // 
             // btn_mapTypeFB
             // 
@@ -183,7 +183,7 @@
             btn_mapTypeFB.TabIndex = 5;
             btn_mapTypeFB.Text = "FB";
             btn_mapTypeFB.UseVisualStyleBackColor = false;
-            btn_mapTypeFB.Click += actionClick_filterMapType8;
+            btn_mapTypeFB.Click += OnFilterMapType8;
             // 
             // btn_mapTypeCOOP
             // 
@@ -196,7 +196,7 @@
             btn_mapTypeCOOP.TabIndex = 4;
             btn_mapTypeCOOP.Text = "CO-OP";
             btn_mapTypeCOOP.UseVisualStyleBackColor = false;
-            btn_mapTypeCOOP.Click += actionClick_filterMapType2;
+            btn_mapTypeCOOP.Click += OnFilterMapType2;
             // 
             // btn_mapTypeCTF
             // 
@@ -209,7 +209,7 @@
             btn_mapTypeCTF.TabIndex = 3;
             btn_mapTypeCTF.Text = "CTF";
             btn_mapTypeCTF.UseVisualStyleBackColor = false;
-            btn_mapTypeCTF.Click += actionClick_filterMapType7;
+            btn_mapTypeCTF.Click += OnFilterMapType7;
             // 
             // btn_mapTypeAD
             // 
@@ -222,7 +222,7 @@
             btn_mapTypeAD.TabIndex = 2;
             btn_mapTypeAD.Text = "AD";
             btn_mapTypeAD.UseVisualStyleBackColor = false;
-            btn_mapTypeAD.Click += actionClick_filterMapType6;
+            btn_mapTypeAD.Click += OnFilterMapType6;
             // 
             // tableLayoutPanel7
             // 
@@ -258,7 +258,7 @@
             btn_mapTypeTKOTH.TabIndex = 6;
             btn_mapTypeTKOTH.Text = "TKOTH";
             btn_mapTypeTKOTH.UseVisualStyleBackColor = false;
-            btn_mapTypeTKOTH.Click += actionClick_filterMapType3;
+            btn_mapTypeTKOTH.Click += OnFilterMapType3;
             // 
             // btn_mapTypeKOTH
             // 
@@ -271,7 +271,7 @@
             btn_mapTypeKOTH.TabIndex = 5;
             btn_mapTypeKOTH.Text = "KOTH";
             btn_mapTypeKOTH.UseVisualStyleBackColor = false;
-            btn_mapTypeKOTH.Click += actionClick_filterMapType4;
+            btn_mapTypeKOTH.Click += OnFilterMapType4;
             // 
             // btn_mapTypeALL
             // 
@@ -284,7 +284,7 @@
             btn_mapTypeALL.TabIndex = 4;
             btn_mapTypeALL.Text = "ALL";
             btn_mapTypeALL.UseVisualStyleBackColor = false;
-            btn_mapTypeALL.Click += actionClick_filterMapType9;
+            btn_mapTypeALL.Click += OnFilterMapType9;
             // 
             // btn_mapTypeTDM
             // 
@@ -297,7 +297,7 @@
             btn_mapTypeTDM.TabIndex = 3;
             btn_mapTypeTDM.Text = "TDM";
             btn_mapTypeTDM.UseVisualStyleBackColor = false;
-            btn_mapTypeTDM.Click += actionClick_filterMapType1;
+            btn_mapTypeTDM.Click += OnFilterMapType1;
             // 
             // btn_mapTypeDM
             // 
@@ -310,7 +310,7 @@
             btn_mapTypeDM.TabIndex = 2;
             btn_mapTypeDM.Text = "DM";
             btn_mapTypeDM.UseVisualStyleBackColor = false;
-            btn_mapTypeDM.Click += actionClick_filterMapType0;
+            btn_mapTypeDM.Click += OnFilterMapType0;
             // 
             // dataGridView_availableMaps
             // 
@@ -338,7 +338,7 @@
             dataGridView_availableMaps.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView_availableMaps.Size = new Size(407, 320);
             dataGridView_availableMaps.TabIndex = 2;
-            dataGridView_availableMaps.CellDoubleClick += actionClick_playlistAddMap;
+            dataGridView_availableMaps.CellDoubleClick += OnPlaylistAddMap;
             // 
             // avail_MapID
             // 
@@ -432,7 +432,7 @@
             dataGridView_currentMaps.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView_currentMaps.Size = new Size(407, 320);
             dataGridView_currentMaps.TabIndex = 1;
-            dataGridView_currentMaps.CellDoubleClick += actionClick_playlistRemoveMap;
+            dataGridView_currentMaps.CellDoubleClick += OnPlaylistRemoveMap;
             // 
             // current_MapID
             // 
@@ -521,7 +521,7 @@
             btn_playListControlB5.TabIndex = 10;
             toolTip1.SetToolTip(btn_playListControlB5, "Update Map Rotation");
             btn_playListControlB5.UseVisualStyleBackColor = true;
-            btn_playListControlB5.Click += actionClick_setPlaylistActive;
+            btn_playListControlB5.Click += OnSetPlaylistActive;
             // 
             // btn_playListControlB4
             // 
@@ -537,7 +537,7 @@
             btn_playListControlB4.TabIndex = 9;
             toolTip1.SetToolTip(btn_playListControlB4, "Move Map Up");
             btn_playListControlB4.UseVisualStyleBackColor = true;
-            btn_playListControlB4.Click += actionClick_playlistMoveRowUp;
+            btn_playListControlB4.Click += OnPlaylistMoveRowUp;
             // 
             // btn_playListControlB3
             // 
@@ -552,7 +552,7 @@
             btn_playListControlB3.TabIndex = 8;
             toolTip1.SetToolTip(btn_playListControlB3, "Move Map Down");
             btn_playListControlB3.UseVisualStyleBackColor = true;
-            btn_playListControlB3.Click += actionClick_playlistMoveRowDown;
+            btn_playListControlB3.Click += OnPlaylistMoveRowDown;
             // 
             // btn_playListControlB2
             // 
@@ -568,7 +568,7 @@
             btn_playListControlB2.TabIndex = 7;
             toolTip1.SetToolTip(btn_playListControlB2, "Save Maplist");
             btn_playListControlB2.UseVisualStyleBackColor = true;
-            btn_playListControlB2.Click += actionClick_saveMapPlaylist;
+            btn_playListControlB2.Click += OnSaveMapPlaylist;
             // 
             // btn_playListControlB1
             // 
@@ -584,7 +584,7 @@
             btn_playListControlB1.TabIndex = 6;
             toolTip1.SetToolTip(btn_playListControlB1, "Erase Maplist");
             btn_playListControlB1.UseVisualStyleBackColor = true;
-            btn_playListControlB1.Click += actionClick_clearMapPlaylist;
+            btn_playListControlB1.Click += OnClearMapPlaylist;
             // 
             // btn_activePlaylist
             // 
@@ -633,7 +633,7 @@
             btn_loadPlaylist5.TabIndex = 16;
             btn_loadPlaylist5.Text = "P5";
             btn_loadPlaylist5.UseVisualStyleBackColor = false;
-            btn_loadPlaylist5.Click += actionClick_loadMapPlaylist5;
+            btn_loadPlaylist5.Click += OnLoadMapPlaylist5;
             // 
             // btn_loadPlaylist4
             // 
@@ -647,7 +647,7 @@
             btn_loadPlaylist4.TabIndex = 15;
             btn_loadPlaylist4.Text = "P4";
             btn_loadPlaylist4.UseVisualStyleBackColor = false;
-            btn_loadPlaylist4.Click += actionClick_loadMapPlaylist4;
+            btn_loadPlaylist4.Click += OnLoadMapPlaylist4;
             // 
             // btn_loadPlaylist3
             // 
@@ -661,7 +661,7 @@
             btn_loadPlaylist3.TabIndex = 14;
             btn_loadPlaylist3.Text = "P3";
             btn_loadPlaylist3.UseVisualStyleBackColor = false;
-            btn_loadPlaylist3.Click += actionClick_loadMapPlaylist3;
+            btn_loadPlaylist3.Click += OnLoadMapPlaylist3;
             // 
             // btn_loadPlaylist2
             // 
@@ -675,7 +675,7 @@
             btn_loadPlaylist2.TabIndex = 13;
             btn_loadPlaylist2.Text = "P2";
             btn_loadPlaylist2.UseVisualStyleBackColor = false;
-            btn_loadPlaylist2.Click += actionClick_loadMapPlaylist2;
+            btn_loadPlaylist2.Click += OnLoadMapPlaylist2;
             // 
             // btn_loadPlaylist1
             // 
@@ -689,7 +689,7 @@
             btn_loadPlaylist1.TabIndex = 12;
             btn_loadPlaylist1.Text = "P1";
             btn_loadPlaylist1.UseVisualStyleBackColor = false;
-            btn_loadPlaylist1.Click += actionClick_loadMapPlaylist1;
+            btn_loadPlaylist1.Click += OnLoadMapPlaylist1;
             // 
             // tableLayoutPanel8
             // 
@@ -733,7 +733,7 @@
             btn_mapControl7.TabIndex = 7;
             toolTip1.SetToolTip(btn_mapControl7, "Export");
             btn_mapControl7.UseVisualStyleBackColor = true;
-            btn_mapControl7.Click += actionClick_backupPlaylist;
+            btn_mapControl7.Click += OnBackupPlaylist;
             // 
             // btn_mapControl6
             // 
@@ -749,7 +749,7 @@
             btn_mapControl6.TabIndex = 6;
             toolTip1.SetToolTip(btn_mapControl6, "Import");
             btn_mapControl6.UseVisualStyleBackColor = true;
-            btn_mapControl6.Click += actionClick_importPlaylist;
+            btn_mapControl6.Click += OnImportPlaylist;
             // 
             // btn_mapControl5
             // 
@@ -765,7 +765,7 @@
             btn_mapControl5.TabIndex = 5;
             toolTip1.SetToolTip(btn_mapControl5, "Randomize Selected Playlist");
             btn_mapControl5.UseVisualStyleBackColor = true;
-            btn_mapControl5.Click += actionClick_randomizePlaylist;
+            btn_mapControl5.Click += OnRandomizePlaylist;
             // 
             // btn_mapControl4
             // 
@@ -781,7 +781,7 @@
             btn_mapControl4.TabIndex = 4;
             toolTip1.SetToolTip(btn_mapControl4, "Refresh Available Maps");
             btn_mapControl4.UseVisualStyleBackColor = true;
-            btn_mapControl4.Click += actionClick_refeshMapLists;
+            btn_mapControl4.Click += OnRefreshMapLists;
             // 
             // btn_mapControl3
             // 
@@ -797,7 +797,7 @@
             btn_mapControl3.TabIndex = 3;
             toolTip1.SetToolTip(btn_mapControl3, "Skip Map");
             btn_mapControl3.UseVisualStyleBackColor = true;
-            btn_mapControl3.Click += actionClick_SkipMap;
+            btn_mapControl3.Click += OnSkipMap;
             // 
             // btn_mapControl2
             // 
@@ -813,7 +813,7 @@
             btn_mapControl2.TabIndex = 2;
             toolTip1.SetToolTip(btn_mapControl2, "Score Map");
             btn_mapControl2.UseVisualStyleBackColor = true;
-            btn_mapControl2.Click += actionClick_ScoreMap;
+            btn_mapControl2.Click += OnScoreMap;
             // 
             // btn_mapControl1
             // 
@@ -829,7 +829,7 @@
             btn_mapControl1.TabIndex = 0;
             toolTip1.SetToolTip(btn_mapControl1, "Play Next");
             btn_mapControl1.UseVisualStyleBackColor = true;
-            btn_mapControl1.Click += actionClick_mapPlayNext;
+            btn_mapControl1.Click += OnMapPlayNext;
             // 
             // tabMaps
             // 
