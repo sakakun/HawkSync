@@ -1,6 +1,7 @@
 ﻿using BHD_ServerManager.Classes.PlayerManagementClasses;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -46,11 +47,21 @@ namespace BHD_ServerManager.Forms.Panels
         public tabPlayers()
         {
             InitializeComponent();
+
+            CommonCore.Ticker?.Start("tabPlayersTicker", 1000, tickerPlayerHook);
         }
 
         public void tickerPlayerHook()
         {
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(tickerPlayerHook));
+                return;
+            }
+
             playerLayout.SuspendLayout();
+
             try
             {
                 if (!_firstLoadComplete)
@@ -81,6 +92,10 @@ namespace BHD_ServerManager.Forms.Panels
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("tickerPlayerHook", $"Error in tickerPlayerHook: {ex.Message}");
             }
             finally
             {

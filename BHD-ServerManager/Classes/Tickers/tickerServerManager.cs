@@ -76,8 +76,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 SafeInvoke(thisServer, () =>
                 {
                     // --- UI Update Hooks ---
-                    thisServer.PlayersTab.tickerPlayerHook();                                       // Update Players Tab
-                    thisServer.ChatTab.ChatTickerHook();                                            // Update Chat Tab
                     thisServer.StatsTab.StatsTickerHook();                                          // Update Stats Tab
                     thisServer.AdminTab.tickerAdmin_Tick();                                         // Update Admin Tab
                     thisServer.MapsTab.UpdateCurrentMapHighlighting();                              // Current Map Highlighting Update

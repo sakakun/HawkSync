@@ -147,15 +147,6 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 AppDebug.Log("tickerChatManagement", $"Chat Message: {playerName} ({teamNum}) - {playerMessage} (Type: {msgType})");
 
-                // Marshal UI updates to UI thread AFTER processing
-                if (thisServer.InvokeRequired)
-                {
-                    thisServer.BeginInvoke(() => thisServer.ChatTab.ChatTickerHook());
-                }
-                else
-                {
-                    thisServer.ChatTab.ChatTickerHook();
-                }
             }
         }
 

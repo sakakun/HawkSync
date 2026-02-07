@@ -5,39 +5,65 @@ using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BHD_ServerManager.Forms.Panels
 {
     public partial class tabChat : UserControl
     {
-        // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
         private chatInstance? chatInstance => CommonCore.instanceChat;
 
-        // --- Class Variables ---
         private bool _firstLoadComplete = false;
         private DateTime _lastGridUpdate;
-        // Add this class variable:
         private bool _autoScrollChat = true;
 
         public tabChat()
         {
             InitializeComponent();
 
-            dataGridView_chatMessages.Scroll += dataGridView_chatMessages_Scroll;
+            chatInstanceManager.LoadSettings();
 
+            CommonCore.Ticker?.Start("ChatTabUpdate", 1000, ChatTickerHook);
+
+            dataGridView_chatMessages.Scroll += dataGridView_chatMessages_Scroll;
         }
 
+        /// <summary>
+        /// Ticker hook for periodic updates
+        /// </summary>
+        public void ChatTickerHook()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(ChatTickerHook));
+                return;
+            }
 
-        // Scroll event handler to track if user is at the bottom
+            if (!_firstLoadComplete)
+            {
+                _firstLoadComplete = true;
+                return;
+            }
+
+            chatInstanceManager.UpdateGridWithMessages(dg_autoMessages, chatInstanceManager.GetAutoMessages(), 0, 1, 2);
+            chatInstanceManager.UpdateGridWithMessages(dg_slapMessages, chatInstanceManager.GetSlapMessages(), 0, 1);
+
+            if (theInstance?.instanceStatus == InstanceStatus.ONLINE ||
+                theInstance?.instanceStatus == InstanceStatus.STARTDELAY)
+            {
+                UpdateChatMessagesGrid();
+            }
+
+            if (theInstance?.instanceStatus == InstanceStatus.SCORING ||
+                theInstance?.instanceStatus == InstanceStatus.LOADINGMAP)
+            {
+                dataGridView_chatMessages.Rows.Clear();
+                _autoScrollChat = true;
+                return;
+            }
+        }
+
         private void dataGridView_chatMessages_Scroll(object? sender, ScrollEventArgs e)
         {
             var dgv = dataGridView_chatMessages;
@@ -48,107 +74,10 @@ namespace BHD_ServerManager.Forms.Panels
         }
 
         /// <summary>
-        /// Update slap messages grid from manager
-        /// </summary>
-        public void functionEvent_UpdateSlapMessages()
-        {
-            var slapMessages = chatInstanceManager.GetSlapMessages();
-            var dgv = dg_slapMessages;
-
-            // Preserve scroll position
-            int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
-
-            // Build lookup for fast access
-            var managerDict = slapMessages.ToDictionary(x => x.SlapMessageId);
-
-            // Remove rows not in manager
-            for (int i = dgv.Rows.Count - 1; i >= 0; i--)
-            {
-                int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
-                if (!managerDict.ContainsKey(id))
-                    dgv.Rows.RemoveAt(i);
-            }
-
-            // Update existing rows and add new ones
-            foreach (var msg in slapMessages)
-            {
-                bool found = false;
-                for (int i = 0; i < dgv.Rows.Count; i++)
-                {
-                    int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
-                    if (id == msg.SlapMessageId)
-                    {
-                        // Update if text changed
-                        if (!Equals(dgv.Rows[i].Cells[1].Value, msg.SlapMessageText))
-                            dgv.Rows[i].Cells[1].Value = msg.SlapMessageText;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    dgv.Rows.Add(msg.SlapMessageId, msg.SlapMessageText);
-                }
-            }
-
-            // Restore scroll position
-            if (dgv.Rows.Count > 0 && scrollIndex < dgv.Rows.Count)
-                dgv.FirstDisplayedScrollingRowIndex = scrollIndex;
-        }
-
-        public void functionEvent_UpdateAutoMessages()
-        {
-            var autoMessages = chatInstanceManager.GetAutoMessages();
-            var dgv = dg_autoMessages;
-
-            // Preserve scroll position
-            int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
-
-            var managerDict = autoMessages.ToDictionary(x => x.AutoMessageId);
-
-            // Remove rows not in manager
-            for (int i = dgv.Rows.Count - 1; i >= 0; i--)
-            {
-                int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
-                if (!managerDict.ContainsKey(id))
-                    dgv.Rows.RemoveAt(i);
-            }
-
-            // Update existing rows and add new ones
-            foreach (var msg in autoMessages)
-            {
-                bool found = false;
-                for (int i = 0; i < dgv.Rows.Count; i++)
-                {
-                    int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
-                    if (id == msg.AutoMessageId)
-                    {
-                        // Update if changed
-                        if (!Equals(dgv.Rows[i].Cells[1].Value, msg.AutoMessageTigger))
-                            dgv.Rows[i].Cells[1].Value = msg.AutoMessageTigger;
-                        if (!Equals(dgv.Rows[i].Cells[2].Value, msg.AutoMessageText))
-                            dgv.Rows[i].Cells[2].Value = msg.AutoMessageText;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    dgv.Rows.Add(msg.AutoMessageId, msg.AutoMessageTigger, msg.AutoMessageText);
-                }
-            }
-
-            // Restore scroll position
-            if (dgv.Rows.Count > 0 && scrollIndex < dgv.Rows.Count)
-                dgv.FirstDisplayedScrollingRowIndex = scrollIndex;
-        }
-
-        /// <summary>
         /// Update chat messages grid from in-memory logs
         /// </summary>
-        public void functionEvent_UpdateChatMessagesGrid()
+        public void UpdateChatMessagesGrid()
         {
-            // Only allow update if at least 2 seconds have passed
             if ((DateTime.UtcNow - _lastGridUpdate).TotalSeconds < 2)
                 return;
 
@@ -157,7 +86,6 @@ namespace BHD_ServerManager.Forms.Panels
             var dgv = dataGridView_chatMessages;
             var chatLogs = chatInstance!.ChatLog;
 
-            // Only add new messages
             int existingRows = dgv.Rows.Count;
             for (int i = existingRows; i < chatLogs.Count; i++)
             {
@@ -171,7 +99,6 @@ namespace BHD_ServerManager.Forms.Panels
                 );
             }
 
-            // Auto-scroll to bottom if enabled
             if (_autoScrollChat && dgv.Rows.Count > 10)
             {
                 int visibleRows = dgv.DisplayedRowCount(false);
@@ -179,43 +106,6 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        /// <summary>
-        /// Ticker hook for periodic updates
-        /// </summary>
-        public void ChatTickerHook()
-        {
-            // Ensure the first load is complete before proceeding with updates
-            if (!_firstLoadComplete)
-            {
-                _firstLoadComplete = true;
-                return;
-            }
-
-            // Update chat UI elements
-            functionEvent_UpdateAutoMessages();
-            functionEvent_UpdateSlapMessages();
-
-            if (theInstance?.instanceStatus == InstanceStatus.ONLINE || 
-                theInstance?.instanceStatus == InstanceStatus.STARTDELAY)
-            {
-                // Update chat messages grid
-                functionEvent_UpdateChatMessagesGrid();
-            }
-
-            // If status is SCORING or LOADING, clear and reload everything
-            if (theInstance?.instanceStatus == InstanceStatus.SCORING ||
-                theInstance?.instanceStatus == InstanceStatus.LOADINGMAP)
-            {
-                dataGridView_chatMessages.Rows.Clear();
-                _autoScrollChat = true; // Reset auto-scroll on reload
-                return;
-            }
-
-        }
-
-        /// <summary>
-        /// Handle adding a slap message via Enter key
-        /// </summary>
         private void actionKeyPress_slapAddMessage(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar != (char)Keys.Enter)
@@ -225,13 +115,12 @@ namespace BHD_ServerManager.Forms.Panels
             if (string.IsNullOrWhiteSpace(messageText))
                 return;
 
-            // Add via manager
             var result = chatInstanceManager.AddSlapMessage(messageText);
-            
+
             if (result.Success)
             {
                 tb_slapMessage.Clear();
-                functionEvent_UpdateSlapMessages();
+                chatInstanceManager.UpdateGridWithMessages(dg_slapMessages, chatInstanceManager.GetSlapMessages(), 0, 1);
             }
             else
             {
@@ -240,16 +129,13 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        /// <summary>
-        /// Handle removing a slap message via double-click
-        /// </summary>
         private void actionClick_RemoveSlap(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return;
 
             int slapMessageId = Convert.ToInt32(dg_slapMessages.Rows[e.RowIndex].Cells[0].Value);
-            
+
             var dialogResult = MessageBox.Show(
                 "Are you sure you want to remove this slap message?",
                 "Confirm Delete",
@@ -259,12 +145,11 @@ namespace BHD_ServerManager.Forms.Panels
             if (dialogResult != DialogResult.Yes)
                 return;
 
-            // Remove via manager
             var result = chatInstanceManager.RemoveSlapMessage(slapMessageId);
-            
+
             if (result.Success)
             {
-                functionEvent_UpdateSlapMessages();
+                chatInstanceManager.UpdateGridWithMessages(dg_slapMessages, chatInstanceManager.GetSlapMessages(), 0, 1);
             }
             else
             {
@@ -273,9 +158,6 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        /// <summary>
-        /// Handle adding an auto message via Enter key
-        /// </summary>
         private void actionKeyPress_AddAutoMessage(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar != (char)Keys.Enter)
@@ -287,14 +169,13 @@ namespace BHD_ServerManager.Forms.Panels
 
             int triggerSeconds = (int)num_AutoMessageTrigger.Value;
 
-            // Add via manager
             var result = chatInstanceManager.AddAutoMessage(messageText, triggerSeconds);
-            
+
             if (result.Success)
             {
                 tb_autoMessage.Clear();
                 num_AutoMessageTrigger.Value = 0;
-                functionEvent_UpdateAutoMessages();
+                chatInstanceManager.UpdateGridWithMessages(dg_autoMessages, chatInstanceManager.GetAutoMessages(), 0, 1, 2);
             }
             else
             {
@@ -303,16 +184,13 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        /// <summary>
-        /// Handle removing an auto message via double-click
-        /// </summary>
         private void actionClick_RemoveAutoMessage(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return;
 
             int autoMessageId = Convert.ToInt32(dg_autoMessages.Rows[e.RowIndex].Cells[0].Value);
-            
+
             var dialogResult = MessageBox.Show(
                 "Are you sure you want to remove this auto message?",
                 "Confirm Delete",
@@ -322,12 +200,11 @@ namespace BHD_ServerManager.Forms.Panels
             if (dialogResult != DialogResult.Yes)
                 return;
 
-            // Remove via manager
             var result = chatInstanceManager.RemoveAutoMessage(autoMessageId);
-            
+
             if (result.Success)
             {
-                functionEvent_UpdateAutoMessages();
+                chatInstanceManager.UpdateGridWithMessages(dg_autoMessages, chatInstanceManager.GetAutoMessages(), 0, 1, 2);
             }
             else
             {
@@ -336,9 +213,6 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        /// <summary>
-        /// Handle submitting a chat message via Enter key
-        /// </summary>
         private void actionKeyPress_SubmitMessage(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar != (char)Keys.Enter)
@@ -348,31 +222,26 @@ namespace BHD_ServerManager.Forms.Panels
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
-            // Map UI channel dropdown to channel number via manager
             int channel = chatInstanceManager.MapChannelIndexToChannel(comboBox_chatGroup.SelectedIndex);
 
-            // Send message via manager
             var result = chatInstanceManager.SendChatMessage(message, channel);
-            
+
             if (result.Success)
             {
                 tb_chatMessage.Clear();
             }
             else
             {
-                // Show error to user
                 MessageBox.Show(result.Message, "Cannot Send Message",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                
-                // Clear textbox anyway if it was a validation error
-                if (!result.Message.Contains("offline") && 
-                    !result.Message.Contains("loading") && 
+
+                if (!result.Message.Contains("offline") &&
+                    !result.Message.Contains("loading") &&
                     !result.Message.Contains("scoring"))
                 {
                     tb_chatMessage.Clear();
                 }
             }
         }
-
     }
 }

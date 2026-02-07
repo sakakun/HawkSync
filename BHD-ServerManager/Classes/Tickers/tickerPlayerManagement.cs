@@ -38,9 +38,6 @@ namespace BHD_ServerManager.Classes.Tickers
             // Now update the UI
             SafeInvoke(thisServer, () =>
             {
-                // Tab Ticker Hooks
-                thisServer.PlayersTab.tickerPlayerHook();                           // Ticker PlayerTab Hook
-
                 // Update stats grids (these should be UI-thread safe)
                 try
                 {
