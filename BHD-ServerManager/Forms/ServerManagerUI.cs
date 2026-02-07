@@ -53,7 +53,6 @@ namespace BHD_ServerManager.Forms
             CommonCore.Ticker?.Start("ServerManager", 1000, Ticker_ServerManagerUI);
 
             // Old Server Settings Initialization - each item should be responsible for its own loading. 
-            // theInstanceManager.LoadWebStatsSettings();
             // adminInstanceManager.InitializeDefaultAdmin();
 
         }

@@ -2,17 +2,6 @@
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static BHD_ServerManager.Classes.InstanceManagers.theInstanceManager;
 using HawkSyncShared.DTOs.tabStats;
 
 namespace BHD_ServerManager.Forms.Panels
@@ -21,59 +10,76 @@ namespace BHD_ServerManager.Forms.Panels
     {
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
-        private statInstance instanceStats => CommonCore.instanceStats!;
+        private statInstance? instanceStats => CommonCore.instanceStats;
 
         // --- Class Variables ---
-        private new string Name = "StatsTab";
+        private const string Name = "StatsTab";
         private bool _firstLoadComplete = false;
 
         public tabStats()
         {
             InitializeComponent();
+            LoadWebStatsSettings();
+
+            CommonCore.Ticker?.Start("StatsTabTicker", 1000, StatsTickerHook);
         }
 
         // --- Form Functions ---
+        /// <summary>
+        /// Ticker hook for stats tab updates
+        /// </summary>
+        public void StatsTickerHook()
+        {
+            if (!_firstLoadComplete)
+            {
+                _firstLoadComplete = true;
+                LoadWebStatsSettings();
+                return;
+            }
+
+            if (instanceStats?.ForceUIUpdate == true)
+            {
+                instanceStats.ForceUIUpdate = false;
+                LoadWebStatsSettings();
+            }
+        }
 
         /// <summary>
         /// Load web stats settings via manager
         /// </summary>
-        public void methodFunction_loadSettings()
+        public void LoadWebStatsSettings()
         {
-            // Load via manager
             var result = theInstanceManager.LoadWebStatsSettings();
 
             if (!result.Success)
             {
                 AppDebug.Log(Name, $"Failed to load web stats settings: {result.Message}");
-                MessageBox.Show($"Failed to load web stats settings:\n\n{result.Message}", "Error", 
+                MessageBox.Show($"Failed to load web stats settings:\n\n{result.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // Update UI from instance (manager already updated instance)
             UpdateUIFromInstance();
         }
 
         /// <summary>
         /// Save web stats settings via manager
         /// </summary>
-        public void methodFunction_saveSettings()
+        public void SaveWebStatsSettings()
         {
-            // Build settings from UI
             var settings = BuildWebStatsSettingsFromUI();
 
-            // Save via manager (includes validation)
             var result = theInstanceManager.SaveWebStatsSettings(settings);
 
             if (result.Success)
             {
-                MessageBox.Show("Web stats settings saved successfully.", "Success", 
+                MessageBox.Show("Web stats settings saved successfully.", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 AppDebug.Log(Name, "Web stats settings saved successfully");
             }
             else
             {
-                MessageBox.Show($"Failed to save web stats settings:\n\n{result.Message}", "Validation Error", 
+                MessageBox.Show($"Failed to save web stats settings:\n\n{result.Message}", "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 AppDebug.Log(Name, $"Failed to save web stats settings: {result.Message}");
             }
@@ -86,7 +92,9 @@ namespace BHD_ServerManager.Forms.Panels
         /// </summary>
         private void UpdateUIFromInstance()
         {
-            tb_serverID.Text = theInstance!.WebStatsProfileID;
+            if (theInstance == null) return;
+
+            tb_serverID.Text = theInstance.WebStatsProfileID;
             cb_enableWebStats.Checked = theInstance.WebStatsEnabled;
             tb_webStatsServerPath.Text = theInstance.WebStatsServerPath;
             cb_enableAnnouncements.Checked = theInstance.WebStatsAnnouncements;
@@ -125,61 +133,25 @@ namespace BHD_ServerManager.Forms.Panels
             num_WebStatsReport.Enabled = announcementsEnabled;
         }
 
-        /// <summary>
-        /// Ticker hook for stats tab updates
-        /// </summary>
-        public void StatsTickerHook()
+        // --- Event Handlers ---
+
+        private void OnSaveStatSettingsClick(object sender, EventArgs e)
         {
-            if (!_firstLoadComplete)
-            {
-                _firstLoadComplete = true;
-                methodFunction_loadSettings();
-                return;
-            }
-
-            if (instanceStats.ForceUIUpdate)
-            {
-                instanceStats.ForceUIUpdate = false;
-                methodFunction_loadSettings();
-            }
-
-            // Additional ticker logic can go here if needed
+            SaveWebStatsSettings();
         }
 
-        // --- Legacy Method (for backwards compatibility) ---
-
-        // --- Action Click Events ---
-
-        /// <summary>
-        /// Save stats settings button clicked
-        /// </summary>
-        private void actionClick_SaveStatSettings(object sender, EventArgs e)
-        {
-            methodFunction_saveSettings();
-        }
-
-        /// <summary>
-        /// Enable/disable announcements
-        /// </summary>
-        private void ActionEvent_EnableAnnouncements(object sender, EventArgs e)
+        private void OnEnableAnnouncementsChanged(object sender, EventArgs e)
         {
             UpdateControlStates();
         }
 
-        /// <summary>
-        /// Enable/disable web stats
-        /// </summary>
-        private void ActionEvent_EnableBabStats(object sender, EventArgs e)
+        private void OnEnableWebStatsChanged(object sender, EventArgs e)
         {
             UpdateControlStates();
         }
 
-        /// <summary>
-        /// Test connection to Babstats server (async)
-        /// </summary>
-        private async void ActionEvent_TestBabstatConnection(object sender, EventArgs e)
+        private async void OnTestBabstatConnectionClick(object sender, EventArgs e)
         {
-            // Disable button during test
             var button = sender as Button;
             if (button != null)
                 button.Enabled = false;
@@ -207,7 +179,6 @@ namespace BHD_ServerManager.Forms.Panels
             }
             finally
             {
-                // Re-enable button
                 if (button != null)
                     button.Enabled = true;
             }
