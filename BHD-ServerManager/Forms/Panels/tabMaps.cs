@@ -38,6 +38,12 @@ namespace BHD_ServerManager.Forms.Panels
 
         private void Ticker_tabMaps()
         {
+            if(InvokeRequired)
+            {
+                Invoke(new Action(Ticker_tabMaps));
+                return;
+            }
+
             UpdateMapControls();
             UpdateCurrentMapHighlighting();
         }

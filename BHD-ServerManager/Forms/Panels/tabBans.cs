@@ -53,6 +53,8 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Wire up tab change event
             banControls.SelectedIndexChanged += BanControls_SelectedIndexChanged;
+
+
         }
 
         public void tickerUpdate()

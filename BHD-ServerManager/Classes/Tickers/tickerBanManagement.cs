@@ -1,13 +1,15 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.Instances;
+﻿using BHD_ServerManager.Classes.GameManagement;
+using BHD_ServerManager.Classes.HelperClasses;
 using BHD_ServerManager.Classes.Services.NetLimiter;
 using BHD_ServerManager.Classes.SupportClasses;
+using BHD_ServerManager.Classes.SupportClasses.Networking;
 using BHD_ServerManager.Forms;
-using System.Net;
+using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
+using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Net;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -26,6 +28,13 @@ namespace BHD_ServerManager.Classes.Tickers
         // Throttle for NetLimiter filter sync (once per minute)
         private static DateTime _lastFilterSync = DateTime.MinValue;
         private static readonly TimeSpan _filterSyncInterval = TimeSpan.FromMinutes(1);
+
+        // In-progress flags to prevent overlapping NetLimiter operations
+        private static bool _netLimiterConnectionCheckInProgress = false;
+        private static bool _netLimiterFilterSyncInProgress = false;
+
+        // Constant for active player threshold (seconds)
+        private const int ActivePlayerThresholdSeconds = 4;
 
         // Helper for UI thread safety
         private static void SafeInvoke(Control control, Action action)
@@ -71,10 +80,11 @@ namespace BHD_ServerManager.Classes.Tickers
                     {
                         DateTime now = DateTime.Now;
 
-                        // Only check if 10 seconds have passed since last check
-                        if (now - _lastNetLimiterCheck >= _netLimiterCheckInterval)
+                        // Only check if 10 seconds have passed since last check and not already running
+                        if (now - _lastNetLimiterCheck >= _netLimiterCheckInterval && !_netLimiterConnectionCheckInProgress)
                         {
                             _lastNetLimiterCheck = now;
+                            _netLimiterConnectionCheckInProgress = true;
 
                             // Run NetLimiter operations on background thread to avoid blocking UI
                             Task.Run(async () =>
@@ -87,20 +97,17 @@ namespace BHD_ServerManager.Classes.Tickers
                                         var connections = await NetLimiterClient.GetConnectionsAsync(appId);
 
                                         // Update UI with current connections analysis
-                                        if (connections != null && connections.Count > 0)
+                                        SafeInvoke(thisServer, () =>
                                         {
-                                            SafeInvoke(thisServer, () =>
+                                            if (connections != null && connections.Count > 0)
                                             {
                                                 AnalyzeConnections(connections);
-                                            });
-                                        }
-                                        else
-                                        {
-                                            SafeInvoke(thisServer, () =>
+                                            }
+                                            else
                                             {
                                                 thisServer.BanTab.dg_NetlimiterConnectionLog.Rows.Clear();
-                                            });
-                                        }
+                                            }
+                                        });
                                     }
                                     else
                                     {
@@ -119,14 +126,20 @@ namespace BHD_ServerManager.Classes.Tickers
                                         thisServer.BanTab.dg_NetlimiterConnectionLog.Rows.Clear();
                                     });
                                 }
+                                finally
+                                {
+                                    _netLimiterConnectionCheckInProgress = false;
+                                }
                             });
                         }
 
-                        // Sync NetLimiter filter with ban/whitelist (throttled to once per minute)
+                        // Sync NetLimiter filter with ban/whitelist (throttled to once per minute, not already running)
                         if (!string.IsNullOrEmpty(theInstance.netLimiterFilterName) &&
-                            now - _lastFilterSync >= _filterSyncInterval)
+                            now - _lastFilterSync >= _filterSyncInterval &&
+                            !_netLimiterFilterSyncInProgress)
                         {
                             _lastFilterSync = now;
+                            _netLimiterFilterSyncInProgress = true;
 
                             // Run filter sync on background thread
                             Task.Run(async () =>
@@ -138,6 +151,10 @@ namespace BHD_ServerManager.Classes.Tickers
                                 catch (Exception ex)
                                 {
                                     AppDebug.Log("tickerBanManagement", $"NetLimiter filter sync error: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    _netLimiterFilterSyncInProgress = false;
                                 }
                             });
                         }
@@ -161,68 +178,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     AppDebug.Log("tickerBanManagement", "Server process is not attached. Ticker Skipping.");
                 }
             });
-        }
-
-        // Helper class for IP range math
-        private class IpRange
-        {
-            public IPAddress Start { get; }
-            public IPAddress End { get; }
-
-            public IpRange(IPAddress start, IPAddress end)
-            {
-                Start = start;
-                End = end;
-            }
-
-            public static IpRange FromCidr(IPAddress baseAddress, int subnetMask)
-            {
-                uint ip = IpToUint(baseAddress);
-                uint mask = subnetMask == 0 ? 0 : 0xFFFFFFFF << (32 - subnetMask);
-                uint start = ip & mask;
-                uint end = start | ~mask;
-                return new IpRange(UintToIp(start), UintToIp(end));
-            }
-
-            public List<IpRange> Subtract(IpRange other)
-            {
-                var result = new List<IpRange>();
-                uint s1 = IpToUint(Start), e1 = IpToUint(End);
-                uint s2 = IpToUint(other.Start), e2 = IpToUint(other.End);
-
-                if (e2 < s1 || s2 > e1)
-                {
-                    // No overlap
-                    result.Add(this);
-                    return result;
-                }
-                if (s2 > s1)
-                    result.Add(new IpRange(UintToIp(s1), UintToIp(s2 - 1)));
-                if (e2 < e1)
-                    result.Add(new IpRange(UintToIp(e2 + 1), UintToIp(e1)));
-                return result;
-            }
-
-            public static uint IpToUint(IPAddress ip)
-            {
-                var bytes = ip.GetAddressBytes();
-                if (BitConverter.IsLittleEndian)
-                    Array.Reverse(bytes);
-                return BitConverter.ToUInt32(bytes, 0);
-            }
-
-            public static IPAddress UintToIp(uint ip)
-            {
-                var bytes = BitConverter.GetBytes(ip);
-                if (BitConverter.IsLittleEndian)
-                    Array.Reverse(bytes);
-                return new IPAddress(bytes);
-            }
-
-            public override string ToString()
-            {
-                return Start.Equals(End) ? Start.ToString() : $"{Start}-{End}";
-            }
         }
 
         // Sync NetLimiter filter with ban and whitelist, subtracting whitelisted ranges from banned ranges
@@ -252,16 +207,8 @@ namespace BHD_ServerManager.Classes.Tickers
                 var bannedRanges = new List<IpRange>();
                 foreach (var bannedIP in banInstance.BannedPlayerIPs)
                 {
-                    // Skip information-only records
-                    if (bannedIP.RecordType == banInstanceRecordType.Information)
+                    if (BanHelper.IsExpiredOrInfo(bannedIP, now))
                         continue;
-
-                    // Skip expired temporary bans
-                    if (bannedIP.RecordType == banInstanceRecordType.Temporary &&
-                        bannedIP.ExpireDate.HasValue &&
-                        now > bannedIP.ExpireDate.Value)
-                        continue;
-
                     bannedRanges.Add(IpRange.FromCidr(bannedIP.PlayerIP, bannedIP.SubnetMask));
                 }
 
@@ -269,12 +216,8 @@ namespace BHD_ServerManager.Classes.Tickers
                 var whitelistedRanges = new List<IpRange>();
                 foreach (var whitelistedIP in banInstance.WhitelistedIPs)
                 {
-                    // Skip expired temporary whitelists
-                    if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
-                        whitelistedIP.ExpireDate.HasValue &&
-                        now > whitelistedIP.ExpireDate.Value)
+                    if (BanHelper.IsExpiredOrInfo(whitelistedIP, now))
                         continue;
-
                     whitelistedRanges.Add(IpRange.FromCidr(whitelistedIP.PlayerIP, whitelistedIP.SubnetMask));
                 }
 
@@ -317,7 +260,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     {
                         if (ipRangeStr.Contains("-"))
                         {
-                            // Range, add each IP (could be optimized to CIDR blocks if NetLimiter supports)
                             var parts = ipRangeStr.Split('-');
                             var start = IPAddress.Parse(parts[0]);
                             var end = IPAddress.Parse(parts[1]);
@@ -332,7 +274,6 @@ namespace BHD_ServerManager.Classes.Tickers
                         }
                         else
                         {
-                            // Single IP
                             bool added = await NetLimiterClient.AddIpToFilterAsync(filterName, ipRangeStr, 32);
                             if (added) addedCount++;
                         }
@@ -396,57 +337,14 @@ namespace BHD_ServerManager.Classes.Tickers
                 int slotNum = kvp.Key;
                 PlayerObject player = kvp.Value;
 
-                // Only check players who were seen in the last 6 seconds (active players)
-                if ((now - player.PlayerLastSeen).TotalSeconds <= 4)
+                // Only check players who were seen in the last N seconds (active players)
+                if ((now - player.PlayerLastSeen).TotalSeconds <= ActivePlayerThresholdSeconds)
                 {
-                    bool isWhitelisted = false;
-
-                    // First, check if player is on the whitelist (names)
-                    foreach (var whitelistedName in banInstance.WhitelistedNames)
+                    if (BanHelper.IsPlayerWhitelisted(player, banInstance, now))
                     {
-                        if (whitelistedName.RecordType == banInstanceRecordType.Information)
-                            continue;
-
-                        if (whitelistedName.RecordType == banInstanceRecordType.Temporary &&
-                            whitelistedName.ExpireDate.HasValue &&
-                            now > whitelistedName.ExpireDate.Value)
-                            continue;
-
-                        if (player.PlayerName.Equals(whitelistedName.PlayerName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            isWhitelisted = true;
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is whitelisted by name. Skipping ban checks.");
-                            break;
-                        }
-                    }
-
-                    // If not whitelisted by name, check if whitelisted by IP
-                    if (!isWhitelisted && !string.IsNullOrEmpty(player.PlayerIPAddress))
-                    {
-                        if (IPAddress.TryParse(player.PlayerIPAddress, out IPAddress? playerIP))
-                        {
-                            foreach (var whitelistedIP in banInstance.WhitelistedIPs)
-                            {
-                                if (whitelistedIP.RecordType == banInstanceRecordType.Information)
-                                    continue;
-
-                                if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
-                                    whitelistedIP.ExpireDate.HasValue &&
-                                    now > whitelistedIP.ExpireDate.Value)
-                                    continue;
-
-                                if (IsIPMatch(playerIP, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask))
-                                {
-                                    isWhitelisted = true;
-                                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is whitelisted by IP. Skipping ban checks.");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (isWhitelisted)
+                        AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is whitelisted. Skipping ban checks.");
                         continue;
+                    }
 
                     bool shouldPunt = false;
                     string puntReason = string.Empty;
@@ -454,12 +352,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     // Check against banned player names
                     foreach (var bannedName in banInstance.BannedPlayerNames)
                     {
-                        if (bannedName.RecordType == banInstanceRecordType.Information)
-                            continue;
-
-                        if (bannedName.RecordType == banInstanceRecordType.Temporary &&
-                            bannedName.ExpireDate.HasValue &&
-                            now > bannedName.ExpireDate.Value)
+                        if (BanHelper.IsExpiredOrInfo(bannedName, now))
                             continue;
 
                         if (player.PlayerName.Equals(bannedName.PlayerName, StringComparison.OrdinalIgnoreCase))
@@ -478,15 +371,10 @@ namespace BHD_ServerManager.Classes.Tickers
                         {
                             foreach (var bannedIP in banInstance.BannedPlayerIPs)
                             {
-                                if (bannedIP.RecordType == banInstanceRecordType.Information)
+                                if (BanHelper.IsExpiredOrInfo(bannedIP, now))
                                     continue;
 
-                                if (bannedIP.RecordType == banInstanceRecordType.Temporary &&
-                                    bannedIP.ExpireDate.HasValue &&
-                                    now > bannedIP.ExpireDate.Value)
-                                    continue;
-
-                                if (IsIPMatch(playerIP, bannedIP.PlayerIP, bannedIP.SubnetMask))
+                                if (BanHelper.IsIPMatch(playerIP, bannedIP.PlayerIP, bannedIP.SubnetMask))
                                 {
                                     shouldPunt = true;
                                     puntReason = $"Banned IP: {bannedIP.PlayerIP}/{bannedIP.SubnetMask}";
@@ -501,7 +389,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     {
                         if (player.PlayerPing <= 0)
                         {
-                            return;  // Player not in game yet. Needless to spam the "punt".
+                            continue;  // Player not in game yet. Needless to spam the "punt".
                         }
 
                         ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
@@ -509,35 +397,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                 }
             }
-        }
-
-        // Helper method to check if an IP matches a banned IP with subnet mask
-        private static bool IsIPMatch(IPAddress playerIP, IPAddress bannedIP, int subnetMask)
-        {
-            if (subnetMask == 32 || subnetMask == 0)
-            {
-                return playerIP.Equals(bannedIP);
-            }
-
-            byte[] playerBytes = playerIP.GetAddressBytes();
-            byte[] bannedBytes = bannedIP.GetAddressBytes();
-
-            if (playerBytes.Length != 4 || bannedBytes.Length != 4)
-                return false;
-
-            int bitsToCompare = subnetMask;
-
-            for (int i = 0; i < 4 && bitsToCompare > 0; i++)
-            {
-                int mask = bitsToCompare >= 8 ? 0xFF : (0xFF << (8 - bitsToCompare)) & 0xFF;
-
-                if ((playerBytes[i] & mask) != (bannedBytes[i] & mask))
-                    return false;
-
-                bitsToCompare -= 8;
-            }
-
-            return true;
         }
 
         // Analyze connections and populate DataGridView with proxy status and ban/whitelist info
@@ -574,8 +433,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     });
                 }
 
-                string vpnStatus = GetVpnStatus(ip);
-                string listStatus = GetListStatus(ip, now);
+                string vpnStatus = BanHelper.GetVpnStatus(ip);
+                string listStatus = BanHelper.GetListStatus(ip, now);
 
                 int recordID = rowIndex++;
 
@@ -611,12 +470,9 @@ namespace BHD_ServerManager.Classes.Tickers
 
             bool alreadyBanned = banInstance.BannedPlayerIPs.Any(bannedIP =>
             {
-                if (bannedIP.RecordType == banInstanceRecordType.Temporary &&
-                    bannedIP.ExpireDate.HasValue &&
-                    now > bannedIP.ExpireDate.Value)
+                if (BanHelper.IsExpiredOrInfo(bannedIP, now))
                     return false;
-
-                return IsIPMatch(ip, bannedIP.PlayerIP, bannedIP.SubnetMask);
+                return BanHelper.IsIPMatch(ip, bannedIP.PlayerIP, bannedIP.SubnetMask);
             });
 
             if (alreadyBanned)
@@ -627,12 +483,9 @@ namespace BHD_ServerManager.Classes.Tickers
 
             bool isWhitelisted = banInstance.WhitelistedIPs.Any(whitelistedIP =>
             {
-                if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
-                    whitelistedIP.ExpireDate.HasValue &&
-                    now > whitelistedIP.ExpireDate.Value)
+                if (BanHelper.IsExpiredOrInfo(whitelistedIP, now))
                     return false;
-
-                return IsIPMatch(ip, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask);
+                return BanHelper.IsIPMatch(ip, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask);
             });
 
             if (isWhitelisted)
@@ -689,131 +542,6 @@ namespace BHD_ServerManager.Classes.Tickers
             }
         }
 
-        private static void CheckIP(IPAddress Address)
-        {
-            if (theInstance.proxyCheckEnabled && ProxyCheckManager.IsInitialized)
-            {
-                try
-                {
-                    AppDebug.Log("CheckIP", $"Attempting to check: {Address.ToString()}");
-                    _ = ProxyCheckManager.CheckIPAsync(Address);
-                }
-                catch (Exception ex)
-                {
-                    AppDebug.Log("tickerBanManagement", $"Error checking IP {Address} with ProxyCheckManager: {ex.Message}");
-                }
-            }
-        }
-
-        // Get VPN/Proxy status from proxy records
-        private static string GetVpnStatus(string ipAddress)
-        {
-            if (!IPAddress.TryParse(ipAddress, out IPAddress? ip))
-                return "INVALID IP";
-
-            var proxyRecord = banInstance.ProxyRecords
-                .FirstOrDefault(p => p.IPAddress.Equals(ip));
-
-            if (proxyRecord == null)
-            {
-                CheckIP(ip);
-                return "UNCHECKED";
-            }
-
-            if (DateTime.Now > proxyRecord.CacheExpiry)
-            {
-                CheckIP(ip);
-                return "CACHE EXPIRED";
-            }
-
-            var statuses = new List<string>();
-
-            if (proxyRecord.IsVpn)
-                statuses.Add("VPN");
-            if (proxyRecord.IsProxy)
-                statuses.Add("PROXY");
-            if (proxyRecord.IsTor)
-                statuses.Add("TOR");
-
-            if (statuses.Count > 0)
-            {
-                string status = string.Join("/", statuses);
-                if (proxyRecord.RiskScore > 0)
-                    status += $" (Risk:{proxyRecord.RiskScore})";
-                if (!string.IsNullOrEmpty(proxyRecord.Provider))
-                    status += $" [{proxyRecord.Provider}]";
-                return status;
-            }
-
-            return "CLEAN";
-        }
-
-        // Get whitelist/blacklist status
-        private static string GetListStatus(string ipAddress, DateTime now)
-        {
-            if (!IPAddress.TryParse(ipAddress, out IPAddress? ip))
-                return "ERROR";
-
-            var comments = new List<string>();
-
-            foreach (var whitelistedIP in banInstance.WhitelistedIPs)
-            {
-                if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
-                    whitelistedIP.ExpireDate.HasValue &&
-                    now > whitelistedIP.ExpireDate.Value)
-                    continue;
-
-                if (IsIPMatch(ip, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask))
-                {
-                    string wlType = whitelistedIP.RecordType == banInstanceRecordType.Permanent ? "WHITELIST" : "WHITELIST (TEMP)";
-                    if (!string.IsNullOrEmpty(whitelistedIP.Notes))
-                        wlType += $": {whitelistedIP.Notes}";
-                    comments.Add(wlType);
-                    break;
-                }
-            }
-
-            foreach (var bannedIP in banInstance.BannedPlayerIPs)
-            {
-                if (bannedIP.RecordType == banInstanceRecordType.Information)
-                    continue;
-
-                if (bannedIP.RecordType == banInstanceRecordType.Temporary &&
-                    bannedIP.ExpireDate.HasValue &&
-                    now > bannedIP.ExpireDate.Value)
-                    continue;
-
-                if (IsIPMatch(ip, bannedIP.PlayerIP, bannedIP.SubnetMask))
-                {
-                    string banType = bannedIP.RecordType == banInstanceRecordType.Permanent ? "BANNED" : "BANNED (TEMP)";
-                    if (!string.IsNullOrEmpty(bannedIP.Notes))
-                        banType += $": {bannedIP.Notes}";
-                    comments.Add(banType);
-                    break;
-                }
-            }
-
-            var proxyRecord = banInstance.ProxyRecords
-                .FirstOrDefault(p => p.IPAddress.Equals(ip));
-
-            if (proxyRecord != null && !string.IsNullOrEmpty(proxyRecord.CountryCode))
-            {
-                var blockedCountry = banInstance.ProxyBlockedCountries
-                    .FirstOrDefault(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
-
-                if (blockedCountry != null)
-                {
-                    comments.Add($"BLOCKED COUNTRY: {blockedCountry.CountryName}");
-                }
-                else if (!string.IsNullOrEmpty(proxyRecord.CountryCode))
-                {
-                    comments.Add($"Country: {proxyRecord.CountryCode}");
-                }
-            }
-
-            return comments.Count > 0 ? string.Join(" | ", comments) : "OK";
-        }
-
         // Check active players against proxy/VPN/TOR rules and geo-blocking
         public static void CheckAndPuntProxyViolations()
         {
@@ -827,7 +555,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 int slotNum = kvp.Key;
                 PlayerObject player = kvp.Value;
 
-                if ((now - player.PlayerLastSeen).TotalSeconds > 4)
+                if ((now - player.PlayerLastSeen).TotalSeconds > ActivePlayerThresholdSeconds)
                     continue;
 
                 if (string.IsNullOrEmpty(player.PlayerIPAddress))
@@ -836,46 +564,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 if (!IPAddress.TryParse(player.PlayerIPAddress, out IPAddress? playerIP))
                     continue;
 
-                bool isWhitelisted = false;
-
-                foreach (var whitelistedName in banInstance.WhitelistedNames)
-                {
-                    if (whitelistedName.RecordType == banInstanceRecordType.Information)
-                        continue;
-
-                    if (whitelistedName.RecordType == banInstanceRecordType.Temporary &&
-                        whitelistedName.ExpireDate.HasValue &&
-                        now > whitelistedName.ExpireDate.Value)
-                        continue;
-
-                    if (player.PlayerName.Equals(whitelistedName.PlayerName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        isWhitelisted = true;
-                        break;
-                    }
-                }
-
-                if (!isWhitelisted)
-                {
-                    foreach (var whitelistedIP in banInstance.WhitelistedIPs)
-                    {
-                        if (whitelistedIP.RecordType == banInstanceRecordType.Information)
-                            continue;
-
-                        if (whitelistedIP.RecordType == banInstanceRecordType.Temporary &&
-                            whitelistedIP.ExpireDate.HasValue &&
-                            now > whitelistedIP.ExpireDate.Value)
-                            continue;
-
-                        if (IsIPMatch(playerIP, whitelistedIP.PlayerIP, whitelistedIP.SubnetMask))
-                        {
-                            isWhitelisted = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (isWhitelisted)
+                if (BanHelper.IsPlayerWhitelisted(player, banInstance, now))
                     continue;
 
                 var proxyRecord = banInstance.ProxyRecords
@@ -883,7 +572,7 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 if (proxyRecord == null || now > proxyRecord.CacheExpiry)
                 {
-                    CheckIP(playerIP);
+                    BanHelper.CheckIP(playerIP);
                     continue;
                 }
 
@@ -990,7 +679,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 int slotNum = kvp.Key;
                 PlayerObject player = kvp.Value;
 
-                if ((now - player.PlayerLastSeen).TotalSeconds > 4)
+                if ((now - player.PlayerLastSeen).TotalSeconds > ActivePlayerThresholdSeconds)
                     continue;
 
                 bool shouldPunt = false;
@@ -1046,5 +735,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 }
             }
         }
+
     }
 }
