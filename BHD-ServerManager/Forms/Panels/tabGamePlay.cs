@@ -353,7 +353,6 @@ namespace BHD_ServerManager.Forms.Panels
                 if (StartServer.startGame())
                 {
                     ServerMemory.ReadMemoryServerStatus();
-                    Program.ServerManagerUI!.MapsTab.methodFunction_UpdateMapControls();
                 }
             }
             else

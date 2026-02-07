@@ -499,16 +499,6 @@ public class GamePlayController : ControllerBase
                 // Update server status
                 ServerMemory.ReadMemoryServerStatus();
 
-                // Trigger UI update on server manager
-                var serverUI = Program.ServerManagerUI;
-                if (serverUI != null)
-                {
-                    serverUI.Invoke(() =>
-                    {
-                        serverUI.MapsTab?.methodFunction_UpdateMapControls();
-                    });
-                }
-
                 return Ok(new CommandResult
                 {
                     Success = true,

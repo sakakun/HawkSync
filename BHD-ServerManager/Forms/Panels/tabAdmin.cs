@@ -5,26 +5,22 @@ using BHD_ServerManager.Classes.SupportClasses;
 using static BHD_ServerManager.Classes.InstanceManagers.adminInstanceManager;
 using HawkSyncShared.Instances;
 using HawkSyncShared.DTOs.tabAdmin;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace BHD_ServerManager.Forms.Panels;
 
 public partial class tabAdmin : UserControl
 {
-    // ================================================================================
-    // FIELDS
-    // ================================================================================
-
     private adminInstance adminInstance => CommonCore.instanceAdmin!;
-
     private int _selectedUserID = -1;
     private bool _isEditMode = false;
-
-    // Add these fields to your class
     private DateTime _lastUserListRefresh = DateTime.MinValue;
     private const int UserListRefreshIntervalSeconds = 10;
-    // Add this field to your class to persist the last selected user ID
     private int? _lastSelectedUserId = null;
     private int _lastScrollIndex = 0;
+    private const int DefaultAdminUserId = 1;
 
     private enum FormMode
     {
@@ -33,19 +29,48 @@ public partial class tabAdmin : UserControl
         Edit
     }
 
-    // ================================================================================
-    // CONSTRUCTOR & INITIALIZATION
-    // ================================================================================
-
     public tabAdmin()
     {
         InitializeComponent();
         InitializeEvents();
-        dataGridView1.SelectionChanged += DataGridView1_SelectionChanged;
+
         adminInstanceManager.LoadUsersCache();
         LoadUserList();
 
         SetFormMode(FormMode.View);
+    }
+
+    public void TickerAdminTick()
+    {
+        if (InvokeRequired)
+        {
+            Invoke(new Action(TickerAdminTick));
+            return;
+        }
+
+        bool shouldRefresh = false;
+
+        if ((DateTime.Now - _lastUserListRefresh).TotalSeconds >= UserListRefreshIntervalSeconds)
+            shouldRefresh = true;
+
+        if (adminInstance.ForceUIUpdate)
+        {
+            shouldRefresh = true;
+            adminInstance.ForceUIUpdate = false;
+        }
+
+        if (shouldRefresh)
+        {
+            if (dataGridView1.CurrentRow != null)
+                _lastSelectedUserId = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value);
+            else
+                _lastSelectedUserId = null;
+
+            _lastUserListRefresh = DateTime.Now;
+
+            adminInstanceManager.LoadUsersCache();
+            LoadUserList();
+        }
     }
 
     private void DataGridView1_SelectionChanged(object? sender, EventArgs e)
@@ -64,76 +89,26 @@ public partial class tabAdmin : UserControl
         }
     }
 
-    public void tickerAdmin_Tick()
-    {
-        if (InvokeRequired)
-        {
-            Invoke(new Action(tickerAdmin_Tick));
-            return;
-        }
-
-        bool shouldRefresh = false;
-
-        // Check if 10 seconds have passed since last refresh
-        if ((DateTime.Now - _lastUserListRefresh).TotalSeconds >= UserListRefreshIntervalSeconds)
-        {
-            shouldRefresh = true;
-        }
-
-        // Or if forced by the adminInstance
-        if (adminInstance.ForceUIUpdate)
-        {
-            shouldRefresh = true;
-            adminInstance.ForceUIUpdate = false;
-        }
-
-        if (shouldRefresh)
-        {
-            // Store current selection and scroll position for restoration in LoadUserList
-            if (dataGridView1.CurrentRow != null)
-                _lastSelectedUserId = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value);
-            else
-                _lastSelectedUserId = null;
-
-            _lastUserListRefresh = DateTime.Now;
-
-            adminInstanceManager.LoadUsersCache();
-            LoadUserList();
-        }
-    }
-
     private void InitializeEvents()
     {
-        // Grid events
         dataGridView1.CellDoubleClick += DgUserList_CellDoubleClick;
-
-        // Button events
-        iconButton1.Click += BtnRefresh_Click;      // Refresh
-        iconButton2.Click += BtnAddUser_Click;      // Add User
-        iconButton3.Click += BtnSave_Click;         // Save
-        iconButton4.Click += BtnDelete_Click;       // Delete
-        iconButton6.Click += BtnCancel_Click;       // Cancel
-
-        // Checkbox events
-        checkBox_showPass.CheckedChanged += CheckBox_showPass_CheckedChanged;
+        iconButton1.Click += OnRefreshClick;
+        iconButton2.Click += OnAddUserClick;
+        iconButton3.Click += OnSaveClick;
+        iconButton4.Click += OnDeleteClick;
+        iconButton6.Click += OnCancelClick;
+        checkBox_showPass.CheckedChanged += OnShowPassCheckedChanged;
+        dataGridView1.SelectionChanged += DataGridView1_SelectionChanged;
     }
-
-    // ================================================================================
-    // DATA LOADING
-    // ================================================================================
 
     private void LoadUserList()
     {
-        // Store scroll position before updating
         if (dataGridView1.Rows.Count > 0)
             _lastScrollIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
 
-        var users = CommonCore.instanceAdmin!.Users.OrderBy(u => u.UserID).ToList();
-
-        // Build a lookup for quick access
+        var users = adminInstance.Users.OrderBy(u => u.UserID).ToList();
         var userDict = users.ToDictionary(u => u.UserID);
 
-        // Track which user IDs are present in the grid
         var gridUserIds = new HashSet<int>();
         foreach (DataGridViewRow row in dataGridView1.Rows)
         {
@@ -143,7 +118,6 @@ public partial class tabAdmin : UserControl
 
             if (userDict.TryGetValue(userId, out var user))
             {
-                // Update row if any data has changed
                 bool needsUpdate =
                     row.Cells[1].Value?.ToString() != user.Username ||
                     row.Cells[2].Value?.ToString() != (user.IsActive ? "Active" : "Disabled") ||
@@ -160,12 +134,10 @@ public partial class tabAdmin : UserControl
             }
             else
             {
-                // User no longer exists, remove row
                 dataGridView1.Rows.Remove(row);
             }
         }
 
-        // Add new users not present in the grid
         foreach (var user in users)
         {
             if (!gridUserIds.Contains(user.UserID))
@@ -180,7 +152,6 @@ public partial class tabAdmin : UserControl
             }
         }
 
-        // Restore selection if possible
         dataGridView1.ClearSelection();
         if (_lastSelectedUserId.HasValue)
         {
@@ -195,7 +166,6 @@ public partial class tabAdmin : UserControl
             }
         }
 
-        // Restore scroll position if possible
         if (dataGridView1.RowCount > 0 && _lastScrollIndex >= 0 && _lastScrollIndex < dataGridView1.RowCount)
         {
             dataGridView1.FirstDisplayedScrollingRowIndex = _lastScrollIndex;
@@ -204,13 +174,6 @@ public partial class tabAdmin : UserControl
         AppDebug.Log("tabAdmin", $"Loaded {users.Count} users from cache (differential update)");
     }
 
-    // ================================================================================
-    // FORM MODE MANAGEMENT
-    // ================================================================================
-
-    /// <summary>
-    /// Set the form to a specific mode (View/Add/Edit)
-    /// </summary>
     private void SetFormMode(FormMode mode)
     {
         switch (mode)
@@ -219,10 +182,10 @@ public partial class tabAdmin : UserControl
                 _isEditMode = false;
                 _selectedUserID = -1;
                 groupBox2.Enabled = false;
-                iconButton3.Enabled = false;  // Save
-                iconButton4.Enabled = false;  // Delete
-                iconButton6.Enabled = false;  // Cancel
-                iconButton2.Enabled = true;   // Add User
+                iconButton3.Enabled = false;
+                iconButton4.Enabled = false;
+                iconButton6.Enabled = false;
+                iconButton2.Enabled = true;
                 textBox_password2.Visible = false;
                 label_Confirm.Visible = false;
                 ClearForm();
@@ -232,10 +195,10 @@ public partial class tabAdmin : UserControl
                 _isEditMode = false;
                 _selectedUserID = -1;
                 groupBox2.Enabled = true;
-                iconButton3.Enabled = true;   // Save
-                iconButton4.Enabled = false;  // Delete
-                iconButton6.Enabled = true;   // Cancel
-                iconButton2.Enabled = false;  // Add User
+                iconButton3.Enabled = true;
+                iconButton4.Enabled = false;
+                iconButton6.Enabled = true;
+                iconButton2.Enabled = false;
                 textBox_password2.Visible = true;
                 label_Confirm.Visible = true;
                 ClearForm();
@@ -245,19 +208,16 @@ public partial class tabAdmin : UserControl
             case FormMode.Edit:
                 _isEditMode = true;
                 groupBox2.Enabled = true;
-                iconButton3.Enabled = true;   // Save
-                iconButton4.Enabled = (_selectedUserID != 1); // Can't delete admin
-                iconButton6.Enabled = true;   // Cancel
-                iconButton2.Enabled = false;  // Add User
+                iconButton3.Enabled = true;
+                iconButton4.Enabled = (_selectedUserID != DefaultAdminUserId);
+                iconButton6.Enabled = true;
+                iconButton2.Enabled = false;
                 textBox_password2.Visible = false;
                 label_Confirm.Visible = false;
                 break;
         }
     }
 
-    /// <summary>
-    /// Clear all form fields
-    /// </summary>
     private void ClearForm()
     {
         textBox_username.Clear();
@@ -266,7 +226,6 @@ public partial class tabAdmin : UserControl
         textBox_userNotes.Clear();
         checkBox_userActive.Checked = true;
 
-        // Clear all permissions
         checkBox_permProfile.Checked = false;
         checkBox_permGamePlay.Checked = false;
         checkBox_permMaps.Checked = false;
@@ -277,20 +236,15 @@ public partial class tabAdmin : UserControl
         checkBox_permUsers.Checked = false;
     }
 
-    /// <summary>
-    /// Load a user's data into the form for editing
-    /// </summary>
     private void LoadUserToForm(UserDTO user)
     {
         _selectedUserID = user.UserID;
-
         textBox_username.Text = user.Username;
-        textBox_password.Clear(); // Don't show password
+        textBox_password.Clear();
         textBox_password2.Clear();
         textBox_userNotes.Text = user.Notes;
         checkBox_userActive.Checked = user.IsActive;
 
-        // Load permissions
         checkBox_permProfile.Checked = user.Permissions.Contains("profile");
         checkBox_permGamePlay.Checked = user.Permissions.Contains("gameplay");
         checkBox_permMaps.Checked = user.Permissions.Contains("maps");
@@ -301,13 +255,9 @@ public partial class tabAdmin : UserControl
         checkBox_permUsers.Checked = user.Permissions.Contains("users");
     }
 
-    /// <summary>
-    /// Build a list of selected permissions from checkboxes
-    /// </summary>
     private List<string> GetSelectedPermissions()
     {
         var permissions = new List<string>();
-
         if (checkBox_permProfile.Checked) permissions.Add("profile");
         if (checkBox_permGamePlay.Checked) permissions.Add("gameplay");
         if (checkBox_permMaps.Checked) permissions.Add("maps");
@@ -316,25 +266,15 @@ public partial class tabAdmin : UserControl
         if (checkBox_permBans.Checked) permissions.Add("bans");
         if (checkBox_permStats.Checked) permissions.Add("stats");
         if (checkBox_permUsers.Checked) permissions.Add("users");
-
         return permissions;
     }
 
-    // ================================================================================
-    // GRID EVENT HANDLERS
-    // ================================================================================
-
-    /// <summary>
-    /// Double-click on a user row to edit
-    /// </summary>
     private void DgUserList_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
     {
         if (e.RowIndex < 0) return;
 
         int userId = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells[0].Value);
-        
-        // Get from cache
-        var user = CommonCore.instanceAdmin!.Users.FirstOrDefault(u => u.UserID == userId);
+        var user = adminInstance.Users.FirstOrDefault(u => u.UserID == userId);
 
         if (user != null)
         {
@@ -343,47 +283,27 @@ public partial class tabAdmin : UserControl
         }
     }
 
-    // ================================================================================
-    // BUTTON EVENT HANDLERS
-    // ================================================================================
-
-    /// <summary>
-    /// Refresh button clicked - reload cache from database
-    /// </summary>
-    private void BtnRefresh_Click(object? sender, EventArgs e)
+    private void OnRefreshClick(object? sender, EventArgs e)
     {
         adminInstanceManager.LoadUsersCache();
         LoadUserList();
         SetFormMode(FormMode.View);
     }
 
-    /// <summary>
-    /// Add User button clicked
-    /// </summary>
-    private void BtnAddUser_Click(object? sender, EventArgs e)
+    private void OnAddUserClick(object? sender, EventArgs e)
     {
         SetFormMode(FormMode.Add);
     }
 
-    /// <summary>
-    /// Save button clicked
-    /// </summary>
-    private void BtnSave_Click(object? sender, EventArgs e)
+    private void OnSaveClick(object? sender, EventArgs e)
     {
         if (_isEditMode)
-        {
             UpdateUser();
-        }
         else
-        {
             CreateUser();
-        }
     }
 
-    /// <summary>
-    /// Delete button clicked
-    /// </summary>
-    private void BtnDelete_Click(object? sender, EventArgs e)
+    private void OnDeleteClick(object? sender, EventArgs e)
     {
         if (_selectedUserID <= 0) return;
 
@@ -401,7 +321,7 @@ public partial class tabAdmin : UserControl
         {
             MessageBox.Show("User deleted successfully.", "Success",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadUserList(); // Cache already updated by manager
+            LoadUserList();
             SetFormMode(FormMode.View);
         }
         else
@@ -411,24 +331,13 @@ public partial class tabAdmin : UserControl
         }
     }
 
-    /// <summary>
-    /// Cancel button clicked
-    /// </summary>
-    private void BtnCancel_Click(object? sender, EventArgs e)
+    private void OnCancelClick(object? sender, EventArgs e)
     {
         SetFormMode(FormMode.View);
     }
 
-    // ================================================================================
-    // USER OPERATIONS
-    // ================================================================================
-
-    /// <summary>
-    /// Create a new user
-    /// </summary>
     private void CreateUser()
     {
-        // Validate passwords match
         if (textBox_password.Text != textBox_password2.Text)
         {
             MessageBox.Show("Passwords do not match.", "Validation Error",
@@ -436,7 +345,6 @@ public partial class tabAdmin : UserControl
             return;
         }
 
-        // Build request
         var request = new CreateUserRequestDTO
         {
             Username = textBox_username.Text.Trim(),
@@ -446,14 +354,13 @@ public partial class tabAdmin : UserControl
             Notes = textBox_userNotes.Text.Trim()
         };
 
-        // Call manager (cache will be auto-updated)
         var result = adminInstanceManager.CreateUser(request);
 
         if (result.Success)
         {
             MessageBox.Show("User created successfully.", "Success",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadUserList(); // Refresh grid from updated cache
+            LoadUserList();
             SetFormMode(FormMode.View);
         }
         else
@@ -463,12 +370,8 @@ public partial class tabAdmin : UserControl
         }
     }
 
-    /// <summary>
-    /// Update an existing user
-    /// </summary>
     private void UpdateUser()
     {
-        // Build request
         var request = new UpdateUserRequestDTO
         {
             UserID = _selectedUserID,
@@ -481,14 +384,13 @@ public partial class tabAdmin : UserControl
             Notes = textBox_userNotes.Text.Trim()
         };
 
-        // Call manager (cache will be auto-updated)
         var result = adminInstanceManager.UpdateUser(request);
 
         if (result.Success)
         {
             MessageBox.Show("User updated successfully.", "Success",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadUserList(); // Refresh grid from updated cache
+            LoadUserList();
             SetFormMode(FormMode.View);
         }
         else
@@ -498,14 +400,7 @@ public partial class tabAdmin : UserControl
         }
     }
 
-    // ================================================================================
-    // OTHER EVENT HANDLERS
-    // ================================================================================
-
-    /// <summary>
-    /// Show/hide password checkbox changed
-    /// </summary>
-    private void CheckBox_showPass_CheckedChanged(object? sender, EventArgs e)
+    private void OnShowPassCheckedChanged(object? sender, EventArgs e)
     {
         textBox_password.UseSystemPasswordChar = !checkBox_showPass.Checked;
         textBox_password2.UseSystemPasswordChar = !checkBox_showPass.Checked;

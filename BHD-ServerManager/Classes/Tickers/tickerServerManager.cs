@@ -72,14 +72,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     ServerMemory.ReadMemoryServerStatus();                                  // Server Status
                 }
 
-                // UI updates that should always run
-                SafeInvoke(thisServer, () =>
-                {
-                    // --- UI Update Hooks ---
-                    thisServer.AdminTab.tickerAdmin_Tick();                                         // Update Admin Tab
-                    thisServer.MapsTab.UpdateCurrentMapHighlighting();                              // Current Map Highlighting Update
-                });
-
                 if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
                 {
                     // If the server is offline, we can skip the rest of the processing
