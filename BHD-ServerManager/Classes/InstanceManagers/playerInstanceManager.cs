@@ -264,7 +264,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Ban a player by name only
         /// </summary>
-        public static OperationResult BanPlayerByName(string playerName, int playerSlot)
+        public static OperationResult BanPlayerByName(string playerName, int playerSlot, string admin = "Console")
         {
             try
             {
@@ -281,7 +281,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     banDate: DateTime.Now,
                     expireDate: null,
                     recordType: banInstanceRecordType.Permanent,
-                    notes: "Banned from PlayerCard context menu",
+                    notes: $"Banned from Player Tab by {admin}",
                     associatedIPID: 0
                 );
 
@@ -307,7 +307,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Ban a player by IP address only (async for NetLimiter integration)
         /// </summary>
-        public static async Task<OperationResult> BanPlayerByIPAsync(IPAddress ipAddress, string playerName, int playerSlot)
+        public static async Task<OperationResult> BanPlayerByIPAsync(IPAddress ipAddress, string playerName, int playerSlot, string admin = "Console")
         {
             try
             {
@@ -325,7 +325,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     banDate: DateTime.Now,
                     expireDate: null,
                     recordType: banInstanceRecordType.Permanent,
-                    notes: "Banned from PlayerCard context menu",
+                    notes: $"Banned from Player Tab by {admin}",
                     associatedNameID: 0
                 );
 
@@ -366,7 +366,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Ban a player by both name and IP address (async for NetLimiter integration)
         /// </summary>
-        public static async Task<OperationResult> BanPlayerByBothAsync(string playerName, IPAddress ipAddress, int playerSlot)
+        public static async Task<OperationResult> BanPlayerByBothAsync(string playerName, IPAddress ipAddress, int playerSlot, string admin = "Console")
         {
             try
             {
@@ -388,7 +388,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     banDate: DateTime.Now,
                     expireDate: null,
                     recordType: banInstanceRecordType.Permanent,
-                    notes: "Banned from PlayerCard context menu"
+                    notes: $"Banned from Player Tab by {admin}"
                 );
 
                 if (!banResult.Success)

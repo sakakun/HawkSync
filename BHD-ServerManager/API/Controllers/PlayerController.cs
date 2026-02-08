@@ -103,13 +103,22 @@ public class PlayerController : ControllerBase
         int playerSlot = command.PlayerSlot;
         bool banIP = command.BanIP;
 
+        // Try to get username from claims
+        var username = User.Identity?.Name;
+
+        // If not set, try to get from a custom claim (e.g., "username")
+        if (string.IsNullOrEmpty(username))
+        {
+            username = "Remote Admin";
+        }
+
         OperationResult result;
 
         // Ban Name Only
         // if BanIP is false
         if (!banIP && (playerName == string.Empty || playerName == null))
         {
-            result = playerInstanceManager.BanPlayerByName(playerName!, playerSlot);
+            result = playerInstanceManager.BanPlayerByName(playerName!, playerSlot, username!);
             return Ok(new CommandResult
             {
                 Success = result.Success,
@@ -122,7 +131,7 @@ public class PlayerController : ControllerBase
         {
             if (IPAddress.TryParse(playerIP, out IPAddress? ipAddress))
             {
-                result = await playerInstanceManager.BanPlayerByIPAsync(ipAddress, playerName!, playerSlot);
+                result = await playerInstanceManager.BanPlayerByIPAsync(ipAddress, playerName!, playerSlot, username!);
             }
             else
             {
@@ -144,7 +153,7 @@ public class PlayerController : ControllerBase
         {
             if (IPAddress.TryParse(playerIP, out IPAddress? ipAddress))
             {
-                result = await playerInstanceManager.BanPlayerByBothAsync(playerName, ipAddress, playerSlot);
+                result = await playerInstanceManager.BanPlayerByBothAsync(playerName, ipAddress, playerSlot, username!);
             }
             else
             {

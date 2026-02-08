@@ -6,6 +6,7 @@ using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Services;
 using BHD_ServerManager.Classes.Services.NetLimiter;
+using BHD_ServerManager.Classes.SupportClasses.Networking;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -98,7 +99,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             DateTime? expireDate,
             banInstanceRecordType recordType,
             string notes,
-            int associatedIPID = 0, 
+            int associatedIPID = 0,
             bool ignoreValidation = false)
         {
             try
@@ -112,6 +113,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     if (expireDate.Value <= DateTime.Now && !ignoreValidation)
                         return new OperationResult(false, "Temporary ban end date must be in the future.");
                 }
+
+                // Duplicate check: player name (case-insensitive)
+                var existingName = instanceBans.BannedPlayerNames
+                    .FirstOrDefault(x => x.PlayerName.Equals(playerName.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (existingName != null)
+                    return new OperationResult(false, "Player name already exists in the blacklist.", existingName.RecordID);
 
                 // Create record
                 var nameRecord = new banInstancePlayerName
@@ -172,6 +179,26 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         return new OperationResult(false, "Temporary ban end date must be in the future.");
                 }
 
+                // Duplicate check: exact IP/subnet
+                var existingIP = instanceBans.BannedPlayerIPs
+                    .FirstOrDefault(x => x.PlayerIP.Equals(ipAddress) && x.SubnetMask == subnetMask);
+                if (existingIP != null)
+                    return new OperationResult(false, "IP address already exists in the blacklist.", existingIP.RecordID);
+
+                // Duplicate check: range overlap
+                var newRange = IpRange.FromCidr(ipAddress, subnetMask);
+                foreach (var ipRec in instanceBans.BannedPlayerIPs)
+                {
+                    var existingRange = IpRange.FromCidr(ipRec.PlayerIP, ipRec.SubnetMask);
+                    uint newStart = IpRange.IpToUint(newRange.Start);
+                    uint newEnd = IpRange.IpToUint(newRange.End);
+                    uint existStart = IpRange.IpToUint(existingRange.Start);
+                    uint existEnd = IpRange.IpToUint(existingRange.End);
+
+                    if (!(newEnd < existStart || newStart > existEnd))
+                        return new OperationResult(false, "IP range overlaps with an existing banned range.", ipRec.RecordID);
+                }
+
                 // Create record
                 var ipRecord = new banInstancePlayerIP
                 {
@@ -225,6 +252,32 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             try
             {
+                // Duplicate check: player name
+                var existingName = instanceBans.BannedPlayerNames
+                    .FirstOrDefault(x => x.PlayerName.Equals(playerName.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (existingName != null)
+                    return new DualRecordResult(false, "Player name already exists in the blacklist.", existingName.RecordID, 0);
+
+                // Duplicate check: exact IP/subnet
+                var existingIP = instanceBans.BannedPlayerIPs
+                    .FirstOrDefault(x => x.PlayerIP.Equals(ipAddress) && x.SubnetMask == subnetMask);
+                if (existingIP != null)
+                    return new DualRecordResult(false, "IP address already exists in the blacklist.", 0, existingIP.RecordID);
+
+                // Duplicate check: range overlap
+                var newRange = IpRange.FromCidr(ipAddress, subnetMask);
+                foreach (var ipRec in instanceBans.BannedPlayerIPs)
+                {
+                    var existingRange = IpRange.FromCidr(ipRec.PlayerIP, ipRec.SubnetMask);
+                    uint newStart = IpRange.IpToUint(newRange.Start);
+                    uint newEnd = IpRange.IpToUint(newRange.End);
+                    uint existStart = IpRange.IpToUint(existingRange.Start);
+                    uint existEnd = IpRange.IpToUint(existingRange.End);
+
+                    if (!(newEnd < existStart || newStart > existEnd))
+                        return new DualRecordResult(false, "IP range overlaps with an existing banned range.", 0, ipRec.RecordID);
+                }
+
                 // Add name record first
                 var nameResult = AddBlacklistNameRecord(playerName, banDate, expireDate, recordType, notes, 0, ignorevalidation);
                 if (!nameResult.Success)
