@@ -1518,38 +1518,34 @@ namespace BHD_ServerManager.Classes.GameManagement
             if (thisInstance.instanceStatus == InstanceStatus.LOADINGMAP)
             {
                 thisInstance.gameInfoTimeRemaining = TimeSpan.FromMinutes(thisInstance.gameStartDelay + thisInstance.gameTimeLimit);
+                return;
             }
 
-            byte[] Ptr = new byte[4];
-            int ReadPtr = 0;
+            // Read pointer to map time
+            byte[] ptr = new byte[4];
+            int readPtr = 0;
+            ReadProcessMemory((int)processHandle, baseAddr + 0x00061098, ptr, ptr.Length, ref readPtr);
+            int mapTimeAddr = BitConverter.ToInt32(ptr, 0);
 
-            ReadProcessMemory((int)processHandle, baseAddr + 0x00061098, Ptr, Ptr.Length, ref ReadPtr);
-            int MapTimeAddr = BitConverter.ToInt32(Ptr, 0);
+            // Read elapsed map time in game ticks (assumed to be milliseconds)
+            byte[] mapTimeMs = new byte[4];
+            int mapTimeRead = 0;
+            ReadProcessMemory((int)processHandle, mapTimeAddr, mapTimeMs, mapTimeMs.Length, ref mapTimeRead);
+            int mapTime = BitConverter.ToInt32(mapTimeMs, 0);
 
-            Stopwatch stopwatchProcessingTime = new Stopwatch();
-            stopwatchProcessingTime.Start();
+            // Convert to seconds (if value is in milliseconds, otherwise adjust as needed)
+            int mapTimeInSeconds = mapTime / 60;
 
-            byte[] MapTimeMs = new byte[4];
-            int MapTimeRead = 0;
-            ReadProcessMemory((int)processHandle, MapTimeAddr, MapTimeMs, MapTimeMs.Length, ref MapTimeRead);
-            int MapTime = BitConverter.ToInt32(MapTimeMs, 0);
-            int MapTimeInSeconds = MapTime / 60;
+            // Calculate total time in seconds
+            int totalTimeInSeconds = (thisInstance.gameStartDelay + thisInstance.gameTimeLimit) * 60;
 
-            DateTime MapStartTime = DateTime.Now - TimeSpan.FromSeconds(MapTimeInSeconds);
-            DateTime MapEndTime = MapStartTime + TimeSpan.FromMinutes(thisInstance.gameStartDelay + thisInstance.gameTimeLimit);
+            // Calculate time remaining
+            int timeRemainingSeconds = totalTimeInSeconds - mapTimeInSeconds;
+            if (timeRemainingSeconds < 0) timeRemainingSeconds = 0;
 
-            byte[] TimeOffset = new byte[4];
-            int TimeOffsetRead = 0;
-            ReadProcessMemory((int)processHandle, MapTimeAddr, TimeOffset, TimeOffset.Length, ref TimeOffsetRead);
-            int intTimeOffset = BitConverter.ToInt32(TimeOffset, 0);
-
-            TimeSpan TimeRemaining = MapEndTime - (DateTime.Now + TimeSpan.FromMilliseconds(stopwatchProcessingTime.ElapsedMilliseconds) - TimeSpan.FromMilliseconds(intTimeOffset));
-            stopwatchProcessingTime.Stop();
-
-            thisInstance.gameInfoTimeRemaining = TimeRemaining;
-
-
+            thisInstance.gameInfoTimeRemaining = TimeSpan.FromSeconds(timeRemainingSeconds);
         }
+
         // Function: ReadMemoryCurrentMissionName
         public static void ReadMemoryCurrentMissionName()
         {
