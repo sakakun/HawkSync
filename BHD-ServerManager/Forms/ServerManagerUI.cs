@@ -101,8 +101,8 @@ namespace BHD_ServerManager.Forms
 
             label_PlayersOnline.Text = $"[{thisInstance.gameInfoNumPlayers}/{thisInstance.gameMaxSlots}]";
 
-            string blueScore = "[NO]";
-            string redScore = "[PLAYERS]";
+            string blueScore = "NO";
+            string redScore = "PLAYERS";
             string winConditions = string.Empty;
 
             if (playerInstance.PlayerList.Count > 0)
