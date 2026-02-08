@@ -6,7 +6,7 @@ using HawkSyncShared.DTOs.tabProfile;
 namespace BHD_ServerManager.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/filesystem")]
 [Authorize]
 public class FileSystemController : ControllerBase
 {

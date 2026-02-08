@@ -17,4 +17,12 @@ namespace HawkSyncShared.DTOs.tabStats
         int ReportInterval,
         int UpdateInterval
     );
+
+    /// <summary>
+    /// DTO for web stats validation request.
+    /// </summary>
+    public class WebStatsValidateRequest
+    {
+        public string ServerPath { get; set; } = string.Empty;
+    }
 }

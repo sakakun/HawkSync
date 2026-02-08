@@ -108,7 +108,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Arm Player");
             command.Click += async (sender, e) =>
             {
-                var result = await ApiCore.ApiClient!.ArmPlayerAsync(Player.PlayerSlot, Player.PlayerName);
+                var result = await ApiCore.ApiClient!.Player.ArmPlayerAsync(Player.PlayerSlot, Player.PlayerName);
                 
                 MessageBox.Show(
                     result.Message,
@@ -125,7 +125,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Disarm Player");
             command.Click += async (sender, e) =>
             {
-                var result = await ApiCore.ApiClient!.DisarmPlayerAsync(Player.PlayerSlot, Player.PlayerName);
+                var result = await ApiCore.ApiClient!.Player.DisarmPlayerAsync(Player.PlayerSlot, Player.PlayerName);
                 
                 MessageBox.Show(
                     result.Message,
@@ -154,7 +154,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 slapItem.Click += async (sender, e) =>
                 {
 
-                    var result = await ApiCore.ApiClient!.WarnPlayerAsync(Player.PlayerSlot, Player.PlayerName, slapMessage.SlapMessageText);
+                    var result = await ApiCore.ApiClient!.Player.WarnPlayerAsync(Player.PlayerSlot, Player.PlayerName, slapMessage.SlapMessageText);
                    
                     MessageBox.Show(
                         result.Success 
@@ -174,7 +174,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Kick Player");
             command.Click += async (sender, e) =>
             {
-                var result = await ApiCore.ApiClient!.KickPlayerAsync(Player.PlayerSlot, Player.PlayerName);
+                var result = await ApiCore.ApiClient!.Player.KickPlayerAsync(Player.PlayerSlot, Player.PlayerName);
                                
                 MessageBox.Show(
                     result.Message,
@@ -191,7 +191,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Kill Player");
             command.Click += async (sender, e) =>
             {
-                var result = await ApiCore.ApiClient!.KillPlayerAsync(Player.PlayerSlot, Player.PlayerName);
+                var result = await ApiCore.ApiClient!.Player.KillPlayerAsync(Player.PlayerSlot, Player.PlayerName);
                 
                 MessageBox.Show(
                     result.Message,
@@ -217,7 +217,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             // Ban by Name
             banByName.Click += async (sender, e) =>
             {
-                var result = await ApiCore.ApiClient!.BanPlayerAsync(Player.PlayerSlot, Player.PlayerName, string.Empty, false);
+                var result = await ApiCore.ApiClient!.Player.BanPlayerAsync(Player.PlayerSlot, Player.PlayerName, string.Empty, false);
                 
                 MessageBox.Show(
                     result.Message,
@@ -243,7 +243,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                         return;
                     }
                     
-                    var result = await ApiCore.ApiClient!.BanPlayerAsync(Player.PlayerSlot, string.Empty, Player.PlayerIPAddress, true);
+                    var result = await ApiCore.ApiClient!.Player.BanPlayerAsync(Player.PlayerSlot, string.Empty, Player.PlayerIPAddress, true);
                     
                     MessageBox.Show(
                         result.Message,
@@ -279,7 +279,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                         );
                         return;
                     }
-                    var result = await ApiCore.ApiClient!.BanPlayerAsync(Player.PlayerSlot, Player.PlayerName, Player.PlayerIPAddress, true);
+                    var result = await ApiCore.ApiClient!.Player.BanPlayerAsync(Player.PlayerSlot, Player.PlayerName, Player.PlayerIPAddress, true);
                     
                     MessageBox.Show(
                         result.Message,
@@ -308,7 +308,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem(IsGod ? "Disable God Mode" : "Enable God Mode");
             command.Click += async (sender, e) =>
             {
-                var result = await ApiCore.ApiClient!.ToggleGodPlayerAsync(Player.PlayerSlot, Player.PlayerName);
+                var result = await ApiCore.ApiClient!.Player.ToggleGodPlayerAsync(Player.PlayerSlot, Player.PlayerName);
 
                 if (result.Success)
                 {
@@ -331,7 +331,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             var command = new ToolStripMenuItem("Switch Team");
             command.Click += async (sender, e) =>
             {
-                var result = await ApiCore.ApiClient!.SwitchTeamPlayerAsync(Player.PlayerSlot, Player.PlayerName, Player.PlayerTeam);
+                var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(Player.PlayerSlot, Player.PlayerName, Player.PlayerTeam);
                 
                 MessageBox.Show(
                     result.Message,

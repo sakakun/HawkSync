@@ -32,3 +32,16 @@ public class ProxyCheckTestResult
     public string? City { get; set; }
     public string? Provider { get; set; }
 }
+
+/// <summary>
+/// DTOs for add/remove country requests.
+/// </summary>
+public class AddBlockedCountryRequest
+{
+    public string CountryCode { get; set; } = string.Empty;
+    public string CountryName { get; set; } = string.Empty;
+}
+public class RemoveBlockedCountryRequest
+{
+    public int RecordID { get; set; }
+}

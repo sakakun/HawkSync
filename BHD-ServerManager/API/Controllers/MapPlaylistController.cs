@@ -9,11 +9,11 @@ using HawkSyncShared.SupportClasses;
 namespace BHD_ServerManager.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/maps")]
 [Authorize]
 public class MapPlaylistController : ControllerBase
 {
-    [HttpGet("available-maps")]
+    [HttpGet("list/available")]
     public ActionResult<List<MapDTO>> GetAvailableMaps()
     {
         if(!HasPermission("maps")) return Forbid();
@@ -31,7 +31,7 @@ public class MapPlaylistController : ControllerBase
         return Ok(allMaps);
     }
 
-    [HttpGet("playlists")]
+    [HttpGet("list/playlists")]
     public ActionResult<AllPlaylistsDTO> GetAllPlaylists()
     {
         if(!HasPermission("maps")) return Forbid();
@@ -56,7 +56,7 @@ public class MapPlaylistController : ControllerBase
         return Ok(dto);
     }
 
-    [HttpGet("playlist/{id}")]
+    [HttpGet("list/playlist/{id}")]
     public ActionResult<PlaylistDTO> GetPlaylist(int id)
     {
         if(!HasPermission("maps")) return Forbid();
@@ -180,7 +180,7 @@ public class MapPlaylistController : ControllerBase
         });
     }
 
-    // Server memory actions
+    // Map Actions
     [HttpPost("server/skip-map")]
     public ActionResult<PlaylistCommandResult> SkipMap()
     {
@@ -206,24 +206,6 @@ public class MapPlaylistController : ControllerBase
 
         var result = mapInstanceManager.SetNextMap(mapIndex);
         return Ok(new PlaylistCommandResult { Success = result.Success, Message = result.Message });
-    }
-
-    [HttpPost("refresh-available-maps")]
-    public ActionResult<List<MapDTO>> RefreshAvailableMaps()
-    {
-        if(!HasPermission("maps")) return Forbid();
-
-        var result = mapInstanceManager.LoadAvailableMaps();
-        var allMaps = result.DefaultMaps.Concat(result.CustomMaps)
-            .Select(m => new MapDTO
-            {
-                MapID = m.MapID,
-                MapName = m.MapName,
-                MapFile = m.MapFile,
-                ModType = m.ModType,
-                MapType = m.MapType
-            }).ToList();
-        return Ok(allMaps);
     }
 
     private void TriggerServerUIReload()

@@ -15,3 +15,13 @@ public class NetLimiterSettingsRequest
     public bool NetLimiterEnableConLimit { get; set; }
     public int NetLimiterConThreshold { get; set; }
 }
+
+/// <summary>
+/// DTO for NetLimiter filters response.
+/// </summary>
+public class NetLimiterFiltersResponse
+{
+    public bool Success { get; set; }
+    public string? Message { get; set; }
+    public List<string>? Filters { get; set; }
+}

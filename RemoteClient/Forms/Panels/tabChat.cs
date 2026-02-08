@@ -242,7 +242,7 @@ namespace RemoteClient.Forms.Panels
             int channel = MapChannelIndexToChannel(comboBox_chatGroup.SelectedIndex);
             if (string.IsNullOrEmpty(message)) return;
 
-            var result = await ApiCore.ApiClient!.SendChatAsync(message, channel);
+            var result = await ApiCore.ApiClient!.Chat.SendChatAsync(message, channel);
             if (result.Success) tb_chatMessage.Clear();
             else MessageBox.Show($"Failed to send: {result.Message}");
         }
@@ -269,7 +269,7 @@ namespace RemoteClient.Forms.Panels
             int interval = (int)num_AutoMessageTrigger.Value;
             if (string.IsNullOrEmpty(message)) return;
 
-            var result = await ApiCore.ApiClient!.SendAutoMessageAsync(message, interval);
+            var result = await ApiCore.ApiClient!.Chat.SendAutoMessageAsync(message, interval);
             if (result.Success) tb_autoMessage.Clear();
             else MessageBox.Show($"Failed to add auto message: {result.Message}");
         }
@@ -280,7 +280,7 @@ namespace RemoteClient.Forms.Panels
             var id = dg_autoMessages.Rows[e.RowIndex].Cells["autoMessageID"].Value?.ToString();
             if (string.IsNullOrEmpty(id)) return;
 
-            var result = await ApiCore.ApiClient!.RemoveAutoMessageAsync(id);
+            var result = await ApiCore.ApiClient!.Chat.RemoveAutoMessageAsync(id);
             if (!result.Success) MessageBox.Show($"Failed to remove auto message: {result.Message}");
         }
 
@@ -289,7 +289,7 @@ namespace RemoteClient.Forms.Panels
             string message = tb_slapMessage.Text.Trim();
             if (string.IsNullOrEmpty(message)) return;
 
-            var result = await ApiCore.ApiClient!.SendSlapMessageAsync(message);
+            var result = await ApiCore.ApiClient!.Chat.SendSlapMessageAsync(message);
             if (result.Success) tb_slapMessage.Clear();
             else MessageBox.Show($"Failed to add slap message: {result.Message}");
         }
@@ -300,7 +300,7 @@ namespace RemoteClient.Forms.Panels
             var id = dg_slapMessages.Rows[e.RowIndex].Cells["slapMessageID"].Value?.ToString();
             if (string.IsNullOrEmpty(id)) return;
 
-            var result = await ApiCore.ApiClient!.RemoveSlapMessageAsync(id);
+            var result = await ApiCore.ApiClient!.Chat.RemoveSlapMessageAsync(id);
             if (!result.Success) MessageBox.Show($"Failed to remove slap message: {result.Message}");
         }
 

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/ban")]
 public class BanController : ControllerBase
 {
     [HttpPost("save-blacklist")]

@@ -258,7 +258,7 @@ public partial class tabGamePlay : UserControl
             var settings = BuildGamePlaySettingsFromUI();
 
             // Validate first
-            var validation = await ApiCore.ApiClient!.ValidateGamePlaySettingsAsync(settings);
+            var validation = await ApiCore.ApiClient!.GamePlay.ValidateGamePlaySettingsAsync(settings);
 
             if (!validation.IsValid)
             {
@@ -275,7 +275,7 @@ public partial class tabGamePlay : UserControl
             btn_SaveSettings.Enabled = false;
 
             // Save to server
-            var result = await ApiCore.ApiClient.SaveGamePlaySettingsAsync(settings);
+            var result = await ApiCore.ApiClient.GamePlay.SaveGamePlaySettingsAsync(settings);
 
             if (result.Success)
             {
@@ -345,7 +345,7 @@ public partial class tabGamePlay : UserControl
             btn_LockLobby.Text = "UN/LOCKING";
 
             // Call API to lock lobby
-            var result = await ApiCore.ApiClient!.LockLobbyAsync();
+            var result = await ApiCore.ApiClient!.GamePlay.LockLobbyAsync();
 
             if (result.Success)
             {
@@ -398,7 +398,7 @@ public partial class tabGamePlay : UserControl
             btn_ServerUpdate.Text = "UPDATING";
 
             // Call API to update server
-            var result = await ApiCore.ApiClient!.UpdateGameServerAsync();
+            var result = await ApiCore.ApiClient!.GamePlay.UpdateGameServerAsync();
 
             if (result.Success)
             {
@@ -644,7 +644,7 @@ public partial class tabGamePlay : UserControl
             btn_ExportSettings.Enabled = false;
             btn_ExportSettings.Text = "EXPORTING";
 
-            var exportResponse = await ApiCore.ApiClient!.ExportGamePlaySettingsAsync();
+            var exportResponse = await ApiCore.ApiClient!.GamePlay.ExportGamePlaySettingsAsync();
 
             if (exportResponse == null || !exportResponse.Success)
             {
@@ -724,7 +724,7 @@ public partial class tabGamePlay : UserControl
             btn_LoadSettings.Enabled = false;
             btn_LoadSettings.Text = "IMPORTING";
 
-            var result = await ApiCore.ApiClient!.ImportGamePlaySettingsAsync(jsonData);
+            var result = await ApiCore.ApiClient!.GamePlay.ImportGamePlaySettingsAsync(jsonData);
 
             if (result.Success)
             {
@@ -799,12 +799,12 @@ public partial class tabGamePlay : UserControl
             if (isOffline)
             {
                 // Start the server
-                result = await ApiCore.ApiClient!.StartServerAsync();
+                result = await ApiCore.ApiClient!.GamePlay.StartServerAsync();
             }
             else
             {
                 // Stop the server
-                result = await ApiCore.ApiClient!.StopServerAsync();
+                result = await ApiCore.ApiClient!.GamePlay.StopServerAsync();
             }
 
             if (result.Success)

@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace BHD_ServerManager.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/admin")]
 [Authorize]
 public class AdminController : ControllerBase
 {
-    [HttpPost("create")]
+    [HttpPost("user/create")]
     public ActionResult<AdminCommandResult> CreateUser([FromBody] CreateUserRequestDTO request)
     {
         if(!HasPermission("users")) return Forbid();
@@ -25,7 +25,7 @@ public class AdminController : ControllerBase
         });
     }
 
-    [HttpPost("update")]
+    [HttpPost("user/update")]
     public ActionResult<AdminCommandResult> UpdateUser([FromBody] UpdateUserRequestDTO request)
     {
         if(!HasPermission("users")) return Forbid();
@@ -38,7 +38,7 @@ public class AdminController : ControllerBase
         });
     }
 
-    [HttpPost("delete")]
+    [HttpPost("user/delete")]
     public ActionResult<AdminCommandResult> DeleteUser([FromBody] DeleteUserRequestDTO request)
     {
         if(!HasPermission("users")) return Forbid();

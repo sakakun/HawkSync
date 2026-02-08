@@ -228,7 +228,7 @@ namespace RemoteClient.Forms.Panels
 
             try
             {
-                var result = await ApiCore.ApiClient!.SaveWebStatsSettingsAsync(settings);
+                var result = await ApiCore.ApiClient!.Stats.SaveWebStatsSettingsAsync(settings);
 
                 if (result.Success)
                 {
@@ -252,7 +252,7 @@ namespace RemoteClient.Forms.Panels
 
             try
             {
-                var result = await ApiCore.ApiClient!.ValidateWebStatsConnectionAsync(tb_webStatsServerPath.Text);
+                var result = await ApiCore.ApiClient!.Stats.ValidateWebStatsConnectionAsync(tb_webStatsServerPath.Text);
 
                 MessageBox.Show(
                     result.Message,

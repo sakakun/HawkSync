@@ -169,7 +169,7 @@ public partial class RemoteFileBrowserDialog : Form
     {
         try
         {
-            var response = await ApiCore.ApiClient!.GetServerDrivesAsync();
+            var response = await ApiCore.ApiClient!.FileSystem.GetServerDrivesAsync();
 
             if (response?.Success == true && response.Drives.Any())
             {
@@ -215,7 +215,7 @@ public partial class RemoteFileBrowserDialog : Form
     {
         if (!string.IsNullOrEmpty(_currentPath))
         {
-            var response = await ApiCore.ApiClient!.GetDirectoryListingAsync(_currentPath);
+            var response = await ApiCore.ApiClient!.FileSystem.GetDirectoryListingAsync(_currentPath);
 
             if (response?.Success == true && !string.IsNullOrEmpty(response.ParentPath))
             {
@@ -285,7 +285,7 @@ public partial class RemoteFileBrowserDialog : Form
             listView!.Items.Clear();
             btnOK!.Enabled = false;
 
-            var response = await ApiCore.ApiClient!.GetDirectoryListingAsync(path, _fileFilter);
+            var response = await ApiCore.ApiClient!.FileSystem.GetDirectoryListingAsync(path, _fileFilter);
 
             if (response?.Success == true)
             {

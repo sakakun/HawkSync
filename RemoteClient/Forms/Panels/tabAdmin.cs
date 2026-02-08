@@ -374,7 +374,7 @@ public partial class tabAdmin : UserControl
 
         if (confirmResult != DialogResult.Yes) return;
 
-        var result = await ApiCore.ApiClient!.DeleteUserAsync(_selectedUserID);
+        var result = await ApiCore.ApiClient!.Admin.DeleteUserAsync(_selectedUserID);
 
         if (result.Success)
         {
@@ -426,7 +426,7 @@ public partial class tabAdmin : UserControl
         };
 
         // Call manager (cache will be auto-updated)
-        AdminCommandResult result = await ApiCore.ApiClient!.CreateUserAsync(request);
+        AdminCommandResult result = await ApiCore.ApiClient!.Admin.CreateUserAsync(request);
 
         if (result.Success)
         {
@@ -460,7 +460,7 @@ public partial class tabAdmin : UserControl
         };
 
         // Call manager (cache will be auto-updated)
-        AdminCommandResult result = await ApiCore.ApiClient!.UpdateUserAsync(request);
+        AdminCommandResult result = await ApiCore.ApiClient!.Admin.UpdateUserAsync(request);
 
         if (result.Success)
         {

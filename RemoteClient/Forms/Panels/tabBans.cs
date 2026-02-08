@@ -554,7 +554,7 @@ namespace RemoteClient.Forms.Panels
 
             try
             {
-                var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(req);
+                var result = await ApiCore.ApiClient!.Ban.SaveBlacklistRecordAsync(req);
                 if (!result.Success)
                 {
                     MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -719,7 +719,7 @@ namespace RemoteClient.Forms.Panels
             // Send delete commands to server
             if (deleteAction == RecordDeleteAction.Both || deleteAction == RecordDeleteAction.NameOnly)
             {
-                var response = await ApiCore.ApiClient!.DeleteBlacklistRecordAsync(_blacklistSelectedRecordIDName, isName: true);
+                var response = await ApiCore.ApiClient!.Ban.DeleteBlacklistRecordAsync(_blacklistSelectedRecordIDName, isName: true);
                 if (response.Success)
                     anySuccess = true;
                 else
@@ -727,7 +727,7 @@ namespace RemoteClient.Forms.Panels
             }
             if (deleteAction == RecordDeleteAction.Both || deleteAction == RecordDeleteAction.IPOnly)
             {
-                var response = await ApiCore.ApiClient!.DeleteBlacklistRecordAsync(_blacklistSelectedRecordIDIP, isName: false);
+                var response = await ApiCore.ApiClient!.Ban.DeleteBlacklistRecordAsync(_blacklistSelectedRecordIDIP, isName: false);
                 if (response.Success)
                     anySuccess = true;
                 else
@@ -863,7 +863,7 @@ namespace RemoteClient.Forms.Panels
                                             request.IsIP = true;
                                             request.IgnoreValidation = true;
 
-                                            var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+                                            var result = await ApiCore.ApiClient!.Ban.SaveBlacklistRecordAsync(request);
 
                                             if (!result.Success)
                                             {
@@ -888,7 +888,7 @@ namespace RemoteClient.Forms.Panels
                                     request.IsIP = false;
                                     request.IgnoreValidation = true;
 
-                                    var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+                                    var result = await ApiCore.ApiClient!.Ban.SaveBlacklistRecordAsync(request);
                                     if (!result.Success)
                                     {
                                         MessageBox.Show($"Error importing name record '{nameRecord.PlayerName}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -923,7 +923,7 @@ namespace RemoteClient.Forms.Panels
                                     request.IsIP = true;
                                     request.IgnoreValidation = true;
 
-                                    var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+                                    var result = await ApiCore.ApiClient!.Ban.SaveBlacklistRecordAsync(request);
 
                                     if (!result.Success)
                                     {
@@ -1005,7 +1005,7 @@ namespace RemoteClient.Forms.Panels
                 request.IsIP = true;
                 request.IgnoreValidation = true;
 
-                var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+                var result = await ApiCore.ApiClient!.Ban.SaveBlacklistRecordAsync(request);
 
                 if (result.Success)
                     importedCount++;
@@ -1053,7 +1053,7 @@ namespace RemoteClient.Forms.Panels
                 request.IsIP = false;
                 request.IgnoreValidation = true;
 
-                var result = await ApiCore.ApiClient!.SaveBlacklistRecordAsync(request);
+                var result = await ApiCore.ApiClient!.Ban.SaveBlacklistRecordAsync(request);
 
                 if (result.Success)
                     importedCount++;
@@ -1364,7 +1364,7 @@ namespace RemoteClient.Forms.Panels
 
             try
             {
-                var result = await ApiCore.ApiClient!.SaveWhitelistRecordAsync(req);
+                var result = await ApiCore.ApiClient!.Ban.SaveWhitelistRecordAsync(req);
                 if (!result.Success)
                 {
                     MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1529,7 +1529,7 @@ namespace RemoteClient.Forms.Panels
             // Send delete commands to server
             if (deleteAction == RecordDeleteAction.Both || deleteAction == RecordDeleteAction.NameOnly)
             {
-                var response = await ApiCore.ApiClient!.DeleteWhitelistRecordAsync(_whitelistSelectedRecordIDName, isName: true);
+                var response = await ApiCore.ApiClient!.Ban.DeleteWhitelistRecordAsync(_whitelistSelectedRecordIDName, isName: true);
                 if (response.Success)
                     anySuccess = true;
                 else
@@ -1537,7 +1537,7 @@ namespace RemoteClient.Forms.Panels
             }
             if (deleteAction == RecordDeleteAction.Both || deleteAction == RecordDeleteAction.IPOnly)
             {
-                var response = await ApiCore.ApiClient!.DeleteWhitelistRecordAsync(_whitelistSelectedRecordIDIP, isName: false);
+                var response = await ApiCore.ApiClient!.Ban.DeleteWhitelistRecordAsync(_whitelistSelectedRecordIDIP, isName: false);
                 if (response.Success)
                     anySuccess = true;
                 else
@@ -1657,7 +1657,7 @@ namespace RemoteClient.Forms.Panels
                                         request.IsIP = true;
                                         request.IgnoreValidation = true;
 
-                                        var result = await ApiCore.ApiClient!.SaveWhitelistRecordAsync(request);
+                                        var result = await ApiCore.ApiClient!.Ban.SaveWhitelistRecordAsync(request);
                                         if (!result.Success)
                                         {
                                             MessageBox.Show($"Error importing name/IP pair '{nameRecord.PlayerName}/{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1681,7 +1681,7 @@ namespace RemoteClient.Forms.Panels
                                 request.IsIP = false;
                                 request.IgnoreValidation = true;
 
-                                var result = await ApiCore.ApiClient!.SaveWhitelistRecordAsync(request);
+                                var result = await ApiCore.ApiClient!.Ban.SaveWhitelistRecordAsync(request);
                                 if (!result.Success)
                                 {
                                     MessageBox.Show($"Error importing name record '{nameRecord.PlayerName}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1716,7 +1716,7 @@ namespace RemoteClient.Forms.Panels
                                 request.IsIP = true;
                                 request.IgnoreValidation = true;
 
-                                var result = await ApiCore.ApiClient!.SaveWhitelistRecordAsync(request);
+                                var result = await ApiCore.ApiClient!.Ban.SaveWhitelistRecordAsync(request);
                                 if (!result.Success)
                                 {
                                     MessageBox.Show($"Error importing IP record '{ipRecord.PlayerIP}': {result.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1912,7 +1912,7 @@ namespace RemoteClient.Forms.Panels
 
             try
             {
-                var result = await ApiCore.ApiClient!.SaveProxyCheckSettingsAsync(settings);
+                var result = await ApiCore.ApiClient!.Ban.SaveProxyCheckSettingsAsync(settings);
 
                 if (result.Success)
                 {
@@ -2000,7 +2000,7 @@ namespace RemoteClient.Forms.Panels
             }
         }
 
-        private async void ProxyCheck_TestService_Click(object sender, EventArgs e)
+        private async void ProxyCheck_ValidateService_Click(object sender, EventArgs e)
         {
             // Validate service selection
             if (!cb_serviceProxyCheckIO.Checked && !cb_serviceIP2LocationIO.Checked)
@@ -2036,7 +2036,7 @@ namespace RemoteClient.Forms.Panels
                 int serviceProvider = cb_serviceProxyCheckIO.Checked ? 1 : 2;
                 string testIP = "8.8.8.8"; // Or allow user input
 
-                var result = await ApiCore.ApiClient!.TestProxyCheckServiceAsync(apiKey, serviceProvider, testIP);
+                var result = await ApiCore.ApiClient!.Ban.ValidateProxyCheckServiceAsync(apiKey, serviceProvider, testIP);
 
                 if (result == null || !result.Success)
                 {
@@ -2102,7 +2102,7 @@ namespace RemoteClient.Forms.Panels
                 return;
             }
 
-            var result = await ApiCore.ApiClient!.AddBlockedCountryAsync(countryCode, countryName);
+            var result = await ApiCore.ApiClient!.Ban.AddBlockedCountryAsync(countryCode, countryName);
 
             if (result.Success)
             {
@@ -2135,7 +2135,7 @@ namespace RemoteClient.Forms.Panels
             if (dialogResult != DialogResult.Yes)
                 return;
 
-            var result = await ApiCore.ApiClient!.RemoveBlockedCountryAsync(recordId);
+            var result = await ApiCore.ApiClient!.Ban.RemoveBlockedCountryAsync(recordId);
 
             if (result.Success)
             {
@@ -2258,7 +2258,7 @@ namespace RemoteClient.Forms.Panels
             };
             try
             {
-                var result = ApiCore.ApiClient!.SaveNetLimiterSettingsAsync(settings).Result;
+                var result = ApiCore.ApiClient!.Ban.SaveNetLimiterSettingsAsync(settings).Result;
                 if (result.Success)
                 {
                     MessageBox.Show("NetLimiter settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -2296,7 +2296,7 @@ namespace RemoteClient.Forms.Panels
 
         public async void NetLimiter_RefreshFilters(object sender, EventArgs e)
         {
-            var (success, filters, errorMessage) = await ApiCore.ApiClient!.GetNetLimiterFiltersAsync();
+            var (success, filters, errorMessage) = await ApiCore.ApiClient!.Ban.GetNetLimiterFiltersAsync();
 
             if (!success || filters == null || filters.Count == 0)
             {

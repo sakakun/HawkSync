@@ -96,5 +96,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="API\Controllers\Admin\" />
+  </ItemGroup>
+
 
 </Project>

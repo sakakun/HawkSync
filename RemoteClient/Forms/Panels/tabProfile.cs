@@ -196,7 +196,7 @@ public partial class tabProfile : UserControl
             var settings = BuildProfileSettingsFromUI();
 
             // Validate first
-            var validation = await ApiCore.ApiClient!.ValidateProfileSettingsAsync(settings);
+            var validation = await ApiCore.ApiClient!.Profile.ValidateProfileSettingsAsync(settings);
 
             if (!validation.IsValid)
             {
@@ -212,7 +212,7 @@ public partial class tabProfile : UserControl
             btn_saveProfile.Text = "Saving...";
 
             // Save to server
-            var result = await ApiCore.ApiClient.SaveProfileSettingsAsync(settings);
+            var result = await ApiCore.ApiClient.Profile.SaveProfileSettingsAsync(settings);
 
             if (result.Success)
             {

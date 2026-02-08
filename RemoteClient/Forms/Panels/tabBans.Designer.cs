@@ -1684,7 +1684,7 @@
             btn_proxyTest.TabIndex = 2;
             toolTip1.SetToolTip(btn_proxyTest, "Validate and Test");
             btn_proxyTest.UseVisualStyleBackColor = true;
-            btn_proxyTest.Click += ProxyCheck_TestService_Click;
+            btn_proxyTest.Click += ProxyCheck_ValidateService_Click;
             // 
             // btn_proxyReset
             // 

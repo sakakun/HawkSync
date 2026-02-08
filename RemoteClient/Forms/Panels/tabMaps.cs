@@ -306,7 +306,7 @@ namespace RemoteClient.Forms.Panels
 
         private async Task RefreshAvailableMaps()
         {
-            var maps = await ApiCore.ApiClient!.GetAvailableMapsAsync();
+            var maps = await ApiCore.ApiClient!.Maps.GetAvailableMapsAsync();
             _availableMaps = maps ?? new List<MapDTO>();
             FilterAvailableMaps(null);
         }
@@ -314,7 +314,7 @@ namespace RemoteClient.Forms.Panels
         private async Task LoadPlaylist(int playlistId)
         {
             _selectedPlaylist = playlistId;
-            var playlist = await ApiCore.ApiClient!.GetPlaylistAsync(playlistId);
+            var playlist = await ApiCore.ApiClient!.Maps.GetPlaylistAsync(playlistId);
             _currentPlaylist = playlist?.Maps ?? new List<MapDTO>();
             RefreshCurrentPlaylistGrid();
             IsEditMode = false;
@@ -328,7 +328,7 @@ namespace RemoteClient.Forms.Panels
                 return;
             }
             var dto = new PlaylistDTO { PlaylistID = _selectedPlaylist, Maps = _currentPlaylist };
-            var result = await ApiCore.ApiClient!.SavePlaylistAsync(dto);
+            var result = await ApiCore.ApiClient!.Maps.SavePlaylistAsync(dto);
             MessageBox.Show(result.Message, result.Success ? "Success" : "Error",
                 MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
         }
@@ -341,14 +341,14 @@ namespace RemoteClient.Forms.Panels
                 return;
             }
             var dto = new PlaylistDTO { PlaylistID = _selectedPlaylist, Maps = _currentPlaylist };
-            var result = await ApiCore.ApiClient!.SetActivePlaylistAsync(dto);
+            var result = await ApiCore.ApiClient!.Maps.SetActivePlaylistAsync(dto);
             MessageBox.Show(result.Message, result.Success ? "Success" : "Error",
                 MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
         }
 
         private async Task ExportPlaylist()
         {
-            var playlist = await ApiCore.ApiClient!.ExportPlaylistAsync(_selectedPlaylist);
+            var playlist = await ApiCore.ApiClient!.Maps.ExportPlaylistAsync(_selectedPlaylist);
             if (playlist == null)
             {
                 MessageBox.Show("Failed to export playlist.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -444,7 +444,7 @@ namespace RemoteClient.Forms.Panels
                         Maps = mapList
                     };
 
-                    var result = await ApiCore.ApiClient!.ImportPlaylistAsync(playlist1);
+                    var result = await ApiCore.ApiClient!.Maps.ImportPlaylistAsync(playlist1);
                     if (result.Success)
                     {
                         await LoadPlaylist(_selectedPlaylist);
@@ -471,7 +471,7 @@ namespace RemoteClient.Forms.Panels
                 }
 
                 playlist2.PlaylistID = _selectedPlaylist;
-                var jsonResult = await ApiCore.ApiClient!.ImportPlaylistAsync(playlist2);
+                var jsonResult = await ApiCore.ApiClient!.Maps.ImportPlaylistAsync(playlist2);
                 if (jsonResult.Success)
                 {
                     await LoadPlaylist(_selectedPlaylist);
@@ -486,14 +486,14 @@ namespace RemoteClient.Forms.Panels
 
         private async Task SkipMap()
         {
-            var result = await ApiCore.ApiClient!.SkipMapAsync();
+            var result = await ApiCore.ApiClient!.Maps.SkipMapAsync();
             MessageBox.Show(result.Message, result.Success ? "Success" : "Error",
                 MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
         }
 
         private async Task ScoreMap()
         {
-            var result = await ApiCore.ApiClient!.ScoreMapAsync();
+            var result = await ApiCore.ApiClient!.Maps.ScoreMapAsync();
             MessageBox.Show(result.Message, result.Success ? "Success" : "Error",
                 MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
         }
@@ -507,7 +507,7 @@ namespace RemoteClient.Forms.Panels
                 return;
             }
             int idx = grid.SelectedRows[0].Index;
-            var result = await ApiCore.ApiClient!.PlayNextMapAsync(idx);
+            var result = await ApiCore.ApiClient!.Maps.PlayNextMapAsync(idx);
             MessageBox.Show(result.Message, result.Success ? "Success" : "Error",
                 MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
         }
