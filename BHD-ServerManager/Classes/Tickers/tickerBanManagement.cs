@@ -549,7 +549,6 @@ namespace BHD_ServerManager.Classes.Tickers
             }
         }
 
-        // Check active players against proxy/VPN/TOR rules and geo-blocking
         public static void CheckAndPuntProxyViolations()
         {
             if (!theInstance.proxyCheckEnabled)
@@ -683,7 +682,6 @@ namespace BHD_ServerManager.Classes.Tickers
             }
         }
 
-        // Check active players against role restrictions and punt if using disabled role
         public static void CheckAndPuntDisabledRoles()
         {
             DateTime now = DateTime.Now;
