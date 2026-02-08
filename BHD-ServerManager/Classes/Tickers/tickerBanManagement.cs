@@ -331,6 +331,7 @@ namespace BHD_ServerManager.Classes.Tickers
         public static void CheckAndPuntBannedPlayers()
         {
             DateTime now = DateTime.Now;
+            var slotsToPunt = new List<(int SlotNum, string PlayerName, string PuntReason)>();
 
             foreach (var kvp in playerInstance.PlayerList)
             {
@@ -392,10 +393,16 @@ namespace BHD_ServerManager.Classes.Tickers
                             continue;  // Player not in game yet. Needless to spam the "punt".
                         }
 
-                        ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                        AppDebug.Log("tickerBanManagement", $"Punting player '{player.PlayerName}' (Slot {slotNum}). Reason: {puntReason}");
+                        slotsToPunt.Add((slotNum, player.PlayerName, puntReason));
                     }
                 }
+            }
+
+            // Punt players after enumeration
+            foreach (var (slotNum, playerName, puntReason) in slotsToPunt)
+            {
+                ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
             }
         }
 
@@ -549,6 +556,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 return;
 
             DateTime now = DateTime.Now;
+            var slotsToPunt = new List<(int SlotNum, string PlayerName, string PuntReason, bool ShouldBan, IPAddress? PlayerIP, string PlayerIPAddress)>();
 
             foreach (var kvp in playerInstance.PlayerList)
             {
@@ -627,45 +635,51 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 if (shouldPunt)
                 {
-                    if (shouldBan)
+                    slotsToPunt.Add((slotNum, player.PlayerName, puntReason, shouldBan, playerIP, player.PlayerIPAddress));
+                }
+            }
+
+            // Process punts and bans after enumeration
+            foreach (var (slotNum, playerName, puntReason, shouldBan, playerIP, playerIPAddress) in slotsToPunt)
+            {
+                if (shouldBan && playerIP != null)
+                {
+                    var banRecord = new banInstancePlayerIP
                     {
-                        var banRecord = new banInstancePlayerIP
+                        RecordID = 0,
+                        MatchID = theInstance.gameMatchID,
+                        PlayerIP = playerIP,
+                        SubnetMask = 32,
+                        Date = DateTime.Now,
+                        ExpireDate = null,
+                        AssociatedName = null,
+                        RecordType = banInstanceRecordType.Permanent,
+                        RecordCategory = 0,
+                        Notes = puntReason
+                    };
+
+                    try
+                    {
+                        int recordId = DatabaseManager.AddPlayerIPRecord(banRecord);
+                        banRecord.RecordID = recordId;
+
+                        banInstance.BannedPlayerIPs.Add(banRecord);
+
+                        AppDebug.Log("tickerBanManagement", $"Auto-banned IP {playerIPAddress}: {puntReason}");
+
+                        if (!string.IsNullOrEmpty(theInstance.netLimiterFilterName))
                         {
-                            RecordID = 0,
-                            MatchID = theInstance.gameMatchID,
-                            PlayerIP = playerIP,
-                            SubnetMask = 32,
-                            Date = now,
-                            ExpireDate = null,
-                            AssociatedName = null,
-                            RecordType = banInstanceRecordType.Permanent,
-                            RecordCategory = 0,
-                            Notes = puntReason
-                        };
-
-                        try
-                        {
-                            int recordId = DatabaseManager.AddPlayerIPRecord(banRecord);
-                            banRecord.RecordID = recordId;
-
-                            banInstance.BannedPlayerIPs.Add(banRecord);
-
-                            AppDebug.Log("tickerBanManagement", $"Auto-banned IP {player.PlayerIPAddress}: {puntReason}");
-
-                            if (!string.IsNullOrEmpty(theInstance.netLimiterFilterName))
-                            {
-                                _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, player.PlayerIPAddress, 32);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            AppDebug.Log("tickerBanManagement", $"Error adding auto-ban record for IP {player.PlayerIPAddress}: {ex.Message}");
+                            _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, playerIPAddress, 32);
                         }
                     }
-
-                    ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                    AppDebug.Log("tickerBanManagement", $"Punting player '{player.PlayerName}' (Slot {slotNum}). Reason: {puntReason}");
+                    catch (Exception ex)
+                    {
+                        AppDebug.Log("tickerBanManagement", $"Error adding auto-ban record for IP {playerIPAddress}: {ex.Message}");
+                    }
                 }
+
+                ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
             }
         }
 
@@ -673,6 +687,7 @@ namespace BHD_ServerManager.Classes.Tickers
         public static void CheckAndPuntDisabledRoles()
         {
             DateTime now = DateTime.Now;
+            var slotsToPunt = new List<(int SlotNum, string PlayerName, string PuntReason)>();
 
             foreach (var kvp in playerInstance.PlayerList)
             {
@@ -730,9 +745,15 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 if (shouldPunt)
                 {
-                    ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                    AppDebug.Log("tickerBanManagement", $"Punting player '{player.PlayerName}' (Slot {slotNum}). Reason: {puntReason}");
+                    slotsToPunt.Add((slotNum, player.PlayerName, puntReason));
                 }
+            }
+
+            // Punt players after enumeration
+            foreach (var (slotNum, playerName, puntReason) in slotsToPunt)
+            {
+                ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
             }
         }
 
