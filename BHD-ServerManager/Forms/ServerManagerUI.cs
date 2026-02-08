@@ -50,7 +50,7 @@ namespace BHD_ServerManager.Forms
             theInstanceManager.InitializeTickers();
 
             // Initialize Ticker for the Server Manager UI
-            CommonCore.Ticker?.Start("ServerManager", 1000, Ticker_ServerManagerUI);
+            CommonCore.Ticker?.Start("ServerManagerUI", 1000, Ticker_ServerManagerUI);
 
         }
 
