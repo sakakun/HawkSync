@@ -374,23 +374,58 @@ namespace BHD_ServerManager.Classes.GameManagement
         }
 
         // Function: CheckForExistingProcess
+        private static readonly object processCheckLock = new();
+
         public static bool CheckForExistingProcess()
         {
             string file_name = "dfbhd.exe";
             string FullFileName = Path.Combine(theInstance.profileServerPath!, file_name);
             string windowTitle = $"BHD Server - {theInstance.gameServerName}";
 
-            // Filter by process name first (much faster)
-            foreach (var searchProcess in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file_name)))
+            // Defensive: run process enumeration in a lock to prevent race conditions
+            lock (processCheckLock)
             {
-                try
+                // Enumerate processes by name (fast, but MainModule access can block)
+                foreach (var searchProcess in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file_name)))
                 {
-                    bool fileMatch = string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase);
-                    bool titleMatch = string.Equals(searchProcess.MainWindowTitle, windowTitle, StringComparison.Ordinal);
+                    bool fileMatch = false;
+                    bool titleMatch = false;
+
+                    // Access MainModule in a try-catch to avoid blocking the main thread
+                    try
+                    {
+                        fileMatch = string.Equals(searchProcess.MainModule?.FileName, FullFileName, StringComparison.OrdinalIgnoreCase);
+                    }
+                    catch (Win32Exception)
+                    {
+                        // Skip processes we can't access
+                        continue;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Process may have exited
+                        continue;
+                    }
+                    catch (SystemException)
+                    {
+                        // Defensive: skip if process is in a bad state
+                        continue;
+                    }
+
+                    // Access MainWindowTitle in a try-catch
+                    try
+                    {
+                        titleMatch = string.Equals(searchProcess.MainWindowTitle, windowTitle, StringComparison.Ordinal);
+                    }
+                    catch
+                    {
+                        // Defensive: skip if window title can't be read
+                        continue;
+                    }
 
                     if (fileMatch && titleMatch)
                     {
-                        AppDebug.Log("StartServer", "Found existing game process: " + searchProcess.ProcessName + " (PID: " + searchProcess.Id + ")");
+                        AppDebug.Log("StartServer", $"Found existing game process: {searchProcess.ProcessName} (PID: {searchProcess.Id})");
                         theInstance.instanceAttachedPID = searchProcess.Id;
                         theInstance.instanceProcessHandle = searchProcess.Handle;
 
@@ -401,11 +436,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                         theInstanceManager.GenerateMatchID();
                         return true;
                     }
-                }
-                catch (Win32Exception)
-                {
-                    // Skip processes we can't access
-                    continue;
                 }
             }
 
