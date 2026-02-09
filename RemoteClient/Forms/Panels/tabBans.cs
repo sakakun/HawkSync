@@ -2240,11 +2240,10 @@ namespace RemoteClient.Forms.Panels
             }
         }
 
-        private void NetLimiter_SaveSettings(object sender, EventArgs e)
+        private async void NetLimiter_SaveSettings(object sender, EventArgs e)
         {
             if (theInstance == null)
                 return;
-            // Gather settings from UI
             var settings = new NetLimiterSettingsRequest
             {
                 NetLimiterEnabled = checkBox_EnableNetLimiter.Checked,
@@ -2258,11 +2257,10 @@ namespace RemoteClient.Forms.Panels
             };
             try
             {
-                var result = ApiCore.ApiClient!.Ban.SaveNetLimiterSettingsAsync(settings).Result;
+                var result = await ApiCore.ApiClient!.Ban.SaveNetLimiterSettingsAsync(settings);
                 if (result.Success)
                 {
                     MessageBox.Show("NetLimiter settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    // Optionally reload settings/UI here
                     NetLimiter_LoadSettings();
                 }
                 else
@@ -2274,7 +2272,6 @@ namespace RemoteClient.Forms.Panels
             {
                 MessageBox.Show($"Error saving settings:\n\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
 
         private void NetLimiter_ResetForm(object sender, EventArgs e)
