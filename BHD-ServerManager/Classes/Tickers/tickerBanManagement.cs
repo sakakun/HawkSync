@@ -559,88 +559,94 @@ namespace BHD_ServerManager.Classes.Tickers
 
             foreach (var kvp in playerInstance.PlayerList)
             {
-                int slotNum = kvp.Key;
-                PlayerObject player = kvp.Value;
+                try { 
+                    int slotNum = kvp.Key;
+                    PlayerObject player = kvp.Value;
 
-                if ((now - player.PlayerLastSeen).TotalSeconds > ActivePlayerThresholdSeconds)
-                    continue;
+                    if ((now - player.PlayerLastSeen).TotalSeconds > ActivePlayerThresholdSeconds)
+                        continue;
 
-                if (string.IsNullOrEmpty(player.PlayerIPAddress))
-                    continue;
+                    if (string.IsNullOrEmpty(player.PlayerIPAddress))
+                        continue;
 
-                if (!IPAddress.TryParse(player.PlayerIPAddress, out IPAddress? playerIP))
-                    continue;
+                    if (!IPAddress.TryParse(player.PlayerIPAddress, out IPAddress? playerIP))
+                        continue;
 
-                if (BanHelper.IsPlayerWhitelisted(player, banInstance, now))
-                    continue;
+                    if (BanHelper.IsPlayerWhitelisted(player, banInstance, now))
+                        continue;
 
-                var proxyRecord = banInstance.ProxyRecords
-                    .FirstOrDefault(p => p.IPAddress.Equals(playerIP));
+                    var proxyRecord = banInstance.ProxyRecords
+                        .FirstOrDefault(p => p.IPAddress.Equals(playerIP));
 
-                if (proxyRecord == null || now > proxyRecord.CacheExpiry)
-                {
-                    BanHelper.CheckIP(playerIP);
-                    continue;
-                }
+                    if (proxyRecord == null || now > proxyRecord.CacheExpiry)
+                    {
+                        BanHelper.CheckIP(playerIP);
+                        continue;
+                    }
 
-                bool shouldPunt = false;
-                bool shouldBan = false;
-                string puntReason = string.Empty;
+                    bool shouldPunt = false;
+                    bool shouldBan = false;
+                    string puntReason = string.Empty;
 
-                if (proxyRecord.IsProxy && theInstance.proxyCheckProxyAction > 0)
-                {
-                    shouldPunt = true;
-                    shouldBan = theInstance.proxyCheckProxyAction == 2;
-                    puntReason = $"Proxy detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
-                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a PROXY. Action: {(shouldBan ? "Ban" : "Kick")}");
-                }
-
-                if (!shouldPunt && proxyRecord.IsVpn && theInstance.proxyCheckVPNAction > 0)
-                {
-                    shouldPunt = true;
-                    shouldBan = theInstance.proxyCheckVPNAction == 2;
-                    puntReason = $"VPN detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
-                    if (!string.IsNullOrEmpty(proxyRecord.Provider))
-                        puntReason += $" - {proxyRecord.Provider}";
-                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a VPN. Action: {(shouldBan ? "Ban" : "Kick")}");
-                }
-
-                if (!shouldPunt && proxyRecord.IsTor && theInstance.proxyCheckTORAction > 0)
-                {
-                    shouldPunt = true;
-                    shouldBan = theInstance.proxyCheckTORAction == 2;
-                    puntReason = $"TOR detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
-                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using TOR. Action: {(shouldBan ? "Ban" : "Kick")}");
-                }
-
-                if (!shouldPunt && theInstance.proxyCheckGeoMode > 0 && !string.IsNullOrEmpty(proxyRecord.CountryCode))
-                {
-                    bool countryInList = banInstance.ProxyBlockedCountries
-                        .Any(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
-
-                    bool shouldBlockCountry = theInstance.proxyCheckGeoMode == 1 ? countryInList : !countryInList;
-
-                    if (shouldBlockCountry)
+                    if (proxyRecord.IsProxy && theInstance.proxyCheckProxyAction > 0)
                     {
                         shouldPunt = true;
-                        shouldBan = false;
-                        var country = banInstance.ProxyBlockedCountries
-                            .FirstOrDefault(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
-                        string countryName = country?.CountryName ?? proxyRecord.CountryCode;
-                        puntReason = $"Geo-blocked: {countryName} ({proxyRecord.CountryCode})";
-                        AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) from blocked country: {countryName}. Action: Kick");
+                        shouldBan = theInstance.proxyCheckProxyAction == 2;
+                        puntReason = $"Proxy detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
+                        AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a PROXY. Action: {(shouldBan ? "Ban" : "Kick")}");
                     }
-                }
 
-                if (shouldPunt)
+                    if (!shouldPunt && proxyRecord.IsVpn && theInstance.proxyCheckVPNAction > 0)
+                    {
+                        shouldPunt = true;
+                        shouldBan = theInstance.proxyCheckVPNAction == 2;
+                        puntReason = $"VPN detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
+                        if (!string.IsNullOrEmpty(proxyRecord.Provider))
+                            puntReason += $" - {proxyRecord.Provider}";
+                        AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a VPN. Action: {(shouldBan ? "Ban" : "Kick")}");
+                    }
+
+                    if (!shouldPunt && proxyRecord.IsTor && theInstance.proxyCheckTORAction > 0)
+                    {
+                        shouldPunt = true;
+                        shouldBan = theInstance.proxyCheckTORAction == 2;
+                        puntReason = $"TOR detected{(shouldBan ? " (Auto-banned)" : " (Kicked)")}";
+                        AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using TOR. Action: {(shouldBan ? "Ban" : "Kick")}");
+                    }
+
+                    if (!shouldPunt && theInstance.proxyCheckGeoMode > 0 && !string.IsNullOrEmpty(proxyRecord.CountryCode))
+                    {
+                        bool countryInList = banInstance.ProxyBlockedCountries
+                            .Any(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
+
+                        bool shouldBlockCountry = theInstance.proxyCheckGeoMode == 1 ? countryInList : !countryInList;
+
+                        if (shouldBlockCountry)
+                        {
+                            shouldPunt = true;
+                            shouldBan = false;
+                            var country = banInstance.ProxyBlockedCountries
+                                .FirstOrDefault(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
+                            string countryName = country?.CountryName ?? proxyRecord.CountryCode;
+                            puntReason = $"Geo-blocked: {countryName} ({proxyRecord.CountryCode})";
+                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) from blocked country: {countryName}. Action: Kick");
+                        }
+                    }
+
+                    if (shouldPunt)
+                    {
+                        slotsToPunt.Add((slotNum, player.PlayerName, puntReason, shouldBan, playerIP, player.PlayerIPAddress));
+                    }
+                } catch (Exception ex)
                 {
-                    slotsToPunt.Add((slotNum, player.PlayerName, puntReason, shouldBan, playerIP, player.PlayerIPAddress));
-                }
+                    AppDebug.Log("tickerBanManagement", $"Error checking proxy status for player in slot {kvp.Key}: {ex.Message}");
+				}
             }
-
+            
             // Process punts and bans after enumeration
             foreach (var (slotNum, playerName, puntReason, shouldBan, playerIP, playerIPAddress) in slotsToPunt)
             {
+                
                 if (shouldBan && playerIP != null)
                 {
                     var banRecord = new banInstancePlayerIP
@@ -670,6 +676,10 @@ namespace BHD_ServerManager.Classes.Tickers
                         {
                             _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, playerIPAddress, 32);
                         }
+
+                        ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                        
+                        AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
                     }
                     catch (Exception ex)
                     {
@@ -677,9 +687,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                 }
 
-                ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
             }
+            
         }
 
         public static void CheckAndPuntDisabledRoles()
@@ -689,69 +698,81 @@ namespace BHD_ServerManager.Classes.Tickers
 
             foreach (var kvp in playerInstance.PlayerList)
             {
-                int slotNum = kvp.Key;
-                PlayerObject player = kvp.Value;
-
-                if ((now - player.PlayerLastSeen).TotalSeconds > ActivePlayerThresholdSeconds)
-                    continue;
-
-                bool shouldPunt = false;
-                string puntReason = string.Empty;
-
-                switch (player.RoleID)
+                try
                 {
-                    case (int)CharacterClass.CQB:
-                    case (int)CharacterClass.SAS_CQB:
-                        if (!theInstance.roleCQB)
-                        {
-                            shouldPunt = true;
-                            puntReason = "CQB role is disabled on this server";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled CQB role.");
-                        }
-                        break;
+                    int slotNum = kvp.Key;
+                    PlayerObject player = kvp.Value;
 
-                    case (int)CharacterClass.MEDIC:
-                    case (int)CharacterClass.SAS_MEDIC:
-                        if (!theInstance.roleMedic)
-                        {
-                            shouldPunt = true;
-                            puntReason = "Medic role is disabled on this server";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Medic role.");
-                        }
-                        break;
+                    if ((now - player.PlayerLastSeen).TotalSeconds > ActivePlayerThresholdSeconds)
+                        continue;
 
-                    case (int)CharacterClass.SNIPER:
-                    case (int)CharacterClass.SAS_SNIPER:
-                        if (!theInstance.roleSniper)
-                        {
-                            shouldPunt = true;
-                            puntReason = "Sniper role is disabled on this server";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Sniper role.");
-                        }
-                        break;
+                    bool shouldPunt = false;
+                    string puntReason = string.Empty;
 
-                    case (int)CharacterClass.GUNNER:
-                    case (int)CharacterClass.SAS_GUNNER:
-                        if (!theInstance.roleGunner)
-                        {
-                            shouldPunt = true;
-                            puntReason = "Gunner role is disabled on this server";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Gunner role.");
-                        }
-                        break;
-                }
+                    switch (player.RoleID)
+                    {
+                        case (int)CharacterClass.CQB:
+                        case (int)CharacterClass.SAS_CQB:
+                            if (!theInstance.roleCQB)
+                            {
+                                shouldPunt = true;
+                                puntReason = "CQB role is disabled on this server";
+                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled CQB role.");
+                            }
+                            break;
 
-                if (shouldPunt)
+                        case (int)CharacterClass.MEDIC:
+                        case (int)CharacterClass.SAS_MEDIC:
+                            if (!theInstance.roleMedic)
+                            {
+                                shouldPunt = true;
+                                puntReason = "Medic role is disabled on this server";
+                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Medic role.");
+                            }
+                            break;
+
+                        case (int)CharacterClass.SNIPER:
+                        case (int)CharacterClass.SAS_SNIPER:
+                            if (!theInstance.roleSniper)
+                            {
+                                shouldPunt = true;
+                                puntReason = "Sniper role is disabled on this server";
+                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Sniper role.");
+                            }
+                            break;
+
+                        case (int)CharacterClass.GUNNER:
+                        case (int)CharacterClass.SAS_GUNNER:
+                            if (!theInstance.roleGunner)
+                            {
+                                shouldPunt = true;
+                                puntReason = "Gunner role is disabled on this server";
+                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Gunner role.");
+                            }
+                            break;
+                    }
+
+                    if (shouldPunt)
+                    {
+                        slotsToPunt.Add((slotNum, player.PlayerName, puntReason));
+                    }
+                } catch (Exception ex)
                 {
-                    slotsToPunt.Add((slotNum, player.PlayerName, puntReason));
-                }
+                    AppDebug.Log("tickerBanManagement", $"Error checking roles for player in slot {kvp.Key}: {ex.Message}");
+				}
             }
 
             // Punt players after enumeration
             foreach (var (slotNum, playerName, puntReason) in slotsToPunt)
             {
-                ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
+                try {
+                    ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                    AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
+                } catch (Exception ex)
+                {
+                    AppDebug.Log("tickerBanManagement", $"Error punting player '{playerName}' (Slot {slotNum}): {ex.Message}");
+				}
+				
             }
         }
 
