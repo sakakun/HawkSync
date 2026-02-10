@@ -332,8 +332,8 @@ namespace BHD_ServerManager.Classes.Tickers
         {
             DateTime now = DateTime.Now;
             var slotsToPunt = new List<(int SlotNum, string PlayerName, string PuntReason)>();
-
-            foreach (var kvp in playerInstance.PlayerList)
+            try { 
+                foreach (var kvp in playerInstance.PlayerList.ToList())
             {
                 int slotNum = kvp.Key;
                 PlayerObject player = kvp.Value;
@@ -396,6 +396,11 @@ namespace BHD_ServerManager.Classes.Tickers
                         slotsToPunt.Add((slotNum, player.PlayerName, puntReason));
                     }
                 }
+            }
+            } 
+            catch (Exception ex)
+            {
+                AppDebug.Log("tickerBanManagement", $"Error checking banned players: {ex.Message}");
             }
 
             // Punt players after enumeration
@@ -549,6 +554,20 @@ namespace BHD_ServerManager.Classes.Tickers
             }
         }
 
+        private static bool IsIpBanned(IPAddress ip, IEnumerable<banInstancePlayerIP> bannedList)
+        {
+            foreach (var banned in bannedList)
+            {
+                var range = IpRange.FromCidr(banned.PlayerIP, banned.SubnetMask);
+                uint ipUint = IpRange.IpToUint(ip);
+                uint start = IpRange.IpToUint(range.Start);
+                uint end = IpRange.IpToUint(range.End);
+                if (ipUint >= start && ipUint <= end)
+                    return true;
+            }
+            return false;
+        }
+
         public static void CheckAndPuntProxyViolations()
         {
             if (!theInstance.proxyCheckEnabled)
@@ -557,9 +576,10 @@ namespace BHD_ServerManager.Classes.Tickers
             DateTime now = DateTime.Now;
             var slotsToPunt = new List<(int SlotNum, string PlayerName, string PuntReason, bool ShouldBan, IPAddress? PlayerIP, string PlayerIPAddress)>();
 
-            foreach (var kvp in playerInstance.PlayerList)
+            foreach (var kvp in playerInstance.PlayerList.ToList())
             {
-                try { 
+                try
+                {
                     int slotNum = kvp.Key;
                     PlayerObject player = kvp.Value;
 
@@ -637,18 +657,25 @@ namespace BHD_ServerManager.Classes.Tickers
                     {
                         slotsToPunt.Add((slotNum, player.PlayerName, puntReason, shouldBan, playerIP, player.PlayerIPAddress));
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     AppDebug.Log("tickerBanManagement", $"Error checking proxy status for player in slot {kvp.Key}: {ex.Message}");
-				}
+                }
             }
-            
+
             // Process punts and bans after enumeration
             foreach (var (slotNum, playerName, puntReason, shouldBan, playerIP, playerIPAddress) in slotsToPunt)
             {
-                
                 if (shouldBan && playerIP != null)
                 {
+                    // Check if already banned (by range or single IP)
+                    if (IsIpBanned(playerIP, banInstance.BannedPlayerIPs))
+                    {
+                        AppDebug.Log("tickerBanManagement", $"IP {playerIPAddress} is already banned. Skipping auto-ban.");
+                        continue;
+                    }
+
                     var banRecord = new banInstancePlayerIP
                     {
                         RecordID = 0,
@@ -676,10 +703,6 @@ namespace BHD_ServerManager.Classes.Tickers
                         {
                             _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, playerIPAddress, 32);
                         }
-
-                        ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                        
-                        AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
                     }
                     catch (Exception ex)
                     {
@@ -687,8 +710,16 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                 }
 
+                try
+                {
+                    ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
+                    AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
+                }
+                catch (Exception ex)
+                {
+                    AppDebug.Log("tickerBanManagement", $"Error punting player '{playerName}' (Slot {slotNum}): {ex.Message}");
+                }
             }
-            
         }
 
         public static void CheckAndPuntDisabledRoles()
@@ -696,7 +727,7 @@ namespace BHD_ServerManager.Classes.Tickers
             DateTime now = DateTime.Now;
             var slotsToPunt = new List<(int SlotNum, string PlayerName, string PuntReason)>();
 
-            foreach (var kvp in playerInstance.PlayerList)
+            foreach (var kvp in playerInstance.PlayerList.ToList())
             {
                 try
                 {
