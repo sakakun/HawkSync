@@ -18,7 +18,6 @@ namespace BHD_ServerManager.Classes.Tickers
         // Global Variables
         private static theInstance theInstance => CommonCore.theInstance!;
         private static banInstance banInstance => CommonCore.instanceBans!;
-        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         private static string gameServerPath { get; set; } = string.Empty;
@@ -31,8 +30,8 @@ namespace BHD_ServerManager.Classes.Tickers
         private const int ActivePlayerThresholdSeconds = 4;
 
         // Locks
-        private static readonly object _netLimiterLock = new object();
-        private static readonly object _netLimiterFilterLock = new object();
+        private static bool _netLimiterLock = false;
+        private static bool _netLimiterFilterLock = false;
 
         // Helper for UI thread safety
         private static void SafeInvoke(Control control, Action action)
@@ -144,43 +143,40 @@ namespace BHD_ServerManager.Classes.Tickers
         // This method runs the ticker for ban management tasks.
         public static void runTicker()
         {
-            string gameServerPath = Path.Combine(theInstance.profileServerPath, "dfbhd.exe");
+            gameServerPath = Path.Combine(theInstance.profileServerPath, "dfbhd.exe");
 
-            // Always marshal to UI thread for UI updates
-            SafeInvoke(thisServer, () =>
+            // If the game server is offline, don't do anything.
+            if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
             {
-                // If the game server is offline, don't do anything.
-                if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
-                {
-                    AppDebug.Log("tickerBanManagement", "Game Server is Offline");
-                    return;
-                }
+                AppDebug.Log("tickerBanManagement", "Game Server is Offline");
+                return;
+            }
                 
-                // Run NetlimiterTask as a fire-and-forget task, ignore CS4014 warning
-                Task.Run(NetlimiterTask);
+            // Run NetlimiterTask as a fire-and-forget task, ignore CS4014 warning
+            Task.Run(NetlimiterTask);
 
-                // Only check and punt bans if server is ONLINE
-                if (theInstance.instanceStatus == InstanceStatus.ONLINE)
-                {
-                    // Basic Ban Checks (Ignore Whitelist)
-                    CheckAndPuntBannedPlayers();
+            // Only check and punt bans if server is ONLINE
+            if (theInstance.instanceStatus == InstanceStatus.ONLINE)
+            {
+                // Basic Ban Checks (Ignore Whitelist)
+                CheckAndPuntBannedPlayers();
 
-                    // Proxy/VPN/TOR and Geo-Blocking Checks
-                    CheckAndPuntProxyViolations();
+                // Proxy/VPN/TOR and Geo-Blocking Checks
+                CheckAndPuntProxyViolations();
 
-                    // Role Restriction Checks
-                    CheckAndPuntDisabledRoles();
-                }
-            });
+                // Role Restriction Checks
+                CheckAndPuntDisabledRoles();
+            }
         }
 
         public static async Task NetlimiterTask()
         {
-            if (!Monitor.TryEnter(_netLimiterLock))
-                return; // Skip if already running
+            if (_netLimiterLock)
+                return;
 
             try
             {
+                _netLimiterLock = true;
                 int appId = await NetLimiterClient.GetAppId(gameServerPath);
                 var connections = await NetLimiterClient.GetConnectionsAsync(appId);
 
@@ -199,7 +195,7 @@ namespace BHD_ServerManager.Classes.Tickers
             finally
             {
                 // Ensure lock is released even if there's an error
-                Monitor.Exit(_netLimiterLock);
+                _netLimiterLock = false;
             }
         }
 
@@ -214,10 +210,10 @@ namespace BHD_ServerManager.Classes.Tickers
                 .OrderByDescending(g => g.Count())
                 .ToList();
 
-            thisServer.BanTab.dg_NetlimiterConnectionLog.Rows.Clear();
             banInstance.NetLimiterConnectionLogs.Clear();
 
             int rowIndex = 0;
+
             foreach (var ipGroup in ipGroups)
             {
                 string ip = ipGroup.Key!;
@@ -259,6 +255,8 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 int recordID = rowIndex++;
 
+                AppDebug.Log("tickerBanManagement", $"NetLimiter Connection Log - RecordID: {recordID}, IP: {ip}, Connections: {count}, VPN Status: {vpnStatus}, List Status: {listStatus}");
+
                 banInstance.NetLimiterConnectionLogs.Add(new netLimiterConnLogEntry
                 {
                     NL_rowID = recordID,
@@ -267,21 +265,13 @@ namespace BHD_ServerManager.Classes.Tickers
                     NL_vpnStatus = vpnStatus,
                     NL_notes = listStatus
                 });
-
-                thisServer.BanTab.dg_NetlimiterConnectionLog.Rows.Add(
-                    recordID,
-                    ip,
-                    count,
-                    vpnStatus,
-                    listStatus
-                );
             }
         }
 
         // Sync NetLimiter filter with ban and whitelist, subtracting whitelisted ranges from banned ranges
         private static async Task SyncNetLimiterFilterAsync()
         {
-            if (!Monitor.TryEnter(_netLimiterFilterLock))
+            if (_netLimiterFilterLock)
                 return; // Skip if already running
 
             string filterName = theInstance.netLimiterFilterName;
@@ -289,18 +279,18 @@ namespace BHD_ServerManager.Classes.Tickers
             if (string.IsNullOrEmpty(filterName))
             {
                 AppDebug.Log("tickerBanManagement", "NetLimiter filter name not configured. Skipping filter sync.");
-                Monitor.Exit(_netLimiterFilterLock);
                 return;
             }
 
             if ((DateTime.Now - _lastFilterSync) < _filterSyncInterval)
             {
-                Monitor.Exit(_netLimiterFilterLock);
                 return; // Skip if last sync was recent
             }
 
             try
             {
+                _netLimiterFilterLock = true;
+                
                 // Update last sync time
                 DateTime now = _lastFilterSync = DateTime.Now;
 
@@ -421,7 +411,7 @@ namespace BHD_ServerManager.Classes.Tickers
             finally
             {
                 // Ensure lock is released even if there's an error
-                Monitor.Exit(_netLimiterFilterLock);
+                _netLimiterFilterLock = false;
             }
 
         }

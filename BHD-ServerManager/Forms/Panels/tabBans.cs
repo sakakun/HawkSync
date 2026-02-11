@@ -14,6 +14,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -61,6 +62,9 @@ namespace BHD_ServerManager.Forms.Panels
         public void tabBansTicker()
         {
             AppDebug.Log("tabBans", "Ticker update - checking NetLimiter settings lockdown");          
+
+            NetLimiter_RefreshConnections();
+
             // NetLimiter Settings Lockdown
             bool netLimiterProcessAttached = (NetLimiterClient._bridgeProcess != null);
             bool shouldBeEnabled = !netLimiterProcessAttached;
@@ -95,7 +99,7 @@ namespace BHD_ServerManager.Forms.Panels
                     MessageBox.Show("Failed to start NetLimiter bridge process. NetLimiter integration has been disabled.", "NetLimiter Integration Disabled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     AppDebug.Log("tickerBanManagement", "NetLimiter integration disabled due to failure to start bridge process.");
                 }
-            }
+            } 
 
             if (instanceBans!.ForceUIUpdates)
             {
@@ -105,7 +109,47 @@ namespace BHD_ServerManager.Forms.Panels
                 Whitelist_Refresh_Click(null!, null!);
                 ProxyCheck_LoadSettings(null!, null!);
                 NetLimiter_LoadSettings(null!, null!);
+            }
 
+        }
+
+        private void NetLimiter_RefreshConnections()
+        {
+            
+            if (InvokeRequired)
+            {
+                Invoke(new Action(NetLimiter_RefreshConnections));
+                return;
+            }
+
+            dg_NetlimiterConnectionLog.Rows.Clear();
+
+            var Connections = instanceBans!.NetLimiterConnectionLogs.ToList();
+
+            AppDebug.Log("tabBans", $"Refreshing NetLimiter connections log with {Connections.Count} entries.");
+            try
+            {
+                
+                foreach (var Conn in Connections)
+                {
+                    var ip = Conn?.NL_ipAddress ?? string.Empty;
+                    var vpnStatus = Conn?.NL_vpnStatus ?? string.Empty;
+                    var notes = Conn?.NL_notes ?? string.Empty;
+                    var rowId = Conn?.NL_rowID ?? 0;
+                    var numCons = Conn?.NL_numCons ?? 0;
+                    
+                    dg_NetlimiterConnectionLog.Rows.Add(
+                        rowId,
+                        ip,
+                        numCons,
+                        vpnStatus,
+                        notes
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("tabBans", $"Error refreshing NetLimiter connections log: {ex}");
             }
         }
 
@@ -2717,6 +2761,12 @@ namespace BHD_ServerManager.Forms.Panels
 
         public async void NetLimiter_RefreshFilters(object sender, EventArgs e)
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => NetLimiter_RefreshFilters(sender, e)));
+                return;
+            }
+
             // Start Process via manager
             var startResult = NetLimiter_StartBridge();
             if (!startResult)
