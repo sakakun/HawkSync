@@ -54,10 +54,11 @@ namespace BHD_ServerManager.Forms.Panels
             // Wire up tab change event
             banControls.SelectedIndexChanged += BanControls_SelectedIndexChanged;
 
+            CommonCore.Ticker?.Start("tabBansTicker", 1000, () => tabBansTicker());
 
         }
 
-        public void tickerUpdate()
+        public void tabBansTicker()
         {
             AppDebug.Log("tabBans", "Ticker update - checking NetLimiter settings lockdown");          
             // NetLimiter Settings Lockdown
@@ -76,14 +77,31 @@ namespace BHD_ServerManager.Forms.Panels
             // Initialize Proxy Service if needed
             if (theInstance!.proxyCheckEnabled && !ProxyCheckManager.IsInitialized)
             {
+                // Initialize Proxy Check
                 banInstanceManager.InitializeProxyService();
+            }
+            
+            if (theInstance.netLimiterEnabled && NetLimiterClient._bridgeProcess == null)
+            {
+                // This should reload the filters from NetLimiter and init the bridge process
+                NetLimiter_RefreshFilters(null!, null!);
+
+                // If this doesn't work, disable NetLimiter integration
+                if (NetLimiterClient._bridgeProcess == null)
+                {
+                    theInstance.netLimiterEnabled = false;
+                    checkBox_EnableNetLimiter.Checked = false;
+                    ServerSettings.Set("NetLimiterEnabled", false);
+                    MessageBox.Show("Failed to start NetLimiter bridge process. NetLimiter integration has been disabled.", "NetLimiter Integration Disabled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    AppDebug.Log("tickerBanManagement", "NetLimiter integration disabled due to failure to start bridge process.");
+                }
             }
 
             if (instanceBans!.ForceUIUpdates)
             {
                 instanceBans!.ForceUIUpdates = false;
 
-                Blacklist_Refresh_Click(null!,null!);
+                Blacklist_Refresh_Click(null!, null!);
                 Whitelist_Refresh_Click(null!, null!);
                 ProxyCheck_LoadSettings(null!, null!);
                 NetLimiter_LoadSettings(null!, null!);
