@@ -35,21 +35,14 @@ namespace BHD_ServerManager.Classes.Tickers
                     return;
                 }
 
-                if (ServerMemory.ReadMemoryIsProcessAttached())
-                {
-                    // Recover auto message counter before processing auto messages
-                    RecoverAutoMessageCounter();
+                // Recover auto message counter before processing auto messages
+                RecoverAutoMessageCounter();
 
-                    // Process auto messages (non-blocking to avoid ticker delays)
-                    Task.Run(ProcessAutoMessages);
+                // Process auto messages (non-blocking to avoid ticker delays)
+                Task.Run(ProcessAutoMessages);
 
-                    // Process latest chat message immediately (no Task.Run to prevent missing messages)
-                    ProcessChatMessages();
-                }
-                else
-                {
-                    AppDebug.Log("tickerChatManagement", "Server process is not attached. Ticker skipping.");
-                }
+                // Process latest chat message immediately (no Task.Run to prevent missing messages)
+                ProcessChatMessages();
             }
         }
 

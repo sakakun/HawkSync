@@ -362,7 +362,7 @@ namespace BHD_ServerManager.Forms.Panels
 
         private void actionClick_GameServerUpdate(object sender, EventArgs e)
         {
-            if (ServerMemory.ReadMemoryIsProcessAttached())
+            if (CommonCore.theInstance!.instanceStatus != InstanceStatus.OFFLINE)
             {
                 var settings = gamePlayInstanceManager.BuildGamePlaySettings(this);
                 var result = theInstanceManager.SaveGamePlaySettings(settings);

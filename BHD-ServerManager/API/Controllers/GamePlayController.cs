@@ -245,7 +245,7 @@ public class GamePlayController : ControllerBase
         try
         {
             // Check if server is running
-            if (!ServerMemory.ReadMemoryIsProcessAttached())
+            if (CommonCore.theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
                 return Ok(new CommandResult
                 {
@@ -284,7 +284,7 @@ public class GamePlayController : ControllerBase
         try
         {
             // Check if server is running
-            if (!ServerMemory.ReadMemoryIsProcessAttached())
+            if (CommonCore.theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
                 return Ok(new CommandResult
                 {
