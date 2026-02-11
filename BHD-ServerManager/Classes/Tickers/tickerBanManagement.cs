@@ -155,9 +155,9 @@ namespace BHD_ServerManager.Classes.Tickers
                     AppDebug.Log("tickerBanManagement", "Game Server is Offline");
                     return;
                 }
-
-                // Run NetlimiterTask as a fire-and-forget task
-                _ = Task.Run(() => { NetlimiterTask(); });
+                
+                // Run NetlimiterTask as a fire-and-forget task, ignore CS4014 warning
+                Task.Run(NetlimiterTask);
 
                 // Only check and punt bans if server is ONLINE
                 if (theInstance.instanceStatus == InstanceStatus.ONLINE)

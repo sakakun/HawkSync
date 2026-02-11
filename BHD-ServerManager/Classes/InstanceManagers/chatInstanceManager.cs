@@ -51,20 +51,43 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
 
-            var managerDict = messages.ToDictionary(m => dgv.Rows.Count > 0 ? dgv.Rows[0].Cells[0].Value : 0);
+            // With this:
+            var managerDict = messages.ToDictionary(
+                m =>
+                {
+                    var idProp = m?.GetType().GetProperty("SlapMessageId") ?? m?.GetType().GetProperty("AutoMessageId");
+                    return Convert.ToInt32(idProp?.GetValue(m));
+                }
+            );
 
             // Remove rows not in manager
             for (int i = dgv.Rows.Count - 1; i >= 0; i--)
             {
                 int id = Convert.ToInt32(dgv.Rows[i].Cells[0].Value);
-                if (!messages.Any(m => Convert.ToInt32(m?.GetType().GetProperty("SlapMessageId")?.GetValue(m) ?? m.GetType().GetProperty("AutoMessageId")?.GetValue(m)) == id))
+                bool exists = messages.Any(m =>
+                {
+                    var type = m?.GetType();
+                    var slapProp = type?.GetProperty("SlapMessageId");
+                    var autoProp = type?.GetProperty("AutoMessageId");
+                    object? value = slapProp?.GetValue(m) ?? autoProp?.GetValue(m);
+                    return value != null && Convert.ToInt32(value) == id;
+                });
+                if (!exists)
                     dgv.Rows.RemoveAt(i);
             }
 
             // Update existing rows and add new ones
             foreach (var msg in messages)
             {
-                int id = Convert.ToInt32(msg?.GetType().GetProperty("SlapMessageId")?.GetValue(msg) ?? msg.GetType().GetProperty("AutoMessageId")?.GetValue(msg));
+                var msgType = msg?.GetType();
+                var slapProp = msgType?.GetProperty("SlapMessageId");
+                var autoProp = msgType?.GetProperty("AutoMessageId");
+                object? idValue = slapProp?.GetValue(msg) ?? autoProp?.GetValue(msg);
+
+                if (idValue == null)
+                    continue; // Skip if no ID property found
+
+                int id = Convert.ToInt32(idValue);
                 bool found = false;
                 for (int i = 0; i < dgv.Rows.Count; i++)
                 {
@@ -73,9 +96,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         for (int c = 1; c < columnIndices.Length; c++)
                         {
-                            var prop = msg.GetType().GetProperties()[columnIndices[c]];
-                            if (!Equals(dgv.Rows[i].Cells[c].Value, prop.GetValue(msg)))
-                                dgv.Rows[i].Cells[c].Value = prop.GetValue(msg);
+                            var prop = msgType?.GetProperties()[columnIndices[c]];
+                            if (prop != null)
+                            {
+                                var propValue = prop.GetValue(msg);
+                                if (!Equals(dgv.Rows[i].Cells[c].Value, propValue))
+                                    dgv.Rows[i].Cells[c].Value = propValue;
+                            }
                         }
                         found = true;
                         break;
@@ -86,7 +113,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     object[] values = new object[columnIndices.Length];
                     for (int c = 0; c < columnIndices.Length; c++)
                     {
-                        values[c] = msg.GetType().GetProperties()[columnIndices[c]].GetValue(msg);
+                        var prop = msgType?.GetProperties()[columnIndices[c]];
+                        var propValue = prop != null ? prop.GetValue(msg) : null;
+                        values[c] = propValue ?? DBNull.Value;
                     }
                     dgv.Rows.Add(values);
                 }
