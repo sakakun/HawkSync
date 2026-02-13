@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             banControls = new TabControl();
             tabBlacklist = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -74,6 +74,8 @@
             tabWhitelist = new TabPage();
             tableLayoutPanel7 = new TableLayoutPanel();
             tableLayoutPanel8 = new TableLayoutPanel();
+            wlControlDownload = new FontAwesome.Sharp.IconButton();
+            wlControlUpload = new FontAwesome.Sharp.IconButton();
             wlControlClose = new FontAwesome.Sharp.IconButton();
             wlControlDelete = new FontAwesome.Sharp.IconButton();
             wlControlSave = new FontAwesome.Sharp.IconButton();
@@ -118,10 +120,7 @@
             textBox_countryCode = new TextBox();
             textBox_countryName = new TextBox();
             btn_proxyAddCountry = new Button();
-            tabControl1 = new TabControl();
-            proxyLookup = new TabPage();
-            tabPage2 = new TabPage();
-            tableLayoutPanel14 = new TableLayoutPanel();
+            proxySettings = new TableLayoutPanel();
             groupBox12 = new GroupBox();
             tableLayoutPanel19 = new TableLayoutPanel();
             cb_serviceIP2LocationIO = new CheckBox();
@@ -192,8 +191,6 @@
             NL_vpnStatus = new DataGridViewTextBoxColumn();
             NL_notes = new DataGridViewTextBoxColumn();
             toolTip1 = new ToolTip(components);
-            wlControlUpload = new FontAwesome.Sharp.IconButton();
-            wlControlDownload = new FontAwesome.Sharp.IconButton();
             banControls.SuspendLayout();
             tabBlacklist.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -230,9 +227,7 @@
             tableLayoutPanel17.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgProxyCountryBlockList).BeginInit();
             tableLayoutPanel15.SuspendLayout();
-            tabControl1.SuspendLayout();
-            tabPage2.SuspendLayout();
-            tableLayoutPanel14.SuspendLayout();
+            proxySettings.SuspendLayout();
             groupBox12.SuspendLayout();
             tableLayoutPanel19.SuspendLayout();
             panel3.SuspendLayout();
@@ -852,6 +847,38 @@
             tableLayoutPanel8.Size = new Size(312, 40);
             tableLayoutPanel8.TabIndex = 3;
             // 
+            // wlControlDownload
+            // 
+            wlControlDownload.Dock = DockStyle.Fill;
+            wlControlDownload.IconChar = FontAwesome.Sharp.IconChar.Download;
+            wlControlDownload.IconColor = Color.Black;
+            wlControlDownload.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlDownload.IconSize = 32;
+            wlControlDownload.Location = new Point(189, 3);
+            wlControlDownload.Name = "wlControlDownload";
+            wlControlDownload.Padding = new Padding(0, 3, 0, 0);
+            wlControlDownload.Size = new Size(56, 34);
+            wlControlDownload.TabIndex = 15;
+            toolTip1.SetToolTip(wlControlDownload, "Export");
+            wlControlDownload.UseVisualStyleBackColor = true;
+            wlControlDownload.Click += btnExportWhitelist_Click;
+            // 
+            // wlControlUpload
+            // 
+            wlControlUpload.Dock = DockStyle.Fill;
+            wlControlUpload.IconChar = FontAwesome.Sharp.IconChar.Upload;
+            wlControlUpload.IconColor = Color.Black;
+            wlControlUpload.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            wlControlUpload.IconSize = 32;
+            wlControlUpload.Location = new Point(65, 3);
+            wlControlUpload.Name = "wlControlUpload";
+            wlControlUpload.Padding = new Padding(0, 3, 0, 0);
+            wlControlUpload.Size = new Size(56, 34);
+            wlControlUpload.TabIndex = 14;
+            toolTip1.SetToolTip(wlControlUpload, "Import");
+            wlControlUpload.UseVisualStyleBackColor = true;
+            wlControlUpload.Click += btnImportWhitelist_Click;
+            // 
             // wlControlClose
             // 
             wlControlClose.Dock = DockStyle.Fill;
@@ -1289,7 +1316,7 @@
             tableLayoutPanel16.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 10F));
             tableLayoutPanel16.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel16.Controls.Add(tableLayoutPanel17, 0, 0);
-            tableLayoutPanel16.Controls.Add(tabControl1, 2, 0);
+            tableLayoutPanel16.Controls.Add(proxySettings, 2, 0);
             tableLayoutPanel16.Dock = DockStyle.Fill;
             tableLayoutPanel16.Location = new Point(3, 3);
             tableLayoutPanel16.Name = "tableLayoutPanel16";
@@ -1408,57 +1435,24 @@
             btn_proxyAddCountry.UseVisualStyleBackColor = true;
             btn_proxyAddCountry.Click += ProxyCheck_AddCountry_Click;
             // 
-            // tabControl1
+            // proxySettings
             // 
-            tabControl1.Controls.Add(proxyLookup);
-            tabControl1.Controls.Add(tabPage2);
-            tabControl1.Dock = DockStyle.Fill;
-            tabControl1.Location = new Point(263, 3);
-            tabControl1.Multiline = true;
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(686, 382);
-            tabControl1.TabIndex = 1;
-            // 
-            // proxyLookup
-            // 
-            proxyLookup.Location = new Point(4, 24);
-            proxyLookup.Name = "proxyLookup";
-            proxyLookup.Padding = new Padding(3);
-            proxyLookup.Size = new Size(678, 354);
-            proxyLookup.TabIndex = 0;
-            proxyLookup.Text = "IP Address Lookup";
-            proxyLookup.UseVisualStyleBackColor = true;
-            // 
-            // tabPage2
-            // 
-            tabPage2.Controls.Add(tableLayoutPanel14);
-            tabPage2.Location = new Point(4, 24);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(678, 354);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "Settings";
-            tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel14
-            // 
-            tableLayoutPanel14.ColumnCount = 5;
-            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 250F));
-            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
-            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel14.Controls.Add(groupBox12, 2, 0);
-            tableLayoutPanel14.Controls.Add(panel3, 0, 0);
-            tableLayoutPanel14.Dock = DockStyle.Fill;
-            tableLayoutPanel14.Location = new Point(3, 3);
-            tableLayoutPanel14.Margin = new Padding(0);
-            tableLayoutPanel14.Name = "tableLayoutPanel14";
-            tableLayoutPanel14.RowCount = 1;
-            tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel14.Size = new Size(672, 348);
-            tableLayoutPanel14.TabIndex = 0;
+            proxySettings.ColumnCount = 5;
+            proxySettings.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 250F));
+            proxySettings.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            proxySettings.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
+            proxySettings.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            proxySettings.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            proxySettings.Controls.Add(groupBox12, 2, 0);
+            proxySettings.Controls.Add(panel3, 0, 0);
+            proxySettings.Dock = DockStyle.Fill;
+            proxySettings.Location = new Point(260, 0);
+            proxySettings.Margin = new Padding(0);
+            proxySettings.Name = "proxySettings";
+            proxySettings.RowCount = 1;
+            proxySettings.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            proxySettings.Size = new Size(692, 388);
+            proxySettings.TabIndex = 0;
             // 
             // groupBox12
             // 
@@ -1467,7 +1461,7 @@
             groupBox12.Location = new Point(273, 3);
             groupBox12.Name = "groupBox12";
             groupBox12.Padding = new Padding(0);
-            groupBox12.Size = new Size(194, 342);
+            groupBox12.Size = new Size(194, 382);
             groupBox12.TabIndex = 1;
             groupBox12.TabStop = false;
             groupBox12.Text = "Service Providers";
@@ -1491,7 +1485,7 @@
             tableLayoutPanel19.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             tableLayoutPanel19.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             tableLayoutPanel19.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel19.Size = new Size(194, 326);
+            tableLayoutPanel19.Size = new Size(194, 366);
             tableLayoutPanel19.TabIndex = 0;
             // 
             // cb_serviceIP2LocationIO
@@ -1532,13 +1526,13 @@
             panel3.Location = new Point(0, 0);
             panel3.Margin = new Padding(0);
             panel3.Name = "panel3";
-            panel3.Size = new Size(250, 348);
+            panel3.Size = new Size(250, 388);
             panel3.TabIndex = 2;
             // 
             // groupBox15
             // 
             groupBox15.Controls.Add(tableLayoutPanel22);
-            groupBox15.Dock = DockStyle.Fill;
+            groupBox15.Dock = DockStyle.Top;
             groupBox15.Location = new Point(0, 232);
             groupBox15.Name = "groupBox15";
             groupBox15.Size = new Size(250, 54);
@@ -1611,7 +1605,7 @@
             // 
             groupBox14.Controls.Add(tableLayoutPanel21);
             groupBox14.Dock = DockStyle.Bottom;
-            groupBox14.Location = new Point(0, 286);
+            groupBox14.Location = new Point(0, 326);
             groupBox14.Name = "groupBox14";
             groupBox14.Size = new Size(250, 62);
             groupBox14.TabIndex = 2;
@@ -2392,16 +2386,16 @@
             // 
             // NL_ipAddress
             // 
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            NL_ipAddress.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_ipAddress.DefaultCellStyle = dataGridViewCellStyle1;
             NL_ipAddress.HeaderText = "IP Address";
             NL_ipAddress.Name = "NL_ipAddress";
             NL_ipAddress.ReadOnly = true;
             // 
             // NL_numCons
             // 
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            NL_numCons.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_numCons.DefaultCellStyle = dataGridViewCellStyle2;
             NL_numCons.HeaderText = "# Cons";
             NL_numCons.Name = "NL_numCons";
             NL_numCons.ReadOnly = true;
@@ -2409,8 +2403,8 @@
             // 
             // NL_vpnStatus
             // 
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            NL_vpnStatus.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            NL_vpnStatus.DefaultCellStyle = dataGridViewCellStyle3;
             NL_vpnStatus.HeaderText = "Status";
             NL_vpnStatus.Name = "NL_vpnStatus";
             NL_vpnStatus.ReadOnly = true;
@@ -2421,38 +2415,6 @@
             NL_notes.HeaderText = "Notes";
             NL_notes.Name = "NL_notes";
             NL_notes.ReadOnly = true;
-            // 
-            // wlControlUpload
-            // 
-            wlControlUpload.Dock = DockStyle.Fill;
-            wlControlUpload.IconChar = FontAwesome.Sharp.IconChar.Upload;
-            wlControlUpload.IconColor = Color.Black;
-            wlControlUpload.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            wlControlUpload.IconSize = 32;
-            wlControlUpload.Location = new Point(65, 3);
-            wlControlUpload.Name = "wlControlUpload";
-            wlControlUpload.Padding = new Padding(0, 3, 0, 0);
-            wlControlUpload.Size = new Size(56, 34);
-            wlControlUpload.TabIndex = 14;
-            toolTip1.SetToolTip(wlControlUpload, "Import");
-            wlControlUpload.UseVisualStyleBackColor = true;
-            wlControlUpload.Click += btnImportWhitelist_Click;
-            // 
-            // wlControlDownload
-            // 
-            wlControlDownload.Dock = DockStyle.Fill;
-            wlControlDownload.IconChar = FontAwesome.Sharp.IconChar.Download;
-            wlControlDownload.IconColor = Color.Black;
-            wlControlDownload.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            wlControlDownload.IconSize = 32;
-            wlControlDownload.Location = new Point(189, 3);
-            wlControlDownload.Name = "wlControlDownload";
-            wlControlDownload.Padding = new Padding(0, 3, 0, 0);
-            wlControlDownload.Size = new Size(56, 34);
-            wlControlDownload.TabIndex = 15;
-            toolTip1.SetToolTip(wlControlDownload, "Export");
-            wlControlDownload.UseVisualStyleBackColor = true;
-            wlControlDownload.Click += btnExportWhitelist_Click;
             // 
             // tabBans
             // 
@@ -2506,9 +2468,7 @@
             ((System.ComponentModel.ISupportInitialize)dgProxyCountryBlockList).EndInit();
             tableLayoutPanel15.ResumeLayout(false);
             tableLayoutPanel15.PerformLayout();
-            tabControl1.ResumeLayout(false);
-            tabPage2.ResumeLayout(false);
-            tableLayoutPanel14.ResumeLayout(false);
+            proxySettings.ResumeLayout(false);
             groupBox12.ResumeLayout(false);
             tableLayoutPanel19.ResumeLayout(false);
             tableLayoutPanel19.PerformLayout();
@@ -2621,10 +2581,9 @@
         private TextBox textBox_countryCode;
         private TextBox textBox_countryName;
         private Button btn_proxyAddCountry;
-        private TabControl tabControl1;
         private TabPage proxyLookup;
         private TabPage tabPage2;
-        private TableLayoutPanel tableLayoutPanel14;
+        private TableLayoutPanel proxySettings;
         private GroupBox groupBox11;
         private TableLayoutPanel tableLayoutPanel18;
         private CheckBox cb_enableProxyCheck;
