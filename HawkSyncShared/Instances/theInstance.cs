@@ -149,6 +149,7 @@ namespace HawkSyncShared.Instances
 
         // Game Info
         public TimeSpan         gameInfoTimeRemaining       { get; set; }       /* Time Remaining in Game, used for the Info Panel */
+        [Obsolete("This property is deprecated. Use instanceMaps.CurrentGameType instead.")]
         public int              gameInfoGameType            { get; set; }       /* Game Type, used for the Info Panel */
         public int              gameInfoNumPlayers          { get; set; } = 0;  /* Current Number of Players, used for the Info Panel */
         public int              gameInfoWinCond             { get; set; } = 0;  /* Current Game Score, used for the Info Panel */

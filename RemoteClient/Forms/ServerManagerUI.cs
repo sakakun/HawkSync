@@ -14,7 +14,6 @@ public partial class ServerManagerUI : Form
     // The Instances (Data)
     private static theInstance thisInstance => CommonCore.theInstance!;
 
-
     private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
     // Server Manager Tabs
@@ -171,53 +170,53 @@ public partial class ServerManagerUI : Form
 
         if (playerInstance.PlayerList.Count > 0)
         {
-            winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
+            winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({CommonCore.instanceMaps!.CurrentGameType})]";
 
-            if (thisInstance.gameInfoGameType == 0)
+            if (CommonCore.instanceMaps!.CurrentGameType == 0)
             {
                 topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.stat_Kills).FirstOrDefault();
                 scoreTotal = topPlayer!.stat_Kills;
                 playerName = (scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
                 blueScore = $"{scoreTotal}";
                 redScore = $"{playerName}";
-            } else if (thisInstance.gameInfoGameType == 4)
+            } else if (CommonCore.instanceMaps!.CurrentGameType == 4)
             {
                 topPlayer = playerInstance.PlayerList.Values.OrderByDescending(p => p.ActiveZoneTime).FirstOrDefault();
                 scoreTotal = topPlayer!.ActiveZoneTime;
                 playerName = ( scoreTotal == 0 ? "Draw" : topPlayer!.PlayerName);
                 blueScore = $"{TimeSpan.FromSeconds(scoreTotal):hh\\:mm\\:ss}";
                 redScore = $"{playerName}";
-                winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond*60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
-            } else if (thisInstance.gameInfoGameType == 5)
+                winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond*60):hh\\:mm\\:ss} ({CommonCore.instanceMaps!.CurrentGameType})]";
+            } else if (CommonCore.instanceMaps!.CurrentGameType == 5)
             {
                 blueScore = $"{thisInstance.gameInfoBlueScore}";
                 redScore = $"{thisInstance.gameInfoRedScore}";
-                winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({thisInstance.gameInfoGameType})]";
-            } else if (thisInstance.gameInfoGameType == 6)
+                winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({CommonCore.instanceMaps!.CurrentGameType})]";
+            } else if (CommonCore.instanceMaps!.CurrentGameType == 6)
             {
                 blueScore = $"{(thisInstance.gameInfoIsBlueDefending == false ? "Red Attacking" : thisInstance.gameInfoBlueScore) }";
                 redScore = $"{(thisInstance.gameInfoIsBlueDefending ? "Blue Attacking" : thisInstance.gameInfoRedScore )}";
-                winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({thisInstance.gameInfoGameType})]";
-            } else if (thisInstance.gameInfoGameType == 3)
+                winConditions = $"[{thisInstance.gameInfoWinCond} Targets ({CommonCore.instanceMaps!.CurrentGameType})]";
+            } else if (CommonCore.instanceMaps!.CurrentGameType == 3)
             {
                 blueScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoBlueScore * 60):hh\\:mm\\:ss}";
                 redScore = $"{TimeSpan.FromSeconds(thisInstance.gameInfoRedScore * 60):hh\\:mm\\:ss}";
-                winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond * 60):hh\\:mm\\:ss} ({thisInstance.gameInfoGameType})]";
-            } else if (thisInstance.gameInfoGameType == 7 || thisInstance.gameInfoGameType == 8)
+                winConditions = $"[Time of {TimeSpan.FromSeconds(thisInstance.gameInfoWinCond * 60):hh\\:mm\\:ss} ({CommonCore.instanceMaps!.CurrentGameType})]";
+            } else if (CommonCore.instanceMaps!.CurrentGameType == 7 || CommonCore.instanceMaps!.CurrentGameType == 8)
             {
                 blueScore = $"{thisInstance.gameInfoBlueScore}";
                 redScore = $"{thisInstance.gameInfoRedScore}";
-                winConditions = $"[{thisInstance.gameInfoWinCond} Captures ({thisInstance.gameInfoGameType})]";
-            } else if (thisInstance.gameInfoGameType == 1)
+                winConditions = $"[{thisInstance.gameInfoWinCond} Captures ({CommonCore.instanceMaps!.CurrentGameType})]";
+            } else if (CommonCore.instanceMaps!.CurrentGameType == 1)
             {
                 blueScore = $"{thisInstance.gameInfoBlueScore}";
                 redScore = $"{thisInstance.gameInfoRedScore}";
-                winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
+                winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({CommonCore.instanceMaps!.CurrentGameType})]";
             } else
             {
                 blueScore = $"{thisInstance.gameInfoBlueScore}";
                 redScore = $"{thisInstance.gameInfoRedScore}";
-                winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({thisInstance.gameInfoGameType})]";
+                winConditions = $"[{thisInstance.gameInfoWinCond} Kills ({CommonCore.instanceMaps!.CurrentGameType})]";
             }
 
 

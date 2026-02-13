@@ -107,7 +107,7 @@ namespace BHD_ServerManager.Forms
 
             if (playerInstance.PlayerList.Count > 0)
             {
-                int gameType = thisInstance.gameInfoGameType;
+                int gameType = CommonCore.instanceMaps!.CurrentGameType;
                 int winCond = thisInstance.gameInfoWinCond;
                 int blue = thisInstance.gameInfoBlueScore;
                 int red = thisInstance.gameInfoRedScore;

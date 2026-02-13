@@ -1098,10 +1098,10 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
 
             AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.Playlists[mapInstance.ActivePlaylist].Count + " Current Map Index: " + currentMapIndex);
-            int currentMapType = thisInstance.gameInfoGameType;
+            int currentMapType = CommonCore.instanceMaps!.CurrentGameType;
             int nextMapType = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapType;
 
-            AppDebug.Log("ServerMemory", "Current Map Type: " + mapInstance.CurrentMapName + " " + thisInstance.gameInfoGameType + " " + currentMapType);
+            AppDebug.Log("ServerMemory", "Current Map Type: " + mapInstance.CurrentMapName + " " + CommonCore.instanceMaps!.CurrentGameType + " " + currentMapType);
             AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName + " " + mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapType + " - " + nextMapType);
 
             mapInstance.NextMapGameType = nextMapType;
@@ -1120,7 +1120,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
 
                 // Deal with the Players
-                theInstanceManager.changeTeamGameMode(thisInstance.gameInfoGameType, mapInstance.NextMapGameType);
+                theInstanceManager.changeTeamGameMode(CommonCore.instanceMaps!.CurrentGameType, mapInstance.NextMapGameType);
                 ServerMemory.UpdatePlayerTeam();                    // Move players to their teams if applicable
 
             }
@@ -1569,7 +1569,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             byte[] buffer = new byte[4];
             ReadProcessMemory((int)processHandle, 0x009F21A4, buffer, buffer.Length, ref bytesRead);
             int GameType = BitConverter.ToInt32(buffer, 0);
-            thisInstance.gameInfoGameType = GameType;
+            CommonCore.instanceMaps!.CurrentGameType = GameType;
 
         }
         // FunctionL ReadMemoryCurrentMapIndex
@@ -2047,9 +2047,9 @@ namespace BHD_ServerManager.Classes.GameManagement
         {
             int scoreAddress1 = 0;
             int scoreAddress2 = 0;
-            int gameTypeId = thisInstance.gameInfoGameType;
+            int gameTypeId = CommonCore.instanceMaps!.CurrentGameType;
 
-            // thisInstance.gameInfoGameType
+            // CommonCore.instanceMaps!.CurrentGameType
             switch (gameTypeId)
             {
                 // KOTH/TKOTH
@@ -2139,7 +2139,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             int scoreAddress1 = 0;
             int scoreAddress2 = 0;
-            int gameTypeId = thisInstance.gameInfoGameType;
+            int gameTypeId = CommonCore.instanceMaps!.CurrentGameType;
 
             switch (gameTypeId)
             {
