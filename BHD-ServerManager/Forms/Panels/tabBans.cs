@@ -109,6 +109,7 @@ namespace BHD_ServerManager.Forms.Panels
                 Whitelist_Refresh_Click(null!, null!);
                 ProxyCheck_LoadSettings(null!, null!);
                 NetLimiter_LoadSettings(null!, null!);
+                LoadProxyBlockedCountries();
             }
 
         }
@@ -1381,9 +1382,6 @@ namespace BHD_ServerManager.Forms.Panels
         {
             if (instanceBans == null)
                 return;
-
-            // Reload from database via manager
-            banInstanceManager.LoadWhitelistRecords();
 
             // Refresh DataGridViews
             LoadWhitelistGrids();

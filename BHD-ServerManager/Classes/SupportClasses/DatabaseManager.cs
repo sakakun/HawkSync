@@ -616,35 +616,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
         }
 
         /// <summary>
-        /// Load all ban instance data from the database.
-        /// </summary>
-        public static banInstance LoadBanInstance()
-        {
-            if (!IsInitialized)
-                throw new InvalidOperationException("DatabaseManager is not initialized.");
-
-            var instance = new banInstance
-            {
-                BannedPlayerNames = GetPlayerNameRecords(RecordCategory.Ban),
-                BannedPlayerIPs = GetPlayerIPRecords(RecordCategory.Ban),
-                WhitelistedNames = GetPlayerNameRecords(RecordCategory.Whitelist),
-                WhitelistedIPs = GetPlayerIPRecords(RecordCategory.Whitelist),
-                ConnectionHistory = GetPlayerNameRecords(RecordCategory.ConnectionHistory),
-                IPConnectionHistory = GetPlayerIPRecords(RecordCategory.ConnectionHistory),
-                ProxyRecords = GetProxyRecords(),
-                ProxyBlockedCountries = GetProxyBlockedCountries()
-            };
-
-            AppDebug.Log("DatabaseManager", 
-                $"Loaded ban instance: {instance.BannedPlayerNames.Count} banned names, " +
-                $"{instance.BannedPlayerIPs.Count} banned IPs, " +
-                $"{instance.WhitelistedNames.Count} whitelisted names, " +
-                $"{instance.WhitelistedIPs.Count} whitelisted IPs");
-
-            return instance;
-        }
-
-        /// <summary>
         /// Load all proxy records from the database.
         /// </summary>
         public static List<proxyRecord> GetProxyRecords()

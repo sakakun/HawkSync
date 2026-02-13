@@ -1084,28 +1084,35 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (string.IsNullOrWhiteSpace(countryName))
                     return new OperationResult(false, "Country name cannot be empty.");
 
-                // Check for duplicates
+                // Check for duplicates (case-insensitive)
                 if (instanceBans.ProxyBlockedCountries.Any(c => c.CountryCode.Equals(countryCode, StringComparison.OrdinalIgnoreCase)))
                     return new OperationResult(false, $"Country code '{countryCode}' already exists.");
 
                 // Add to database
-                int recordID = DatabaseManager.AddProxyBlockedCountry(countryCode.ToUpper(), countryName);
+                int recordID = DatabaseManager.AddProxyBlockedCountry(countryCode.ToUpperInvariant(), countryName);
 
-                if (recordID > 0)
+                // If the insert failed due to UNIQUE constraint, try to fetch the existing record
+                if (recordID <= 0)
                 {
-                    var newCountry = new proxyCountry
-                    {
-                        RecordID = recordID,
-                        CountryCode = countryCode.ToUpper(),
-                        CountryName = countryName
-                    };
-                    instanceBans.ProxyBlockedCountries.Add(newCountry);
+                    // Try to get the existing record's ID
+                    var existing = instanceBans.ProxyBlockedCountries
+                        .FirstOrDefault(c => c.CountryCode.Equals(countryCode, StringComparison.OrdinalIgnoreCase));
+                    if (existing != null)
+                        return new OperationResult(false, $"Country code '{countryCode}' already exists.", existing.RecordID);
 
-                    AppDebug.Log("banInstanceManager", $"Added blocked country: {countryCode} - {countryName} (ID: {recordID})");
-                    return new OperationResult(true, "Blocked country added successfully.", recordID);
+                    return new OperationResult(false, "Failed to add blocked country to database.");
                 }
 
-                return new OperationResult(false, "Failed to add blocked country to database.");
+                var newCountry = new proxyCountry
+                {
+                    RecordID = recordID,
+                    CountryCode = countryCode.ToUpperInvariant(),
+                    CountryName = countryName
+                };
+                instanceBans.ProxyBlockedCountries.Add(newCountry);
+
+                AppDebug.Log("banInstanceManager", $"Added blocked country: {countryCode} - {countryName} (ID: {recordID})");
+                return new OperationResult(true, "Blocked country added successfully.", recordID);
             }
             catch (Exception ex)
             {
@@ -1364,9 +1371,17 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// </summary>
         public static void LoadSettings()
         {
-            LoadBlacklistRecords();
-            LoadWhitelistRecords();
-            LoadBlockedCountries();
+            // Database Records
+
+            CommonCore.instanceBans!.BannedPlayerNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Ban);
+            CommonCore.instanceBans!.BannedPlayerIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Ban);
+            CommonCore.instanceBans!.WhitelistedNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Whitelist);
+            CommonCore.instanceBans!.WhitelistedIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Whitelist);
+            CommonCore.instanceBans!.ConnectionHistory = DatabaseManager.GetPlayerNameRecords(RecordCategory.ConnectionHistory);
+            CommonCore.instanceBans!.IPConnectionHistory = DatabaseManager.GetPlayerIPRecords(RecordCategory.ConnectionHistory);
+            CommonCore.instanceBans!.ProxyRecords = DatabaseManager.GetProxyRecords();
+            CommonCore.instanceBans!.ProxyBlockedCountries = DatabaseManager.GetProxyBlockedCountries();
+
             LoadProxyCheckSettings();
             LoadNetLimiterSettings();
             AppDebug.Log("banInstanceManager", "All ban/whitelist settings loaded");
