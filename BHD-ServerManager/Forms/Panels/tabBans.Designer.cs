@@ -2581,8 +2581,6 @@
         private TextBox textBox_countryCode;
         private TextBox textBox_countryName;
         private Button btn_proxyAddCountry;
-        private TabPage proxyLookup;
-        private TabPage tabPage2;
         private TableLayoutPanel proxySettings;
         private GroupBox groupBox11;
         private TableLayoutPanel tableLayoutPanel18;

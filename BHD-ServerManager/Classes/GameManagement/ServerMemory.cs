@@ -1630,7 +1630,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             if (NumPlayers > 0)
             {
-
                 int buffer = 0;
                 var Pointer = baseAddr + 0x005ED600;
 
@@ -1661,7 +1660,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                     ReadProcessMemory((int)processHandle, playerNameLocation, playerNameBytes, playerNameBytes.Length, ref buffer);
                     string formattedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(playerNameBytes).Replace("\0", "");
 
-                    if (string.IsNullOrEmpty(formattedPlayerName) || string.IsNullOrWhiteSpace(formattedPlayerName))
+                    // Always check for IP, even if player name is empty
+                    string playerIP = ReadMemoryGrabPlayerIPAddress(formattedPlayerName);
+
+                    // If no player name and no IP, skip this slot
+                    if ((string.IsNullOrEmpty(formattedPlayerName) || string.IsNullOrWhiteSpace(formattedPlayerName)) && string.IsNullOrEmpty(playerIP))
                     {
                         playerlistStartingLocation += 0xAF33C;
                         i--;
@@ -1669,11 +1672,16 @@ namespace BHD_ServerManager.Classes.GameManagement
                         continue;
                     }
 
+                    // If player name is empty but IP is present, use IP as a fallback name
+                    if (string.IsNullOrEmpty(formattedPlayerName) || string.IsNullOrWhiteSpace(formattedPlayerName))
+                    {
+                        formattedPlayerName = $"[IP:{playerIP}]";
+                    }
+
                     byte[] playerTeamBytes = new byte[4];
                     int playerTeamLocation = playerlistStartingLocation + 0x90;
                     ReadProcessMemory((int)processHandle, playerTeamLocation, playerTeamBytes, playerTeamBytes.Length, ref buffer);
                     int playerTeam = BitConverter.ToInt32(playerTeamBytes, 0);
-                    string playerIP = ReadMemoryGrabPlayerIPAddress(formattedPlayerName).ToString();
 
                     PlayerObject PlayerStats = ReadMemoryPlayerStats(playerSlot);
                     CharacterClass PlayerCharacterClass = (CharacterClass)PlayerStats.RoleID;
@@ -1681,61 +1689,42 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                     Dictionary<int, List<WeaponStack>> PlayerWeapons = new Dictionary<int, List<WeaponStack>>();
 
-                    if (string.IsNullOrEmpty(formattedPlayerName) || string.IsNullOrWhiteSpace(formattedPlayerName))
+                    try
                     {
+                        // Try to preserve PlayerJoined if player already exists in the persistent list
+                        if (playerInstance.PlayerList.TryGetValue(playerSlot, out var existingPlayer))
+                        {
+                            PlayerStats.PlayerJoined = existingPlayer.PlayerJoined;
+                        }
+                        // Final Touches
+                        PlayerStats.PlayerLastSeen = DateTime.Now;
+                        PlayerStats.PlayerTimePlayed = (int)(PlayerStats.PlayerLastSeen - PlayerStats.PlayerJoined).TotalSeconds;
+                        PlayerStats.PlayerSlot = playerSlot;
+                        byte[] trimmedPlayerNameBytes = playerNameBytes.Where(b => b != 0).ToArray();
+                        PlayerStats.PlayerNameBase64 = Convert.ToBase64String(trimmedPlayerNameBytes);
+                        PlayerStats.PlayerName = formattedPlayerName;
+                        PlayerStats.PlayerTeam = playerTeam;
+                        PlayerStats.PlayerIPAddress = playerIP;
+                        PlayerStats.PlayerPing = PlayerStats.PlayerPing;
+                        PlayerStats.RoleName = PlayerCharacterClass.ToString();
+                        PlayerStats.SelectedWeaponName = PlayerSelectedWeapon.ToString();
+
+                        // Push to List
+                        currentPlayerList.Add(playerSlot, PlayerStats);
+
+                        // Setup for Next Player
+                        playerlistStartingLocation += 0xAF33C;
+
                         if (currentPlayerList.Count >= NumPlayers)
                         {
                             break;
                         }
-                        else
-                        {
-                            playerlistStartingLocation += 0xAF33C;
-                            continue;
-                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        try
-                        {
-                            // Try to preserve PlayerJoined if player already exists in the persistent list
-                            if (playerInstance.PlayerList.TryGetValue(playerSlot, out var existingPlayer))
-                            {
-                                PlayerStats.PlayerJoined = existingPlayer.PlayerJoined;
-                            }
-                            // Final Touches
-                            PlayerStats.PlayerLastSeen = DateTime.Now;
-                            PlayerStats.PlayerTimePlayed = (int)(PlayerStats.PlayerLastSeen - PlayerStats.PlayerJoined).TotalSeconds;
-                            PlayerStats.PlayerSlot = playerSlot;
-                            byte[] trimmedPlayerNameBytes = playerNameBytes.Where(b => b != 0).ToArray();
-                            PlayerStats.PlayerNameBase64 = Convert.ToBase64String(trimmedPlayerNameBytes);
-                            PlayerStats.PlayerName = formattedPlayerName;
-                            PlayerStats.PlayerTeam = playerTeam;
-                            PlayerStats.PlayerIPAddress = playerIP;
-                            PlayerStats.PlayerPing = PlayerStats.PlayerPing;
-                            PlayerStats.RoleName = PlayerCharacterClass.ToString();
-                            PlayerStats.SelectedWeaponName = PlayerSelectedWeapon.ToString();
-
-                            // Push to List
-                            currentPlayerList.Add(playerSlot, PlayerStats);
-
-                            // Setup for Next Player
-                            playerlistStartingLocation += 0xAF33C;
-
-                            if (currentPlayerList.Count >= NumPlayers)
-                            {
-                                break;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            AppDebug.Log("ServerMemory", "Detected an error!\n\n" + "Player Name: " + playerSlot + "\n\n" + formattedPlayerName + "\n\n" + e.ToString());
-                        }
-
+                        AppDebug.Log("ServerMemory", "Detected an error!\n\n" + "Player Name: " + playerSlot + "\n\n" + formattedPlayerName + "\n\n" + e.ToString());
                     }
-
                 }
-
-
             }
             playerInstance.PlayerList.Clear();
             foreach (var kvp in currentPlayerList)
@@ -1744,6 +1733,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
             // CoreManager.DebugLog("PlayerList Updated");
         }
+
         // Function: ReadMemoryGrabPlayerIPAddress
         public static string ReadMemoryGrabPlayerIPAddress(string playername)
         {
