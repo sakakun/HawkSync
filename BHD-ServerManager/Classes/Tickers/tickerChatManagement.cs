@@ -109,22 +109,50 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 // Find player team number
                 int teamNum = 3;
+                string serverTeamMessage = string.Empty;
 
-                foreach (var player in playerInstance.PlayerList.Values)
+                AppDebug.Log("tickerChatManagement", $"First char: '{playerMessage[0]}' (hex: {((int)playerMessage[0]):X2}) | Full message: {playerMessage}");
+
+                // Check marker first - but only if player name matches the server host name
+                if (playerName.Equals(thisInstance.gameHostName, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (player.PlayerName == playerName)
+                    if (playerMessage.StartsWith("R~"))
                     {
-                        teamNum = player.PlayerTeam;
-                        break;
+                        teamNum = 2; // Red
+                        serverTeamMessage = playerMessage.Substring(2);
                     }
+                    else if (playerMessage.StartsWith("B~"))
+                    {
+                        teamNum = 1; // Blue
+                        serverTeamMessage = playerMessage.Substring(2);
+                    }
+                    else
+                    {
+                        // Server message without a team marker (e.g., global or server chat)
+                        serverTeamMessage = playerMessage;
+                    }
+                }
+                else
+                {
+                    // Normal player message - do player lookup
+                    foreach (var player in playerInstance.PlayerList.Values)
+                    {
+                        if (player.PlayerName == playerName)
+                        {
+                            AppDebug.Log("tickerChatManagement", $"Matched player '{playerName}' to team {player.PlayerTeam}");
+                            teamNum = player.PlayerTeam;
+                            break;
+                        }
+                    }
+                    serverTeamMessage = playerMessage;
                 }
 
                 // Create chat log entry
                 ChatLogObject newChatLog = new ChatLogObject
                 {
                     PlayerName = playerName,
-                    MessageText = playerMessage,
-                    MessageType = msgType,
+                    MessageText = serverTeamMessage == string.Empty ? playerMessage : serverTeamMessage,
+					MessageType = msgType,
                     MessageType2 = teamNum,
                     MessageTimeStamp = DateTime.Now,
                     TeamDisplay = chatInstanceManager.GetTeamDisplayName(msgType, teamNum)
@@ -138,7 +166,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 _lastProcessedMessageText = playerMessage;
                 _lastProcessedMessageTime = DateTime.Now;
 
-                AppDebug.Log("tickerChatManagement", $"Chat Message: {playerName} ({teamNum}) - {playerMessage} (Type: {msgType})");
+                AppDebug.Log("tickerChatManagement", $"Chat Message: {playerName} ({teamNum}) - {playerMessage.Substring(1)} (Type: {msgType})");
 
             }
         }

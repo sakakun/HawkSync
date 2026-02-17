@@ -271,6 +271,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (parsedMessage.Length <= maxLength)
                 {
+                    // Use control characters for Red/Blue team
+                    if (channel == 2) // Red team
+                        parsedMessage = "R~" + parsedMessage;
+                    else if (channel == 3) // Blue team
+                        parsedMessage = "B~" + parsedMessage;
+
                     ServerMemory.WriteMemorySendChatMessage(channel, parsedMessage);
                     AppDebug.Log("chatInstanceManager", $"Sent message to channel {channel}: {parsedMessage}");
                 }
