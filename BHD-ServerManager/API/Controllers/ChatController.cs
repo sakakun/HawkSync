@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.DTOs.tabPlayers;
+using BHD_ServerManager.Classes.SupportClasses;
+using HawkSyncShared.Instances;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -56,6 +58,39 @@ public class ChatController : ControllerBase
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
 
+    [HttpGet("history/players")]
+    public ActionResult<List<string>> GetDistinctPlayerNames([FromQuery] int limit = 500)
+    {
+        if (!HasPermission("chat")) return Forbid();
+        var players = DatabaseManager.GetDistinctPlayerNames(limit);
+        return Ok(players);
+    }
+
+    [HttpPost("history/search")]
+    public ActionResult<ChatHistoryResponse> GetChatHistory([FromBody] ChatHistoryRequest request)
+    {
+        if (!HasPermission("chat")) return Forbid();
+
+        var result = DatabaseManager.GetChatLogsFiltered(
+            request.StartDate,
+            request.EndDate,
+            request.PlayerFilter,
+            request.TypeFilter,
+            request.TeamFilter,
+            request.SearchText,
+            request.Page,
+            request.PageSize
+        );
+
+        return Ok(new ChatHistoryResponse
+        {
+            Logs = result.logs,
+            TotalCount = result.totalCount,
+            Page = request.Page,
+            PageSize = request.PageSize
+        });
+    }
+
     private bool HasPermission(string permission)
     {
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
@@ -66,3 +101,23 @@ public class ChatController : ControllerBase
 public class AutoMessageRequest { public string? Message { get; set; } public int Interval { get; set; } }
 public class SlapMessageRequest { public string? Message { get; set; } }
 public class RemoveMessageRequest { public string? Id { get; set; } }
+
+public class ChatHistoryRequest
+{
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public string? PlayerFilter { get; set; }
+    public int? TypeFilter { get; set; }
+    public int? TeamFilter { get; set; }
+    public string? SearchText { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 100;
+}
+
+public class ChatHistoryResponse
+{
+    public List<ChatLogObject> Logs { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+}

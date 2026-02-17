@@ -1,6 +1,6 @@
-﻿namespace BHD_ServerManager.Forms.SubPanels
+﻿namespace RemoteClient.Forms.SubPanels
 {
-    partial class ChatHistory
+partial class ChatHistory
     {
         /// <summary> 
         /// Required designer variable.

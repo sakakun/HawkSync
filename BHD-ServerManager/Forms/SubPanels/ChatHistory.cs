@@ -124,16 +124,30 @@ namespace BHD_ServerManager.Forms.SubPanels
 
                 // Get message type filter
                 int? typeFilter = null;
+                int? teamFilter = null;
                 if (comboBox_TypeFilter.SelectedIndex > 0)
                 {
-                    // Map UI index to message type
-                    typeFilter = comboBox_TypeFilter.SelectedIndex switch
+                    // Map UI index to message type and team
+                    switch (comboBox_TypeFilter.SelectedIndex)
                     {
-                        1 => 0, // Server Messages
-                        2 => 1, // Global Chat
-                        3 => 2, // Team Chat (will filter by messageType2 later if needed)
-                        _ => null
-                    };
+                        case 1: // Server Messages
+                            typeFilter = 0;
+                            break;
+                        case 2: // Global Chat
+                            typeFilter = 1;
+                            break;
+                        case 3: // All Team Chat
+                            typeFilter = 2;
+                            break;
+                        case 4: // Red Team Chat
+                            typeFilter = 2;
+                            teamFilter = 2; // Red team
+                            break;
+                        case 5: // Blue Team Chat
+                            typeFilter = 2;
+                            teamFilter = 1; // Blue team
+                            break;
+                    }
                 }
 
                 // Get search text
@@ -147,6 +161,7 @@ namespace BHD_ServerManager.Forms.SubPanels
                     endDate,
                     playerFilter,
                     typeFilter,
+                    teamFilter,
                     searchText,
                     _currentPage,
                     _pageSize

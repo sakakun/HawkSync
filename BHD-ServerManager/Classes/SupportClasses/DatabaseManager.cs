@@ -709,6 +709,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             DateTime? endDate = null,
             string? playerNameFilter = null,
             int? messageTypeFilter = null,
+            int? teamFilter = null,
             string? searchText = null,
             int page = 1,
             int pageSize = 100)
@@ -742,10 +743,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
             
             if (!string.IsNullOrEmpty(playerNameFilter))
                 conditions.Add("playerName = $playerName");
-            
+
             if (messageTypeFilter.HasValue)
                 conditions.Add("messageType = $messageType");
-            
+
+            if (teamFilter.HasValue)
+                conditions.Add("messageType2 = $teamFilter");
+
             if (!string.IsNullOrEmpty(searchText))
                 conditions.Add("messageText LIKE $searchText");
 
@@ -757,11 +761,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
             using (var countCmd = conn.CreateCommand())
             {
                 countCmd.CommandText = $"SELECT COUNT(*) FROM tb_chatLogs{whereClause};";
-                
+
                 if (!string.IsNullOrEmpty(playerNameFilter))
                     countCmd.Parameters.AddWithValue("$playerName", playerNameFilter);
                 if (messageTypeFilter.HasValue)
                     countCmd.Parameters.AddWithValue("$messageType", messageTypeFilter.Value);
+                if (teamFilter.HasValue)
+                    countCmd.Parameters.AddWithValue("$teamFilter", teamFilter.Value);
                 if (!string.IsNullOrEmpty(searchText))
                     countCmd.Parameters.AddWithValue("$searchText", $"%{searchText}%");
 
@@ -784,9 +790,11 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     dataCmd.Parameters.AddWithValue("$playerName", playerNameFilter);
                 if (messageTypeFilter.HasValue)
                     dataCmd.Parameters.AddWithValue("$messageType", messageTypeFilter.Value);
+                if (teamFilter.HasValue)
+                    dataCmd.Parameters.AddWithValue("$teamFilter", teamFilter.Value);
                 if (!string.IsNullOrEmpty(searchText))
                     dataCmd.Parameters.AddWithValue("$searchText", $"%{searchText}%");
-                
+
                 dataCmd.Parameters.AddWithValue("$limit", pageSize);
                 dataCmd.Parameters.AddWithValue("$offset", offset);
 
