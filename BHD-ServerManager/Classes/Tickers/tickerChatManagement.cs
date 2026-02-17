@@ -86,8 +86,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                 }
 
-                // Secondary check: Use static fields with 1-second window
-                // This allows multi-part messages (sent 1+ seconds apart) to both be logged
+                // This make sure the last message will not be processed multiple times
+                // Because of server messages and other players there is a very unlikely chance of the player saying the same thing twice.
                 if (_lastProcessedPlayerName == playerName && 
                     _lastProcessedMessageText == playerMessage)
                 {
