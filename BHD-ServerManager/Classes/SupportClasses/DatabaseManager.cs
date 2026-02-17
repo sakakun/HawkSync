@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using BHD_ServerManager.Classes.InstanceManagers;
 
 namespace BHD_ServerManager.Classes.SupportClasses
 {
@@ -536,7 +537,9 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     ($timestamp, $playerName, $type, $type2, $text);
                 ";
 
-                cmd.Parameters.AddWithValue("$timestamp", chatLog.MessageTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"));
+                // Store as Unix timestamp (INTEGER) for better performance
+                long unixTimestamp = ((DateTimeOffset)chatLog.MessageTimeStamp).ToUnixTimeSeconds();
+                cmd.Parameters.AddWithValue("$timestamp", unixTimestamp);
                 cmd.Parameters.AddWithValue("$playerName", chatLog.PlayerName);
                 cmd.Parameters.AddWithValue("$type", chatLog.MessageType);
                 cmd.Parameters.AddWithValue("$type2", chatLog.MessageType2);
@@ -613,6 +616,358 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             AppDebug.Log("DatabaseManager", $"Loaded {logs.Count} chat log entries");
             return logs;
+        }
+
+        /// <summary>
+        /// Safely read timestamp from database, handling both INTEGER (Unix) and TEXT (legacy) formats.
+        /// </summary>
+        private static DateTime SafeReadTimestamp(SqliteDataReader reader, int columnIndex)
+        {
+            try
+            {
+                // Try to read as INTEGER (Unix timestamp) first
+                if (reader.GetFieldType(columnIndex) == typeof(long))
+                {
+                    long unixTimestamp = reader.GetInt64(columnIndex);
+                    
+                    // Validate it's a reasonable timestamp (2020-2040)
+                    if (unixTimestamp >= 1577836800 && unixTimestamp <= 2209017600)
+                    {
+                        return DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).DateTime;
+                    }
+                    else
+                    {
+                        AppDebug.Log("DatabaseManager", $"Warning: Invalid Unix timestamp {unixTimestamp}, attempting TEXT parse");
+                    }
+                }
+            }
+            catch (InvalidCastException)
+            {
+                // Column is TEXT, fall through to string parsing
+            }
+
+            try
+            {
+                // Fallback: Try to read as TEXT (legacy format)
+                string textTimestamp = reader.GetString(columnIndex);
+                
+                if (DateTime.TryParse(textTimestamp, out DateTime parsedDate))
+                {
+                    AppDebug.Log("DatabaseManager", $"Warning: Found TEXT timestamp (legacy format): {textTimestamp}");
+                    return parsedDate;
+                }
+                else
+                {
+                    AppDebug.Log("DatabaseManager", $"Error: Failed to parse timestamp: {textTimestamp}");
+                    return DateTime.MinValue;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Error reading timestamp: {ex.Message}");
+                return DateTime.MinValue;
+            }
+        }
+
+        /// <summary>
+        /// Get distinct player names for filter dropdown.
+        /// </summary>
+        public static List<string> GetDistinctPlayerNames(int limit = 500)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var players = new List<string>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT DISTINCT playerName 
+                FROM tb_chatLogs 
+                ORDER BY playerName ASC 
+                LIMIT $limit;
+            ";
+            cmd.Parameters.AddWithValue("$limit", limit);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                players.Add(reader.GetString(0));
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {players.Count} distinct player names");
+            return players;
+        }
+
+        /// <summary>
+        /// Get paginated chat logs with advanced filtering.
+        /// </summary>
+        public static (List<ChatLogObject> logs, int totalCount) GetChatLogsFiltered(
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            string? playerNameFilter = null,
+            int? messageTypeFilter = null,
+            string? searchText = null,
+            int page = 1,
+            int pageSize = 100)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var logs = new List<ChatLogObject>();
+            int totalCount = 0;
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            // Build WHERE clause
+            var conditions = new List<string>();
+            
+            if (startDate.HasValue)
+            {
+                // Support both INTEGER (Unix) and TEXT formats
+                long unixStart = ((DateTimeOffset)startDate.Value).ToUnixTimeSeconds();
+                string textStart = startDate.Value.ToString("yyyy-MM-dd HH:mm:ss");
+                conditions.Add($"(messageTimeStamp >= {unixStart} OR messageTimeStamp >= '{textStart}')");
+            }
+            
+            if (endDate.HasValue)
+            {
+                long unixEnd = ((DateTimeOffset)endDate.Value).ToUnixTimeSeconds();
+                string textEnd = endDate.Value.ToString("yyyy-MM-dd HH:mm:ss");
+                conditions.Add($"(messageTimeStamp <= {unixEnd} OR messageTimeStamp <= '{textEnd}')");
+            }
+            
+            if (!string.IsNullOrEmpty(playerNameFilter))
+                conditions.Add("playerName = $playerName");
+            
+            if (messageTypeFilter.HasValue)
+                conditions.Add("messageType = $messageType");
+            
+            if (!string.IsNullOrEmpty(searchText))
+                conditions.Add("messageText LIKE $searchText");
+
+            string whereClause = conditions.Count > 0 
+                ? " WHERE " + string.Join(" AND ", conditions) 
+                : "";
+
+            // Get total count
+            using (var countCmd = conn.CreateCommand())
+            {
+                countCmd.CommandText = $"SELECT COUNT(*) FROM tb_chatLogs{whereClause};";
+                
+                if (!string.IsNullOrEmpty(playerNameFilter))
+                    countCmd.Parameters.AddWithValue("$playerName", playerNameFilter);
+                if (messageTypeFilter.HasValue)
+                    countCmd.Parameters.AddWithValue("$messageType", messageTypeFilter.Value);
+                if (!string.IsNullOrEmpty(searchText))
+                    countCmd.Parameters.AddWithValue("$searchText", $"%{searchText}%");
+
+                totalCount = Convert.ToInt32(countCmd.ExecuteScalar());
+            }
+
+            // Get paginated data
+            using (var dataCmd = conn.CreateCommand())
+            {
+                int offset = (page - 1) * pageSize;
+                dataCmd.CommandText = $@"
+                    SELECT messageTimeStamp, playerName, messageType, messageType2, messageText
+                    FROM tb_chatLogs
+                    {whereClause}
+                    ORDER BY messageTimeStamp DESC
+                    LIMIT $limit OFFSET $offset;
+                ";
+
+                if (!string.IsNullOrEmpty(playerNameFilter))
+                    dataCmd.Parameters.AddWithValue("$playerName", playerNameFilter);
+                if (messageTypeFilter.HasValue)
+                    dataCmd.Parameters.AddWithValue("$messageType", messageTypeFilter.Value);
+                if (!string.IsNullOrEmpty(searchText))
+                    dataCmd.Parameters.AddWithValue("$searchText", $"%{searchText}%");
+                
+                dataCmd.Parameters.AddWithValue("$limit", pageSize);
+                dataCmd.Parameters.AddWithValue("$offset", offset);
+
+                using var reader = dataCmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    int msgType = reader.GetInt32(2);
+                    int teamNum = reader.GetInt32(3);
+
+                    // Use safe reader that handles both INTEGER and TEXT
+                    DateTime timestamp = SafeReadTimestamp(reader, 0);
+
+                    logs.Add(new ChatLogObject
+                    {
+                        MessageTimeStamp = timestamp,
+                        PlayerName = reader.GetString(1),
+                        MessageType = msgType,
+                        MessageType2 = teamNum,
+                        MessageText = reader.GetString(4),
+                        TeamDisplay = chatInstanceManager.GetTeamDisplayName(msgType, teamNum)
+                    });
+                }
+            }
+
+            AppDebug.Log("DatabaseManager", $"Loaded {logs.Count} of {totalCount} chat logs (Page {page})");
+            return (logs, totalCount);
+        }
+
+        /// <summary>
+        /// Migrate messageTimeStamp from TEXT to INTEGER (Unix timestamp) with validation.
+        /// </summary>
+        public static void MigrateChatLogsTimestamps()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+
+            try
+            {
+                // Check if already migrated
+                bool isAlreadyInteger = false;
+                using (var checkCmd = conn.CreateCommand())
+                {
+                    checkCmd.Transaction = tx;
+                    checkCmd.CommandText = "PRAGMA table_info(tb_chatLogs);";
+                    using var reader = checkCmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        if (reader.GetString(1) == "messageTimeStamp")
+                        {
+                            string columnType = reader.GetString(2);
+                            if (columnType == "INTEGER")
+                            {
+                                isAlreadyInteger = true;
+                                AppDebug.Log("DatabaseManager", "Chat logs timestamps already migrated to INTEGER");
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (isAlreadyInteger)
+                {
+                    tx.Commit();
+                    return;
+                }
+
+                // Count existing records
+                int originalCount = 0;
+                using (var countCmd = conn.CreateCommand())
+                {
+                    countCmd.Transaction = tx;
+                    countCmd.CommandText = "SELECT COUNT(*) FROM tb_chatLogs;";
+                    originalCount = Convert.ToInt32(countCmd.ExecuteScalar());
+                }
+
+                AppDebug.Log("DatabaseManager", $"Starting migration of {originalCount} chat log records...");
+
+                // Create new table with INTEGER timestamp
+                using (var createCmd = conn.CreateCommand())
+                {
+                    createCmd.Transaction = tx;
+                    createCmd.CommandText = @"
+                        CREATE TABLE tb_chatLogs_new (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            messageTimeStamp INTEGER NOT NULL,
+                            playerName TEXT NOT NULL,
+                            messageType INTEGER NOT NULL,
+                            messageType2 INTEGER NOT NULL,
+                            messageText TEXT NOT NULL
+                        );
+                    ";
+                    createCmd.ExecuteNonQuery();
+                }
+
+                // Copy data with timestamp conversion
+                using (var copyCmd = conn.CreateCommand())
+                {
+                    copyCmd.Transaction = tx;
+                    copyCmd.CommandText = @"
+                        INSERT INTO tb_chatLogs_new (id, messageTimeStamp, playerName, messageType, messageType2, messageText)
+                        SELECT 
+                            id,
+                            CAST(strftime('%s', messageTimeStamp) AS INTEGER),
+                            playerName,
+                            messageType,
+                            messageType2,
+                            messageText
+                        FROM tb_chatLogs
+                        WHERE messageTimeStamp IS NOT NULL;
+                    ";
+                    int rowsAffected = copyCmd.ExecuteNonQuery();
+                    
+                    if (rowsAffected != originalCount)
+                    {
+                        throw new Exception($"Migration mismatch: {originalCount} original records, {rowsAffected} migrated");
+                    }
+                    
+                    AppDebug.Log("DatabaseManager", $"Successfully migrated {rowsAffected} records");
+                }
+
+                // Validate migration - check a sample record
+                using (var validateCmd = conn.CreateCommand())
+                {
+                    validateCmd.Transaction = tx;
+                    validateCmd.CommandText = "SELECT messageTimeStamp FROM tb_chatLogs_new LIMIT 1;";
+                    var result = validateCmd.ExecuteScalar();
+                    
+                    if (result != null && result != DBNull.Value)
+                    {
+                        long timestamp = Convert.ToInt64(result);
+                        // Validate it's a reasonable Unix timestamp (between 2020 and 2040)
+                        if (timestamp < 1577836800 || timestamp > 2209017600)
+                        {
+                            throw new Exception($"Invalid timestamp after migration: {timestamp}");
+                        }
+                        AppDebug.Log("DatabaseManager", $"Validation passed. Sample timestamp: {timestamp}");
+                    }
+                }
+
+                // Drop old table
+                using (var dropCmd = conn.CreateCommand())
+                {
+                    dropCmd.Transaction = tx;
+                    dropCmd.CommandText = "DROP TABLE tb_chatLogs;";
+                    dropCmd.ExecuteNonQuery();
+                }
+
+                // Rename new table
+                using (var renameCmd = conn.CreateCommand())
+                {
+                    renameCmd.Transaction = tx;
+                    renameCmd.CommandText = "ALTER TABLE tb_chatLogs_new RENAME TO tb_chatLogs;";
+                    renameCmd.ExecuteNonQuery();
+                }
+
+                // Create indexes for performance
+                using (var indexCmd = conn.CreateCommand())
+                {
+                    indexCmd.Transaction = tx;
+                    indexCmd.CommandText = @"
+                        CREATE INDEX IF NOT EXISTS idx_chatLogs_timestamp ON tb_chatLogs(messageTimeStamp DESC);
+                        CREATE INDEX IF NOT EXISTS idx_chatLogs_playerName ON tb_chatLogs(playerName);
+                        CREATE INDEX IF NOT EXISTS idx_chatLogs_messageType ON tb_chatLogs(messageType);
+                    ";
+                    indexCmd.ExecuteNonQuery();
+                }
+
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", "✅ Chat logs timestamp migration completed successfully");
+            }
+            catch (Exception ex)
+            {
+                tx.Rollback();
+                AppDebug.Log("DatabaseManager", $"❌ Migration failed: {ex.Message}");
+                throw new Exception($"Chat log migration failed: {ex.Message}", ex);
+            }
         }
 
         /// <summary>

@@ -20,6 +20,10 @@ namespace BHD_ServerManager
 			try { 
 				// Initialize the Instance of the Application
 				DatabaseManager.Initialize();
+				
+				// Migrate chat log timestamps from TEXT to INTEGER (one-time operation)
+				DatabaseManager.MigrateChatLogsTimestamps();
+				
 				CommonCore.InitializeCore();
 			
 				ServerManagerUI = new ServerManagerUI();
