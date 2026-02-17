@@ -122,4 +122,135 @@ public class FileSystemService
     }
 
 
+    // ================================================================================
+    // FILE MANAGER OPERATIONS
+    // ================================================================================
+
+    /// <summary>
+    /// Get list of files from server's profileServerPath
+    /// </summary>
+    public async Task<FileListResponse?> GetFilesAsync()
+    {
+        try
+        {
+            return await _apiClient._httpClient.GetFromJsonAsync<FileListResponse>("/api/filesystem/files");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting files: {ex.Message}");
+            return new FileListResponse
+            {
+                Success = false,
+                Message = $"Error: {ex.Message}"
+            };
+        }
+    }
+
+    /// <summary>
+    /// Upload a file to the server
+    /// </summary>
+    public async Task<FileOperationResponse?> UploadFileAsync(string filePath)
+    {
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                return new FileOperationResponse
+                {
+                    Success = false,
+                    Message = "File not found"
+                };
+            }
+
+            using var content = new MultipartFormDataContent();
+            using var fileStream = File.OpenRead(filePath);
+            using var streamContent = new StreamContent(fileStream);
+            
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            content.Add(streamContent, "file", Path.GetFileName(filePath));
+
+            var response = await _apiClient._httpClient.PostAsync("/api/filesystem/upload", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new FileOperationResponse
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}"
+                };
+            }
+
+            return await response.Content.ReadFromJsonAsync<FileOperationResponse>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error uploading file: {ex.Message}");
+            return new FileOperationResponse
+            {
+                Success = false,
+                Message = $"Error: {ex.Message}"
+            };
+        }
+    }
+
+    /// <summary>
+    /// Download a file from the server
+    /// </summary>
+    public async Task<bool> DownloadFileAsync(string fileName, string destinationPath)
+    {
+        try
+        {
+            var response = await _apiClient._httpClient.GetAsync($"/api/filesystem/download/{Uri.EscapeDataString(fileName)}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Error downloading file: HTTP {response.StatusCode}");
+                return false;
+            }
+
+            using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            await response.Content.CopyToAsync(fileStream);
+            
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error downloading file: {ex.Message}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Delete files from the server
+    /// </summary>
+    public async Task<FileOperationResponse?> DeleteFilesAsync(List<string> fileNames)
+    {
+        try
+        {
+            var request = new FileDeleteRequest { FileNames = fileNames };
+            var response = await _apiClient._httpClient.PostAsJsonAsync("/api/filesystem/delete", request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new FileOperationResponse
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}"
+                };
+            }
+
+            return await response.Content.ReadFromJsonAsync<FileOperationResponse>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting files: {ex.Message}");
+            return new FileOperationResponse
+            {
+                Success = false,
+                Message = $"Error: {ex.Message}"
+            };
+        }
+    }
+
 }
+

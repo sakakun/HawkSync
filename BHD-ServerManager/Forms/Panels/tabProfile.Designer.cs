@@ -86,6 +86,8 @@
             profileServerAttribute19 = new CheckBox();
             profileServerAttribute20 = new CheckBox();
             profileServerAttribute21 = new CheckBox();
+            tabFileManager = new TabPage();
+            fileManager1 = new BHD_ServerManager.Forms.SubPanels.FileManager();
             panel1 = new Panel();
             groupBox5 = new GroupBox();
             groupBox4 = new GroupBox();
@@ -114,6 +116,7 @@
             tableLayoutPanel2.SuspendLayout();
             groupBox3.SuspendLayout();
             tableAtributes.SuspendLayout();
+            tabFileManager.SuspendLayout();
             panel1.SuspendLayout();
             groupBox4.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
@@ -138,6 +141,7 @@
             // 
             profileFileManagers.Controls.Add(tabProfilePage1);
             profileFileManagers.Controls.Add(tabProfilePage2);
+            profileFileManagers.Controls.Add(tabFileManager);
             profileFileManagers.Dock = DockStyle.Fill;
             profileFileManagers.Location = new Point(521, 3);
             profileFileManagers.Name = "profileFileManagers";
@@ -913,6 +917,27 @@
             profileServerAttribute21.Text = "/LOADBAR";
             profileServerAttribute21.UseVisualStyleBackColor = true;
             // 
+            // tabFileManager
+            // 
+            tabFileManager.Controls.Add(fileManager1);
+            tabFileManager.Location = new Point(4, 24);
+            tabFileManager.Name = "tabFileManager";
+            tabFileManager.Padding = new Padding(3);
+            tabFileManager.Size = new Size(434, 388);
+            tabFileManager.TabIndex = 2;
+            tabFileManager.Text = "File Manager";
+            tabFileManager.UseVisualStyleBackColor = true;
+            // 
+            // fileManager1
+            // 
+            fileManager1.Dock = DockStyle.Fill;
+            fileManager1.Location = new Point(3, 3);
+            fileManager1.MaximumSize = new Size(434, 388);
+            fileManager1.MinimumSize = new Size(434, 388);
+            fileManager1.Name = "fileManager1";
+            fileManager1.Size = new Size(434, 388);
+            fileManager1.TabIndex = 0;
+            // 
             // panel1
             // 
             panel1.Controls.Add(groupBox5);
@@ -1023,6 +1048,7 @@
             groupBox3.ResumeLayout(false);
             tableAtributes.ResumeLayout(false);
             tableAtributes.PerformLayout();
+            tabFileManager.ResumeLayout(false);
             panel1.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
@@ -1097,5 +1123,7 @@
         public NumericUpDown num_minPing;
         public NumericUpDown num_remotePort;
         private CheckBox checkBox_enableRemote;
+        private TabPage tabFileManager;
+        private SubPanels.FileManager fileManager1;
     }
 }

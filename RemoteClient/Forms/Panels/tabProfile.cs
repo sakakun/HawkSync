@@ -3,6 +3,7 @@ using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
+using RemoteClient.Forms.SubPanels;
 
 namespace RemoteClient.Forms.Panels;
 
