@@ -362,6 +362,25 @@ public static class adminInstanceManager
             .OrderByDescending(x => x.Item2)
             .ToList();
 
+    public static void CleanupStaleSessions(int inactiveMinutes = 30)
+    {
+        var staleThreshold = DateTime.Now.AddMinutes(-inactiveMinutes);
+        var staleSessions = adminInstance.ActiveSessions
+            .Where(kvp => kvp.Value < staleThreshold)
+            .Select(kvp => kvp.Key)
+            .ToList();
+
+        foreach (var username in staleSessions)
+        {
+            RemoveSession(username);
+        }
+
+        if (staleSessions.Count > 0)
+        {
+            AppDebug.Log("adminInstanceManager", $"Cleaned up {staleSessions.Count} stale session(s)");
+        }
+    }
+
     // --- VALIDATION ---
 
     public static (bool isValid, List<string> errors) ValidateCreateUserRequest(CreateUserRequestDTO request)

@@ -40,6 +40,20 @@ public partial class tabAdmin : UserControl
         SetFormMode(FormMode.View);
     }
 
+    protected override void OnVisibleChanged(EventArgs e)
+    {
+        base.OnVisibleChanged(e);
+
+        if (Visible)
+        {
+            CommonCore.Ticker!.Start("AdminTabTicker", 1000, TickerAdminTick);
+        }
+        else
+        {
+            CommonCore.Ticker?.Stop("AdminTabTicker");
+        }
+    }
+
     public void TickerAdminTick()
     {
         if (InvokeRequired)
@@ -108,6 +122,7 @@ public partial class tabAdmin : UserControl
 
         var users = adminInstance.Users.OrderBy(u => u.UserID).ToList();
         var userDict = users.ToDictionary(u => u.UserID);
+        var onlineUsers = new HashSet<string>(adminInstance.ActiveSessions.Keys, StringComparer.OrdinalIgnoreCase);
 
         var gridUserIds = new HashSet<int>();
         foreach (DataGridViewRow row in dataGridView1.Rows)
@@ -118,19 +133,27 @@ public partial class tabAdmin : UserControl
 
             if (userDict.TryGetValue(userId, out var user))
             {
+                bool isOnline = onlineUsers.Contains(user.Username);
+                string status = isOnline ? "Online" : (user.IsActive ? "Active" : "Disabled");
+
                 bool needsUpdate =
                     row.Cells[1].Value?.ToString() != user.Username ||
-                    row.Cells[2].Value?.ToString() != (user.IsActive ? "Active" : "Disabled") ||
+                    row.Cells[2].Value?.ToString() != status ||
                     row.Cells[3].Value?.ToString() != user.Created.ToString("yyyy-MM-dd") ||
                     row.Cells[4].Value?.ToString() != (user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never");
 
                 if (needsUpdate)
                 {
                     row.Cells[1].Value = user.Username;
-                    row.Cells[2].Value = user.IsActive ? "Active" : "Disabled";
+                    row.Cells[2].Value = status;
                     row.Cells[3].Value = user.Created.ToString("yyyy-MM-dd");
                     row.Cells[4].Value = user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never";
                 }
+
+                if (isOnline)
+                    row.DefaultCellStyle.BackColor = Color.LightGreen;
+                else
+                    row.DefaultCellStyle.BackColor = dataGridView1.DefaultCellStyle.BackColor;
             }
             else
             {
@@ -142,13 +165,19 @@ public partial class tabAdmin : UserControl
         {
             if (!gridUserIds.Contains(user.UserID))
             {
-                dataGridView1.Rows.Add(
+                bool isOnline = onlineUsers.Contains(user.Username);
+                string status = isOnline ? "Online" : (user.IsActive ? "Active" : "Disabled");
+
+                int rowIndex = dataGridView1.Rows.Add(
                     user.UserID,
                     user.Username,
-                    user.IsActive ? "Active" : "Disabled",
+                    status,
                     user.Created.ToString("yyyy-MM-dd"),
                     user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never"
                 );
+
+                if (isOnline)
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
             }
         }
 

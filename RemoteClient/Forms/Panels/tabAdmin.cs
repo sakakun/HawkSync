@@ -111,6 +111,7 @@ public partial class tabAdmin : UserControl
 
         // Build a lookup for quick access
         var userDict = users.ToDictionary(u => u.UserID);
+        var onlineUsers = new HashSet<string>(CommonCore.instanceAdmin!.ActiveSessions.Keys, StringComparer.OrdinalIgnoreCase);
 
         // Track which user IDs are present in the grid
         var gridUserIds = new HashSet<int>();
@@ -122,20 +123,28 @@ public partial class tabAdmin : UserControl
 
             if (userDict.TryGetValue(userId, out var user))
             {
+                bool isOnline = onlineUsers.Contains(user.Username);
+                string status = isOnline ? "Online" : (user.IsActive ? "Active" : "Disabled");
+
                 // Update row if any data has changed
                 bool needsUpdate =
                     row.Cells[1].Value?.ToString() != user.Username ||
-                    row.Cells[2].Value?.ToString() != (user.IsActive ? "Active" : "Disabled") ||
+                    row.Cells[2].Value?.ToString() != status ||
                     row.Cells[3].Value?.ToString() != user.Created.ToString("yyyy-MM-dd") ||
                     row.Cells[4].Value?.ToString() != (user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never");
 
                 if (needsUpdate)
                 {
                     row.Cells[1].Value = user.Username;
-                    row.Cells[2].Value = user.IsActive ? "Active" : "Disabled";
+                    row.Cells[2].Value = status;
                     row.Cells[3].Value = user.Created.ToString("yyyy-MM-dd");
                     row.Cells[4].Value = user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never";
                 }
+
+                if (isOnline)
+                    row.DefaultCellStyle.BackColor = Color.LightGreen;
+                else
+                    row.DefaultCellStyle.BackColor = dataGridView1.DefaultCellStyle.BackColor;
             }
             else
             {
@@ -149,13 +158,19 @@ public partial class tabAdmin : UserControl
         {
             if (!gridUserIds.Contains(user.UserID))
             {
-                dataGridView1.Rows.Add(
+                bool isOnline = onlineUsers.Contains(user.Username);
+                string status = isOnline ? "Online" : (user.IsActive ? "Active" : "Disabled");
+
+                int rowIndex = dataGridView1.Rows.Add(
                     user.UserID,
                     user.Username,
-                    user.IsActive ? "Active" : "Disabled",
+                    status,
                     user.Created.ToString("yyyy-MM-dd"),
                     user.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never"
                 );
+
+                if (isOnline)
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightGreen;
             }
         }
 

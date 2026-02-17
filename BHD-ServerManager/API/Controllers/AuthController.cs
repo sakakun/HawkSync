@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -31,6 +32,8 @@ public class AuthController : ControllerBase
         }
 
         var token = GenerateJwtToken(user);
+
+        adminInstanceManager.TrackSession(user.Username);
 
         return Ok(new LoginResponse
         {
@@ -72,5 +75,17 @@ public class AuthController : ControllerBase
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    public ActionResult Logout()
+    {
+        var username = User.FindFirst("username")?.Value;
+        if (!string.IsNullOrEmpty(username))
+        {
+            adminInstanceManager.RemoveSession(username);
+        }
+        return Ok(new { Success = true, Message = "Logged out successfully" });
     }
 }

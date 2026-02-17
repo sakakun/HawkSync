@@ -10,6 +10,7 @@ public class SignalRClient : IDisposable
 {
     private HubConnection? _connection;
     private readonly string _hubUrl;
+    private System.Timers.Timer? _heartbeatTimer;
 
     public event Action<ServerSnapshot>? OnSnapshotReceived;
     public event Action<string>? OnConnectionStateChanged;
@@ -42,6 +43,7 @@ public class SignalRClient : IDisposable
         _connection.Reconnecting += error =>
         {
             OnConnectionStateChanged?.Invoke("🟡 Reconnecting...");
+            StopHeartbeat();
             return Task.CompletedTask;
         };
 
@@ -49,6 +51,7 @@ public class SignalRClient : IDisposable
         {
             OnConnectionStateChanged?.Invoke("🟢 Connected");
             _ = SubscribeToUpdatesAsync();
+            StartHeartbeat();
             return Task.CompletedTask;
         };
 
@@ -57,6 +60,7 @@ public class SignalRClient : IDisposable
             OnConnectionStateChanged?.Invoke(error != null 
                 ? $"🔴 Disconnected: {error.Message}" 
                 : "🔴 Disconnected");
+            StopHeartbeat();
             return Task.CompletedTask;
         };
 
@@ -69,9 +73,42 @@ public class SignalRClient : IDisposable
         // Connect
         await _connection.StartAsync();
         OnConnectionStateChanged?.Invoke("🟢 Connected");
-        
+
         // Subscribe to updates
         await SubscribeToUpdatesAsync();
+
+        // Start heartbeat
+        StartHeartbeat();
+    }
+
+    private void StartHeartbeat()
+    {
+        _heartbeatTimer = new System.Timers.Timer(30000); // 30 seconds
+        _heartbeatTimer.Elapsed += async (sender, e) =>
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+            {
+                try
+                {
+                    await _connection.InvokeAsync("Heartbeat");
+                }
+                catch
+                {
+                    // Ignore heartbeat errors
+                }
+            }
+        };
+        _heartbeatTimer.Start();
+    }
+
+    private void StopHeartbeat()
+    {
+        if (_heartbeatTimer != null)
+        {
+            _heartbeatTimer.Stop();
+            _heartbeatTimer.Dispose();
+            _heartbeatTimer = null;
+        }
     }
 
     private async Task SubscribeToUpdatesAsync()
@@ -84,6 +121,8 @@ public class SignalRClient : IDisposable
 
     public async Task DisconnectAsync()
     {
+        StopHeartbeat();
+
         if (_connection != null)
         {
             try

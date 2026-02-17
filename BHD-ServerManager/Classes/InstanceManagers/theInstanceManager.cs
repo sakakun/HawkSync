@@ -1096,6 +1096,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             CommonCore.Ticker?.Start("ChatManager", 100, () => tickerChatManagement.runTicker());
             CommonCore.Ticker?.Start("PlayerManager", 1000, () => tickerPlayerManagement.runTicker());
             CommonCore.Ticker?.Start("BanManager", 1000, () => tickerBanManagement.runTicker());
+            CommonCore.Ticker?.Start("SessionCleanup", 60000, () => adminInstanceManager.CleanupStaleSessions(2));
         }
 
         public static void changeTeamGameMode(int currentMapType, int nextMapType)
