@@ -1124,7 +1124,6 @@
         private CheckBox checkBox_enableRemote;
         public NumericUpDown num_remotePort;
         private TabPage tabFileManager;
-        private SubPanels.FileManager fileManager1;
         private SubPanels.FileManager fileManager2;
     }
 }
