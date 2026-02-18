@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using HawkSyncShared.DTOs.API;
-using HawkSyncShared.DTOs.tabProfile;
+using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
-using System.IO.Compression;
+using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.Audit;
+using HawkSyncShared.DTOs.tabProfile;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.IO.Compression;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -280,59 +282,48 @@ public class FileSystemController : ControllerBase
     {
         if(!HasPermission("profile")) return Forbid();
 
+        string fileName = file != null ? Path.GetFileName(file.FileName) : string.Empty;
+        bool success = false;
+        string message = string.Empty;
+        int count = 0;
         try
         {
             var theInstance = CommonCore.theInstance;
             if (theInstance == null || string.IsNullOrEmpty(theInstance.profileServerPath))
             {
-                return Ok(new FileOperationResponse
-                {
-                    Success = false,
-                    Message = "Server path is not configured"
-                });
+                message = "Server path is not configured";
+                return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
             if (!Directory.Exists(theInstance.profileServerPath))
             {
-                return Ok(new FileOperationResponse
-                {
-                    Success = false,
-                    Message = $"Directory not found: {theInstance.profileServerPath}"
-                });
+                message = $"Directory not found: {theInstance.profileServerPath}";
+                return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
             if (file == null || file.Length == 0)
             {
-                return Ok(new FileOperationResponse
-                {
-                    Success = false,
-                    Message = "No file provided"
-                });
+                message = "No file provided";
+                return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
-            var fileName = Path.GetFileName(file.FileName);
             var extension = Path.GetExtension(fileName).ToLower();
             var allowedExtensions = new[] { ".bms", ".mis", ".til", ".zip" };
 
             if (!allowedExtensions.Contains(extension))
             {
-                return Ok(new FileOperationResponse
-                {
-                    Success = false,
-                    Message = $"File type not allowed: {fileName}. Allowed types: .bms, .mis, .til, .zip"
-                });
+                message = $"File type not allowed: {fileName}. Allowed types: .bms, .mis, .til, .zip";
+                return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
             // Handle ZIP files
             if (extension == ".zip")
             {
                 int extractedCount = await ExtractZipFile(file, theInstance.profileServerPath);
-                return Ok(new FileOperationResponse
-                {
-                    Success = true,
-                    Message = $"{extractedCount} file(s) extracted successfully",
-                    Count = extractedCount
-                });
+                success = true;
+                message = $"{extractedCount} file(s) extracted successfully";
+                count = extractedCount;
+                return Ok(new FileOperationResponse { Success = success, Message = message, Count = count });
             }
 
             // Handle individual files
@@ -341,21 +332,19 @@ public class FileSystemController : ControllerBase
             {
                 await file.CopyToAsync(stream);
             }
-
-            return Ok(new FileOperationResponse
-            {
-                Success = true,
-                Message = "File uploaded successfully",
-                Count = 1
-            });
+            success = true;
+            message = "File uploaded successfully";
+            count = 1;
+            return Ok(new FileOperationResponse { Success = success, Message = message, Count = count });
         }
         catch (Exception ex)
         {
-            return Ok(new FileOperationResponse
-            {
-                Success = false,
-                Message = $"Error uploading file: {ex.Message}"
-            });
+            message = $"Error uploading file: {ex.Message}";
+            return Ok(new FileOperationResponse { Success = false, Message = message });
+        }
+        finally
+        {
+            LogFileAction("UploadFile", fileName, success, message);
         }
     }
 
@@ -367,27 +356,32 @@ public class FileSystemController : ControllerBase
     {
         if(!HasPermission("profile")) return Forbid();
 
+        bool success = false;
+        string message = string.Empty;
         try
         {
             var theInstance = CommonCore.theInstance;
             if (theInstance == null || string.IsNullOrEmpty(theInstance.profileServerPath))
             {
-                return BadRequest("Server path is not configured");
+                message = "Server path is not configured";
+                return BadRequest(message);
             }
 
             var filePath = Path.Combine(theInstance.profileServerPath, fileName);
-            
+        
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound("File not found");
+                message = "File not found";
+                return NotFound(message);
             }
 
             var allowedExtensions = new[] { ".bms", ".mis", ".til" };
             var extension = Path.GetExtension(fileName).ToLower();
-            
+        
             if (!allowedExtensions.Contains(extension))
             {
-                return BadRequest("File type not allowed");
+                message = "File type not allowed";
+                return BadRequest(message);
             }
 
             var memory = new MemoryStream();
@@ -396,12 +390,18 @@ public class FileSystemController : ControllerBase
                 stream.CopyTo(memory);
             }
             memory.Position = 0;
-
+            success = true;
+            message = "File downloaded successfully";
             return File(memory, "application/octet-stream", fileName);
         }
         catch (Exception ex)
         {
-            return BadRequest($"Error downloading file: {ex.Message}");
+            message = $"Error downloading file: {ex.Message}";
+            return BadRequest(message);
+        }
+        finally
+        {
+            LogFileAction("DownloadFile", fileName, success, message);
         }
     }
 
@@ -413,16 +413,17 @@ public class FileSystemController : ControllerBase
     {
         if(!HasPermission("profile")) return Forbid();
 
+        string fileNames = string.Join(", ", request.FileNames ?? new List<string>());
+        bool success = false;
+        string message = string.Empty;
+        int deletedCount = 0;
         try
         {
             var theInstance = CommonCore.theInstance;
             if (theInstance == null || string.IsNullOrEmpty(theInstance.profileServerPath))
             {
-                return Ok(new FileOperationResponse
-                {
-                    Success = false,
-                    Message = "Server path is not configured"
-                });
+                message = "Server path is not configured";
+                return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
             // Check if any .bms files are in use by playlists
@@ -431,7 +432,7 @@ public class FileSystemController : ControllerBase
             
             if (mapInstance != null && mapInstance.Playlists != null)
             {
-                foreach (var fileName in request.FileNames)
+                foreach (var fileName in request.FileNames!)
                 {
                     var extension = Path.GetExtension(fileName).ToLower();
                     if (extension == ".bms")
@@ -454,15 +455,11 @@ public class FileSystemController : ControllerBase
 
             if (filesInUse.Count > 0)
             {
-                return Ok(new FileOperationResponse
-                {
-                    Success = false,
-                    Message = $"The following map files cannot be deleted because they are in use by playlists: {string.Join(", ", filesInUse)}"
-                });
+                message = $"The following map files cannot be deleted because they are in use by playlists: {string.Join(", ", filesInUse)}";
+                return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
-            int deletedCount = 0;
-            foreach (var fileName in request.FileNames)
+            foreach (var fileName in request.FileNames!)
             {
                 var filePath = Path.Combine(theInstance.profileServerPath, fileName);
                 if (System.IO.File.Exists(filePath))
@@ -472,20 +469,18 @@ public class FileSystemController : ControllerBase
                 }
             }
 
-            return Ok(new FileOperationResponse
-            {
-                Success = true,
-                Message = $"{deletedCount} file(s) deleted successfully",
-                Count = deletedCount
-            });
+            success = true;
+            message = $"{deletedCount} file(s) deleted successfully";
+            return Ok(new FileOperationResponse { Success = success, Message = message, Count = deletedCount });
         }
         catch (Exception ex)
         {
-            return Ok(new FileOperationResponse
-            {
-                Success = false,
-                Message = $"Error deleting files: {ex.Message}"
-            });
+            message = $"Error deleting files: {ex.Message}";
+            return Ok(new FileOperationResponse { Success = false, Message = message });
+        }
+        finally
+        {
+            LogFileAction("DeleteFiles", fileNames, success, message);
         }
     }
 
@@ -520,4 +515,22 @@ public class FileSystemController : ControllerBase
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
         return permissions.Contains(permission);
     }
+
+    private void LogFileAction(string actionType, string fileName, bool success, string message)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null,
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.System, // or AuditCategory.Profile if you have one for file ops
+            actionType: actionType,
+            description: $"{actionType}: {fileName}",
+            targetType: "File",
+            targetId: null,
+            targetName: fileName,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: success,
+            errorMessage: success ? null : message
+        );
+    }
+
 }

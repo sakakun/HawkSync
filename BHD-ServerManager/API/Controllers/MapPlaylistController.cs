@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using HawkSyncShared;
-using HawkSyncShared.DTOs.tabMaps;
 using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.SupportClasses;
+using HawkSyncShared;
+using HawkSyncShared.DTOs.Audit;
+using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -94,16 +96,18 @@ public class MapPlaylistController : ControllerBase
         }).ToList();
 
         var result = mapInstanceManager.SavePlaylist(playlist.PlaylistID, maps);
-
         TriggerServerUIReload();
-
+        LogMapPlaylistAction(
+            "SavePlaylist",
+            $"Saved playlist {playlist.PlaylistID}",
+            result.Success,
+            result.Message
+        );
         return Ok(new PlaylistCommandResult
         {
             Success = result.Success,
             Message = result.Message
         });
-
-        
     }
 
     [HttpPost("playlist/set-active")]
@@ -121,10 +125,24 @@ public class MapPlaylistController : ControllerBase
         }).ToList());
 
         if (!saveResult.Success)
+        {
+            LogMapPlaylistAction(
+                "SetActivePlaylist",
+                $"Failed to save playlist {playlist.PlaylistID} before activating",
+                false,
+                saveResult.Message
+            );
             return Ok(new PlaylistCommandResult { Success = false, Message = saveResult.Message });
+        }
 
         var activateResult = mapInstanceManager.SetActivePlaylist(playlist.PlaylistID);
         TriggerServerUIReload();
+        LogMapPlaylistAction(
+            "SetActivePlaylist",
+            $"Set active playlist to {playlist.PlaylistID}",
+            activateResult.Success,
+            activateResult.Message
+        );
         return Ok(new PlaylistCommandResult
         {
             Success = activateResult.Success,
@@ -137,7 +155,6 @@ public class MapPlaylistController : ControllerBase
     {
         if(!HasPermission("maps")) return Forbid();
 
-        // Overwrite playlist with imported maps
         var result = mapInstanceManager.SavePlaylist(playlist.PlaylistID, playlist.Maps.Select(m => new MapObject
         {
             MapID = m.MapID,
@@ -146,15 +163,18 @@ public class MapPlaylistController : ControllerBase
             ModType = m.ModType,
             MapType = m.MapType
         }).ToList());
-
         TriggerServerUIReload();
-
+        LogMapPlaylistAction(
+            "ImportPlaylist",
+            $"Imported playlist {playlist.PlaylistID}",
+            result.Success,
+            result.Message
+        );
         return Ok(new PlaylistCommandResult
         {
             Success = result.Success,
             Message = result.Message
         });
-
     }
 
     [HttpGet("playlist/export/{id}")]
@@ -164,8 +184,21 @@ public class MapPlaylistController : ControllerBase
 
         var (success, maps, error) = mapInstanceManager.GetPlaylistMaps(id);
         if (!success)
+        {
+            LogMapPlaylistAction(
+                "ExportPlaylist",
+                $"Failed to export playlist {id}",
+                false,
+                error
+            );
             return BadRequest(new PlaylistCommandResult { Success = false, Message = error });
-
+        }
+        LogMapPlaylistAction(
+            "ExportPlaylist",
+            $"Exported playlist {id}",
+            true,
+            "Export successful"
+        );
         return Ok(new PlaylistDTO
         {
             PlaylistID = id,
@@ -187,6 +220,12 @@ public class MapPlaylistController : ControllerBase
         if(!HasPermission("maps")) return Forbid();
 
         var result = mapInstanceManager.SkipMap();
+        LogMapPlaylistAction(
+            "SkipMap",
+            "Skipped current map in playlist",
+            result.Success,
+            result.Message
+        );
         return Ok(new PlaylistCommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -196,6 +235,12 @@ public class MapPlaylistController : ControllerBase
         if(!HasPermission("maps")) return Forbid();
 
         var result = mapInstanceManager.ScoreMap();
+        LogMapPlaylistAction(
+            "ScoreMap",
+            "Scored current map in playlist",
+            result.Success,
+            result.Message
+        );
         return Ok(new PlaylistCommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -205,6 +250,12 @@ public class MapPlaylistController : ControllerBase
         if(!HasPermission("maps")) return Forbid();
 
         var result = mapInstanceManager.SetNextMap(mapIndex);
+        LogMapPlaylistAction(
+            "PlayNext",
+            $"Set next map in playlist to index {mapIndex}",
+            result.Success,
+            result.Message
+        );
         return Ok(new PlaylistCommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -228,6 +279,23 @@ public class MapPlaylistController : ControllerBase
         AppDebug.Log("MapPlaylistController", $"User permissions: {string.Join(", ", permissions)}");
         AppDebug.Log("MapPlaylistController", $"Has Permission: {permissions.Contains(permission).ToString()}");
         return permissions.Contains(permission);
+    }
+
+    private void LogMapPlaylistAction(string actionType, string description, bool success, string message)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null,
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.Map,
+            actionType: actionType,
+            description: description,
+            targetType: "MapPlaylist",
+            targetId: null,
+            targetName: null,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: success,
+            errorMessage: success ? null : message
+        );
     }
 
 }

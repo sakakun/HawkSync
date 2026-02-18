@@ -1,7 +1,9 @@
 using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
@@ -84,6 +86,15 @@ public class BanController : ControllerBase
             result = new BanRecordSaveResult { Success = false, Message = "No valid data to save." };
         }
 
+        LogBanAction(
+            actionType: req.NameRecordID == null && req.IPRecordID == null ? "Create" : "Update",
+            listType: "Blacklist",
+            target: req.PlayerName ?? req.IPAddress ?? "Unknown",
+            recordId: result.NameRecordID ?? result.IPRecordID,
+            success: result.Success,
+            message: result.Message
+        );
+
         CommonCore.instanceBans!.ForceUIUpdates = true;
 
         return Ok(result);
@@ -103,10 +114,20 @@ public class BanController : ControllerBase
         else
             opResult = banInstanceManager.DeleteBlacklistIPRecord(req.RecordID);
 
+        LogBanAction(
+            actionType: "Delete",
+            listType: "Blacklist",
+            target: req.IsName ? "Name" : "IP",
+            recordId: req.RecordID,
+            success: opResult.Success,
+            message: opResult.Message
+        );
+
         if (!opResult.Success)
             return Ok(new CommandResult { Success = false, Message = opResult.Message });
 
         CommonCore.instanceBans!.ForceUIUpdates = true;
+
         return Ok(new CommandResult { Success = true, Message = "Record deleted." });
     }
 
@@ -182,6 +203,15 @@ public class BanController : ControllerBase
             result = new BanRecordSaveResult { Success = false, Message = "No valid data to save." };
         }
 
+        LogBanAction(
+            actionType: req.NameRecordID == null && req.IPRecordID == null ? "Create" : "Update",
+            listType: "Whitelist",
+            target: req.PlayerName ?? req.IPAddress ?? "Unknown",
+            recordId: result.NameRecordID ?? result.IPRecordID,
+            success: result.Success,
+            message: result.Message
+        );
+
         CommonCore.instanceBans!.ForceUIUpdates = true;
 
         return Ok(result);
@@ -201,6 +231,15 @@ public class BanController : ControllerBase
         else
             opResult = banInstanceManager.DeleteWhitelistIPRecord(req.RecordID);
 
+        LogBanAction(
+            actionType: "Delete",
+            listType: "Whitelist",
+            target: req.IsName ? "Name" : "IP",
+            recordId: req.RecordID,
+            success: opResult.Success,
+            message: opResult.Message
+        );
+
         if (!opResult.Success)
             return Ok(new CommandResult { Success = false, Message = opResult.Message });
 
@@ -212,6 +251,29 @@ public class BanController : ControllerBase
     {
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
         return permissions.Contains(permission);
+    }
+
+	private void LogBanAction(
+    string actionType,
+    string listType, // "Blacklist" or "Whitelist"
+    string target,
+    int? recordId,
+    bool success,
+    string message)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null, // or get from User claims if available
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.Ban,
+            actionType: actionType,
+            description: $"{actionType} {listType} record: {target}",
+            targetType: listType,
+            targetId: recordId?.ToString(),
+            targetName: target,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: success,
+            errorMessage: success ? null : message
+        );
     }
 
 }

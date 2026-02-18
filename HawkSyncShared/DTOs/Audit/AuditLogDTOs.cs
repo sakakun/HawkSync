@@ -88,6 +88,7 @@ public static class AuditCategory
     public const string Settings = "Settings";
     public const string User = "User";
     public const string System = "System";
+    public const string Stats = "Stats";
     public const string Server = "Server";
 }
 

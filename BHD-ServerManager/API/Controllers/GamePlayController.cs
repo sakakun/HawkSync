@@ -1,7 +1,9 @@
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabGameplay;
 using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.Instances;
@@ -53,7 +55,6 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
-        // Convert DTO to GamePlaySettings
         var options = new ServerOptions(
             request.Options.AutoBalance, request.Options.ShowTracers,
             request.Options.ShowClays, request.Options.AutoRange,
@@ -61,17 +62,14 @@ public class GamePlayController : ControllerBase
             request.Options.FatBullets, request.Options.OneShotKills,
             request.Options.AllowLeftLeaning
         );
-
         var friendlyFire = new FriendlyFireSettings(
             request.FriendlyFire.Enabled, request.FriendlyFire.MaxKills,
             request.FriendlyFire.WarnOnKill, request.FriendlyFire.ShowFriendlyTags
         );
-
         var roles = new RoleRestrictions(
             request.Roles.CQB, request.Roles.Gunner,
             request.Roles.Sniper, request.Roles.Medic
         );
-
         var weapons = new WeaponRestrictions(
             request.Weapons.Colt45, request.Weapons.M9Beretta,
             request.Weapons.CAR15, request.Weapons.CAR15203,
@@ -86,7 +84,6 @@ public class GamePlayController : ControllerBase
             request.Weapons.Satchel, request.Weapons.AT4,
             request.Weapons.FlashBang, request.Weapons.Claymore
         );
-
         var settings = new GamePlaySettings(
             request.BluePassword, request.RedPassword,
             request.ScoreKOTH, request.ScoreDM, request.ScoreFB,
@@ -95,16 +92,12 @@ public class GamePlayController : ControllerBase
             request.PSPTakeoverTimer, request.FlagReturnTime, request.MaxTeamLives,
             options, friendlyFire, roles, weapons
         );
-
-        // Save via manager (includes validation)
         var result = theInstanceManager.SaveGamePlaySettings(settings);
-
         if (result.Success)
         {
-            // Trigger UI reload on server manager
             TriggerServerUIReload();
         }
-
+        LogGamePlayAction("SaveSettings", "Gameplay settings updated", result.Success, result.Message);
         return Ok(new CommandResult
         {
             Success = result.Success,
@@ -152,6 +145,22 @@ public class GamePlayController : ControllerBase
     // ================================================================================
     // HELPER METHODS
     // ================================================================================
+    private void LogGamePlayAction(string actionType, string description, bool success, string message)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null,
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.Settings, // or AuditCategory.Gameplay if you have one
+            actionType: actionType,
+            description: description,
+            targetType: "GamePlay",
+            targetId: null,
+            targetName: null,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: success,
+            errorMessage: success ? null : message
+        );
+    }
 
     private GamePlaySettingsData MapToSettingsData()
     {
@@ -242,34 +251,28 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
+        bool success = false;
+        string message = string.Empty;
         try
         {
-            // Check if server is running
             if (CommonCore.theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
-                return Ok(new CommandResult
-                {
-                    Success = false,
-                    Message = "Game server is not running. Cannot update settings."
-                });
+                message = "Game server is not running. Cannot update settings.";
+                return Ok(new CommandResult { Success = false, Message = message });
             }
-
-            // Update the game server with current settings from instance
             theInstanceManager.UpdateGameServer();
-
-            return Ok(new CommandResult
-            {
-                Success = true,
-                Message = "Gameplay settings have been applied to the running game server."
-            });
+            success = true;
+            message = "Gameplay settings have been applied to the running game server.";
+            return Ok(new CommandResult { Success = success, Message = message });
         }
         catch (Exception ex)
         {
-            return Ok(new CommandResult
-            {
-                Success = false,
-                Message = $"Error updating game server: {ex.Message}"
-            });
+            message = $"Error updating game server: {ex.Message}";
+            return Ok(new CommandResult { Success = false, Message = message });
+        }
+        finally
+        {
+            LogGamePlayAction("UpdateGameServer", "Applied gameplay settings to running server", success, message);
         }
     }
 
@@ -281,34 +284,28 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
+        bool success = false;
+        string message = string.Empty;
         try
         {
-            // Check if server is running
             if (CommonCore.theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
-                return Ok(new CommandResult
-                {
-                    Success = false,
-                    Message = "Game server is not running. Cannot un/lock lobby."
-                });
+                message = "Game server is not running. Cannot un/lock lobby.";
+                return Ok(new CommandResult { Success = false, Message = message });
             }
-
-            // Send lock game command to server
             ServerMemory.WriteMemorySendConsoleCommand("lockgame");
-
-            return Ok(new CommandResult
-            {
-                Success = true,
-                Message = "Game lobby has been un/locked."
-            });
+            success = true;
+            message = "Game lobby has been un/locked.";
+            return Ok(new CommandResult { Success = success, Message = message });
         }
         catch (Exception ex)
         {
-            return Ok(new CommandResult
-            {
-                Success = false,
-                Message = $"Error un/locking lobby: {ex.Message}"
-            });
+            message = $"Error un/locking lobby: {ex.Message}";
+            return Ok(new CommandResult { Success = false, Message = message });
+        }
+        finally
+        {
+            LogGamePlayAction("LockLobby", "Game lobby lock/unlock", success, message);
         }
     }
 
@@ -320,22 +317,17 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
+        bool success = false;
+        string message = string.Empty;
         try
         {
             var result = theInstanceManager.LoadGamePlaySettings();
-        
             if (!result.Success)
             {
-                return Ok(new GamePlaySettingsExportResponse
-                {
-                    Success = false,
-                    Message = result.Message
-                });
+                message = result.Message;
+                return Ok(new GamePlaySettingsExportResponse { Success = false, Message = message });
             }
-
-            // Get current settings from instance
             var instance = CommonCore.theInstance!;
-        
             var options = new ServerOptions(
                 instance.gameOptionAutoBalance, instance.gameOptionShowTracers,
                 instance.gameShowTeamClays, instance.gameOptionAutoRange,
@@ -343,17 +335,14 @@ public class GamePlayController : ControllerBase
                 instance.gameFatBullets, instance.gameOneShotKills,
                 instance.gameAllowLeftLeaning
             );
-
             var friendlyFire = new FriendlyFireSettings(
                 instance.gameOptionFF, instance.gameFriendlyFireKills,
                 instance.gameOptionFFWarn, instance.gameOptionFriendlyTags
             );
-
             var roles = new RoleRestrictions(
                 instance.roleCQB, instance.roleGunner,
                 instance.roleSniper, instance.roleMedic
             );
-
             var weapons = new WeaponRestrictions(
                 instance.weaponColt45, instance.weaponM9Beretta,
                 instance.weaponCar15, instance.weaponCar15203,
@@ -368,7 +357,6 @@ public class GamePlayController : ControllerBase
                 instance.weaponSatchelCharges, instance.weaponAT4,
                 instance.weaponFlashGrenade, instance.weaponClaymore
             );
-
             var settings = new GamePlaySettings(
                 instance.gamePasswordBlue, instance.gamePasswordRed,
                 instance.gameScoreZoneTime, instance.gameScoreKills, instance.gameScoreFlags,
@@ -377,28 +365,25 @@ public class GamePlayController : ControllerBase
                 instance.gamePSPTOTimer, instance.gameFlagReturnTime, instance.gameMaxTeamLives,
                 options, friendlyFire, roles, weapons
             );
-
-            // Serialize to JSON
-            var json = System.Text.Json.JsonSerializer.Serialize(settings, new System.Text.Json.JsonSerializerOptions 
-            { 
-                WriteIndented = true 
-            });
-
+            var json = System.Text.Json.JsonSerializer.Serialize(settings, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            success = true;
+            message = "Settings exported successfully";
             return Ok(new GamePlaySettingsExportResponse
             {
                 Success = true,
-                Message = "Settings exported successfully",
+                Message = message,
                 JsonData = json,
                 FileName = $"GamePlaySettings_{DateTime.Now:yyyyMMdd_HHmmss}.json"
             });
         }
         catch (Exception ex)
         {
-            return Ok(new GamePlaySettingsExportResponse
-            {
-                Success = false,
-                Message = $"Error exporting settings: {ex.Message}"
-            });
+            message = $"Error exporting settings: {ex.Message}";
+            return Ok(new GamePlaySettingsExportResponse { Success = false, Message = message });
+        }
+        finally
+        {
+            LogGamePlayAction("ExportSettings", "Exported gameplay settings as JSON", success, message);
         }
     }
 
@@ -410,52 +395,40 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
+        bool success = false;
+        string message = string.Empty;
         try
         {
-            // Deserialize JSON
             var settings = System.Text.Json.JsonSerializer.Deserialize<GamePlaySettings>(request.JsonData);
-        
             if (settings == null)
             {
-                return Ok(new CommandResult
-                {
-                    Success = false,
-                    Message = "Failed to parse JSON data. Invalid format."
-                });
+                message = "Failed to parse JSON data. Invalid format.";
+                return Ok(new CommandResult { Success = false, Message = message });
             }
-
-            // Save the imported settings
             var result = theInstanceManager.SaveGamePlaySettings(settings);
-
             if (result.Success)
             {
-                // Trigger UI reload on server manager
                 TriggerServerUIReload();
             }
-
-            return Ok(new CommandResult
-            {
-                Success = result.Success,
-                Message = result.Success 
-                    ? "Settings imported and applied successfully." 
-                    : $"Failed to import settings: {result.Message}"
-            });
+            success = result.Success;
+            message = result.Success 
+                ? "Settings imported and applied successfully." 
+                : $"Failed to import settings: {result.Message}";
+            return Ok(new CommandResult { Success = success, Message = message });
         }
         catch (System.Text.Json.JsonException ex)
         {
-            return Ok(new CommandResult
-            {
-                Success = false,
-                Message = $"Invalid JSON format: {ex.Message}"
-            });
+            message = $"Invalid JSON format: {ex.Message}";
+            return Ok(new CommandResult { Success = false, Message = message });
         }
         catch (Exception ex)
         {
-            return Ok(new CommandResult
-            {
-                Success = false,
-                Message = $"Error importing settings: {ex.Message}"
-            });
+            message = $"Error importing settings: {ex.Message}";
+            return Ok(new CommandResult { Success = false, Message = message });
+        }
+        finally
+        {
+            LogGamePlayAction("ImportSettings", "Imported gameplay settings from JSON", success, message);
         }
     }
 
@@ -467,60 +440,43 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
+        bool success = false;
+        string message = string.Empty;
         try
         {
             var instance = CommonCore.theInstance;
-        
-            // Check if already running
             if (instance != null && instance.instanceStatus != InstanceStatus.OFFLINE)
             {
-                return Ok(new CommandResult
-                {
-                    Success = false,
-                    Message = "Server is already running."
-                });
+                message = "Server is already running.";
+                return Ok(new CommandResult { Success = false, Message = message });
             }
-
-            // Validate server path
             if (!theInstanceManager.ValidateGameServerPath())
             {
-                return Ok(new CommandResult
-                {
-                    Success = false,
-                    Message = "Invalid game server path. Please configure the server path in Profile settings."
-                });
+                message = "Invalid game server path. Please configure the server path in Profile settings.";
+                return Ok(new CommandResult { Success = false, Message = message });
             }
-
-            // Start the server
             bool started = BHD_ServerManager.Classes.GameManagement.StartServer.startGame();
-
             if (started)
             {
-                // Update server status
                 ServerMemory.ReadMemoryServerStatus();
-
-                return Ok(new CommandResult
-                {
-                    Success = true,
-                    Message = "Game server started successfully."
-                });
+                success = true;
+                message = "Game server started successfully.";
+                return Ok(new CommandResult { Success = success, Message = message });
             }
             else
             {
-                return Ok(new CommandResult
-                {
-                    Success = false,
-                    Message = "Failed to start game server. Check server logs for details."
-                });
+                message = "Failed to start game server. Check server logs for details.";
+                return Ok(new CommandResult { Success = false, Message = message });
             }
         }
         catch (Exception ex)
         {
-            return Ok(new CommandResult
-            {
-                Success = false,
-                Message = $"Error starting server: {ex.Message}"
-            });
+            message = $"Error starting server: {ex.Message}";
+            return Ok(new CommandResult { Success = false, Message = message });
+        }
+        finally
+        {
+            LogGamePlayAction("StartServer", "Started game server", success, message);
         }
     }
 
@@ -532,36 +488,29 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
+        bool success = false;
+        string message = string.Empty;
         try
         {
             var instance = CommonCore.theInstance;
-        
-            // Check if server is running
             if (instance == null || instance.instanceStatus == InstanceStatus.OFFLINE)
             {
-                return Ok(new CommandResult
-                {
-                    Success = false,
-                    Message = "Server is not running."
-                });
+                message = "Server is not running.";
+                return Ok(new CommandResult { Success = false, Message = message });
             }
-
-            // Stop the server
             BHD_ServerManager.Classes.GameManagement.StartServer.stopGame();
-
-            return Ok(new CommandResult
-            {
-                Success = true,
-                Message = "Game server stopped successfully."
-            });
+            success = true;
+            message = "Game server stopped successfully.";
+            return Ok(new CommandResult { Success = success, Message = message });
         }
         catch (Exception ex)
         {
-            return Ok(new CommandResult
-            {
-                Success = false,
-                Message = $"Error stopping server: {ex.Message}"
-            });
+            message = $"Error stopping server: {ex.Message}";
+            return Ok(new CommandResult { Success = false, Message = message });
+        }
+        finally
+        {
+            LogGamePlayAction("StopServer", "Stopped game server", success, message);
         }
     }
     private bool HasPermission(string permission)

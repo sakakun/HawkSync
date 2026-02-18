@@ -1,6 +1,8 @@
 ﻿using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.DTOs.tabBans.Service;
 using HawkSyncShared.DTOs.tabProfile;
@@ -91,6 +93,13 @@ public class ProfileController : ControllerBase
 
         // Save via manager
         var result = theInstanceManager.SaveProfileSettings(settings);
+
+        LogProfileAction(
+            "SaveSettings",
+            "Profile settings updated",
+            result.Success,
+            result.Message
+        );
 
         if (result.Success)
         {
@@ -216,6 +225,23 @@ public class ProfileController : ControllerBase
     {
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
         return permissions.Contains(permission);
+    }
+
+    private void LogProfileAction(string actionType, string description, bool success, string message)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null,
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.Settings,
+            actionType: actionType,
+            description: description,
+            targetType: "Profile",
+            targetId: null,
+            targetName: null,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: success,
+            errorMessage: success ? null : message
+        );
     }
 
 }

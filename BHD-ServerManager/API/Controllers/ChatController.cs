@@ -6,6 +6,7 @@ using HawkSyncShared.SupportClasses;
 using HawkSyncShared.DTOs.tabPlayers;
 using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared.Instances;
+using HawkSyncShared.DTOs.Audit;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -16,13 +17,20 @@ public class ChatController : ControllerBase
     public ActionResult<CommandResult> SendMessage([FromBody] SendChatCommand command)
     {
         if (!HasPermission("chat")) return Forbid();
-       
         if (command.Channel < 0 || command.Channel > 3)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid channel." });
 
         string chatMessage = AppFunc.FB64(command.Message);
-
         var result = chatInstanceManager.SendChatMessage(chatMessage, command.Channel);
+
+        LogChatAction(
+            actionType: "SendMessage",
+            target: command.Message ?? string.Empty,
+            extra: $"Channel: {command.Channel}",
+            success: result.Success,
+            message: result.Message
+        );
+
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -31,6 +39,13 @@ public class ChatController : ControllerBase
     {
         if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.AddAutoMessage(request.Message!, request.Interval);
+        LogChatAction(
+            actionType: "AddAutoMessage",
+            target: request.Message ?? string.Empty,
+            extra: $"Interval: {request.Interval}",
+            success: result.Success,
+            message: result.Message
+        );
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -39,6 +54,13 @@ public class ChatController : ControllerBase
     {
         if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.RemoveAutoMessage(int.Parse(request.Id!));
+        LogChatAction(
+            actionType: "RemoveAutoMessage",
+            target: request.Id ?? string.Empty,
+            extra: string.Empty,
+            success: result.Success,
+            message: result.Message
+        );
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -47,6 +69,13 @@ public class ChatController : ControllerBase
     {
         if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.AddSlapMessage(request.Message!);
+        LogChatAction(
+            actionType: "AddSlapMessage",
+            target: request.Message ?? string.Empty,
+            extra: string.Empty,
+            success: result.Success,
+            message: result.Message
+        );
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -55,6 +84,13 @@ public class ChatController : ControllerBase
     {
         if (!HasPermission("chat")) return Forbid();
         var result = chatInstanceManager.RemoveSlapMessage(int.Parse(request.Id!));
+        LogChatAction(
+            actionType: "RemoveSlapMessage",
+            target: request.Id ?? string.Empty,
+            extra: string.Empty,
+            success: result.Success,
+            message: result.Message
+        );
         return Ok(new CommandResult { Success = result.Success, Message = result.Message });
     }
 
@@ -96,6 +132,24 @@ public class ChatController : ControllerBase
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
         return permissions.Contains(permission);
     }
+
+    private void LogChatAction(string actionType, string target, string extra, bool success, string message)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null, // or get from User claims if available
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.Chat,
+            actionType: actionType,
+            description: $"{actionType}: {target} {(string.IsNullOrWhiteSpace(extra) ? "" : "(" + extra + ")")}",
+            targetType: "Chat",
+            targetId: null,
+            targetName: target,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: success,
+            errorMessage: success ? null : message
+        );
+    }
+
 }
 
 public class AutoMessageRequest { public string? Message { get; set; } public int Interval { get; set; } }

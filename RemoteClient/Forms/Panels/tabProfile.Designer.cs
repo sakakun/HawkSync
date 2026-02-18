@@ -28,8 +28,8 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-			DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+			DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+			DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
 			tableLayoutPanel1 = new TableLayoutPanel();
 			profileFileManagers = new TabControl();
 			tabProfilePage1 = new TabPage();
@@ -100,6 +100,12 @@
 			cbAuditCategoryFilter = new ComboBox();
 			lblAuditCategory = new Label();
 			dgvAuditLogs = new DataGridView();
+			Time = new DataGridViewTextBoxColumn();
+			dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
+			dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
+			dataGridViewTextBoxColumn4 = new DataGridViewTextBoxColumn();
+			Description = new DataGridViewTextBoxColumn();
+			Status = new DataGridViewTextBoxColumn();
 			lblAuditStatus = new Label();
 			groupBox4 = new GroupBox();
 			tableLayoutPanel4 = new TableLayoutPanel();
@@ -107,12 +113,6 @@
 			btn_saveProfile = new Button();
 			folderProfileBrowserDialog = new FolderBrowserDialog();
 			openFileDialog1 = new OpenFileDialog();
-			Time = new DataGridViewTextBoxColumn();
-			dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
-			dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
-			dataGridViewTextBoxColumn4 = new DataGridViewTextBoxColumn();
-			Description = new DataGridViewTextBoxColumn();
-			Status = new DataGridViewTextBoxColumn();
 			tableLayoutPanel1.SuspendLayout();
 			profileFileManagers.SuspendLayout();
 			tabProfilePage1.SuspendLayout();
@@ -1043,12 +1043,11 @@
 			// 
 			cbAuditCategoryFilter.DropDownStyle = ComboBoxStyle.DropDownList;
 			cbAuditCategoryFilter.FormattingEnabled = true;
-			cbAuditCategoryFilter.Items.AddRange(new object[] { "All", "Ban", "Chat", "Player", "Map", "Settings", "User", "System", "Server" });
+			cbAuditCategoryFilter.Items.AddRange(new object[] { "All", "Ban", "Chat", "Player", "Map", "Settings", "Server", "Stats", "System", "User" });
 			cbAuditCategoryFilter.Location = new Point(68, 9);
 			cbAuditCategoryFilter.Name = "cbAuditCategoryFilter";
 			cbAuditCategoryFilter.Size = new Size(100, 23);
 			cbAuditCategoryFilter.TabIndex = 1;
-			cbAuditCategoryFilter.Text = "All";
 			cbAuditCategoryFilter.SelectedIndexChanged += cbAuditCategoryFilter_SelectedIndexChanged;
 			// 
 			// lblAuditCategory
@@ -1065,17 +1064,17 @@
 			dgvAuditLogs.AllowUserToAddRows = false;
 			dgvAuditLogs.AllowUserToDeleteRows = false;
 			dgvAuditLogs.AllowUserToResizeRows = false;
-			dataGridViewCellStyle7.BackColor = Color.FromArgb(240, 240, 240);
-			dgvAuditLogs.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
+			dataGridViewCellStyle1.BackColor = Color.FromArgb(240, 240, 240);
+			dgvAuditLogs.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
 			dgvAuditLogs.BorderStyle = BorderStyle.Fixed3D;
-			dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle8.BackColor = Color.FromArgb(230, 230, 230);
-			dataGridViewCellStyle8.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-			dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
-			dataGridViewCellStyle8.SelectionBackColor = SystemColors.Highlight;
-			dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
-			dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
-			dgvAuditLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
+			dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle2.BackColor = Color.FromArgb(230, 230, 230);
+			dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+			dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+			dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+			dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+			dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+			dgvAuditLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
 			dgvAuditLogs.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			dgvAuditLogs.Columns.AddRange(new DataGridViewColumn[] { Time, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3, dataGridViewTextBoxColumn4, Description, Status });
 			dgvAuditLogs.Dock = DockStyle.Fill;
@@ -1088,6 +1087,48 @@
 			dgvAuditLogs.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 			dgvAuditLogs.Size = new Size(500, 265);
 			dgvAuditLogs.TabIndex = 1;
+			// 
+			// Time
+			// 
+			Time.HeaderText = "Time";
+			Time.Name = "Time";
+			Time.ReadOnly = true;
+			Time.Width = 60;
+			// 
+			// dataGridViewTextBoxColumn2
+			// 
+			dataGridViewTextBoxColumn2.HeaderText = "User";
+			dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+			dataGridViewTextBoxColumn2.ReadOnly = true;
+			dataGridViewTextBoxColumn2.Width = 75;
+			// 
+			// dataGridViewTextBoxColumn3
+			// 
+			dataGridViewTextBoxColumn3.HeaderText = "Category";
+			dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+			dataGridViewTextBoxColumn3.ReadOnly = true;
+			dataGridViewTextBoxColumn3.Width = 60;
+			// 
+			// dataGridViewTextBoxColumn4
+			// 
+			dataGridViewTextBoxColumn4.HeaderText = "Action";
+			dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+			dataGridViewTextBoxColumn4.ReadOnly = true;
+			dataGridViewTextBoxColumn4.Width = 55;
+			// 
+			// Description
+			// 
+			Description.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Description.HeaderText = "Description";
+			Description.Name = "Description";
+			Description.ReadOnly = true;
+			// 
+			// Status
+			// 
+			Status.HeaderText = "✓";
+			Status.Name = "Status";
+			Status.ReadOnly = true;
+			Status.Width = 25;
 			// 
 			// lblAuditStatus
 			// 
@@ -1156,48 +1197,6 @@
 			// openFileDialog1
 			// 
 			openFileDialog1.FileName = "openModFileDialog";
-			// 
-			// Time
-			// 
-			Time.HeaderText = "Time";
-			Time.Name = "Time";
-			Time.ReadOnly = true;
-			Time.Width = 60;
-			// 
-			// dataGridViewTextBoxColumn2
-			// 
-			dataGridViewTextBoxColumn2.HeaderText = "User";
-			dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-			dataGridViewTextBoxColumn2.ReadOnly = true;
-			dataGridViewTextBoxColumn2.Width = 75;
-			// 
-			// dataGridViewTextBoxColumn3
-			// 
-			dataGridViewTextBoxColumn3.HeaderText = "Category";
-			dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-			dataGridViewTextBoxColumn3.ReadOnly = true;
-			dataGridViewTextBoxColumn3.Width = 60;
-			// 
-			// dataGridViewTextBoxColumn4
-			// 
-			dataGridViewTextBoxColumn4.HeaderText = "Action";
-			dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-			dataGridViewTextBoxColumn4.ReadOnly = true;
-			dataGridViewTextBoxColumn4.Width = 55;
-			// 
-			// Description
-			// 
-			Description.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-			Description.HeaderText = "Description";
-			Description.Name = "Description";
-			Description.ReadOnly = true;
-			// 
-			// Status
-			// 
-			Status.HeaderText = "✓";
-			Status.Name = "Status";
-			Status.ReadOnly = true;
-			Status.Width = 25;
 			// 
 			// tabProfile
 			// 

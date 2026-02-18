@@ -1,6 +1,8 @@
 ﻿using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.DTOs.tabBans.Service;
 using HawkSyncShared.DTOs.tabProfile;
@@ -31,6 +33,14 @@ public class StatsController : ControllerBase
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
         var result = theInstanceManager.SaveWebStatsSettings(settings);
+
+        LogStatsAction(
+            "SaveWebStatsSettings",
+            "Web stats settings updated",
+            result.Success,
+            result.Message
+        );
+
         CommonCore.instanceStats!.ForceUIUpdate = true;
         return Ok(new CommandResult
         {
@@ -53,6 +63,23 @@ public class StatsController : ControllerBase
             Success = result.Success,
             Message = result.Message
         });
+    }
+
+    private void LogStatsAction(string actionType, string description, bool success, string message)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null,
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.Stats,
+            actionType: actionType,
+            description: description,
+            targetType: "Stats",
+            targetId: null,
+            targetName: null,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: success,
+            errorMessage: success ? null : message
+        );
     }
 
 }
