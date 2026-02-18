@@ -263,7 +263,8 @@ public partial class tabAdmin : UserControl
         checkBox_permBans.Checked = false;
         checkBox_permStats.Checked = false;
         checkBox_permUsers.Checked = false;
-    }
+        checkBox_permAudit.Checked = false;
+	}
 
     private void LoadUserToForm(UserDTO user)
     {
@@ -282,6 +283,7 @@ public partial class tabAdmin : UserControl
         checkBox_permBans.Checked = user.Permissions.Contains("bans");
         checkBox_permStats.Checked = user.Permissions.Contains("stats");
         checkBox_permUsers.Checked = user.Permissions.Contains("users");
+        checkBox_permAudit.Checked = user.Permissions.Contains("audit");
     }
 
     private List<string> GetSelectedPermissions()
@@ -295,6 +297,7 @@ public partial class tabAdmin : UserControl
         if (checkBox_permBans.Checked) permissions.Add("bans");
         if (checkBox_permStats.Checked) permissions.Add("stats");
         if (checkBox_permUsers.Checked) permissions.Add("users");
+        if (checkBox_permAudit.Checked) permissions.Add("audit");
         return permissions;
     }
 

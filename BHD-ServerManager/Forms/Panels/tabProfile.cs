@@ -1,4 +1,5 @@
 ﻿using HawkSyncShared;
+using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
@@ -24,10 +25,19 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Instance Objects ---
         private theInstance? theInstance => CommonCore.theInstance;
         
+        // --- Audit Log Fields ---
+        private System.Windows.Forms.Timer? _auditFilterTimer;
+        private string _currentUserFilter = string.Empty;
+        private string _currentCategoryFilter = "All";
+        
         public tabProfile()
         {
             // Initialize the form components
             InitializeComponent();
+            
+            // Initialize audit log UI
+            InitializeAuditLogUI();
+            
             // Initialize the profile tab with current settings
             Profile_LoadSettings();
 
@@ -284,5 +294,156 @@ namespace BHD_ServerManager.Forms.Panels
                 MessageBox.Show("Failed to open profile file dialog. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        #region Audit Logs
+
+        /// <summary>
+        /// Initialize audit log UI components
+        /// </summary>
+        private void InitializeAuditLogUI()
+        {
+            AppDebug.Log("tabProfile", "Initializing audit log UI...");
+            
+            // Initialize filter timer for debouncing user filter
+            _auditFilterTimer = new System.Windows.Forms.Timer
+            {
+                Interval = 500 // 500ms debounce
+            };
+            _auditFilterTimer.Tick += (s, e) =>
+            {
+                _auditFilterTimer.Stop();
+                LoadAuditLogs();
+            };
+
+            // Set default category filter
+            if (cbAuditCategoryFilter.Items.Count > 0 && cbAuditCategoryFilter.SelectedIndex < 0)
+            {
+                cbAuditCategoryFilter.SelectedIndex = 0; // Select "All"
+                AppDebug.Log("tabProfile", $"Set default category filter to: {cbAuditCategoryFilter.SelectedItem}");
+            }
+
+            // Load initial data
+            AppDebug.Log("tabProfile", "Loading initial audit logs...");
+            LoadAuditLogs();
+        }
+
+        /// <summary>
+        /// Load audit logs from database with current filters
+        /// </summary>
+        private void LoadAuditLogs()
+        {
+            try
+            {
+                AppDebug.Log("tabProfile", "LoadAuditLogs called");
+                
+                if (!DatabaseManager.IsInitialized)
+                {
+                    lblAuditStatus.Text = "Database not initialized";
+                    AppDebug.Log("tabProfile", "Database not initialized");
+                    return;
+                }
+
+                // Get logs from last 24 hours
+                var startDate = DateTime.Now.AddHours(-24);
+                var endDate = DateTime.Now;
+
+                // Apply filters
+                string? categoryFilter = _currentCategoryFilter == "All" ? null : _currentCategoryFilter;
+                string? userFilter = string.IsNullOrWhiteSpace(_currentUserFilter) ? null : _currentUserFilter;
+
+                AppDebug.Log("tabProfile", $"Fetching audit logs - Category: {_currentCategoryFilter}, User: {_currentUserFilter ?? "All"}");
+
+                var (logs, totalCount) = DatabaseManager.GetAuditLogs(
+                    startDate: startDate,
+                    endDate: endDate,
+                    usernameFilter: userFilter,
+                    categoryFilter: categoryFilter,
+                    limit: 500
+                );
+
+                AppDebug.Log("tabProfile", $"Retrieved {logs.Count} logs out of {totalCount} total");
+
+                // Update grid
+                dgvAuditLogs.Rows.Clear();
+
+                foreach (var log in logs)
+                {
+                    var rowIndex = dgvAuditLogs.Rows.Add(
+                        log.Timestamp.ToString("HH:mm:ss"),
+                        log.Username,
+                        log.ActionCategory,
+                        log.ActionType,
+                        log.ActionDescription,
+                        log.Success ? "✓" : "✗"
+                    );
+
+                    var row = dgvAuditLogs.Rows[rowIndex];
+
+                    // Store full log object in Tag for detail view
+                    row.Tag = log;
+
+                    // Color code failed actions
+                    if (!log.Success)
+                    {
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(255, 230, 230);
+                        row.Cells["Status"].Style.ForeColor = Color.Red;
+                    }
+                    else
+                    {
+                        row.Cells["Status"].Style.ForeColor = Color.Green;
+                    }
+
+                    // Add tooltip with full timestamp
+                    row.Cells["Time"].ToolTipText = log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+                    
+                    // Add tooltip with full description if truncated
+                    if (log.ActionDescription.Length > 40)
+                    {
+                        row.Cells["Description"].ToolTipText = log.ActionDescription;
+                    }
+                }
+
+                // Update status label
+                lblAuditStatus.Text = $"Showing {logs.Count} of {totalCount} records | Last updated: {DateTime.Now:HH:mm:ss}";
+
+                AppDebug.Log("tabProfile", $"Loaded {logs.Count} audit logs");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("tabProfile", $"Failed to load audit logs: {ex.Message}");
+                lblAuditStatus.Text = "Error loading audit logs";
+            }
+        }
+
+        /// <summary>
+        /// Category filter changed event handler
+        /// </summary>
+        private void cbAuditCategoryFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _currentCategoryFilter = cbAuditCategoryFilter.SelectedItem?.ToString() ?? "All";
+            LoadAuditLogs();
+        }
+
+        /// <summary>
+        /// User filter text changed event handler (with debounce)
+        /// </summary>
+        private void txtAuditUserFilter_TextChanged(object sender, EventArgs e)
+        {
+            _currentUserFilter = txtAuditUserFilter.Text;
+            
+            // Reset timer for debouncing
+            _auditFilterTimer?.Stop();
+            _auditFilterTimer?.Start();
+        }
+
+        /// <summary>
+        /// Refresh button click event handler
+        /// </summary>
+        private void btnAuditRefresh_Click(object sender, EventArgs e)
+        {
+            LoadAuditLogs();
+        }
+
+        #endregion
     }
 }

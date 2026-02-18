@@ -5,8 +5,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.Audit;
+using HawkSyncShared.SupportClasses;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -19,11 +22,40 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
     {
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+        
+        AppDebug.Log("AuthController", $"Login attempt from {ipAddress} for user: {request.Username}");
+        
         var (success, user, message) = adminInstanceManager.AuthenticateUser(
             request.Username, request.Password);
 
         if (!success || user == null)
         {
+            AppDebug.Log("AuthController", $"Login failed for {request.Username}: {message}");
+            
+            // Log failed login attempt
+            try
+            {
+                DatabaseManager.LogAuditAction(
+                    userId: null,
+                    username: request.Username,
+                    category: AuditCategory.System,
+                    actionType: AuditAction.Login,
+                    description: $"Failed login attempt: {message}",
+                    targetType: "Authentication",
+                    targetId: null,
+                    targetName: request.Username,
+                    ipAddress: ipAddress,
+                    success: false,
+                    errorMessage: message
+                );
+                AppDebug.Log("AuthController", "Failed login audit log written");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("AuthController", $"Error writing failed login audit log: {ex.Message}");
+            }
+
             return Ok(new LoginResponse
             {
                 Success = false,
@@ -34,6 +66,37 @@ public class AuthController : ControllerBase
         var token = GenerateJwtToken(user);
 
         adminInstanceManager.TrackSession(user.Username);
+
+        AppDebug.Log("AuthController", $"Login successful for {request.Username}");
+        
+        // Log successful login
+        bool auditLogSuccess = false;
+        try
+        {
+            DatabaseManager.LogAuditAction(
+                userId: user.UserID,
+                username: user.Username,
+                category: AuditCategory.System,
+                actionType: AuditAction.Login,
+                description: "User logged in successfully",
+                targetType: "User",
+                targetId: user.UserID.ToString(),
+                targetName: user.Username,
+                ipAddress: ipAddress,
+                success: true
+            );
+            auditLogSuccess = true;
+            AppDebug.Log("AuthController", "Successful login audit log written");
+        }
+        catch (Exception ex)
+        {
+            AppDebug.Log("AuthController", $"Error writing successful login audit log: {ex.Message}");
+        }
+
+        if (!auditLogSuccess)
+        {
+            AppDebug.Log("AuthController", "WARNING: Login was successful but audit log failed to write");
+        }
 
         return Ok(new LoginResponse
         {

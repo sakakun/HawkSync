@@ -1,9 +1,11 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
 using RemoteClient.Forms.SubPanels;
+using System.Net.Http.Json;
 
 namespace RemoteClient.Forms.Panels;
 
@@ -21,12 +23,23 @@ public partial class tabProfile : UserControl
     private System.Windows.Forms.Timer? _inactivityTimer;
     private const int INACTIVITY_TIMEOUT_SECONDS = 120; // 2 minutes
 
+	// ================================================================================
+	// AUDIT LOG FIELDS
+	// ================================================================================
+
+	private System.Windows.Forms.Timer? _auditFilterTimer;
+	private string _currentUserFilter = string.Empty;
+	private string _currentCategoryFilter = "All";
+
     public tabProfile()
     {
         InitializeComponent();
 
         // Subscribe to server updates
         ApiCore.OnSnapshotReceived += OnSnapshotReceived;
+
+		// Initialize audit log UI
+		InitializeAuditLogUI();
 
         // Initial load from server
         ApplySettingsToUI();
@@ -441,5 +454,165 @@ public partial class tabProfile : UserControl
         }
     }
 
+	#region Audit Logs
+
+	/// <summary>
+	/// Initialize audit log UI components
+	/// </summary>
+	private void InitializeAuditLogUI()
+	{
+		Console.WriteLine("[tabProfile] Initializing audit log UI...");
+		
+		// Initialize filter timer for debouncing user filter
+		_auditFilterTimer = new System.Windows.Forms.Timer
+		{
+			Interval = 500 // 500ms debounce
+		};
+		_auditFilterTimer.Tick += (s, e) =>
+		{
+			_auditFilterTimer.Stop();
+			LoadAuditLogs();
+		};
+
+		// Set default category filter
+		if (cbAuditCategoryFilter.Items.Count > 0 && cbAuditCategoryFilter.SelectedIndex < 0)
+		{
+			cbAuditCategoryFilter.SelectedIndex = 0; // Select "All"
+			Console.WriteLine($"[tabProfile] Set default category filter to: {cbAuditCategoryFilter.SelectedItem}");
+		}
+
+		// Load initial data
+		Console.WriteLine("[tabProfile] Loading initial audit logs...");
+		LoadAuditLogs();
+	}
+
+	/// <summary>
+	/// Load audit logs from API with current filters
+	/// </summary>
+	private async void LoadAuditLogs()
+	{
+		try
+		{
+			Console.WriteLine("[tabProfile] LoadAuditLogs called");
+			
+			if (ApiCore.ApiClient == null)
+			{
+				lblAuditStatus.Text = "Not connected to server";
+				Console.WriteLine("[tabProfile] ApiClient is null - not connected");
+				return;
+			}
+
+			// Build request
+			var request = new AuditLogRequest
+			{
+				StartDate = DateTime.Now.AddHours(-24),
+				EndDate = DateTime.Now,
+				UsernameFilter = string.IsNullOrWhiteSpace(_currentUserFilter) ? null : _currentUserFilter,
+				CategoryFilter = _currentCategoryFilter == "All" ? null : _currentCategoryFilter,
+				Limit = 500
+			};
+
+			Console.WriteLine($"[tabProfile] Fetching audit logs - Category: {_currentCategoryFilter}, User: {_currentUserFilter ?? "All"}");
+
+			// Call API using HttpClient
+			var httpResponse = await ApiCore.ApiClient._httpClient.PostAsJsonAsync("/api/audit/logs", request);
+
+			if (!httpResponse.IsSuccessStatusCode)
+			{
+				lblAuditStatus.Text = "Failed to load audit logs";
+				Console.WriteLine($"[tabProfile] API call failed with status: {httpResponse.StatusCode}");
+				return;
+			}
+
+			var response = await httpResponse.Content.ReadFromJsonAsync<AuditLogResponse>();
+
+			if (response == null)
+			{
+				lblAuditStatus.Text = "Failed to parse audit logs";
+				Console.WriteLine("[tabProfile] Failed to parse response");
+				return;
+			}
+
+			Console.WriteLine($"[tabProfile] Retrieved {response.Logs.Count} logs out of {response.TotalCount} total");
+
+			// Update grid
+			dgvAuditLogs.Rows.Clear();
+
+			foreach (var log in response.Logs)
+			{
+				var rowIndex = dgvAuditLogs.Rows.Add(
+					log.Timestamp.ToString("HH:mm:ss"),
+					log.Username,
+					log.ActionCategory,
+					log.ActionType,
+					log.ActionDescription,
+					log.Success ? "✓" : "✗"
+				);
+
+				var row = dgvAuditLogs.Rows[rowIndex];
+
+				// Store full log object in Tag for detail view
+				row.Tag = log;
+
+				// Color code failed actions
+				if (!log.Success)
+				{
+					row.DefaultCellStyle.BackColor = Color.FromArgb(255, 230, 230);
+					row.Cells["Status"].Style.ForeColor = Color.Red;
+				}
+				else
+				{
+					row.Cells["Status"].Style.ForeColor = Color.Green;
+				}
+
+				// Add tooltip with full timestamp
+				row.Cells["Time"].ToolTipText = log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+
+				// Add tooltip with full description if truncated
+				if (log.ActionDescription.Length > 40)
+				{
+					row.Cells["Description"].ToolTipText = log.ActionDescription;
+				}
+			}
+
+			// Update status label
+			lblAuditStatus.Text = $"Showing {response.Logs.Count} of {response.TotalCount} records | Last updated: {DateTime.Now:HH:mm:ss}";
+		}
+		catch (Exception ex)
+		{
+			lblAuditStatus.Text = $"Error loading audit logs: {ex.Message}";
+		}
+	}
+
+	/// <summary>
+	/// Category filter changed event handler
+	/// </summary>
+	private void cbAuditCategoryFilter_SelectedIndexChanged(object sender, EventArgs e)
+	{
+		_currentCategoryFilter = cbAuditCategoryFilter.SelectedItem?.ToString() ?? "All";
+		LoadAuditLogs();
+	}
+
+	/// <summary>
+	/// User filter text changed event handler (with debounce)
+	/// </summary>
+	private void txtAuditUserFilter_TextChanged(object sender, EventArgs e)
+	{
+		_currentUserFilter = txtAuditUserFilter.Text;
+
+		// Reset timer for debouncing
+		_auditFilterTimer?.Stop();
+		_auditFilterTimer?.Start();
+	}
+
+	/// <summary>
+	/// Refresh button click event handler
+	/// </summary>
+	private void btnAuditRefresh_Click(object sender, EventArgs e)
+	{
+		LoadAuditLogs();
+	}
+
+	#endregion
 
 }

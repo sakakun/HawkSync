@@ -110,6 +110,26 @@ CREATE TABLE IF NOT EXISTS "tb_users" (
 	"Notes"	TEXT DEFAULT '',
 	PRIMARY KEY("UserID" AUTOINCREMENT)
 );
+CREATE TABLE IF NOT EXISTS "tb_auditLogs" (
+	"LogID"	INTEGER,
+	"Timestamp"	TEXT NOT NULL,
+	"UserID"	INTEGER,
+	"Username"	TEXT NOT NULL,
+	"ActionCategory"	TEXT NOT NULL,
+	"ActionType"	TEXT NOT NULL,
+	"ActionDescription"	TEXT NOT NULL,
+	"TargetType"	TEXT,
+	"TargetID"	TEXT,
+	"TargetName"	TEXT,
+	"OldValue"	TEXT,
+	"NewValue"	TEXT,
+	"IPAddress"	TEXT,
+	"Success"	INTEGER NOT NULL DEFAULT 1,
+	"ErrorMessage"	TEXT,
+	"Metadata"	TEXT,
+	PRIMARY KEY("LogID" AUTOINCREMENT),
+	FOREIGN KEY("UserID") REFERENCES "tb_users"("UserID") ON DELETE SET NULL
+);
 INSERT INTO "tb_defaultMaps" VALUES (1,'Road Rage','DMK_01A.BMS',0,0);
 INSERT INTO "tb_defaultMaps" VALUES (2,'City Madness','DMM_01A.BMS',0,0);
 INSERT INTO "tb_defaultMaps" VALUES (3,'Cracked','DMM_01E.BMS',0,0);
@@ -287,4 +307,18 @@ CREATE INDEX IF NOT EXISTS "idx_users_active" ON "tb_users" (
 CREATE INDEX IF NOT EXISTS "idx_users_username" ON "tb_users" (
 	"Username"
 );
-COMMIT;
+CREATE INDEX IF NOT EXISTS "idx_auditLog_timestamp" ON "tb_auditLogs" (
+	"Timestamp" DESC
+);
+CREATE INDEX IF NOT EXISTS "idx_auditLog_user" ON "tb_auditLogs" (
+	"UserID",
+	"Username"
+);
+CREATE INDEX IF NOT EXISTS "idx_auditLog_category" ON "tb_auditLogs" (
+	"ActionCategory",
+	"ActionType"
+);
+CREATE INDEX IF NOT EXISTS "idx_auditLog_target" ON "tb_auditLogs" (
+	"TargetType",
+	"TargetID"
+);

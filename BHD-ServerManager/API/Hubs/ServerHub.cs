@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using HawkSyncShared.SupportClasses;
+using HawkSyncShared.DTOs.Audit;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
@@ -72,6 +73,26 @@ public class ServerHub : Hub
             _connectionToUsername.Remove(Context.ConnectionId);
             adminInstanceManager.RemoveSession(username);
             CommonCore.instanceAdmin!.ForceUIUpdate = true;
+            
+            // Log disconnection as logout event
+            var userId = Context.User?.FindFirst("userId")?.Value;
+            var ipAddress = Context.GetHttpContext()?.Connection.RemoteIpAddress?.ToString();
+            var disconnectReason = exception != null ? $"Abnormal disconnect: {exception.Message}" : "Client disconnected";
+            
+            DatabaseManager.LogAuditAction(
+                userId: userId != null ? int.Parse(userId) : null,
+                username: username,
+                category: AuditCategory.System,
+                actionType: AuditAction.Logout,
+                description: disconnectReason,
+                targetType: "Connection",
+                targetId: Context.ConnectionId,
+                targetName: "SignalR",
+                ipAddress: ipAddress,
+                success: exception == null,
+                errorMessage: exception?.Message
+            );
+            
             AppDebug.Log("ServerHub", $"Client disconnected: {username} ({Context.ConnectionId})");
         }
         else

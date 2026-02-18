@@ -1,4 +1,5 @@
 ﻿using HawkSyncShared.DTOs;
+using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.Instances;
@@ -57,6 +58,60 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             _connection = new SqliteConnection(csb.ToString());
             _connection.Open();
+            
+            // Ensure audit logs table exists (migration for existing databases)
+            EnsureAuditLogsTableExists();
+        }
+
+        /// <summary>
+        /// Ensure the audit logs table exists (for database migration/upgrade)
+        /// </summary>
+        private static void EnsureAuditLogsTableExists()
+        {
+            try
+            {
+                using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+                conn.Open();
+
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS tb_auditLogs (
+                        LogID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Timestamp TEXT NOT NULL,
+                        UserID INTEGER,
+                        Username TEXT NOT NULL,
+                        ActionCategory TEXT NOT NULL,
+                        ActionType TEXT NOT NULL,
+                        ActionDescription TEXT NOT NULL,
+                        TargetType TEXT,
+                        TargetID TEXT,
+                        TargetName TEXT,
+                        OldValue TEXT,
+                        NewValue TEXT,
+                        IPAddress TEXT,
+                        Success INTEGER NOT NULL DEFAULT 1,
+                        ErrorMessage TEXT,
+                        Metadata TEXT,
+                        FOREIGN KEY(UserID) REFERENCES tb_users(UserID) ON DELETE SET NULL
+                    );";
+
+                cmd.ExecuteNonQuery();
+                
+                // Create indices for better performance
+                cmd.CommandText = @"
+                    CREATE INDEX IF NOT EXISTS idx_auditLog_timestamp ON tb_auditLogs (Timestamp DESC);
+                    CREATE INDEX IF NOT EXISTS idx_auditLog_user ON tb_auditLogs (Username);
+                    CREATE INDEX IF NOT EXISTS idx_auditLog_category ON tb_auditLogs (ActionCategory);
+                    CREATE INDEX IF NOT EXISTS idx_auditLog_target ON tb_auditLogs (TargetType, TargetID);";
+                cmd.ExecuteNonQuery();
+
+                AppDebug.Log("DatabaseManager", "Audit logs table and indices verified/created");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Error ensuring audit logs table exists: {ex.Message}");
+                // Don't throw - this is not critical for basic operation
+            }
         }
 
         /// <summary>
@@ -2191,6 +2246,319 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// Releases the exclusive lock and closes the internal connection.
         /// Call this at application shutdown.
         /// </summary>
+        #region Audit Logs
+
+        /// <summary>
+        /// Log an audit action to the database
+        /// </summary>
+        public static void LogAuditAction(
+            int? userId,
+            string username,
+            string category,
+            string actionType,
+            string description,
+            string? targetType = null,
+            string? targetId = null,
+            string? targetName = null,
+            string? oldValue = null,
+            string? newValue = null,
+            string? ipAddress = null,
+            bool success = true,
+            string? errorMessage = null,
+            string? metadata = null)
+        {
+            try
+            {
+                AppDebug.Log("DatabaseManager", $"LogAuditAction called: User={username}, Category={category}, Action={actionType}, Success={success}");
+                
+                if (!IsInitialized)
+                {
+                    AppDebug.Log("DatabaseManager", "Cannot log audit action: DatabaseManager is not initialized.");
+                    return;
+                }
+
+                using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+                conn.Open();
+
+                using var tx = conn.BeginTransaction();
+                using var cmd = conn.CreateCommand();
+
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_auditLogs 
+                    (Timestamp, UserID, Username, ActionCategory, ActionType, ActionDescription, 
+                     TargetType, TargetID, TargetName, OldValue, NewValue, IPAddress, 
+                     Success, ErrorMessage, Metadata)
+                    VALUES 
+                    ($Timestamp, $UserID, $Username, $ActionCategory, $ActionType, $ActionDescription,
+                     $TargetType, $TargetID, $TargetName, $OldValue, $NewValue, $IPAddress,
+                     $Success, $ErrorMessage, $Metadata)";
+
+                cmd.Parameters.AddWithValue("$Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$UserID", userId.HasValue ? userId.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("$Username", username);
+                cmd.Parameters.AddWithValue("$ActionCategory", category);
+                cmd.Parameters.AddWithValue("$ActionType", actionType);
+                cmd.Parameters.AddWithValue("$ActionDescription", description);
+                cmd.Parameters.AddWithValue("$TargetType", targetType ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$TargetID", targetId ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$TargetName", targetName ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$OldValue", oldValue ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$NewValue", newValue ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$IPAddress", ipAddress ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$Success", success ? 1 : 0);
+                cmd.Parameters.AddWithValue("$ErrorMessage", errorMessage ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("$Metadata", metadata ?? (object)DBNull.Value);
+
+                cmd.ExecuteNonQuery();
+                tx.Commit();
+                
+                AppDebug.Log("DatabaseManager", $"Audit log successfully written for {username}");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Failed to log audit action: {ex.Message}");
+                AppDebug.Log("DatabaseManager", $"Stack trace: {ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// Get audit logs with filtering and pagination
+        /// </summary>
+        public static (List<AuditLogDTO> Logs, int TotalCount) GetAuditLogs(
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            string? usernameFilter = null,
+            string? categoryFilter = null,
+            string? actionTypeFilter = null,
+            string? targetFilter = null,
+            bool? successOnly = null,
+            int limit = 1000,
+            int offset = 0)
+        {
+            var logs = new List<AuditLogDTO>();
+            int totalCount = 0;
+
+            try
+            {
+                AppDebug.Log("DatabaseManager", $"GetAuditLogs called: Start={startDate}, End={endDate}, User={usernameFilter}, Category={categoryFilter}");
+                
+                if (!IsInitialized)
+                {
+                    AppDebug.Log("DatabaseManager", "GetAuditLogs: DatabaseManager is not initialized.");
+                    throw new InvalidOperationException("DatabaseManager is not initialized.");
+                }
+
+                using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+                conn.Open();
+
+                var whereClauses = new List<string>();
+
+                if (startDate.HasValue)
+                    whereClauses.Add("datetime(Timestamp) >= $StartDate");
+                if (endDate.HasValue)
+                    whereClauses.Add("datetime(Timestamp) <= $EndDate");
+                if (!string.IsNullOrEmpty(usernameFilter))
+                    whereClauses.Add("Username LIKE $Username");
+                if (!string.IsNullOrEmpty(categoryFilter))
+                    whereClauses.Add("ActionCategory = $Category");
+                if (!string.IsNullOrEmpty(actionTypeFilter))
+                    whereClauses.Add("ActionType = $ActionType");
+                if (!string.IsNullOrEmpty(targetFilter))
+                    whereClauses.Add("(TargetName LIKE $Target OR TargetID LIKE $Target)");
+                if (successOnly.HasValue)
+                    whereClauses.Add(successOnly.Value ? "Success = 1" : "Success = 0");
+
+                string whereClause = whereClauses.Count > 0
+                    ? "WHERE " + string.Join(" AND ", whereClauses)
+                    : "";
+
+                AppDebug.Log("DatabaseManager", $"GetAuditLogs: Query WHERE clause: {whereClause}");
+
+                // Get total count
+                string countSql = $"SELECT COUNT(*) FROM tb_auditLogs {whereClause}";
+                using (var countCmd = conn.CreateCommand())
+                {
+                    countCmd.CommandText = countSql;
+                    AddAuditFilterParameters(countCmd, startDate, endDate, usernameFilter,
+                        categoryFilter, actionTypeFilter, targetFilter);
+                    totalCount = Convert.ToInt32(countCmd.ExecuteScalar() ?? 0);
+                    AppDebug.Log("DatabaseManager", $"GetAuditLogs: Total count = {totalCount}");
+                }
+
+                // Get logs
+                string sql = $@"
+                    SELECT LogID, Timestamp, UserID, Username, ActionCategory, ActionType,
+                           ActionDescription, TargetType, TargetID, TargetName, OldValue,
+                           NewValue, IPAddress, Success, ErrorMessage, Metadata
+                    FROM tb_auditLogs
+                    {whereClause}
+                    ORDER BY Timestamp DESC
+                    LIMIT $Limit OFFSET $Offset";
+
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = sql;
+                AddAuditFilterParameters(cmd, startDate, endDate, usernameFilter,
+                    categoryFilter, actionTypeFilter, targetFilter);
+                cmd.Parameters.AddWithValue("$Limit", limit);
+                cmd.Parameters.AddWithValue("$Offset", offset);
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    logs.Add(new AuditLogDTO
+                    {
+                        LogID = reader.GetInt32(0),
+                        Timestamp = DateTime.Parse(reader.GetString(1)),
+                        UserID = reader.IsDBNull(2) ? null : reader.GetInt32(2),
+                        Username = reader.GetString(3),
+                        ActionCategory = reader.GetString(4),
+                        ActionType = reader.GetString(5),
+                        ActionDescription = reader.GetString(6),
+                        TargetType = reader.IsDBNull(7) ? null : reader.GetString(7),
+                        TargetID = reader.IsDBNull(8) ? null : reader.GetString(8),
+                        TargetName = reader.IsDBNull(9) ? null : reader.GetString(9),
+                        OldValue = reader.IsDBNull(10) ? null : reader.GetString(10),
+                        NewValue = reader.IsDBNull(11) ? null : reader.GetString(11),
+                        IPAddress = reader.IsDBNull(12) ? null : reader.GetString(12),
+                        Success = reader.GetInt32(13) == 1,
+                        ErrorMessage = reader.IsDBNull(14) ? null : reader.GetString(14),
+                        Metadata = reader.IsDBNull(15) ? null : reader.GetString(15)
+                    });
+                }
+
+                AppDebug.Log("DatabaseManager", $"Retrieved {logs.Count} of {totalCount} audit logs");
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Failed to retrieve audit logs: {ex.Message}");
+            }
+
+            return (logs, totalCount);
+        }
+
+        /// <summary>
+        /// Helper method to add filter parameters to audit log queries
+        /// </summary>
+        private static void AddAuditFilterParameters(SqliteCommand cmd,
+            DateTime? startDate, DateTime? endDate, string? username,
+            string? category, string? actionType, string? target)
+        {
+            if (startDate.HasValue)
+                cmd.Parameters.AddWithValue("$StartDate", startDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            if (endDate.HasValue)
+                cmd.Parameters.AddWithValue("$EndDate", endDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            if (!string.IsNullOrEmpty(username))
+                cmd.Parameters.AddWithValue("$Username", $"%{username}%");
+            if (!string.IsNullOrEmpty(category))
+                cmd.Parameters.AddWithValue("$Category", category);
+            if (!string.IsNullOrEmpty(actionType))
+                cmd.Parameters.AddWithValue("$ActionType", actionType);
+            if (!string.IsNullOrEmpty(target))
+                cmd.Parameters.AddWithValue("$Target", $"%{target}%");
+        }
+
+        /// <summary>
+        /// Delete audit logs older than specified days
+        /// </summary>
+        public static int DeleteOldAuditLogs(int daysToKeep = 90)
+        {
+            try
+            {
+                if (!IsInitialized)
+                    throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+                using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+                conn.Open();
+
+                using var tx = conn.BeginTransaction();
+                using var cmd = conn.CreateCommand();
+
+                cmd.Transaction = tx;
+                cmd.CommandText = @"DELETE FROM tb_auditLogs 
+                                   WHERE datetime(Timestamp) < datetime('now', $Days)";
+
+                cmd.Parameters.AddWithValue("$Days", $"-{daysToKeep} days");
+
+                int deletedCount = cmd.ExecuteNonQuery();
+                tx.Commit();
+
+                AppDebug.Log("DatabaseManager", $"Deleted {deletedCount} old audit log records (kept {daysToKeep} days)");
+                return deletedCount;
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Failed to delete old audit logs: {ex.Message}");
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Get distinct categories from audit logs (for filter dropdown)
+        /// </summary>
+        public static List<string> GetAuditCategories()
+        {
+            var categories = new List<string>();
+
+            try
+            {
+                if (!IsInitialized)
+                    throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+                using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+                conn.Open();
+
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT DISTINCT ActionCategory FROM tb_auditLogs ORDER BY ActionCategory";
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    categories.Add(reader.GetString(0));
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Failed to get audit categories: {ex.Message}");
+            }
+
+            return categories;
+        }
+
+        /// <summary>
+        /// Get distinct action types from audit logs (for filter dropdown)
+        /// </summary>
+        public static List<string> GetAuditActionTypes()
+        {
+            var actionTypes = new List<string>();
+
+            try
+            {
+                if (!IsInitialized)
+                    throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+                using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+                conn.Open();
+
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT DISTINCT ActionType FROM tb_auditLogs ORDER BY ActionType";
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    actionTypes.Add(reader.GetString(0));
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Failed to get audit action types: {ex.Message}");
+            }
+
+            return actionTypes;
+        }
+
+        #endregion
+
         public static void Shutdown()
         {
             if (_connection == null)

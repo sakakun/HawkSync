@@ -15,7 +15,7 @@ public static class adminInstanceManager
     private static readonly string[] ValidPermissions = new[]
     {
         "profile", "gameplay", "maps", "players",
-        "chat", "bans", "stats", "users"
+        "chat", "bans", "stats", "users", "audit"
     };
     private const int BcryptWorkFactor = 11;
 
