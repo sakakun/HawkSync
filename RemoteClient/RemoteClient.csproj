@@ -28,9 +28,6 @@
     <Compile Update="Forms\Panels\tabChat.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Forms\Panels\tabGamePlay.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Update="Forms\Panels\tabMaps.cs">
       <SubType>UserControl</SubType>
     </Compile>

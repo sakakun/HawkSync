@@ -33,15 +33,6 @@ namespace BHD_ServerManager.Classes.Tickers
         private static bool _netLimiterLock = false;
         private static bool _netLimiterFilterLock = false;
 
-        // Helper for UI thread safety
-        private static void SafeInvoke(Control control, Action action)
-        {
-            if (control.InvokeRequired)
-                control.BeginInvoke(action);
-            else
-                action();
-        }
-
         // Helper: Enumerate active players (seen within threshold)
         private static IEnumerable<(int SlotNum, PlayerObject Player)> GetActivePlayers()
         {
@@ -151,9 +142,12 @@ namespace BHD_ServerManager.Classes.Tickers
                 AppDebug.Log("tickerBanManagement", "Game Server is Offline");
                 return;
             }
-                
-            // Run NetlimiterTask as a fire-and-forget task, ignore CS4014 warning
-            Task.Run(NetlimiterTask);
+            
+            if (theInstance.netLimiterEnabled)
+            {
+                // Run NetlimiterTask as a fire-and-forget task, ignore CS4014 warning
+			    Task.Run(NetlimiterTask);
+			}
 
             // Only check and punt bans if server is ONLINE
             if (theInstance.instanceStatus == InstanceStatus.ONLINE)

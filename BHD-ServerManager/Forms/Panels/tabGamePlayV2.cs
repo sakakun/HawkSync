@@ -319,51 +319,27 @@ namespace BHD_ServerManager.Forms.Panels
                 var btn = sender as Button;
                 if (btn == null) return;
 
-                // Right click: Toggle Gold (Always Enabled) on/off
-                // Gray or Green → Gold
-                // Gold → restore to previous state (Green if was enabled, Gray if was disabled)
-                if (btn.BackColor == Color.Gold)
+                // Right click: Cycle through enabled states
+                // Gray (weapon disabled) → Green (weapon enabled with threshold)
+                // Green (threshold-based) → Gold (always enabled, bypass threshold)
+                // Gold (always enabled) → Green (back to threshold-based)
+                // This enforces: restrictedWeapon* can only be true when weapon* is true
+                if (btn.BackColor == Color.LightGray)
                 {
-                    // Going from Gold back - check if this weapon was previously enabled (Green)
-                    // We do this by checking the current theInstance state
-                    bool wasEnabled = GetWeaponEnabledState(btn);
-                    btn.BackColor = wasEnabled ? Color.LightGreen : Color.LightGray;
+                    // Gray → Green: Enable weapon first (cannot jump to Gold from disabled state)
+                    btn.BackColor = Color.LightGreen;
                 }
-                else
+                else if (btn.BackColor == Color.LightGreen)
                 {
+                    // Green → Gold: Add restricted override
                     btn.BackColor = Color.Gold;
                 }
+                else if (btn.BackColor == Color.Gold)
+                {
+                    // Gold → Green: Remove restricted override, keep weapon enabled
+                    btn.BackColor = Color.LightGreen;
+                }
             }
-        }
-
-        private bool GetWeaponEnabledState(Button btn)
-        {
-            // Map each weapon button to its corresponding theInstance.weapon* property
-            if (btn == btnWeapon01) return theInstance!.weaponColt45;
-            if (btn == btnWeapon02) return theInstance!.weaponM9Beretta;
-            if (btn == btnWeapon11) return theInstance!.weaponCar15;
-            if (btn == btnWeapon12) return theInstance!.weaponCar15203;
-            if (btn == btnWeapon15) return theInstance!.weaponM16;
-            if (btn == btnWeapon16) return theInstance!.weaponM16203;
-            if (btn == btnWeapon13) return theInstance!.weaponG3;
-            if (btn == btnWeapon14) return theInstance!.weaponG36;
-            if (btn == btnWeapon10) return theInstance!.weaponSAW;
-            if (btn == btnWeapon17) return theInstance!.weaponM240;
-            if (btn == btnWeapon18) return theInstance!.weaponM60;
-            if (btn == btnWeapon19) return theInstance!.weaponMP5;
-            if (btn == btnWeapon23) return theInstance!.weaponMCRT300;
-            if (btn == btnWeapon21) return theInstance!.weaponM21;
-            if (btn == btnWeapon22) return theInstance!.weaponM24;
-            if (btn == btnWeapon20) return theInstance!.weaponBarrett;
-            if (btn == btnWeapon24) return theInstance!.weaponPSG1;
-            if (btn == btnWeapon03) return theInstance!.weaponShotgun;
-            if (btn == btnWeapon07) return theInstance!.weaponFragGrenade;
-            if (btn == btnWeapon09) return theInstance!.weaponSmokeGrenade;
-            if (btn == btnWeapon08) return theInstance!.weaponSatchelCharges;
-            if (btn == btnWeapon04) return theInstance!.weaponAT4;
-            if (btn == btnWeapon06) return theInstance!.weaponFlashGrenade;
-            if (btn == btnWeapon05) return theInstance!.weaponClaymore;
-            return false; // Default to disabled
         }
 
         private void actionClick_RoleButtonChanged(object? sender, EventArgs e)
@@ -488,30 +464,30 @@ namespace BHD_ServerManager.Forms.Panels
             );
 
             var weapons = new WeaponEnablement(
-                Colt45: btnWeapon01.BackColor == Color.LightGreen,
-                M9Beretta: btnWeapon02.BackColor == Color.LightGreen,
-                CAR15: btnWeapon11.BackColor == Color.LightGreen,
-                CAR15203: btnWeapon12.BackColor == Color.LightGreen,
-                M16: btnWeapon15.BackColor == Color.LightGreen,
-                M16203: btnWeapon16.BackColor == Color.LightGreen,
-                G3: btnWeapon13.BackColor == Color.LightGreen,
-                G36: btnWeapon14.BackColor == Color.LightGreen,
-                M60: btnWeapon18.BackColor == Color.LightGreen,
-                M240: btnWeapon17.BackColor == Color.LightGreen,
-                MP5: btnWeapon19.BackColor == Color.LightGreen,
-                SAW: btnWeapon10.BackColor == Color.LightGreen,
-                MCRT300: btnWeapon23.BackColor == Color.LightGreen,
-                M21: btnWeapon21.BackColor == Color.LightGreen,
-                M24: btnWeapon22.BackColor == Color.LightGreen,
-                Barrett: btnWeapon20.BackColor == Color.LightGreen,
-                PSG1: btnWeapon24.BackColor == Color.LightGreen,
-                Shotgun: btnWeapon03.BackColor == Color.LightGreen,
-                FragGrenade: btnWeapon07.BackColor == Color.LightGreen,
-                SmokeGrenade: btnWeapon09.BackColor == Color.LightGreen,
-                Satchel: btnWeapon08.BackColor == Color.LightGreen,
-                AT4: btnWeapon04.BackColor == Color.LightGreen,
-                FlashBang: btnWeapon06.BackColor == Color.LightGreen,
-                Claymore: btnWeapon05.BackColor == Color.LightGreen
+                Colt45: btnWeapon01.BackColor == Color.LightGreen || btnWeapon01.BackColor == Color.Gold,
+                M9Beretta: btnWeapon02.BackColor == Color.LightGreen || btnWeapon02.BackColor == Color.Gold,
+                CAR15: btnWeapon11.BackColor == Color.LightGreen || btnWeapon11.BackColor == Color.Gold,
+                CAR15203: btnWeapon12.BackColor == Color.LightGreen || btnWeapon12.BackColor == Color.Gold,
+                M16: btnWeapon15.BackColor == Color.LightGreen || btnWeapon15.BackColor == Color.Gold,
+                M16203: btnWeapon16.BackColor == Color.LightGreen || btnWeapon16.BackColor == Color.Gold,
+                G3: btnWeapon13.BackColor == Color.LightGreen || btnWeapon13.BackColor == Color.Gold,
+                G36: btnWeapon14.BackColor == Color.LightGreen || btnWeapon14.BackColor == Color.Gold,
+                M60: btnWeapon18.BackColor == Color.LightGreen || btnWeapon18.BackColor == Color.Gold,
+                M240: btnWeapon17.BackColor == Color.LightGreen || btnWeapon17.BackColor == Color.Gold,
+                MP5: btnWeapon19.BackColor == Color.LightGreen || btnWeapon19.BackColor == Color.Gold,
+                SAW: btnWeapon10.BackColor == Color.LightGreen || btnWeapon10.BackColor == Color.Gold,
+                MCRT300: btnWeapon23.BackColor == Color.LightGreen || btnWeapon23.BackColor == Color.Gold,
+                M21: btnWeapon21.BackColor == Color.LightGreen || btnWeapon21.BackColor == Color.Gold,
+                M24: btnWeapon22.BackColor == Color.LightGreen || btnWeapon22.BackColor == Color.Gold,
+                Barrett: btnWeapon20.BackColor == Color.LightGreen || btnWeapon20.BackColor == Color.Gold,
+                PSG1: btnWeapon24.BackColor == Color.LightGreen || btnWeapon24.BackColor == Color.Gold,
+                Shotgun: btnWeapon03.BackColor == Color.LightGreen || btnWeapon03.BackColor == Color.Gold,
+                FragGrenade: btnWeapon07.BackColor == Color.LightGreen || btnWeapon07.BackColor == Color.Gold,
+                SmokeGrenade: btnWeapon09.BackColor == Color.LightGreen || btnWeapon09.BackColor == Color.Gold,
+                Satchel: btnWeapon08.BackColor == Color.LightGreen || btnWeapon08.BackColor == Color.Gold,
+                AT4: btnWeapon04.BackColor == Color.LightGreen || btnWeapon04.BackColor == Color.Gold,
+                FlashBang: btnWeapon06.BackColor == Color.LightGreen || btnWeapon06.BackColor == Color.Gold,
+                Claymore: btnWeapon05.BackColor == Color.LightGreen || btnWeapon05.BackColor == Color.Gold
             );
 
             var restrictedWeapons = new RestrictedWeapons (

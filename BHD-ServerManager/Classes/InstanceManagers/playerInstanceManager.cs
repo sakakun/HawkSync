@@ -348,16 +348,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         {
                             // Still has restricted weapon - disarm again for another 5 seconds
                             disarmInfo.DisarmTime = DateTime.Now;
-                            disarmInfo.MessageSent = false;
+                            // Don't send message again - keep MessageSent as true
                             
                             DisarmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                             
-                            string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} still has {disarmInfo.RestrictedWeaponName} - disarmed again (requires {threshold}+ players)";
-                            ServerMemory.WriteMemorySendChatMessage(1, message);
-                            
                             AppDebug.Log("CheckWeaponRestriction", 
                                 $"  → RE-DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
-                                $"still has {disarmInfo.RestrictedWeaponName} after 5 seconds");
+                                $"still has {disarmInfo.RestrictedWeaponName} after 5 seconds (no message sent)");
                         }
                         else
                         {
@@ -366,7 +363,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                             
                             ArmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                             
-                            string rearmMessage = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} - Re-armed with allowed weapon";
+                            string rearmMessage = $"{playerInfo.PlayerName} - Re-armed with allowed weapon.";
                             ServerMemory.WriteMemorySendChatMessage(1, rearmMessage);
                             
                             AppDebug.Log("CheckWeaponRestriction", 
@@ -406,11 +403,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                     if (result.Success)
                     {
-                        string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} disarmed for 5s - {weaponName} requires {threshold}+ players (Current: {currentPlayers})";
+                        // Send message only once per disarm cycle
+                        string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted and requires {threshold}+ players.";
                         ServerMemory.WriteMemorySendChatMessage(1, message);
+                        weaponDisarmedPlayers[playerInfo.PlayerSlot].MessageSent = true;
 
                         AppDebug.Log("CheckWeaponRestriction", 
-                            $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) for 5s - " +
+                            $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
                             $"Weapon {weaponName} (ID: {weaponId}) not allowed with {currentPlayers} players");
                     }
                     else
