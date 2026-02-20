@@ -1,3 +1,25 @@
+-- ============================================================================
+-- DATABASE SCHEMA - Single Source of Truth
+-- ============================================================================
+--
+-- This file defines the complete database schema for the application.
+-- The migration system automatically applies changes from this file.
+--
+-- MAKING SCHEMA CHANGES:
+--
+-- 1. Edit this file to add/modify tables, columns, or indexes
+-- 2. Increment CURRENT_SCHEMA_VERSION in DatabaseManager.cs
+-- 3. On next startup, changes are automatically applied
+--
+-- RULES:
+-- - Always use "CREATE TABLE IF NOT EXISTS" 
+-- - Always use "CREATE INDEX IF NOT EXISTS"
+-- - New columns must have DEFAULT values (or be nullable)
+-- - For complex changes (rename/remove columns), add custom migration code
+--
+-- See DATABASE_MIGRATION_GUIDE.md for detailed instructions
+-- ============================================================================
+
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS "tb_auditLogs" (
 	"LogID"	INTEGER,
@@ -247,36 +269,36 @@ INSERT INTO "tb_defaultMaps" ("mapID","mapName","mapFile","modType","mapType") V
  (120,'Dust Devil A','KHM_01G.BMS',0,4),
  (121,'Desert Insertion A','KHM_02A.BMS',0,4),
  (122,'Desert Fox A','KHM_03A.BMS',0,4);
-CREATE INDEX "idx_auditLog_category" ON "tb_auditLogs" (
+CREATE INDEX IF NOT EXISTS "idx_auditLog_category" ON "tb_auditLogs" (
 	"ActionCategory",
 	"ActionType"
 );
-CREATE INDEX "idx_auditLog_target" ON "tb_auditLogs" (
+CREATE INDEX IF NOT EXISTS "idx_auditLog_target" ON "tb_auditLogs" (
 	"TargetType",
 	"TargetID"
 );
-CREATE INDEX "idx_auditLog_timestamp" ON "tb_auditLogs" (
+CREATE INDEX IF NOT EXISTS "idx_auditLog_timestamp" ON "tb_auditLogs" (
 	"Timestamp" DESC
 );
-CREATE INDEX "idx_auditLog_user" ON "tb_auditLogs" (
+CREATE INDEX IF NOT EXISTS "idx_auditLog_user" ON "tb_auditLogs" (
 	"UserID",
 	"Username"
 );
-CREATE INDEX idx_chatLogs_timestamp ON tb_chatLogs(messageTimeStamp);
-CREATE INDEX idx_permissions_permission ON tb_userPermissions(Permission);
-CREATE INDEX idx_permissions_userid ON tb_userPermissions(UserID);
-CREATE INDEX idx_playerip_category ON "tb_playerIPRecords"(RecordCategory, RecordType);
-CREATE INDEX idx_playerip_expiry ON "tb_playerIPRecords"(ExpireDate);
-CREATE INDEX idx_playerip_ip ON "tb_playerIPRecords"(PlayerIP);
-CREATE INDEX idx_playerip_matchid ON "tb_playerIPRecords"(MatchID);
-CREATE INDEX idx_playername_category ON "tb_playerNameRecords"(RecordCategory, RecordType);
-CREATE INDEX idx_playername_expiry ON "tb_playerNameRecords"(ExpireDate);
-CREATE INDEX idx_playername_matchid ON "tb_playerNameRecords"(MatchID);
-CREATE INDEX idx_playername_name ON "tb_playerNameRecords"(PlayerName);
-CREATE INDEX idx_proxy_country_code ON "tb_proxyBlockedCountries"(CountryCode);
-CREATE INDEX idx_proxy_expiry ON "tb_proxyRecords"(CacheExpiry);
-CREATE INDEX idx_proxy_ip ON "tb_proxyRecords"(IPAddress);
-CREATE INDEX idx_proxy_vpn ON "tb_proxyRecords"(IsVpn, IsProxy, IsTor);
-CREATE INDEX idx_users_active ON tb_users(IsActive);
-CREATE INDEX idx_users_username ON tb_users(Username);
+CREATE INDEX IF NOT EXISTS idx_chatLogs_timestamp ON tb_chatLogs(messageTimeStamp);
+CREATE INDEX IF NOT EXISTS idx_permissions_permission ON tb_userPermissions(Permission);
+CREATE INDEX IF NOT EXISTS idx_permissions_userid ON tb_userPermissions(UserID);
+CREATE INDEX IF NOT EXISTS idx_playerip_category ON "tb_playerIPRecords"(RecordCategory, RecordType);
+CREATE INDEX IF NOT EXISTS idx_playerip_expiry ON "tb_playerIPRecords"(ExpireDate);
+CREATE INDEX IF NOT EXISTS idx_playerip_ip ON "tb_playerIPRecords"(PlayerIP);
+CREATE INDEX IF NOT EXISTS idx_playerip_matchid ON "tb_playerIPRecords"(MatchID);
+CREATE INDEX IF NOT EXISTS idx_playername_category ON "tb_playerNameRecords"(RecordCategory, RecordType);
+CREATE INDEX IF NOT EXISTS idx_playername_expiry ON "tb_playerNameRecords"(ExpireDate);
+CREATE INDEX IF NOT EXISTS idx_playername_matchid ON "tb_playerNameRecords"(MatchID);
+CREATE INDEX IF NOT EXISTS idx_playername_name ON "tb_playerNameRecords"(PlayerName);
+CREATE INDEX IF NOT EXISTS idx_proxy_country_code ON "tb_proxyBlockedCountries"(CountryCode);
+CREATE INDEX IF NOT EXISTS idx_proxy_expiry ON "tb_proxyRecords"(CacheExpiry);
+CREATE INDEX IF NOT EXISTS idx_proxy_ip ON "tb_proxyRecords"(IPAddress);
+CREATE INDEX IF NOT EXISTS idx_proxy_vpn ON "tb_proxyRecords"(IsVpn, IsProxy, IsTor);
+CREATE INDEX IF NOT EXISTS idx_users_active ON tb_users(IsActive);
+CREATE INDEX IF NOT EXISTS idx_users_username ON tb_users(Username);
 COMMIT;

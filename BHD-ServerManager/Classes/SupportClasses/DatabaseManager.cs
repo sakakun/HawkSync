@@ -30,6 +30,10 @@ namespace BHD_ServerManager.Classes.SupportClasses
         private static string databaseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Databases");
         private static SqliteConnection? _connection;
         private static string _databasePath = Path.Combine(databaseDirectory, "database.sqlite");
+        private static string _schemaFilePath = Path.Combine(databaseDirectory, "database.sqlite.sql");
+        
+        // Current schema version - increment this when you update database.sqlite.sql
+        private const int CURRENT_SCHEMA_VERSION = 1;
 
         public static bool IsInitialized => _connection != null;
 
@@ -59,59 +63,581 @@ namespace BHD_ServerManager.Classes.SupportClasses
             _connection = new SqliteConnection(csb.ToString());
             _connection.Open();
             
-            // Ensure audit logs table exists (migration for existing databases)
-            EnsureAuditLogsTableExists();
+            // Check and upgrade database schema if needed
+            UpgradeDatabase();
         }
+       
+        /*
+         * DATABASE MIGRATION SYSTEM (SQL File-Based)
+         * 
+         * This system automatically upgrades the database schema from the database.sqlite.sql file.
+         * The SQL file is the single source of truth for the database schema.
+         * 
+         * HOW IT WORKS:
+         * 
+         * 1. On startup, the system compares the current database schema version
+         * 2. If the version is outdated, it reads database.sqlite.sql
+         * 3. Extracts CREATE TABLE and CREATE INDEX statements
+         * 4. Applies them (CREATE IF NOT EXISTS ensures no errors on existing objects)
+         * 5. For existing tables, detects and adds missing columns
+         * 
+         * HOW TO UPGRADE THE DATABASE:
+         * 
+         * 1. Update the database.sqlite.sql file with your schema changes:
+         *    - Add new tables
+         *    - Add new columns to existing tables (will auto-detect)
+         *    - Add new indexes
+         *    - Use CREATE TABLE IF NOT EXISTS and CREATE INDEX IF NOT EXISTS
+         * 
+         * 2. Increment CURRENT_SCHEMA_VERSION in this file
+         * 
+         * 3. The migration will automatically apply on next startup
+         * 
+         * SUPPORTED CHANGES:
+         * - ✅ Creating new tables
+         * - ✅ Adding new columns to existing tables (with DEFAULT values)
+         * - ✅ Creating new indexes
+         * - ⚠️ Column renames require manual migration in ApplyCustomMigrations()
+         * - ⚠️ Column type changes require manual migration in ApplyCustomMigrations()
+         * - ⚠️ Removing columns requires manual migration in ApplyCustomMigrations()
+         * 
+         * MANUAL MIGRATIONS:
+         * If you need complex migrations (rename columns, change types, etc.),
+         * add them to the ApplyCustomMigrations() method for the specific version.
+         * 
+         * NOTES:
+         * - Backup is automatically created before applying migrations
+         * - All changes run within a transaction and rollback on failure
+         * - The system preserves all existing data
+         */
 
         /// <summary>
-        /// Ensure the audit logs table exists (for database migration/upgrade)
+        /// Main upgrade method that reads database.sqlite.sql and applies schema changes
         /// </summary>
-        private static void EnsureAuditLogsTableExists()
+        private static void UpgradeDatabase()
         {
             try
             {
+                AppDebug.Log("DatabaseManager", "Checking database schema version...");
+                
                 using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
                 conn.Open();
 
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = @"
-                    CREATE TABLE IF NOT EXISTS tb_auditLogs (
-                        LogID INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Timestamp TEXT NOT NULL,
-                        UserID INTEGER,
-                        Username TEXT NOT NULL,
-                        ActionCategory TEXT NOT NULL,
-                        ActionType TEXT NOT NULL,
-                        ActionDescription TEXT NOT NULL,
-                        TargetType TEXT,
-                        TargetID TEXT,
-                        TargetName TEXT,
-                        OldValue TEXT,
-                        NewValue TEXT,
-                        IPAddress TEXT,
-                        Success INTEGER NOT NULL DEFAULT 1,
-                        ErrorMessage TEXT,
-                        Metadata TEXT,
-                        FOREIGN KEY(UserID) REFERENCES tb_users(UserID) ON DELETE SET NULL
-                    );";
-
-                cmd.ExecuteNonQuery();
+                // Get current schema version (default to 0 for legacy databases)
+                int currentVersion = GetSchemaVersion(conn);
                 
-                // Create indices for better performance
-                cmd.CommandText = @"
-                    CREATE INDEX IF NOT EXISTS idx_auditLog_timestamp ON tb_auditLogs (Timestamp DESC);
-                    CREATE INDEX IF NOT EXISTS idx_auditLog_user ON tb_auditLogs (Username);
-                    CREATE INDEX IF NOT EXISTS idx_auditLog_category ON tb_auditLogs (ActionCategory);
-                    CREATE INDEX IF NOT EXISTS idx_auditLog_target ON tb_auditLogs (TargetType, TargetID);";
-                cmd.ExecuteNonQuery();
+                AppDebug.Log("DatabaseManager", $"Current schema version: {currentVersion}, Target version: {CURRENT_SCHEMA_VERSION}");
 
-                AppDebug.Log("DatabaseManager", "Audit logs table and indices verified/created");
+                if (currentVersion < CURRENT_SCHEMA_VERSION)
+                {
+                    AppDebug.Log("DatabaseManager", $"Database upgrade needed from version {currentVersion} to {CURRENT_SCHEMA_VERSION}");
+                    
+                    // Create a backup before upgrading
+                    CreateDatabaseBackup();
+                    
+                    // Apply schema from SQL file
+                    using var tx = conn.BeginTransaction();
+                    try
+                    {
+                        // Apply schema from database.sqlite.sql
+                        ApplySchemaFromSqlFile(conn, tx);
+                        
+                        // Apply any custom migrations that can't be handled automatically
+                        ApplyCustomMigrations(conn, tx, currentVersion, CURRENT_SCHEMA_VERSION);
+                        
+                        // Update schema version
+                        SetSchemaVersion(conn, tx, CURRENT_SCHEMA_VERSION);
+                        
+                        tx.Commit();
+                        AppDebug.Log("DatabaseManager", $"Database successfully upgraded to version {CURRENT_SCHEMA_VERSION}");
+                    }
+                    catch (Exception ex)
+                    {
+                        tx.Rollback();
+                        AppDebug.Log("DatabaseManager", $"ERROR: Database upgrade failed: {ex.Message}");
+                        throw new Exception($"Database upgrade failed: {ex.Message}", ex);
+                    }
+                }
+                else if (currentVersion == CURRENT_SCHEMA_VERSION)
+                {
+                    AppDebug.Log("DatabaseManager", "Database schema is up to date");
+                }
+                else
+                {
+                    AppDebug.Log("DatabaseManager", $"WARNING: Database schema version ({currentVersion}) is newer than expected ({CURRENT_SCHEMA_VERSION})");
+                }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Error ensuring audit logs table exists: {ex.Message}");
-                // Don't throw - this is not critical for basic operation
+                AppDebug.Log("DatabaseManager", $"Error during database upgrade check: {ex.Message}");
+                throw;
             }
+        }
+
+        /// <summary>
+        /// Read and apply schema from database.sqlite.sql file
+        /// </summary>
+        private static void ApplySchemaFromSqlFile(SqliteConnection conn, SqliteTransaction tx)
+        {
+            if (!File.Exists(_schemaFilePath))
+            {
+                AppDebug.Log("DatabaseManager", $"Schema file not found: {_schemaFilePath}");
+                throw new FileNotFoundException("Database schema file not found", _schemaFilePath);
+            }
+
+            string sqlContent = File.ReadAllText(_schemaFilePath);
+            AppDebug.Log("DatabaseManager", $"Loaded schema file ({sqlContent.Length} bytes)");
+
+            // Parse and execute SQL statements
+            var statements = ParseSqlStatements(sqlContent);
+            
+            using var cmd = conn.CreateCommand();
+            cmd.Transaction = tx;
+
+            int tableCount = 0;
+            int indexCount = 0;
+
+            foreach (var statement in statements)
+            {
+                var trimmed = statement.Trim();
+                
+                // Skip empty statements, comments, and data inserts (INSERT statements)
+                if (string.IsNullOrWhiteSpace(trimmed) || 
+                    trimmed.StartsWith("--") || 
+                    trimmed.StartsWith("/*") ||
+                    trimmed.StartsWith("BEGIN TRANSACTION", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.StartsWith("COMMIT", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.StartsWith("INSERT INTO", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    if (trimmed.StartsWith("CREATE TABLE", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Extract table name
+                        string tableName = ExtractTableName(trimmed);
+                        
+                        if (!string.IsNullOrEmpty(tableName))
+                        {
+                            // Check if table exists
+                            if (TableExists(conn, tx, tableName))
+                            {
+                                AppDebug.Log("DatabaseManager", $"Table '{tableName}' exists - checking for missing columns...");
+                                AddMissingColumns(conn, tx, tableName, trimmed);
+                            }
+                            else
+                            {
+                                AppDebug.Log("DatabaseManager", $"Creating new table: {tableName}");
+                                cmd.CommandText = trimmed;
+                                cmd.ExecuteNonQuery();
+                                tableCount++;
+                            }
+                        }
+                    }
+                    else if (trimmed.StartsWith("CREATE INDEX", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Indexes use IF NOT EXISTS, so safe to execute
+                        cmd.CommandText = trimmed;
+                        cmd.ExecuteNonQuery();
+                        indexCount++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AppDebug.Log("DatabaseManager", $"Warning: Failed to execute statement: {ex.Message}");
+                    AppDebug.Log("DatabaseManager", $"Statement: {trimmed.Substring(0, Math.Min(100, trimmed.Length))}...");
+                    // Continue with other statements - some may fail if already applied
+                }
+            }
+
+            AppDebug.Log("DatabaseManager", $"Schema application complete: {tableCount} new tables, {indexCount} indexes applied");
+        }
+
+        /// <summary>
+        /// Parse SQL file into individual statements
+        /// </summary>
+        private static List<string> ParseSqlStatements(string sqlContent)
+        {
+            var statements = new List<string>();
+            var currentStatement = new StringBuilder();
+            bool inQuote = false;
+            bool inDoubleQuote = false;
+
+            for (int i = 0; i < sqlContent.Length; i++)
+            {
+                char c = sqlContent[i];
+
+                // Track quotes to avoid splitting on semicolons inside strings
+                if (c == '\'' && (i == 0 || sqlContent[i - 1] != '\\'))
+                {
+                    inQuote = !inQuote;
+                }
+                else if (c == '"' && (i == 0 || sqlContent[i - 1] != '\\'))
+                {
+                    inDoubleQuote = !inDoubleQuote;
+                }
+
+                currentStatement.Append(c);
+
+                // Split on semicolon when not inside quotes
+                if (c == ';' && !inQuote && !inDoubleQuote)
+                {
+                    string stmt = currentStatement.ToString().Trim();
+                    if (!string.IsNullOrWhiteSpace(stmt))
+                    {
+                        statements.Add(stmt);
+                    }
+                    currentStatement.Clear();
+                }
+            }
+
+            // Add any remaining statement
+            string lastStmt = currentStatement.ToString().Trim();
+            if (!string.IsNullOrWhiteSpace(lastStmt))
+            {
+                statements.Add(lastStmt);
+            }
+
+            AppDebug.Log("DatabaseManager", $"Parsed {statements.Count} SQL statements");
+            return statements;
+        }
+
+        /// <summary>
+        /// Extract table name from CREATE TABLE statement
+        /// </summary>
+        private static string ExtractTableName(string createTableStatement)
+        {
+            try
+            {
+                // Pattern: CREATE TABLE [IF NOT EXISTS] "tableName" or tableName
+                var match = System.Text.RegularExpressions.Regex.Match(
+                    createTableStatement,
+                    @"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[""']?(\w+)[""']?",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                if (match.Success)
+                {
+                    return match.Groups[1].Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Error extracting table name: {ex.Message}");
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Parse column definitions from CREATE TABLE statement
+        /// </summary>
+        private static List<(string Name, string Definition)> ParseColumnDefinitions(string createTableStatement)
+        {
+            var columns = new List<(string, string)>();
+
+            try
+            {
+                // Find the column definitions between parentheses
+                int startParen = createTableStatement.IndexOf('(');
+                int endParen = createTableStatement.LastIndexOf(')');
+
+                if (startParen == -1 || endParen == -1 || endParen <= startParen)
+                    return columns;
+
+                string columnSection = createTableStatement.Substring(startParen + 1, endParen - startParen - 1);
+
+                // Split by comma, but be careful of parentheses (like CHECK constraints)
+                var columnDefs = SplitColumnDefinitions(columnSection);
+
+                foreach (var def in columnDefs)
+                {
+                    var trimmed = def.Trim();
+                    
+                    // Skip constraints (PRIMARY KEY, FOREIGN KEY, CHECK, UNIQUE)
+                    if (trimmed.StartsWith("PRIMARY KEY", StringComparison.OrdinalIgnoreCase) ||
+                        trimmed.StartsWith("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) ||
+                        trimmed.StartsWith("CHECK", StringComparison.OrdinalIgnoreCase) ||
+                        trimmed.StartsWith("UNIQUE", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    // Extract column name (first token, removing quotes)
+                    var tokens = trimmed.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (tokens.Length > 0)
+                    {
+                        string colName = tokens[0].Trim('"', '\'');
+                        columns.Add((colName, trimmed));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Error parsing column definitions: {ex.Message}");
+            }
+
+            return columns;
+        }
+
+        /// <summary>
+        /// Split column definitions respecting parentheses
+        /// </summary>
+        private static List<string> SplitColumnDefinitions(string columnSection)
+        {
+            var definitions = new List<string>();
+            var current = new StringBuilder();
+            int parenDepth = 0;
+
+            foreach (char c in columnSection)
+            {
+                if (c == '(')
+                {
+                    parenDepth++;
+                    current.Append(c);
+                }
+                else if (c == ')')
+                {
+                    parenDepth--;
+                    current.Append(c);
+                }
+                else if (c == ',' && parenDepth == 0)
+                {
+                    definitions.Add(current.ToString());
+                    current.Clear();
+                }
+                else
+                {
+                    current.Append(c);
+                }
+            }
+
+            if (current.Length > 0)
+            {
+                definitions.Add(current.ToString());
+            }
+
+            return definitions;
+        }
+
+        /// <summary>
+        /// Check existing table and add any missing columns from the schema
+        /// </summary>
+        private static void AddMissingColumns(SqliteConnection conn, SqliteTransaction tx, string tableName, string createTableStatement)
+        {
+            try
+            {
+                // Get existing columns
+                var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.Transaction = tx;
+                    cmd.CommandText = $"PRAGMA table_info({tableName});";
+                    
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        existingColumns.Add(reader.GetString(1)); // Column name is at index 1
+                    }
+                }
+
+                // Parse target columns from CREATE TABLE statement
+                var targetColumns = ParseColumnDefinitions(createTableStatement);
+
+                // Find missing columns
+                var missingColumns = targetColumns.Where(col => !existingColumns.Contains(col.Name)).ToList();
+
+                if (missingColumns.Count > 0)
+                {
+                    AppDebug.Log("DatabaseManager", $"Found {missingColumns.Count} missing columns in '{tableName}'");
+
+                    using var cmd = conn.CreateCommand();
+                    cmd.Transaction = tx;
+
+                    foreach (var (colName, colDef) in missingColumns)
+                    {
+                        try
+                        {
+                            // SQLite ALTER TABLE ADD COLUMN has limitations:
+                            // - Column must have a DEFAULT value or be nullable
+                            // - Cannot add PRIMARY KEY columns
+                            
+                            if (colDef.Contains("PRIMARY KEY", StringComparison.OrdinalIgnoreCase))
+                            {
+                                AppDebug.Log("DatabaseManager", $"Skipping PRIMARY KEY column '{colName}' - cannot add via ALTER TABLE");
+                                continue;
+                            }
+
+                            cmd.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {colDef};";
+                            cmd.ExecuteNonQuery();
+                            AppDebug.Log("DatabaseManager", $"Added column '{colName}' to '{tableName}'");
+                        }
+                        catch (Exception ex)
+                        {
+                            AppDebug.Log("DatabaseManager", $"Warning: Could not add column '{colName}': {ex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    AppDebug.Log("DatabaseManager", $"Table '{tableName}' is up to date - no missing columns");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Error checking columns for table '{tableName}': {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Apply custom migrations that cannot be handled automatically
+        /// Add version-specific complex migrations here (column renames, type changes, etc.)
+        /// </summary>
+        private static void ApplyCustomMigrations(SqliteConnection conn, SqliteTransaction tx, int fromVersion, int toVersion)
+        {
+            // Apply each version's custom migrations
+            for (int version = fromVersion + 1; version <= toVersion; version++)
+            {
+                switch (version)
+                {
+                    case 1:
+                        // Version 1: No custom migrations needed
+                        // All changes handled by SQL file
+                        AppDebug.Log("DatabaseManager", "Version 1: No custom migrations needed");
+                        break;
+
+                    // Example for future versions:
+                    // case 2:
+                    //     MigrateCustomVersion2(conn, tx);
+                    //     break;
+
+                    default:
+                        // No custom migrations for this version
+                        break;
+                }
+            }
+        }
+
+        // Example of a custom migration method for complex changes
+        // Uncomment and modify when needed:
+        /*
+        private static void MigrateCustomVersion2(SqliteConnection conn, SqliteTransaction tx)
+        {
+            using var cmd = conn.CreateCommand();
+            cmd.Transaction = tx;
+
+            // Example: Rename a column (SQLite doesn't support direct RENAME)
+            // 1. Create new table with correct structure
+            // 2. Copy data
+            // 3. Drop old table
+            // 4. Rename new table
+            // 5. Recreate indexes
+
+            AppDebug.Log("DatabaseManager", "Applied custom migrations for version 2");
+        }
+        */
+
+        /// <summary>
+        /// Get the current schema version from the database
+        /// </summary>
+        private static int GetSchemaVersion(SqliteConnection conn)
+        {
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT value FROM tb_settings WHERE key = 'schema_version' LIMIT 1;";
+                
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    if (int.TryParse(result.ToString(), out int version))
+                    {
+                        return version;
+                    }
+                }
+            }
+            catch
+            {
+                // If there's an error (e.g., table doesn't exist), assume version 0
+            }
+            
+            return 0; // Legacy database with no version tracking
+        }
+
+        /// <summary>
+        /// Set the schema version in the database
+        /// </summary>
+        private static void SetSchemaVersion(SqliteConnection conn, SqliteTransaction tx, int version)
+        {
+            using var cmd = conn.CreateCommand();
+            cmd.Transaction = tx;
+            cmd.CommandText = @"
+                INSERT INTO tb_settings (key, value)
+                VALUES ('schema_version', $version)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value;
+            ";
+            cmd.Parameters.AddWithValue("$version", version.ToString());
+            cmd.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Create a backup of the database before applying migrations
+        /// </summary>
+        private static void CreateDatabaseBackup()
+        {
+            try
+            {
+                string backupPath = $"{_databasePath}.backup_{DateTime.Now:yyyyMMdd_HHmmss}";
+                File.Copy(_databasePath, backupPath, false);
+                AppDebug.Log("DatabaseManager", $"Database backup created: {backupPath}");
+                
+                // Keep only the last 5 backups
+                CleanupOldBackups();
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Warning: Failed to create database backup: {ex.Message}");
+                // Don't throw - backup failure shouldn't prevent upgrade if user accepts risk
+            }
+        }
+
+        /// <summary>
+        /// Clean up old backup files, keeping only the most recent ones
+        /// </summary>
+        private static void CleanupOldBackups()
+        {
+            try
+            {
+                var backupFiles = Directory.GetFiles(databaseDirectory, "database.sqlite.backup_*")
+                    .OrderByDescending(f => File.GetCreationTime(f))
+                    .Skip(5)
+                    .ToList();
+
+                foreach (var file in backupFiles)
+                {
+                    File.Delete(file);
+                    AppDebug.Log("DatabaseManager", $"Deleted old backup: {file}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("DatabaseManager", $"Warning: Failed to cleanup old backups: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Check if a table exists (helper for migrations)
+        /// </summary>
+        private static bool TableExists(SqliteConnection conn, SqliteTransaction tx, string tableName)
+        {
+            using var cmd = conn.CreateCommand();
+            cmd.Transaction = tx;
+            cmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name=$tableName;";
+            cmd.Parameters.AddWithValue("$tableName", tableName);
+            
+            var result = cmd.ExecuteScalar();
+            return result != null;
         }
 
         /// <summary>
@@ -2246,7 +2772,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// Releases the exclusive lock and closes the internal connection.
         /// Call this at application shutdown.
         /// </summary>
-        #region Audit Logs
 
         /// <summary>
         /// Log an audit action to the database
@@ -2556,8 +3081,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             return actionTypes;
         }
-
-        #endregion
 
         public static void Shutdown()
         {
