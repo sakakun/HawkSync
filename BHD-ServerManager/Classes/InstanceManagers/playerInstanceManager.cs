@@ -31,6 +31,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             public int RestrictedWeaponId { get; set; }
             public string RestrictedWeaponName { get; set; } = string.Empty;
             public bool MessageSent { get; set; }
+            public bool IsRearmed { get; set; } = false;
         }
 
 		// ================================================================================
@@ -294,10 +295,25 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     $">>> Player: {playerInfo.PlayerName}, Slot: {playerInfo.PlayerSlot}, " +
                     $"WeaponID: {weaponId}, WeaponName: '{playerInfo.SelectedWeaponName}'");
 
-                // Skip check for knife and medkit (always allowed)
+                // Check for knife and medkit (always allowed) - but may need to rearm if previously disarmed
                 if (weaponId == (int)WeaponStack.WPN_KNIFE || weaponId == (int)WeaponStack.WPN_MEDPACK)
                 {
-                    AppDebug.Log("CheckWeaponRestriction", $"  → Skipped (knife/medkit always allowed)");
+                    AppDebug.Log("CheckWeaponRestriction", $"  → Knife/medpack detected (always allowed)");
+                    
+                    // If player was disarmed, rearm them and remove from tracking
+                    if (weaponDisarmedPlayers.TryGetValue(playerInfo.PlayerSlot, out WeaponDisarmInfo? knifeDisarmInfo))
+                    {
+                        weaponDisarmedPlayers.Remove(playerInfo.PlayerSlot);
+                        
+                        ArmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
+                        
+                        ServerMemory.WriteMemorySendChatMessage(1, $"{playerInfo.PlayerName} re-armed.");
+                        
+                        AppDebug.Log("CheckWeaponRestriction", 
+                            $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
+                            $"switched to knife/medpack");
+                    }
+                    
                     return;
                 }
 
@@ -338,37 +354,72 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     TimeSpan timeSinceDisarm = DateTime.Now - disarmInfo.DisarmTime;
 
                     AppDebug.Log("CheckWeaponRestriction", 
-                        $"  → Player IN disarm cycle: {timeSinceDisarm.TotalSeconds:F1}s elapsed (need {WEAPON_DISARM_DURATION_SECONDS}s)");
+                        $"  → Player IN disarm cycle: {timeSinceDisarm.TotalSeconds:F1}s elapsed (need {WEAPON_DISARM_DURATION_SECONDS}s), IsRearmed: {disarmInfo.IsRearmed}");
 
                     // Check if 5 seconds have passed
                     if (timeSinceDisarm.TotalSeconds >= WEAPON_DISARM_DURATION_SECONDS)
                     {
                         // 5 seconds passed - check current weapon
-                        if (isWeaponRestricted && weaponId == disarmInfo.RestrictedWeaponId)
+                        if (isWeaponRestricted)
                         {
-                            // Still has restricted weapon - disarm again for another 5 seconds
-                            disarmInfo.DisarmTime = DateTime.Now;
-                            // Don't send message again - keep MessageSent as true
-                            
-                            DisarmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
-                            
-                            AppDebug.Log("CheckWeaponRestriction", 
-                                $"  → RE-DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
-                                $"still has {disarmInfo.RestrictedWeaponName} after 5 seconds (no message sent)");
+                            // Player has a restricted weapon after disarm period
+                            // Only send message if player was rearmed (state transition: allowed → restricted)
+                            if (disarmInfo.IsRearmed)
+                            {
+                                // Player switched back to restricted weapon after being rearmed
+                                disarmInfo.DisarmTime = DateTime.Now;
+                                disarmInfo.RestrictedWeaponId = weaponId;
+                                disarmInfo.RestrictedWeaponName = restriction.WeaponName;
+                                disarmInfo.IsRearmed = false;
+                                
+                                DisarmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
+                                
+                                // Send message
+                                string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+ players.";
+                                ServerMemory.WriteMemorySendChatMessage(1, message);
+                                
+                                AppDebug.Log("CheckWeaponRestriction", 
+                                    $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
+                                    $"Weapon {restriction.WeaponName} (ID: {weaponId}) not allowed");
+                            }
+                            else
+                            {
+                                // Still holding same restricted weapon OR switched to different restricted weapon
+                                // Update tracking but don't send another message
+                                disarmInfo.DisarmTime = DateTime.Now;
+                                disarmInfo.RestrictedWeaponId = weaponId;
+                                disarmInfo.RestrictedWeaponName = restriction.WeaponName;
+                                
+                                DisarmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
+                                
+                                AppDebug.Log("CheckWeaponRestriction", 
+                                    $"  → Extending disarm (no message) - still holding restricted weapon {restriction.WeaponName}");
+                            }
                         }
                         else
                         {
-                            // Player switched to allowed weapon - re-arm them
-                            weaponDisarmedPlayers.Remove(playerInfo.PlayerSlot);
-                            
-                            ArmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
-                            
-                            string rearmMessage = $"{playerInfo.PlayerName} - Re-armed with allowed weapon.";
-                            ServerMemory.WriteMemorySendChatMessage(1, rearmMessage);
-                            
-                            AppDebug.Log("CheckWeaponRestriction", 
-                                $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
-                                $"switched from {disarmInfo.RestrictedWeaponName} to {restriction.WeaponName}");
+                            // Player has an allowed weapon
+                            if (!disarmInfo.IsRearmed)
+                            {
+                                // Player just switched to allowed weapon - re-arm them
+                                disarmInfo.IsRearmed = true;
+                                
+                                ArmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
+                                
+                                ServerMemory.WriteMemorySendChatMessage(1, $"{playerInfo.PlayerName} re-armed.");
+                                
+                                AppDebug.Log("CheckWeaponRestriction", 
+                                    $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
+                                    $"switched to {restriction.WeaponName}");
+                            }
+                            else
+                            {
+                                // Player already rearmed and still has allowed weapon - remove from tracking
+                                weaponDisarmedPlayers.Remove(playerInfo.PlayerSlot);
+                                
+                                AppDebug.Log("CheckWeaponRestriction", 
+                                    $"  → Removed {playerInfo.PlayerName} from tracking - continues with allowed weapon");
+                            }
                         }
                     }
                     else
@@ -395,7 +446,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         DisarmTime = DateTime.Now,
                         RestrictedWeaponId = weaponId,
                         RestrictedWeaponName = weaponName,
-                        MessageSent = false
+                        MessageSent = false,
+                        IsRearmed = false
                     };
 
                     // Disarm the player
@@ -403,8 +455,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                     if (result.Success)
                     {
-                        // Send message only once per disarm cycle
-                        string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted and requires {threshold}+ players.";
+                        // Send message
+                        string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+ players.";
                         ServerMemory.WriteMemorySendChatMessage(1, message);
                         weaponDisarmedPlayers[playerInfo.PlayerSlot].MessageSent = true;
 
@@ -656,7 +708,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     ArmPlayer(slot, player.PlayerName);
                     
-                    string rearmMessage = $"{DateTime.Now:HH:mm:ss} - {player.PlayerName} - Full weapons now available ({currentPlayers}/{threshold} players)";
+                    string rearmMessage = $"{player.PlayerName} re-armed. Full weapons available ({currentPlayers}/{threshold} players).";
                     ServerMemory.WriteMemorySendChatMessage(1, rearmMessage);
                     AppDebug.Log("CheckWeaponRestriction", rearmMessage);
                 }
