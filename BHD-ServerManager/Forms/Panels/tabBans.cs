@@ -61,6 +61,12 @@ namespace BHD_ServerManager.Forms.Panels
 
         public void tabBansTicker()
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(tabBansTicker));
+                return;
+            }
+
             AppDebug.Log("tabBans", "Ticker update - checking NetLimiter settings lockdown");          
 
             NetLimiter_RefreshConnections();

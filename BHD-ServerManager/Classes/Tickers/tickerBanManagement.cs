@@ -34,12 +34,14 @@ namespace BHD_ServerManager.Classes.Tickers
         private static bool _netLimiterFilterLock = false;
 
         // Helper: Enumerate active players (seen within threshold)
-        private static IEnumerable<(int SlotNum, PlayerObject Player)> GetActivePlayers()
+        // Returns a list snapshot to avoid enumeration issues when PlayerList is modified by other threads
+        private static List<(int SlotNum, PlayerObject Player)> GetActivePlayers()
         {
             DateTime now = DateTime.Now;
             return playerInstance.PlayerList
                 .Where(kvp => (now - kvp.Value.PlayerLastSeen).TotalSeconds <= ActivePlayerThresholdSeconds)
-                .Select(kvp => (kvp.Key, kvp.Value));
+                .Select(kvp => (kvp.Key, kvp.Value))
+                .ToList();
         }
 
         // Helper: Punt players and log

@@ -52,6 +52,12 @@ namespace BHD_ServerManager.Forms.Panels
         /// </summary>
         public void Ticker_ProfileTab()
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(Ticker_ProfileTab));
+                return;
+            }
+
             // Enable/disable profile controls based on server status
             bool currentState = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
             btn_profileBrowse1.Enabled = currentState;

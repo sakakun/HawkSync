@@ -684,30 +684,32 @@ public partial class tabGamePlayV2 : UserControl
             btn_RolesSniper.BackColor = theInstance.roleSniper ? Color.LightGreen : Color.LightGray;
 
             // Weapon Restrictions (Buttons) - 3-state logic
-            btnWeapon01.BackColor = theInstance.weaponColt45 ? Color.LightGreen : (theInstance.restrictedWeaponColt45 ? Color.Gold : Color.LightGray);
-            btnWeapon02.BackColor = theInstance.weaponM9Beretta ? Color.LightGreen : (theInstance.restrictedWeaponM9Beretta ? Color.Gold : Color.LightGray);
-            btnWeapon11.BackColor = theInstance.weaponCar15 ? Color.LightGreen : (theInstance.restrictedWeaponCar15 ? Color.Gold : Color.LightGray);
-            btnWeapon12.BackColor = theInstance.weaponCar15203 ? Color.LightGreen : (theInstance.restrictedWeaponCar15203 ? Color.Gold : Color.LightGray);
-            btnWeapon15.BackColor = theInstance.weaponM16 ? Color.LightGreen : (theInstance.restrictedWeaponM16 ? Color.Gold : Color.LightGray);
-            btnWeapon16.BackColor = theInstance.weaponM16203 ? Color.LightGreen : (theInstance.restrictedWeaponM16203 ? Color.Gold : Color.LightGray);
-            btnWeapon13.BackColor = theInstance.weaponG3 ? Color.LightGreen : (theInstance.restrictedWeaponG3 ? Color.Gold : Color.LightGray);
-            btnWeapon14.BackColor = theInstance.weaponG36 ? Color.LightGreen : (theInstance.restrictedWeaponG36 ? Color.Gold : Color.LightGray);
-            btnWeapon10.BackColor = theInstance.weaponSAW ? Color.LightGreen : (theInstance.restrictedWeaponSAW ? Color.Gold : Color.LightGray);
-            btnWeapon17.BackColor = theInstance.weaponM240 ? Color.LightGreen : (theInstance.restrictedWeaponM240 ? Color.Gold : Color.LightGray);
-            btnWeapon18.BackColor = theInstance.weaponM60 ? Color.LightGreen : (theInstance.restrictedWeaponM60 ? Color.Gold : Color.LightGray);
-            btnWeapon19.BackColor = theInstance.weaponMP5 ? Color.LightGreen : (theInstance.restrictedWeaponMP5 ? Color.Gold : Color.LightGray);
-            btnWeapon23.BackColor = theInstance.weaponMCRT300 ? Color.LightGreen : (theInstance.restrictedWeaponMCRT300 ? Color.Gold : Color.LightGray);
-            btnWeapon21.BackColor = theInstance.weaponM21 ? Color.LightGreen : (theInstance.restrictedWeaponM21 ? Color.Gold : Color.LightGray);
-            btnWeapon22.BackColor = theInstance.weaponM24 ? Color.LightGreen : (theInstance.restrictedWeaponM24 ? Color.Gold : Color.LightGray);
-            btnWeapon20.BackColor = theInstance.weaponBarrett ? Color.LightGreen : (theInstance.restrictedWeaponBarrett ? Color.Gold : Color.LightGray);
-            btnWeapon24.BackColor = theInstance.weaponPSG1 ? Color.LightGreen : (theInstance.restrictedWeaponPSG1 ? Color.Gold : Color.LightGray);
-            btnWeapon03.BackColor = theInstance.weaponShotgun ? Color.LightGreen : (theInstance.restrictedWeaponShotgun ? Color.Gold : Color.LightGray);
-            btnWeapon07.BackColor = theInstance.weaponFragGrenade ? Color.LightGreen : (theInstance.restrictedWeaponFragGrenade ? Color.Gold : Color.LightGray);
-            btnWeapon09.BackColor = theInstance.weaponSmokeGrenade ? Color.LightGreen : (theInstance.restrictedWeaponSmokeGrenade ? Color.Gold : Color.LightGray);
-            btnWeapon08.BackColor = theInstance.weaponSatchelCharges ? Color.LightGreen : (theInstance.restrictedWeaponSatchelCharges ? Color.Gold : Color.LightGray);
-            btnWeapon04.BackColor = theInstance.weaponAT4 ? Color.LightGreen : (theInstance.restrictedWeaponAT4 ? Color.Gold : Color.LightGray);
-            btnWeapon06.BackColor = theInstance.weaponFlashGrenade ? Color.LightGreen : (theInstance.restrictedWeaponFlashGrenade ? Color.Gold : Color.LightGray);
-            btnWeapon05.BackColor = theInstance.weaponClaymore ? Color.LightGreen : (theInstance.restrictedWeaponClaymore ? Color.Gold : Color.LightGray);
+            // Gold = Always enabled (bypass threshold), Green = Enabled with threshold, Gray = Disabled
+            // Check restricted first: if true, show Gold; else check weapon enabled for Green; else Gray
+            btnWeapon01.BackColor = theInstance.restrictedWeaponColt45 ? Color.Gold : (theInstance.weaponColt45 ? Color.LightGreen : Color.LightGray);
+            btnWeapon02.BackColor = theInstance.restrictedWeaponM9Beretta ? Color.Gold : (theInstance.weaponM9Beretta ? Color.LightGreen : Color.LightGray);
+            btnWeapon11.BackColor = theInstance.restrictedWeaponCar15 ? Color.Gold : (theInstance.weaponCar15 ? Color.LightGreen : Color.LightGray);
+            btnWeapon12.BackColor = theInstance.restrictedWeaponCar15203 ? Color.Gold : (theInstance.weaponCar15203 ? Color.LightGreen : Color.LightGray);
+            btnWeapon15.BackColor = theInstance.restrictedWeaponM16 ? Color.Gold : (theInstance.weaponM16 ? Color.LightGreen : Color.LightGray);
+            btnWeapon16.BackColor = theInstance.restrictedWeaponM16203 ? Color.Gold : (theInstance.weaponM16203 ? Color.LightGreen : Color.LightGray);
+            btnWeapon13.BackColor = theInstance.restrictedWeaponG3 ? Color.Gold : (theInstance.weaponG3 ? Color.LightGreen : Color.LightGray);
+            btnWeapon14.BackColor = theInstance.restrictedWeaponG36 ? Color.Gold : (theInstance.weaponG36 ? Color.LightGreen : Color.LightGray);
+            btnWeapon10.BackColor = theInstance.restrictedWeaponSAW ? Color.Gold : (theInstance.weaponSAW ? Color.LightGreen : Color.LightGray);
+            btnWeapon17.BackColor = theInstance.restrictedWeaponM240 ? Color.Gold : (theInstance.weaponM240 ? Color.LightGreen : Color.LightGray);
+            btnWeapon18.BackColor = theInstance.restrictedWeaponM60 ? Color.Gold : (theInstance.weaponM60 ? Color.LightGreen : Color.LightGray);
+            btnWeapon19.BackColor = theInstance.restrictedWeaponMP5 ? Color.Gold : (theInstance.weaponMP5 ? Color.LightGreen : Color.LightGray);
+            btnWeapon23.BackColor = theInstance.restrictedWeaponMCRT300 ? Color.Gold : (theInstance.weaponMCRT300 ? Color.LightGreen : Color.LightGray);
+            btnWeapon21.BackColor = theInstance.restrictedWeaponM21 ? Color.Gold : (theInstance.weaponM21 ? Color.LightGreen : Color.LightGray);
+            btnWeapon22.BackColor = theInstance.restrictedWeaponM24 ? Color.Gold : (theInstance.weaponM24 ? Color.LightGreen : Color.LightGray);
+            btnWeapon20.BackColor = theInstance.restrictedWeaponBarrett ? Color.Gold : (theInstance.weaponBarrett ? Color.LightGreen : Color.LightGray);
+            btnWeapon24.BackColor = theInstance.restrictedWeaponPSG1 ? Color.Gold : (theInstance.weaponPSG1 ? Color.LightGreen : Color.LightGray);
+            btnWeapon03.BackColor = theInstance.restrictedWeaponShotgun ? Color.Gold : (theInstance.weaponShotgun ? Color.LightGreen : Color.LightGray);
+            btnWeapon07.BackColor = theInstance.restrictedWeaponFragGrenade ? Color.Gold : (theInstance.weaponFragGrenade ? Color.LightGreen : Color.LightGray);
+            btnWeapon09.BackColor = theInstance.restrictedWeaponSmokeGrenade ? Color.Gold : (theInstance.weaponSmokeGrenade ? Color.LightGreen : Color.LightGray);
+            btnWeapon08.BackColor = theInstance.restrictedWeaponSatchelCharges ? Color.Gold : (theInstance.weaponSatchelCharges ? Color.LightGreen : Color.LightGray);
+            btnWeapon04.BackColor = theInstance.restrictedWeaponAT4 ? Color.Gold : (theInstance.weaponAT4 ? Color.LightGreen : Color.LightGray);
+            btnWeapon06.BackColor = theInstance.restrictedWeaponFlashGrenade ? Color.Gold : (theInstance.weaponFlashGrenade ? Color.LightGreen : Color.LightGray);
+            btnWeapon05.BackColor = theInstance.restrictedWeaponClaymore ? Color.Gold : (theInstance.weaponClaymore ? Color.LightGreen : Color.LightGray);
         }
         finally
         {

@@ -29,6 +29,12 @@ namespace BHD_ServerManager.Forms.Panels
         /// </summary>
         public void StatsTickerHook()
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(StatsTickerHook));
+                return;
+            }
+
             if (!_firstLoadComplete)
             {
                 _firstLoadComplete = true;
