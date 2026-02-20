@@ -1,9 +1,10 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
+﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.Instances;
 using BHD_ServerManager.Forms;
+using HawkSyncShared;
+using HawkSyncShared.DTOs.tabPlayers;
+using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -31,8 +32,14 @@ namespace BHD_ServerManager.Classes.Tickers
 
             if (thisInstance.instanceStatus == InstanceStatus.ONLINE)
             {
-                // Check for left leaning violations
-                CheckLeftLeaningViolations();
+                // Check for leaning violations (left and/or right)
+                CheckLeaningViolations();
+                
+                // Check for weapon restrictions based on player count threshold
+                CheckWeaponRestrictions();
+                
+                // Clean up disconnected players from weapon restriction tracking
+                playerInstanceManager.CleanupDisconnectedPlayers();
             }
 
             // Now update the UI
@@ -51,10 +58,17 @@ namespace BHD_ServerManager.Classes.Tickers
             });
         }
 
-        public static void CheckLeftLeaningViolations()
+        /// <summary>
+        /// Check and enforce leaning restrictions (left and/or right)
+        /// </summary>
+        public static void CheckLeaningViolations()
         {
-            // Only check if left leaning is disabled
-            if (thisInstance.gameAllowLeftLeaning)
+            // Check if either leaning check is enabled
+            bool checkLeftLeaning = !thisInstance.gameAllowLeftLeaning;
+            bool checkRightLeaning = !thisInstance.gameAllowRightLeaning;
+
+            // Skip if both are allowed
+            if (!checkLeftLeaning && !checkRightLeaning)
             {
                 return;
             }
@@ -67,11 +81,11 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     ServerMemory.WriteMemoryArmPlayer(player.Key);
                     disarmedPlayers.Remove(player.Key);
-                    AppDebug.Log("LeftLeaningCheck", $"Re-armed player in slot {player.Key}");
+                    AppDebug.Log("LeaningCheck", $"Re-armed player in slot {player.Key}");
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("LeftLeaningCheck", $"Error re-arming player {player.Key}: {ex.Message}");
+                    AppDebug.Log("LeaningCheck", $"Error re-arming player {player.Key}: {ex.Message}");
                 }
             }
 
@@ -85,7 +99,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 disarmedPlayers.Remove(slot);
             }
 
-            // Check all active players for left leaning
+            // Check all active players for leaning violations
             foreach (var playerKvp in playerInstance.PlayerList.ToList())
             {
                 int playerSlot = playerKvp.Key;
@@ -101,8 +115,16 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     int leanStatus = ServerMemory.ReadMemoryPlayerLeaningStatus(playerSlot);
 
+                    // Lean status values:
+                    // 0 = upright
                     // 2 = left leaning
-                    if (leanStatus == 2)
+                    // 4 = right leaning
+                    
+                    bool isLeftLeaning = leanStatus == 2;
+                    bool isRightLeaning = leanStatus == 4;
+                    
+                    // Check for left leaning violation
+                    if (checkLeftLeaning && isLeftLeaning)
                     {
                         // Disarm the player
                         ServerMemory.WriteMemoryDisarmPlayer(playerSlot);
@@ -111,19 +133,71 @@ namespace BHD_ServerManager.Classes.Tickers
                         disarmedPlayers[playerSlot] = DateTime.Now.AddSeconds(10);
 
                         // Send chat message
-                        string message = $"{DateTime.Now.ToString("HH:mm:ss")} - {playerInfo.PlayerName} has been disarmed for 10 seconds - Left leaning is not allowed!";
+                        string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} has been disarmed for 10 seconds - Left leaning is not allowed!";
 
                         SendLongMessage(message, 59);
 
-                        AppDebug.Log("LeftLeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for left leaning");
+                        AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for left leaning");
+                    }
+                    // Check for right leaning violation
+                    else if (checkRightLeaning && isRightLeaning)
+                    {
+                        // Disarm the player
+                        ServerMemory.WriteMemoryDisarmPlayer(playerSlot);
+
+                        // Track when to re-arm (10 seconds from now)
+                        disarmedPlayers[playerSlot] = DateTime.Now.AddSeconds(10);
+
+                        // Send chat message
+                        string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} has been disarmed for 10 seconds - Right leaning is not allowed!";
+
+                        SendLongMessage(message, 59);
+
+                        AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for right leaning");
                     }
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("LeftLeaningCheck", $"Error checking lean status for player {playerSlot}: {ex.Message}");
+                    AppDebug.Log("LeaningCheck", $"Error checking lean status for player {playerSlot}: {ex.Message}");
                 }
             }
         }
+
+        /// <summary>
+        /// Check and enforce weapon restrictions based on player count threshold
+        /// </summary>
+        public static void CheckWeaponRestrictions()
+        {
+            // Get current player count and threshold
+            int currentPlayers = thisInstance.gameInfoNumPlayers;
+            int threshold = thisInstance.gameFullWeaponThreshold;
+
+            // If player count is at or above threshold, all configured weapons are allowed
+            if (currentPlayers >= threshold)
+            {
+                // Re-arm any players who were previously disarmed
+                playerInstanceManager.RearmAllDisarmedPlayers(currentPlayers, threshold);
+                return; // Full weapons enabled
+            }
+
+            // Below threshold - check each active player for restricted weapons
+            foreach (var playerKvp in playerInstance.PlayerList.ToList())
+            {
+                int playerSlot = playerKvp.Key;
+                var playerInfo = playerKvp.Value;
+
+                try
+                {
+                    // Check this player's weapon restriction
+                    playerInstanceManager.CheckWeaponRestriction(playerInfo);
+                }
+                catch (Exception ex)
+                {
+                    AppDebug.Log("WeaponRestrictionCheck", $"Error checking weapons for player {playerSlot}: {ex.Message}");
+                }
+            }
+        }
+
         private static void SendLongMessage(string message, int maxLength = 59)
         {
             if (message.Length <= maxLength)

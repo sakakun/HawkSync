@@ -19,14 +19,14 @@ namespace BHD_ServerManager.Forms
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         // Server Manager Tabs
-        public tabProfile       ProfileTab = null!;                   // The Profile Tab User Control
-        public tabGamePlay      GamePlayTab  = null!;                   // The Server Tab User Control
-        public tabMaps          MapsTab    = null!;                   // The Maps Tab User Control
-        public tabPlayers       PlayersTab = null!;                   // The Players Tab User Control
-        public tabChat          ChatTab    = null!;                   // The Chat Tab User Control
-        public tabBans          BanTab     = null!;                   // The Bans Tab User Control
-        public tabStats         StatsTab   = null!;                   // The Stats Tab User Control
-        public tabAdmin         AdminTab   = null!;                   // The Admin Tab User Control
+        public tabProfile       ProfileTab      = null!;                   // The Profile Tab User Control
+        public tabGamePlayV2    GamePlayTab     = null!;                   // The Server Tab User Control
+        public tabMaps          MapsTab         = null!;                   // The Maps Tab User Control
+        public tabPlayers       PlayersTab      = null!;                   // The Players Tab User Control
+        public tabChat          ChatTab         = null!;                   // The Chat Tab User Control
+        public tabBans          BanTab          = null!;                   // The Bans Tab User Control
+        public tabStats         StatsTab        = null!;                   // The Stats Tab User Control
+        public tabAdmin         AdminTab        = null!;                   // The Admin Tab User Control
 
         public ServerManagerUI()
         {
@@ -38,7 +38,7 @@ namespace BHD_ServerManager.Forms
         {
             // Load the User Controls into the TabPages
             tabProfile.Controls.Add(ProfileTab = new tabProfile());
-            tabGamePlay.Controls.Add(GamePlayTab = new tabGamePlay());
+            tabGamePlay.Controls.Add(GamePlayTab = new tabGamePlayV2());
             tabMaps.Controls.Add(MapsTab = new tabMaps());
             tabPlayers.Controls.Add(PlayersTab = new tabPlayers());
             tabChat.Controls.Add(ChatTab = new tabChat());

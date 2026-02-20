@@ -1,15 +1,16 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
+﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Services;
+using BHD_ServerManager.Classes.SupportClasses;
+using HawkSyncShared;
+using HawkSyncShared.DTOs.tabPlayers;
+using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
+using Windows.Storage;
 using UserControl = System.Windows.Forms.UserControl;
-using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.PlayerManagementClasses
 {
@@ -517,5 +518,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                    a.PlayerTeam == b.PlayerTeam &&
                    a.PlayerPing == b.PlayerPing;
         }
+
+
     }
 }

@@ -85,12 +85,15 @@ namespace HawkSyncShared.Instances
         public int              gamePSPTOTimer              { get; set; } = 20;  /* PSP Take Over Timer in Seconds */
         public int              gameFlagReturnTime          { get; set; } = 4;   /* Flag return time in minutes */
         public int              gameMaxTeamLives            { get; set; } = 20;  /* Max Team Lives */
+        public int              gameFullWeaponThreshold     { get; set; } = 10;  /* Number of players required for full weapons */
 
         // Game Settings: Misc Settings
         public bool             gameOneShotKills            { get; set; } = false;
         public bool             gameFatBullets              { get; set; } = false;
         public bool             gameDestroyBuildings        { get; set; } = false;
         public bool             gameAllowLeftLeaning        { get; set; } = true;
+        public bool             gameAllowRightLeaning       { get; set; } = true;
+
 
         // Game Settings: Ping Settings
         public bool             gameMinPing                 { get; set; } = false;
@@ -140,6 +143,32 @@ namespace HawkSyncShared.Instances
         public bool             weaponSatchelCharges        { get; set; } = true;
         public bool             weaponAT4                   { get; set; } = true;
         public bool             weaponClaymore              { get; set; } = true;
+
+        // Limited Weapon Restrictions (allowed when below threshold)
+        public bool             limitedWeaponColt45         { get; set; } = false;
+        public bool             limitedWeaponM9Beretta      { get; set; } = false;
+        public bool             limitedWeaponCar15          { get; set; } = false;
+        public bool             limitedWeaponCar15203       { get; set; } = false;
+        public bool             limitedWeaponM16            { get; set; } = false;
+        public bool             limitedWeaponM16203         { get; set; } = false;
+        public bool             limitedWeaponG3             { get; set; } = false;
+        public bool             limitedWeaponG36            { get; set; } = false;
+        public bool             limitedWeaponM60            { get; set; } = false;
+        public bool             limitedWeaponM240           { get; set; } = false;
+        public bool             limitedWeaponMP5            { get; set; } = false;
+        public bool             limitedWeaponSAW            { get; set; } = false;
+        public bool             limitedWeaponMCRT300        { get; set; } = false;
+        public bool             limitedWeaponM21            { get; set; } = false;
+        public bool             limitedWeaponM24            { get; set; } = false;
+        public bool             limitedWeaponBarrett        { get; set; } = false;
+        public bool             limitedWeaponPSG1           { get; set; } = false;
+        public bool             limitedWeaponShotgun        { get; set; } = false;
+        public bool             limitedWeaponFragGrenade    { get; set; } = false;
+        public bool             limitedWeaponSmokeGrenade   { get; set; } = false;
+        public bool             limitedWeaponFlashGrenade   { get; set; } = false;
+        public bool             limitedWeaponSatchelCharges { get; set; } = false;
+        public bool             limitedWeaponAT4            { get; set; } = false;
+        public bool             limitedWeaponClaymore       { get; set; } = false;
 
         // Role Restrictions
         public bool             roleCQB                     { get; set; } = true;

@@ -60,7 +60,7 @@ public class GamePlayController : ControllerBase
             request.Options.ShowClays, request.Options.AutoRange,
             request.Options.CustomSkins, request.Options.DestroyBuildings,
             request.Options.FatBullets, request.Options.OneShotKills,
-            request.Options.AllowLeftLeaning
+            request.Options.AllowLeftLeaning, request.Options.AllowRightLeaning
         );
         var friendlyFire = new FriendlyFireSettings(
             request.FriendlyFire.Enabled, request.FriendlyFire.MaxKills,
@@ -84,13 +84,28 @@ public class GamePlayController : ControllerBase
             request.Weapons.Satchel, request.Weapons.AT4,
             request.Weapons.FlashBang, request.Weapons.Claymore
         );
+        var limitedWeapons = new LimitedWeaponRestrictions(
+            request.LimitedWeapons.Colt45, request.LimitedWeapons.M9Beretta,
+            request.LimitedWeapons.CAR15, request.LimitedWeapons.CAR15203,
+            request.LimitedWeapons.M16, request.LimitedWeapons.M16203,
+            request.LimitedWeapons.G3, request.LimitedWeapons.G36,
+            request.LimitedWeapons.M60, request.LimitedWeapons.M240,
+            request.LimitedWeapons.MP5, request.LimitedWeapons.SAW,
+            request.LimitedWeapons.MCRT300, request.LimitedWeapons.M21,
+            request.LimitedWeapons.M24, request.LimitedWeapons.Barrett,
+            request.LimitedWeapons.PSG1, request.LimitedWeapons.Shotgun,
+            request.LimitedWeapons.FragGrenade, request.LimitedWeapons.SmokeGrenade,
+            request.LimitedWeapons.Satchel, request.LimitedWeapons.AT4,
+            request.LimitedWeapons.FlashBang, request.LimitedWeapons.Claymore
+        );
         var settings = new GamePlaySettings(
             request.BluePassword, request.RedPassword,
             request.ScoreKOTH, request.ScoreDM, request.ScoreFB,
             request.TimeLimit, request.LoopMaps, request.StartDelay,
             request.RespawnTime, request.ScoreBoardDelay, request.MaxSlots,
             request.PSPTakeoverTimer, request.FlagReturnTime, request.MaxTeamLives,
-            options, friendlyFire, roles, weapons
+            request.FullWeaponThreshold,
+            options, friendlyFire, roles, weapons, limitedWeapons
         );
         var result = theInstanceManager.SaveGamePlaySettings(settings);
         if (result.Success)
@@ -175,7 +190,8 @@ public class GamePlayController : ControllerBase
             instance.gameDestroyBuildings,
             instance.gameFatBullets,
             instance.gameOneShotKills,
-            instance.gameAllowLeftLeaning
+            instance.gameAllowLeftLeaning,
+            instance.gameAllowRightLeaning
         );
 
         var friendlyFire = new FriendlyFireSettingsDTO(
@@ -192,6 +208,7 @@ public class GamePlayController : ControllerBase
             instance.roleMedic
         );
 
+
         var weapons = new WeaponRestrictionsDTO(
             instance.weaponColt45, instance.weaponM9Beretta,
             instance.weaponCar15, instance.weaponCar15203,
@@ -205,6 +222,21 @@ public class GamePlayController : ControllerBase
             instance.weaponFragGrenade, instance.weaponSmokeGrenade,
             instance.weaponSatchelCharges, instance.weaponAT4,
             instance.weaponFlashGrenade, instance.weaponClaymore
+        );
+
+        var limitedWeapons = new LimitedWeaponRestrictionsDTO(
+            instance.limitedWeaponColt45, instance.limitedWeaponM9Beretta,
+            instance.limitedWeaponCar15, instance.limitedWeaponCar15203,
+            instance.limitedWeaponM16, instance.limitedWeaponM16203,
+            instance.limitedWeaponG3, instance.limitedWeaponG36,
+            instance.limitedWeaponM60, instance.limitedWeaponM240,
+            instance.limitedWeaponMP5, instance.limitedWeaponSAW,
+            instance.limitedWeaponMCRT300, instance.limitedWeaponM21,
+            instance.limitedWeaponM24, instance.limitedWeaponBarrett,
+            instance.limitedWeaponPSG1, instance.limitedWeaponShotgun,
+            instance.limitedWeaponFragGrenade, instance.limitedWeaponSmokeGrenade,
+            instance.limitedWeaponSatchelCharges, instance.limitedWeaponAT4,
+            instance.limitedWeaponFlashGrenade, instance.limitedWeaponClaymore
         );
 
         return new GamePlaySettingsData
@@ -223,10 +255,12 @@ public class GamePlayController : ControllerBase
             PSPTakeoverTimer = instance.gamePSPTOTimer,
             FlagReturnTime = instance.gameFlagReturnTime,
             MaxTeamLives = instance.gameMaxTeamLives,
+            FullWeaponThreshold = instance.gameFullWeaponThreshold,
             Options = options,
             FriendlyFire = friendlyFire,
             Roles = roles,
-            Weapons = weapons
+            Weapons = weapons,
+            LimitedWeapons = limitedWeapons
         };
     }
 
@@ -333,7 +367,7 @@ public class GamePlayController : ControllerBase
                 instance.gameShowTeamClays, instance.gameOptionAutoRange,
                 instance.gameCustomSkins, instance.gameDestroyBuildings,
                 instance.gameFatBullets, instance.gameOneShotKills,
-                instance.gameAllowLeftLeaning
+                instance.gameAllowLeftLeaning, instance.gameAllowRightLeaning
             );
             var friendlyFire = new FriendlyFireSettings(
                 instance.gameOptionFF, instance.gameFriendlyFireKills,
@@ -357,13 +391,28 @@ public class GamePlayController : ControllerBase
                 instance.weaponSatchelCharges, instance.weaponAT4,
                 instance.weaponFlashGrenade, instance.weaponClaymore
             );
+            var limitedWeapons = new LimitedWeaponRestrictions(
+                instance.limitedWeaponColt45, instance.limitedWeaponM9Beretta,
+                instance.limitedWeaponCar15, instance.limitedWeaponCar15203,
+                instance.limitedWeaponM16, instance.limitedWeaponM16203,
+                instance.limitedWeaponG3, instance.limitedWeaponG36,
+                instance.limitedWeaponM60, instance.limitedWeaponM240,
+                instance.limitedWeaponMP5, instance.limitedWeaponSAW,
+                instance.limitedWeaponMCRT300, instance.limitedWeaponM21,
+                instance.limitedWeaponM24, instance.limitedWeaponBarrett,
+                instance.limitedWeaponPSG1, instance.limitedWeaponShotgun,
+                instance.limitedWeaponFragGrenade, instance.limitedWeaponSmokeGrenade,
+                instance.limitedWeaponSatchelCharges, instance.limitedWeaponAT4,
+                instance.limitedWeaponFlashGrenade, instance.limitedWeaponClaymore
+            );
             var settings = new GamePlaySettings(
                 instance.gamePasswordBlue, instance.gamePasswordRed,
                 instance.gameScoreZoneTime, instance.gameScoreKills, instance.gameScoreFlags,
                 instance.gameTimeLimit, instance.gameLoopMaps, instance.gameStartDelay,
                 instance.gameRespawnTime, instance.gameScoreBoardDelay, instance.gameMaxSlots,
                 instance.gamePSPTOTimer, instance.gameFlagReturnTime, instance.gameMaxTeamLives,
-                options, friendlyFire, roles, weapons
+                instance.gameFullWeaponThreshold,
+                options, friendlyFire, roles, weapons, limitedWeapons
             );
             var json = System.Text.Json.JsonSerializer.Serialize(settings, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             success = true;

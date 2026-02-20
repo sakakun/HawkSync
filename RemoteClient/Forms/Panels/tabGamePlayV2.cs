@@ -3,10 +3,11 @@ using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabGameplay;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
+using System.Drawing;
 
 namespace RemoteClient.Forms.Panels;
 
-public partial class tabGamePlay : UserControl
+public partial class tabGamePlayV2 : UserControl
 {
     private theInstance theInstance => CommonCore.theInstance!;
 
@@ -19,15 +20,18 @@ public partial class tabGamePlay : UserControl
     private DateTime _lastEditTime = DateTime.MinValue;
     private System.Windows.Forms.Timer? _inactivityTimer;
     private const int INACTIVITY_TIMEOUT_SECONDS = 120; // 2 minutes
-    private bool _updatingWeaponCheckboxes = false;
-    private List<CheckBox> weaponCheckboxes = new();
+    private bool _updatingButtons = false;
+    private List<Button> weaponButtons = new();
+    private List<Button> roleButtons = new();
+    private List<Button> optionButtons = new();
+    private List<Button> friendlyFireButtons = new();
 
-    public tabGamePlay()
+    public tabGamePlayV2()
     {
         InitializeComponent();
 
-        // Initialize weapon checkboxes
-        InitializeWeaponCheckboxes();
+        // Initialize button lists
+        InitializeButtonLists();
 
         // Subscribe to server updates
         ApiCore.OnSnapshotReceived += OnSnapshotReceived;
@@ -43,7 +47,44 @@ public partial class tabGamePlay : UserControl
 
         // Initialize button visibility and state
         UpdateServerControlVisibility();
-        UpdateServerControlButtonState(); // Add this line
+        UpdateServerControlButtonState();
+    }
+
+    // ================================================================================
+    // INITIALIZATION
+    // ================================================================================
+
+    private void InitializeButtonLists()
+    {
+        weaponButtons = new()
+        {
+            btnWeapon01, btnWeapon02, btnWeapon11, btnWeapon12, btnWeapon15, btnWeapon16,
+            btnWeapon13, btnWeapon14, btnWeapon10, btnWeapon17, btnWeapon18, btnWeapon19, btnWeapon23,
+            btnWeapon21, btnWeapon22, btnWeapon20, btnWeapon24, btnWeapon03, btnWeapon07,
+            btnWeapon09, btnWeapon08, btnWeapon04, btnWeapon06, btnWeapon05
+        };
+
+        // Enable right-click for weapon buttons
+        foreach (var btn in weaponButtons)
+        {
+            btn.MouseDown += WeaponButton_MouseDown;
+        }
+
+        roleButtons = new() 
+        { 
+            btn_RolesCQB, btn_RolesGunner, btn_RolesMedic, btn_RolesSniper 
+        };
+
+        optionButtons = new()
+        {
+            btn_AutoBalance, btn_CustomSkins, btn_AllowLeftLeaning, btn_AllowRightLeaning, btn_AutoRange, 
+            btn_DestroyBuildings, btn_FatBullets, btn_OneShotKills, btn_ShowTracers, btn_ShowClays
+        };
+
+        friendlyFireButtons = new()
+        {
+            btn_FriendlyFireEnabled, btn_ShowFriendlyTags, btn_WarnOnFFKill
+        };
     }
 
     // ================================================================================
@@ -107,37 +148,24 @@ public partial class tabGamePlay : UserControl
         num_flagReturnTime.ValueChanged += Control_ValueChanged;
         num_maxTeamLives.ValueChanged += Control_ValueChanged;
         num_maxFFKills.ValueChanged += Control_ValueChanged;
-
-        // Wire up checkboxes
-        cb_autoBalance.CheckedChanged += Control_ValueChanged;
-        cb_showTracers.CheckedChanged += Control_ValueChanged;
-        cb_showClays.CheckedChanged += Control_ValueChanged;
-        cb_autoRange.CheckedChanged += Control_ValueChanged;
-        cb_customSkins.CheckedChanged += Control_ValueChanged;
-        cb_enableDistroyBuildings.CheckedChanged += Control_ValueChanged;
-        cb_enableFatBullets.CheckedChanged += Control_ValueChanged;
-        cb_enableOneShotKills.CheckedChanged += Control_ValueChanged;
-        cb_enableLeftLean.CheckedChanged += Control_ValueChanged;
-        cb_enableFFkills.CheckedChanged += Control_ValueChanged;
-        cb_warnFFkils.CheckedChanged += Control_ValueChanged;
-        cb_showTeamTags.CheckedChanged += Control_ValueChanged;
-        cb_roleCQB.CheckedChanged += Control_ValueChanged;
-        cb_roleGunner.CheckedChanged += Control_ValueChanged;
-        cb_roleSniper.CheckedChanged += Control_ValueChanged;
-        cb_roleMedic.CheckedChanged += Control_ValueChanged;
+        num_FullWeaponThreshold.ValueChanged += Control_ValueChanged;
 
         // Wire up combobox
         cb_replayMaps.SelectedIndexChanged += Control_ValueChanged;
 
-        // Wire up weapon checkboxes
-        foreach (var checkbox in weaponCheckboxes)
-        {
-            checkbox.CheckedChanged += Control_ValueChanged;
-        }
+        // Wire up all buttons
+        foreach (var btn in weaponButtons)
+            btn.Click += Button_Click;
+        foreach (var btn in roleButtons)
+            btn.Click += Button_Click;
+        foreach (var btn in optionButtons)
+            btn.Click += Button_Click;
+        foreach (var btn in friendlyFireButtons)
+            btn.Click += Button_Click;
 
-        // Wire up select all/none (special handling)
-        checkBox_selectAll.CheckedChanged += SelectAllNone_CheckedChanged;
-        checkBox_selectNone.CheckedChanged += SelectAllNone_CheckedChanged;
+        // Wire up weapon select all/none
+        btnWeaponSA.Click += WeaponSelectAll_Click;
+        btnWeaponSN.Click += WeaponSelectNone_Click;
     }
 
     private void Control_ValueChanged(object? sender, EventArgs e)
@@ -155,35 +183,79 @@ public partial class tabGamePlay : UserControl
 
         // Reset inactivity timer
         _lastEditTime = DateTime.Now;
+    }
 
-        // Update select all/none checkboxes if weapon changed
-        if (sender is CheckBox cb && weaponCheckboxes.Contains(cb))
+    private void Button_Click(object? sender, EventArgs e)
+    {
+        if (_suppressChangeTracking || _updatingButtons)
+            return;
+
+        var btn = sender as Button;
+        if (btn == null) return;
+
+        // For weapon buttons, use 3-state logic (Green/Gold/Gray)
+        if (weaponButtons.Contains(btn))
         {
-            UpdateWeaponSelectCheckboxes();
+            // Cycle through states on left-click
+            if (btn.BackColor == Color.LightGray)
+                btn.BackColor = Color.LightGreen;
+            else if (btn.BackColor == Color.LightGreen)
+                btn.BackColor = Color.Gold;
+            else
+                btn.BackColor = Color.LightGray;
+        }
+        else
+        {
+            // For non-weapon buttons, toggle between Green and Gray
+            btn.BackColor = btn.BackColor == Color.LightGreen ? Color.LightGray : Color.LightGreen;
+        }
+
+        // Trigger edit mode
+        Control_ValueChanged(sender, e);
+    }
+
+    private void WeaponButton_MouseDown(object? sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            if (_suppressChangeTracking || _updatingButtons)
+                return;
+
+            var btn = sender as Button;
+            if (btn == null) return;
+
+            // Right-click: toggle between Gold (limited) and LightGray (disabled)
+            if (btn.BackColor == Color.Gold)
+                btn.BackColor = Color.LightGray;
+            else
+                btn.BackColor = Color.Gold;
+
+            // Trigger edit mode
+            Control_ValueChanged(sender, e);
         }
     }
 
-    private void SelectAllNone_CheckedChanged(object? sender, EventArgs e)
+    private void WeaponSelectAll_Click(object? sender, EventArgs e)
     {
-        if (_suppressChangeTracking || _updatingWeaponCheckboxes)
+        if (_suppressChangeTracking || _updatingButtons)
             return;
 
-        _updatingWeaponCheckboxes = true;
+        _updatingButtons = true;
+        weaponButtons.ForEach(btn => btn.BackColor = Color.LightGreen);
+        _updatingButtons = false;
 
-        if (sender == checkBox_selectAll && checkBox_selectAll.Checked)
-        {
-            weaponCheckboxes.ForEach(cb => cb.Checked = true);
-            checkBox_selectNone.Checked = false;
-        }
-        else if (sender == checkBox_selectNone && checkBox_selectNone.Checked)
-        {
-            weaponCheckboxes.ForEach(cb => cb.Checked = false);
-            checkBox_selectAll.Checked = false;
-        }
+        Control_ValueChanged(sender, e);
+    }
 
-        _updatingWeaponCheckboxes = false;
+    private void WeaponSelectNone_Click(object? sender, EventArgs e)
+    {
+        if (_suppressChangeTracking || _updatingButtons)
+            return;
 
-        // Trigger edit mode
+        _updatingButtons = true;
+        weaponButtons.ForEach(btn => btn.BackColor = Color.LightGray);
+        _updatingButtons = false;
+
         Control_ValueChanged(sender, e);
     }
 
@@ -225,7 +297,6 @@ public partial class tabGamePlay : UserControl
     // SNAPSHOT UPDATE (Smart Logic)
     // ================================================================================
 
-    // Update the OnSnapshotReceived method:
     private void OnSnapshotReceived(ServerSnapshot snapshot)
     {
         if (InvokeRequired)
@@ -236,21 +307,20 @@ public partial class tabGamePlay : UserControl
 
         // Update button visibility based on server status
         UpdateServerControlVisibility();
-        UpdateServerControlButtonState(); // Add this line
+        UpdateServerControlButtonState();
 
         // ✅ ONLY update if NOT in edit mode
         if (!_isEditing)
         {
             ApplySettingsToUI();
         }
-        // else: User is editing - don't overwrite their changes
     }
 
     // ================================================================================
     // LOAD/SAVE OPERATIONS
     // ================================================================================
 
-    private async void BtnSave_Click(object sender, EventArgs e)
+    private async void BtnSave_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -317,7 +387,7 @@ public partial class tabGamePlay : UserControl
         }
     }
 
-    private void BtnReset_Click(object sender, EventArgs e)
+    private void BtnReset_Click(object? sender, EventArgs e)
     {
         var result = MessageBox.Show(
             "Discard all changes and reload from server?",
@@ -335,7 +405,7 @@ public partial class tabGamePlay : UserControl
         }
     }
 
-    private async void BtnLockLobby_Click(object sender, EventArgs e)
+    private async void BtnLockLobby_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -379,7 +449,7 @@ public partial class tabGamePlay : UserControl
         }
     }
 
-    private async void BtnServerUpdate_Click(object sender, EventArgs e)
+    private async void BtnServerUpdate_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -439,57 +509,84 @@ public partial class tabGamePlay : UserControl
     private GamePlaySettingsRequest BuildGamePlaySettingsFromUI()
     {
         var options = new ServerOptionsDTO(
-            AutoBalance: cb_autoBalance.Checked,
-            ShowTracers: cb_showTracers.Checked,
-            ShowClays: cb_showClays.Checked,
-            AutoRange: cb_autoRange.Checked,
-            CustomSkins: cb_customSkins.Checked,
-            DestroyBuildings: cb_enableDistroyBuildings.Checked,
-            FatBullets: cb_enableFatBullets.Checked,
-            OneShotKills: cb_enableOneShotKills.Checked,
-            AllowLeftLeaning: cb_enableLeftLean.Checked,
-            AllowRightLeaning: false
+            AutoBalance: btn_AutoBalance.BackColor == Color.LightGreen,
+            ShowTracers: btn_ShowTracers.BackColor == Color.LightGreen,
+            ShowClays: btn_ShowClays.BackColor == Color.LightGreen,
+            AutoRange: btn_AutoRange.BackColor == Color.LightGreen,
+            CustomSkins: btn_CustomSkins.BackColor == Color.LightGreen,
+            DestroyBuildings: btn_DestroyBuildings.BackColor == Color.LightGreen,
+            FatBullets: btn_FatBullets.BackColor == Color.LightGreen,
+            OneShotKills: btn_OneShotKills.BackColor == Color.LightGreen,
+            AllowLeftLeaning: btn_AllowLeftLeaning.BackColor == Color.LightGreen,
+            AllowRightLeaning: btn_AllowRightLeaning.BackColor == Color.LightGreen
         );
 
         var friendlyFire = new FriendlyFireSettingsDTO(
-            Enabled: cb_enableFFkills.Checked,
+            Enabled: btn_FriendlyFireEnabled.BackColor == Color.LightGreen,
             MaxKills: (int)num_maxFFKills.Value,
-            WarnOnKill: cb_warnFFkils.Checked,
-            ShowFriendlyTags: cb_showTeamTags.Checked
+            WarnOnKill: btn_WarnOnFFKill.BackColor == Color.LightGreen,
+            ShowFriendlyTags: btn_ShowFriendlyTags.BackColor == Color.LightGreen
         );
 
         var roles = new RoleRestrictionsDTO(
-            CQB: cb_roleCQB.Checked,
-            Gunner: cb_roleGunner.Checked,
-            Sniper: cb_roleSniper.Checked,
-            Medic: cb_roleMedic.Checked
+            CQB: btn_RolesCQB.BackColor == Color.LightGreen,
+            Gunner: btn_RolesGunner.BackColor == Color.LightGreen,
+            Sniper: btn_RolesSniper.BackColor == Color.LightGreen,
+            Medic: btn_RolesMedic.BackColor == Color.LightGreen
         );
 
         var weapons = new WeaponRestrictionsDTO(
-            Colt45: cb_weapColt45.Checked,
-            M9Beretta: cb_weapM9Bereatta.Checked,
-            CAR15: cb_weapCAR15.Checked,
-            CAR15203: cb_weapCAR15203.Checked,
-            M16: cb_weapM16.Checked,
-            M16203: cb_weapM16203.Checked,
-            G3: cb_weapG3.Checked,
-            G36: cb_weapG36.Checked,
-            M60: cb_weapM60.Checked,
-            M240: cb_weapM240.Checked,
-            MP5: cb_weapMP5.Checked,
-            SAW: cb_weapSaw.Checked,
-            MCRT300: cb_weap300Tact.Checked,
-            M21: cb_weapM21.Checked,
-            M24: cb_weapM24.Checked,
-            Barrett: cb_weapBarret.Checked,
-            PSG1: cb_weapPSG1.Checked,
-            Shotgun: cb_weapShotgun.Checked,
-            FragGrenade: cb_weapFragGrenade.Checked,
-            SmokeGrenade: cb_weapSmokeGrenade.Checked,
-            Satchel: cb_weapSatchel.Checked,
-            AT4: cb_weapAT4.Checked,
-            FlashBang: cb_weapFlashBang.Checked,
-            Claymore: cb_weapClay.Checked
+            Colt45: btnWeapon01.BackColor == Color.LightGreen,
+            M9Beretta: btnWeapon02.BackColor == Color.LightGreen,
+            CAR15: btnWeapon11.BackColor == Color.LightGreen,
+            CAR15203: btnWeapon12.BackColor == Color.LightGreen,
+            M16: btnWeapon15.BackColor == Color.LightGreen,
+            M16203: btnWeapon16.BackColor == Color.LightGreen,
+            G3: btnWeapon13.BackColor == Color.LightGreen,
+            G36: btnWeapon14.BackColor == Color.LightGreen,
+            M60: btnWeapon18.BackColor == Color.LightGreen,
+            M240: btnWeapon17.BackColor == Color.LightGreen,
+            MP5: btnWeapon19.BackColor == Color.LightGreen,
+            SAW: btnWeapon10.BackColor == Color.LightGreen,
+            MCRT300: btnWeapon23.BackColor == Color.LightGreen,
+            M21: btnWeapon21.BackColor == Color.LightGreen,
+            M24: btnWeapon22.BackColor == Color.LightGreen,
+            Barrett: btnWeapon20.BackColor == Color.LightGreen,
+            PSG1: btnWeapon24.BackColor == Color.LightGreen,
+            Shotgun: btnWeapon03.BackColor == Color.LightGreen,
+            FragGrenade: btnWeapon07.BackColor == Color.LightGreen,
+            SmokeGrenade: btnWeapon09.BackColor == Color.LightGreen,
+            Satchel: btnWeapon08.BackColor == Color.LightGreen,
+            AT4: btnWeapon04.BackColor == Color.LightGreen,
+            FlashBang: btnWeapon06.BackColor == Color.LightGreen,
+            Claymore: btnWeapon05.BackColor == Color.LightGreen
+        );
+
+        var limitedWeapons = new LimitedWeaponRestrictionsDTO(
+            Colt45: btnWeapon01.BackColor == Color.Gold,
+            M9Beretta: btnWeapon02.BackColor == Color.Gold,
+            CAR15: btnWeapon11.BackColor == Color.Gold,
+            CAR15203: btnWeapon12.BackColor == Color.Gold,
+            M16: btnWeapon15.BackColor == Color.Gold,
+            M16203: btnWeapon16.BackColor == Color.Gold,
+            G3: btnWeapon13.BackColor == Color.Gold,
+            G36: btnWeapon14.BackColor == Color.Gold,
+            M60: btnWeapon18.BackColor == Color.Gold,
+            M240: btnWeapon17.BackColor == Color.Gold,
+            MP5: btnWeapon19.BackColor == Color.Gold,
+            SAW: btnWeapon10.BackColor == Color.Gold,
+            MCRT300: btnWeapon23.BackColor == Color.Gold,
+            M21: btnWeapon21.BackColor == Color.Gold,
+            M24: btnWeapon22.BackColor == Color.Gold,
+            Barrett: btnWeapon20.BackColor == Color.Gold,
+            PSG1: btnWeapon24.BackColor == Color.Gold,
+            Shotgun: btnWeapon03.BackColor == Color.Gold,
+            FragGrenade: btnWeapon07.BackColor == Color.Gold,
+            SmokeGrenade: btnWeapon09.BackColor == Color.Gold,
+            Satchel: btnWeapon08.BackColor == Color.Gold,
+            AT4: btnWeapon04.BackColor == Color.Gold,
+            FlashBang: btnWeapon06.BackColor == Color.Gold,
+            Claymore: btnWeapon05.BackColor == Color.Gold
         );
 
         return new GamePlaySettingsRequest
@@ -508,10 +605,12 @@ public partial class tabGamePlay : UserControl
             PSPTakeoverTimer = (int)num_pspTakeoverTimer.Value,
             FlagReturnTime = (int)num_flagReturnTime.Value,
             MaxTeamLives = (int)num_maxTeamLives.Value,
+            FullWeaponThreshold = (int)num_FullWeaponThreshold.Value,
             Options = options,
             FriendlyFire = friendlyFire,
             Roles = roles,
-            Weapons = weapons
+            Weapons = weapons,
+            LimitedWeapons = limitedWeapons
         };
     }
 
@@ -519,7 +618,7 @@ public partial class tabGamePlay : UserControl
     {
         // Suppress change tracking during programmatic updates
         _suppressChangeTracking = true;
-        _updatingWeaponCheckboxes = true;
+        _updatingButtons = true;
 
         try
         {
@@ -542,102 +641,71 @@ public partial class tabGamePlay : UserControl
             num_pspTakeoverTimer.Value = theInstance.gamePSPTOTimer;
             num_flagReturnTime.Value = theInstance.gameFlagReturnTime;
             num_maxTeamLives.Value = theInstance.gameMaxTeamLives;
+            num_FullWeaponThreshold.Value = theInstance.gameFullWeaponThreshold;
 
-            // Server Options
-            cb_autoBalance.Checked = theInstance.gameOptionAutoBalance;
-            cb_customSkins.Checked = theInstance.gameCustomSkins;
-            cb_enableDistroyBuildings.Checked = theInstance.gameDestroyBuildings;
-            cb_enableFatBullets.Checked = theInstance.gameFatBullets;
-            cb_enableOneShotKills.Checked = theInstance.gameOneShotKills;
-            cb_enableLeftLean.Checked = theInstance.gameAllowLeftLeaning;
-            cb_showTracers.Checked = theInstance.gameOptionShowTracers;
-            cb_showClays.Checked = theInstance.gameShowTeamClays;
-            cb_autoRange.Checked = theInstance.gameOptionAutoRange;
+            // Server Options (Buttons)
+            btn_AutoBalance.BackColor = theInstance.gameOptionAutoBalance ? Color.LightGreen : Color.LightGray;
+            btn_CustomSkins.BackColor = theInstance.gameCustomSkins ? Color.LightGreen : Color.LightGray;
+            btn_AllowLeftLeaning.BackColor = theInstance.gameAllowLeftLeaning ? Color.LightGreen : Color.LightGray;
+            btn_AllowRightLeaning.BackColor = theInstance.gameAllowRightLeaning ? Color.LightGreen : Color.LightGray;
+            btn_AutoRange.BackColor = theInstance.gameOptionAutoRange ? Color.LightGreen : Color.LightGray;
+            btn_DestroyBuildings.BackColor = theInstance.gameDestroyBuildings ? Color.LightGreen : Color.LightGray;
+            btn_FatBullets.BackColor = theInstance.gameFatBullets ? Color.LightGreen : Color.LightGray;
+            btn_OneShotKills.BackColor = theInstance.gameOneShotKills ? Color.LightGreen : Color.LightGray;
+            btn_ShowTracers.BackColor = theInstance.gameOptionShowTracers ? Color.LightGreen : Color.LightGray;
+            btn_ShowClays.BackColor = theInstance.gameShowTeamClays ? Color.LightGreen : Color.LightGray;
 
-            // Friendly Fire
-            cb_enableFFkills.Checked = theInstance.gameOptionFF;
+            // Friendly Fire (Buttons)
+            btn_FriendlyFireEnabled.BackColor = theInstance.gameOptionFF ? Color.LightGreen : Color.LightGray;
+            btn_ShowFriendlyTags.BackColor = theInstance.gameOptionFriendlyTags ? Color.LightGreen : Color.LightGray;
+            btn_WarnOnFFKill.BackColor = theInstance.gameOptionFFWarn ? Color.LightGreen : Color.LightGray;
             num_maxFFKills.Value = theInstance.gameFriendlyFireKills;
-            cb_warnFFkils.Checked = theInstance.gameOptionFFWarn;
-            cb_showTeamTags.Checked = theInstance.gameOptionFriendlyTags;
 
-            // Role Restrictions
-            cb_roleCQB.Checked = theInstance.roleCQB;
-            cb_roleGunner.Checked = theInstance.roleGunner;
-            cb_roleSniper.Checked = theInstance.roleSniper;
-            cb_roleMedic.Checked = theInstance.roleMedic;
+            // Role Restrictions (Buttons)
+            btn_RolesCQB.BackColor = theInstance.roleCQB ? Color.LightGreen : Color.LightGray;
+            btn_RolesGunner.BackColor = theInstance.roleGunner ? Color.LightGreen : Color.LightGray;
+            btn_RolesMedic.BackColor = theInstance.roleMedic ? Color.LightGreen : Color.LightGray;
+            btn_RolesSniper.BackColor = theInstance.roleSniper ? Color.LightGreen : Color.LightGray;
 
-            // Weapon Restrictions
-            cb_weapColt45.Checked = theInstance.weaponColt45;
-            cb_weapM9Bereatta.Checked = theInstance.weaponM9Beretta;
-            cb_weapCAR15.Checked = theInstance.weaponCar15;
-            cb_weapCAR15203.Checked = theInstance.weaponCar15203;
-            cb_weapM16.Checked = theInstance.weaponM16;
-            cb_weapM16203.Checked = theInstance.weaponM16203;
-            cb_weapG3.Checked = theInstance.weaponG3;
-            cb_weapG36.Checked = theInstance.weaponG36;
-            cb_weapM60.Checked = theInstance.weaponM60;
-            cb_weapM240.Checked = theInstance.weaponM240;
-            cb_weapMP5.Checked = theInstance.weaponMP5;
-            cb_weapSaw.Checked = theInstance.weaponSAW;
-            cb_weap300Tact.Checked = theInstance.weaponMCRT300;
-            cb_weapM21.Checked = theInstance.weaponM21;
-            cb_weapM24.Checked = theInstance.weaponM24;
-            cb_weapBarret.Checked = theInstance.weaponBarrett;
-            cb_weapPSG1.Checked = theInstance.weaponPSG1;
-            cb_weapShotgun.Checked = theInstance.weaponShotgun;
-            cb_weapFragGrenade.Checked = theInstance.weaponFragGrenade;
-            cb_weapSmokeGrenade.Checked = theInstance.weaponSmokeGrenade;
-            cb_weapSatchel.Checked = theInstance.weaponSatchelCharges;
-            cb_weapAT4.Checked = theInstance.weaponAT4;
-            cb_weapFlashBang.Checked = theInstance.weaponFlashGrenade;
-            cb_weapClay.Checked = theInstance.weaponClaymore;
-
-            // Update select all/none checkboxes
-            UpdateWeaponSelectCheckboxes();
+            // Weapon Restrictions (Buttons) - 3-state logic
+            btnWeapon01.BackColor = theInstance.weaponColt45 ? Color.LightGreen : (theInstance.limitedWeaponColt45 ? Color.Gold : Color.LightGray);
+            btnWeapon02.BackColor = theInstance.weaponM9Beretta ? Color.LightGreen : (theInstance.limitedWeaponM9Beretta ? Color.Gold : Color.LightGray);
+            btnWeapon11.BackColor = theInstance.weaponCar15 ? Color.LightGreen : (theInstance.limitedWeaponCar15 ? Color.Gold : Color.LightGray);
+            btnWeapon12.BackColor = theInstance.weaponCar15203 ? Color.LightGreen : (theInstance.limitedWeaponCar15203 ? Color.Gold : Color.LightGray);
+            btnWeapon15.BackColor = theInstance.weaponM16 ? Color.LightGreen : (theInstance.limitedWeaponM16 ? Color.Gold : Color.LightGray);
+            btnWeapon16.BackColor = theInstance.weaponM16203 ? Color.LightGreen : (theInstance.limitedWeaponM16203 ? Color.Gold : Color.LightGray);
+            btnWeapon13.BackColor = theInstance.weaponG3 ? Color.LightGreen : (theInstance.limitedWeaponG3 ? Color.Gold : Color.LightGray);
+            btnWeapon14.BackColor = theInstance.weaponG36 ? Color.LightGreen : (theInstance.limitedWeaponG36 ? Color.Gold : Color.LightGray);
+            btnWeapon10.BackColor = theInstance.weaponSAW ? Color.LightGreen : (theInstance.limitedWeaponSAW ? Color.Gold : Color.LightGray);
+            btnWeapon17.BackColor = theInstance.weaponM240 ? Color.LightGreen : (theInstance.limitedWeaponM240 ? Color.Gold : Color.LightGray);
+            btnWeapon18.BackColor = theInstance.weaponM60 ? Color.LightGreen : (theInstance.limitedWeaponM60 ? Color.Gold : Color.LightGray);
+            btnWeapon19.BackColor = theInstance.weaponMP5 ? Color.LightGreen : (theInstance.limitedWeaponMP5 ? Color.Gold : Color.LightGray);
+            btnWeapon23.BackColor = theInstance.weaponMCRT300 ? Color.LightGreen : (theInstance.limitedWeaponMCRT300 ? Color.Gold : Color.LightGray);
+            btnWeapon21.BackColor = theInstance.weaponM21 ? Color.LightGreen : (theInstance.limitedWeaponM21 ? Color.Gold : Color.LightGray);
+            btnWeapon22.BackColor = theInstance.weaponM24 ? Color.LightGreen : (theInstance.limitedWeaponM24 ? Color.Gold : Color.LightGray);
+            btnWeapon20.BackColor = theInstance.weaponBarrett ? Color.LightGreen : (theInstance.limitedWeaponBarrett ? Color.Gold : Color.LightGray);
+            btnWeapon24.BackColor = theInstance.weaponPSG1 ? Color.LightGreen : (theInstance.limitedWeaponPSG1 ? Color.Gold : Color.LightGray);
+            btnWeapon03.BackColor = theInstance.weaponShotgun ? Color.LightGreen : (theInstance.limitedWeaponShotgun ? Color.Gold : Color.LightGray);
+            btnWeapon07.BackColor = theInstance.weaponFragGrenade ? Color.LightGreen : (theInstance.limitedWeaponFragGrenade ? Color.Gold : Color.LightGray);
+            btnWeapon09.BackColor = theInstance.weaponSmokeGrenade ? Color.LightGreen : (theInstance.limitedWeaponSmokeGrenade ? Color.Gold : Color.LightGray);
+            btnWeapon08.BackColor = theInstance.weaponSatchelCharges ? Color.LightGreen : (theInstance.limitedWeaponSatchelCharges ? Color.Gold : Color.LightGray);
+            btnWeapon04.BackColor = theInstance.weaponAT4 ? Color.LightGreen : (theInstance.limitedWeaponAT4 ? Color.Gold : Color.LightGray);
+            btnWeapon06.BackColor = theInstance.weaponFlashGrenade ? Color.LightGreen : (theInstance.limitedWeaponFlashGrenade ? Color.Gold : Color.LightGray);
+            btnWeapon05.BackColor = theInstance.weaponClaymore ? Color.LightGreen : (theInstance.limitedWeaponClaymore ? Color.Gold : Color.LightGray);
         }
         finally
         {
             // Always re-enable change tracking
             _suppressChangeTracking = false;
-            _updatingWeaponCheckboxes = false;
+            _updatingButtons = false;
         }
-    }
-
-    // ================================================================================
-    // WEAPON CHECKBOX LOGIC
-    // ================================================================================
-
-    private void InitializeWeaponCheckboxes()
-    {
-        weaponCheckboxes = new()
-        {
-            cb_weapColt45, cb_weapM9Bereatta, cb_weapCAR15, cb_weapCAR15203, 
-            cb_weapM16, cb_weapM16203, cb_weapG3, cb_weapG36, 
-            cb_weapM60, cb_weapM240, cb_weapMP5, cb_weapSaw, 
-            cb_weap300Tact, cb_weapM21, cb_weapM24, cb_weapBarret, 
-            cb_weapPSG1, cb_weapShotgun, cb_weapFragGrenade, cb_weapSmokeGrenade, 
-            cb_weapSatchel, cb_weapAT4, cb_weapFlashBang, cb_weapClay
-        };
-    }
-
-    private void UpdateWeaponSelectCheckboxes()
-    {
-        if (_updatingWeaponCheckboxes) 
-            return;
-
-        _updatingWeaponCheckboxes = true;
-
-        checkBox_selectAll.Checked = weaponCheckboxes.All(cb => cb.Checked);
-        checkBox_selectNone.Checked = weaponCheckboxes.All(cb => !cb.Checked);
-
-        _updatingWeaponCheckboxes = false;
     }
 
     // ================================================================================
     // EXPORT/IMPORT OPERATIONS
     // ================================================================================
 
-    private async void BtnExport_Click(object sender, EventArgs e)
+    private async void BtnExport_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -693,7 +761,7 @@ public partial class tabGamePlay : UserControl
         }
     }
 
-    private async void BtnLoad_Click(object sender, EventArgs e)
+    private async void BtnLoad_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -708,34 +776,25 @@ public partial class tabGamePlay : UserControl
             if (openFileDialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            // Read the JSON file
+            // Read the JSON data
             string jsonData = await File.ReadAllTextAsync(openFileDialog.FileName);
 
-            // Confirm before importing
-            var confirmResult = MessageBox.Show(
-                "Import these settings to the server?\n\nThis will overwrite the current server settings.",
-                "Confirm Import",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (confirmResult != DialogResult.Yes)
-                return;
-
-            // Send to server
+            // Disable UI during load
             btn_LoadSettings.Enabled = false;
-            btn_LoadSettings.Text = "IMPORTING";
+            btn_LoadSettings.Text = "LOADING";
 
+            // Send to server for import
             var result = await ApiCore.ApiClient!.GamePlay.ImportGamePlaySettingsAsync(jsonData);
 
             if (result.Success)
             {
                 MessageBox.Show(
-                    "Gameplay settings imported successfully!\n\nThe server has been updated.",
+                    "Gameplay settings imported successfully!\n\nThe settings have been applied to the server.",
                     "Import Complete",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
 
-                // Reload UI to reflect imported settings
+                // Reload from server to show new settings
                 ApplySettingsToUI();
             }
             else
@@ -746,14 +805,6 @@ public partial class tabGamePlay : UserControl
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
-        }
-        catch (System.Text.Json.JsonException ex)
-        {
-            MessageBox.Show(
-                $"Invalid JSON file format:\n\n{ex.Message}",
-                "Import Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
         }
         catch (Exception ex)
         {
@@ -774,7 +825,7 @@ public partial class tabGamePlay : UserControl
     // SERVER CONTROL OPERATIONS
     // ================================================================================
 
-    private async void BtnServerControl_Click(object sender, EventArgs e)
+    private async void BtnServerControl_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -815,8 +866,6 @@ public partial class tabGamePlay : UserControl
                     "Success",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
-
-                // Button state will update automatically via snapshot
             }
             else
             {
@@ -852,7 +901,5 @@ public partial class tabGamePlay : UserControl
 
         bool isOffline = theInstance.instanceStatus == InstanceStatus.OFFLINE;
         btn_serverControl.Text = isOffline ? "START" : "STOP";
-    
     }
-
 }

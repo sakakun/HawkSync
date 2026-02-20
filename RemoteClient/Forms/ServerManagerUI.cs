@@ -18,7 +18,7 @@ public partial class ServerManagerUI : Form
 
     // Server Manager Tabs
     public tabProfile       ProfileTab = null!;     // The Profile Tab User Control
-    public tabGamePlay      ServerTab  = null!;     // The Server Tab User Control
+    public tabGamePlayV2      ServerTab  = null!;     // The Server Tab User Control
     public tabMaps          MapsTab    = null!;     // The Maps Tab User Control
     public tabPlayers       PlayersTab = null!;     // The Players Tab User Control
     public tabChat          ChatTab    = null!;     // The Chat Tab User Control
@@ -53,7 +53,7 @@ public partial class ServerManagerUI : Form
         var tabPermissionPairs = new (TabPage tab, string name, string text, string permission, UserControl control)[]
         {
             (tabProfile,   "tabProfile",   "Profile",   "profile",   new tabProfile()),
-            (tabGamePlay,  "tabGamePlay",  "Gameplay",  "gameplay",  new tabGamePlay()),
+            (tabGamePlay,  "tabGamePlay",  "Gameplay",  "gameplay",  new tabGamePlayV2()),
             (tabMaps,      "tabMaps",      "Maps",      "maps",      new tabMaps()),
             (tabPlayers,   "tabPlayers",   "Players",   "players",   new tabPlayers()),
             (tabChat,      "tabChat",      "Chat",      "chat",      new tabChat()),

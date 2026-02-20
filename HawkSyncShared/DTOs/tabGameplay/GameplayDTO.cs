@@ -12,7 +12,8 @@ public record ServerOptionsDTO(
     bool DestroyBuildings,
     bool FatBullets,
     bool OneShotKills,
-    bool AllowLeftLeaning
+    bool AllowLeftLeaning,
+    bool AllowRightLeaning
 );
 
 /// <summary>
@@ -54,6 +55,24 @@ public record WeaponRestrictionsDTO(
 );
 
 /// <summary>
+/// Limited weapon restrictions DTO (allowed when below threshold)
+/// </summary>
+public record LimitedWeaponRestrictionsDTO(
+    bool Colt45, bool M9Beretta,
+    bool CAR15, bool CAR15203,
+    bool M16, bool M16203,
+    bool G3, bool G36,
+    bool M60, bool M240,
+    bool MP5, bool SAW,
+    bool MCRT300, bool M21,
+    bool M24, bool Barrett,
+    bool PSG1, bool Shotgun,
+    bool FragGrenade, bool SmokeGrenade,
+    bool Satchel, bool AT4,
+    bool FlashBang, bool Claymore
+);
+
+/// <summary>
 /// Request to save gameplay settings
 /// </summary>
 public class GamePlaySettingsRequest
@@ -77,12 +96,14 @@ public class GamePlaySettingsRequest
     public int PSPTakeoverTimer { get; set; }
     public int FlagReturnTime { get; set; }
     public int MaxTeamLives { get; set; }
+    public int FullWeaponThreshold { get; set; }
 
     // Grouped Settings
-    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false);
+    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false, false);
     public FriendlyFireSettingsDTO FriendlyFire { get; set; } = new(false, 0, false, false);
     public RoleRestrictionsDTO Roles { get; set; } = new(false, false, false, false);
     public WeaponRestrictionsDTO Weapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+    public LimitedWeaponRestrictionsDTO LimitedWeapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
 }
 
 /// <summary>
@@ -109,12 +130,14 @@ public class GamePlaySettingsData
     public int PSPTakeoverTimer { get; set; }
     public int FlagReturnTime { get; set; }
     public int MaxTeamLives { get; set; }
+    public int FullWeaponThreshold { get; set; }
 
     // Grouped Settings
-    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false);
+    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false, false);
     public FriendlyFireSettingsDTO FriendlyFire { get; set; } = new(false, 0, false, false);
     public RoleRestrictionsDTO Roles { get; set; } = new(false, false, false, false);
     public WeaponRestrictionsDTO Weapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+    public LimitedWeaponRestrictionsDTO LimitedWeapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
 }
 
 /// <summary>

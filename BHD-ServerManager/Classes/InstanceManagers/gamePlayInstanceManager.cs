@@ -20,7 +20,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 DestroyBuildings: gamePlayTab.cb_enableDistroyBuildings.Checked,
                 FatBullets: gamePlayTab.cb_enableFatBullets.Checked,
                 OneShotKills: gamePlayTab.cb_enableOneShotKills.Checked,
-                AllowLeftLeaning: gamePlayTab.cb_enableLeftLean.Checked
+                AllowLeftLeaning: gamePlayTab.cb_enableLeftLean.Checked,
+                AllowRightLeaning: false
             );
 
             var friendlyFire = new FriendlyFireSettings(
@@ -79,12 +80,15 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 PSPTakeoverTimer: (int)gamePlayTab.num_pspTakeoverTimer.Value,
                 FlagReturnTime: (int)gamePlayTab.num_flagReturnTime.Value,
                 MaxTeamLives: (int)gamePlayTab.num_maxTeamLives.Value,
+                FullWeaponThreshold: 10,
                 Options: options,
                 FriendlyFire: friendlyFire,
                 Roles: roles,
-                Weapons: weapons
+                Weapons: weapons,
+                LimitedWeapons: new LimitedWeaponRestrictions(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
             );
         }
+
 
         /// <summary>
         /// Build GamePlaySettings DTO from theInstance (for UI population)
@@ -100,7 +104,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 DestroyBuildings: instance.gameDestroyBuildings,
                 FatBullets: instance.gameFatBullets,
                 OneShotKills: instance.gameOneShotKills,
-                AllowLeftLeaning: instance.gameAllowLeftLeaning
+                AllowLeftLeaning: instance.gameAllowLeftLeaning,
+                AllowRightLeaning: instance.gameAllowRightLeaning
             );
 
             var friendlyFire = new FriendlyFireSettings(
@@ -159,10 +164,25 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 PSPTakeoverTimer: instance.gamePSPTOTimer,
                 FlagReturnTime: instance.gameFlagReturnTime,
                 MaxTeamLives: instance.gameMaxTeamLives,
+                FullWeaponThreshold: instance.gameFullWeaponThreshold,
                 Options: options,
                 FriendlyFire: friendlyFire,
                 Roles: roles,
-                Weapons: weapons
+                Weapons: weapons,
+                LimitedWeapons: new LimitedWeaponRestrictions(
+                    instance.limitedWeaponColt45, instance.limitedWeaponM9Beretta,
+                    instance.limitedWeaponCar15, instance.limitedWeaponCar15203,
+                    instance.limitedWeaponM16, instance.limitedWeaponM16203,
+                    instance.limitedWeaponG3, instance.limitedWeaponG36,
+                    instance.limitedWeaponM60, instance.limitedWeaponM240,
+                    instance.limitedWeaponMP5, instance.limitedWeaponSAW,
+                    instance.limitedWeaponMCRT300, instance.limitedWeaponM21,
+                    instance.limitedWeaponM24, instance.limitedWeaponBarrett,
+                    instance.limitedWeaponPSG1, instance.limitedWeaponShotgun,
+                    instance.limitedWeaponFragGrenade, instance.limitedWeaponSmokeGrenade,
+                    instance.limitedWeaponSatchelCharges, instance.limitedWeaponAT4,
+                    instance.limitedWeaponFlashGrenade, instance.limitedWeaponClaymore
+                )
             );
         }
     }
