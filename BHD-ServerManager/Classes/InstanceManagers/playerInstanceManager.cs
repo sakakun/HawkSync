@@ -375,7 +375,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 DisarmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                                 
                                 // Send message
-                                string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+ players.";
+                                string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+.";
                                 ServerMemory.WriteMemorySendChatMessage(1, message);
                                 
                                 AppDebug.Log("CheckWeaponRestriction", 
