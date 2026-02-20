@@ -17,6 +17,9 @@ namespace BHD_ServerManager.Classes.Tickers
 
         // Track disarmed players and their re-arm time
         private static Dictionary<int, DateTime> disarmedPlayers = new Dictionary<int, DateTime>();
+        
+        // Track if weapon config has been logged
+        private static bool weaponConfigLogged = false;
 
         // Helper for UI thread safety
         private static void SafeInvoke(Control control, Action action)
@@ -168,19 +171,33 @@ namespace BHD_ServerManager.Classes.Tickers
         /// </summary>
         public static void CheckWeaponRestrictions()
         {
+            // Log configuration once on first run
+            if (!weaponConfigLogged)
+            {
+                playerInstanceManager.LogWeaponRestrictionConfig();
+                weaponConfigLogged = true;
+            }
+
             // Get current player count and threshold
             int currentPlayers = thisInstance.gameInfoNumPlayers;
             int threshold = thisInstance.gameFullWeaponThreshold;
 
+            AppDebug.Log("WeaponRestrictionCheck", $"=== CheckWeaponRestrictions START === Players: {currentPlayers}, Threshold: {threshold}");
+
             // If player count is at or above threshold, all configured weapons are allowed
             if (currentPlayers >= threshold)
             {
+                AppDebug.Log("WeaponRestrictionCheck", $"Player count ({currentPlayers}) >= threshold ({threshold}) - Full weapons enabled");
+                
                 // Re-arm any players who were previously disarmed
                 playerInstanceManager.RearmAllDisarmedPlayers(currentPlayers, threshold);
                 return; // Full weapons enabled
             }
 
+            AppDebug.Log("WeaponRestrictionCheck", $"Player count ({currentPlayers}) < threshold ({threshold}) - Checking {playerInstance.PlayerList.Count} players for restricted weapons");
+
             // Below threshold - check each active player for restricted weapons
+            int checkedCount = 0;
             foreach (var playerKvp in playerInstance.PlayerList.ToList())
             {
                 int playerSlot = playerKvp.Key;
@@ -188,14 +205,19 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 try
                 {
+                    checkedCount++;
+                    AppDebug.Log("WeaponRestrictionCheck", $"[{checkedCount}] Checking player: {playerInfo.PlayerName} (slot {playerSlot}), WeaponID: {playerInfo.SelectedWeaponID}, WeaponName: {playerInfo.SelectedWeaponName}");
+                    
                     // Check this player's weapon restriction
                     playerInstanceManager.CheckWeaponRestriction(playerInfo);
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("WeaponRestrictionCheck", $"Error checking weapons for player {playerSlot}: {ex.Message}");
+                    AppDebug.Log("WeaponRestrictionCheck", $"ERROR checking weapons for player {playerSlot}: {ex.Message}");
                 }
             }
+
+            AppDebug.Log("WeaponRestrictionCheck", $"=== CheckWeaponRestrictions END === Checked {checkedCount} players");
         }
 
         private static void SendLongMessage(string message, int maxLength = 59)

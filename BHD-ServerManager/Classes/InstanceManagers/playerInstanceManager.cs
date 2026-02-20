@@ -290,26 +290,55 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Get weapon ID
                 int weaponId = playerInfo.SelectedWeaponID;
 
+                AppDebug.Log("CheckWeaponRestriction", 
+                    $">>> Player: {playerInfo.PlayerName}, Slot: {playerInfo.PlayerSlot}, " +
+                    $"WeaponID: {weaponId}, WeaponName: '{playerInfo.SelectedWeaponName}'");
+
                 // Skip check for knife and medkit (always allowed)
                 if (weaponId == (int)WeaponStack.WPN_KNIFE || weaponId == (int)WeaponStack.WPN_MEDPACK)
                 {
+                    AppDebug.Log("CheckWeaponRestriction", $"  → Skipped (knife/medkit always allowed)");
                     return;
                 }
 
                 // Check if weapon is on the restricted list
                 WeaponRestrictionResult restriction = CheckWeaponRestrictionStatus(weaponId);
 
-                // LOGIC: Below threshold, check if weapon is allowed
-                // Green (IsFullyAllowed) = Always allowed
-                // Gold (IsLimitedAllowed) = Allowed below threshold
-                // Gray (neither) = RESTRICTED
-                bool isWeaponRestricted = !restriction.IsFullyAllowed && !restriction.IsLimitedAllowed;
+                AppDebug.Log("CheckWeaponRestriction", 
+                    $"  → Weapon '{restriction.WeaponName}': IsFullyAllowed={restriction.IsFullyAllowed}, IsLimitedAllowed={restriction.IsLimitedAllowed}");
+
+                // LOGIC: Determine if weapon should be restricted
+                // Gold (IsFullyAllowed = true) = Always allowed, never disarm
+                // Green (IsLimitedAllowed = true) = Allowed only when currentPlayers >= threshold
+                // Gray (both false) = Always disabled, always disarm
+                bool isWeaponRestricted;
+                if (restriction.IsFullyAllowed)
+                {
+                    // Gold button - weapon always allowed regardless of player count
+                    isWeaponRestricted = false;
+                }
+                else if (restriction.IsLimitedAllowed)
+                {
+                    // Green button - weapon restricted below threshold
+                    isWeaponRestricted = (currentPlayers < threshold);
+                }
+                else
+                {
+                    // Gray button - weapon always disabled
+                    isWeaponRestricted = true;
+                }
+
+                AppDebug.Log("CheckWeaponRestriction", 
+                    $"  → IsWeaponRestricted: {isWeaponRestricted} (Players: {currentPlayers}/{threshold})");
 
                 // Check if player is currently in disarm cycle
                 if (weaponDisarmedPlayers.TryGetValue(playerInfo.PlayerSlot, out WeaponDisarmInfo? disarmInfo))
                 {
                     // Player is in disarm cycle
                     TimeSpan timeSinceDisarm = DateTime.Now - disarmInfo.DisarmTime;
+
+                    AppDebug.Log("CheckWeaponRestriction", 
+                        $"  → Player IN disarm cycle: {timeSinceDisarm.TotalSeconds:F1}s elapsed (need {WEAPON_DISARM_DURATION_SECONDS}s)");
 
                     // Check if 5 seconds have passed
                     if (timeSinceDisarm.TotalSeconds >= WEAPON_DISARM_DURATION_SECONDS)
@@ -327,7 +356,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                             ServerMemory.WriteMemorySendChatMessage(1, message);
                             
                             AppDebug.Log("CheckWeaponRestriction", 
-                                $"Re-disarmed {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
+                                $"  → RE-DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
                                 $"still has {disarmInfo.RestrictedWeaponName} after 5 seconds");
                         }
                         else
@@ -341,19 +370,28 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                             ServerMemory.WriteMemorySendChatMessage(1, rearmMessage);
                             
                             AppDebug.Log("CheckWeaponRestriction", 
-                                $"Re-armed {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
+                                $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
                                 $"switched from {disarmInfo.RestrictedWeaponName} to {restriction.WeaponName}");
                         }
+                    }
+                    else
+                    {
+                        AppDebug.Log("CheckWeaponRestriction", $"  → Still in disarm window, waiting...");
                     }
                     // else: Still within 5-second disarm window, do nothing
                     return;
                 }
+
+                AppDebug.Log("CheckWeaponRestriction", $"  → Player NOT in disarm cycle");
 
                 // Player NOT in disarm cycle - check if weapon is restricted
                 if (isWeaponRestricted)
                 {
                     // Weapon is RESTRICTED (Gray) - start disarm cycle
                     string weaponName = playerInfo.SelectedWeaponName ?? restriction.WeaponName ?? "Unknown";
+                    
+                    AppDebug.Log("CheckWeaponRestriction", 
+                        $"  → ⚠️ WEAPON RESTRICTED! Starting disarm cycle for {weaponName}");
                     
                     weaponDisarmedPlayers[playerInfo.PlayerSlot] = new WeaponDisarmInfo
                     {
@@ -372,15 +410,24 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         ServerMemory.WriteMemorySendChatMessage(1, message);
 
                         AppDebug.Log("CheckWeaponRestriction", 
-                            $"Disarmed {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) for 5s - " +
+                            $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) for 5s - " +
                             $"Weapon {weaponName} (ID: {weaponId}) not allowed with {currentPlayers} players");
                     }
+                    else
+                    {
+                        AppDebug.Log("CheckWeaponRestriction", 
+                            $"  → ❌ FAILED to disarm: {result.Message}");
+                    }
                 }
-                // else: Weapon is allowed (Green or Gold), do nothing
+                else
+                {
+                    AppDebug.Log("CheckWeaponRestriction", 
+                        $"  → ✅ Weapon ALLOWED (Green or Gold)");
+                }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("CheckWeaponRestriction", $"Error checking weapon restriction: {ex.Message}");
+                AppDebug.Log("CheckWeaponRestriction", $"❌ EXCEPTION: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
@@ -393,140 +440,140 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 // Pistols
                 (int)WeaponStack.WPN_colt45 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponColt45, 
                     theInstance.weaponColt45, 
-                    theInstance.limitedWeaponColt45, 
                     "Colt .45"),
                 
                 (int)WeaponStack.WPN_M9Beretta => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponM9Beretta, 
                     theInstance.weaponM9Beretta, 
-                    theInstance.limitedWeaponM9Beretta, 
                     "M9 Beretta"),
 
                 // Shotgun
                 (int)WeaponStack.WPN_RemmingtonSG => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponShotgun, 
                     theInstance.weaponShotgun, 
-                    theInstance.limitedWeaponShotgun, 
                     "Shotgun"),
 
                 // CAR-15 variants
                 (int)WeaponStack.WPN_CAR15_AUTO or 
                 (int)WeaponStack.WPN_CAR15_SEMI => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponCar15, 
                     theInstance.weaponCar15, 
-                    theInstance.limitedWeaponCar15, 
                     "CAR-15"),
 
                 (int)WeaponStack.WPN_CAR15_203_AUTO or 
                 (int)WeaponStack.WPN_CAR15_203_SEMI or 
                 (int)WeaponStack.WPN_CAR15_203_203 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponCar15203, 
                     theInstance.weaponCar15203, 
-                    theInstance.limitedWeaponCar15203, 
                     "CAR-15 M203"),
 
                 // M16 variants
                 (int)WeaponStack.WPN_M16_Burst or 
                 (int)WeaponStack.WPN_M16_SEMI => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponM16, 
                     theInstance.weaponM16, 
-                    theInstance.limitedWeaponM16, 
                     "M16"),
 
                 (int)WeaponStack.WPN_M16_203_Burst or 
                 (int)WeaponStack.WPN_M16_203_SEMI or 
                 (int)WeaponStack.WPN_M16_203_203 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponM16203, 
                     theInstance.weaponM16203, 
-                    theInstance.limitedWeaponM16203, 
                     "M16 M203"),
 
                 // Sniper rifles
                 (int)WeaponStack.WPN_M21 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponM21, 
                     theInstance.weaponM21, 
-                    theInstance.limitedWeaponM21, 
                     "M21"),
 
                 (int)WeaponStack.WPN_M24 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponM24, 
                     theInstance.weaponM24, 
-                    theInstance.limitedWeaponM24, 
                     "M24"),
 
                 (int)WeaponStack.WPN_MCRT_300_TACTICAL => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponMCRT300, 
                     theInstance.weaponMCRT300, 
-                    theInstance.limitedWeaponMCRT300, 
                     "McMillan .300"),
 
                 (int)WeaponStack.WPN_Barrett => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponBarrett, 
                     theInstance.weaponBarrett, 
-                    theInstance.limitedWeaponBarrett, 
                     "Barrett"),
 
                 (int)WeaponStack.WPN_PSG1 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponPSG1, 
                     theInstance.weaponPSG1, 
-                    theInstance.limitedWeaponPSG1, 
                     "PSG-1"),
 
                 // Machine guns
                 (int)WeaponStack.WPN_SAW => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponSAW, 
                     theInstance.weaponSAW, 
-                    theInstance.limitedWeaponSAW, 
                     "SAW"),
 
                 (int)WeaponStack.WPN_M60 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponM60, 
                     theInstance.weaponM60, 
-                    theInstance.limitedWeaponM60, 
                     "M60"),
 
                 (int)WeaponStack.WPN_M240 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponM240, 
                     theInstance.weaponM240, 
-                    theInstance.limitedWeaponM240, 
                     "M240"),
 
                 (int)WeaponStack.WPN_MP5 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponMP5, 
                     theInstance.weaponMP5, 
-                    theInstance.limitedWeaponMP5, 
                     "MP5"),
 
                 // G3 variants
                 (int)WeaponStack.WPN_G3_Auto or 
                 (int)WeaponStack.WPN_G3_SEMI => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponG3, 
                     theInstance.weaponG3, 
-                    theInstance.limitedWeaponG3, 
                     "G3"),
 
                 // G36 variants
                 (int)WeaponStack.WPN_G36_AUTO or 
                 (int)WeaponStack.WPN_G36_SEMI => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponG36, 
                     theInstance.weaponG36, 
-                    theInstance.limitedWeaponG36, 
                     "G36"),
 
                 // Grenades and explosives
                 (int)WeaponStack.WPN_XM84_STUN => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponFlashGrenade, 
                     theInstance.weaponFlashGrenade, 
-                    theInstance.limitedWeaponFlashGrenade, 
                     "Flash Grenade"),
 
                 (int)WeaponStack.WPN_M67_FRAG => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponFragGrenade, 
                     theInstance.weaponFragGrenade, 
-                    theInstance.limitedWeaponFragGrenade, 
                     "Frag Grenade"),
 
                 (int)WeaponStack.WPN_AN_M8_SMOKE => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponSmokeGrenade, 
                     theInstance.weaponSmokeGrenade, 
-                    theInstance.limitedWeaponSmokeGrenade, 
                     "Smoke Grenade"),
 
                 (int)WeaponStack.WPN_Satchel_CHARGE or 
                 (int)WeaponStack.WPN_Radio_DETONATOR => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponSatchelCharges, 
                     theInstance.weaponSatchelCharges, 
-                    theInstance.limitedWeaponSatchelCharges, 
                     "Satchel Charge"),
 
                 (int)WeaponStack.WPN_Claymore => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponClaymore, 
                     theInstance.weaponClaymore, 
-                    theInstance.limitedWeaponClaymore, 
                     "Claymore"),
 
                 (int)WeaponStack.WPN_AT4 => new WeaponRestrictionResult(
+                    theInstance.restrictedWeaponAT4, 
                     theInstance.weaponAT4, 
-                    theInstance.limitedWeaponAT4, 
                     "AT4"),
 
                 // Unknown or always-allowed weapons (knife, medkit, mounts)
@@ -548,6 +595,50 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 weaponDisarmedPlayers.Remove(slot);
                 AppDebug.Log("CheckWeaponRestriction", $"Cleaned up disconnected player from slot {slot}");
             }
+        }
+
+        /// <summary>
+        /// Debug method to log current weapon restriction configuration
+        /// </summary>
+        public static void LogWeaponRestrictionConfig()
+        {
+            AppDebug.Log("WeaponConfig", "=== WEAPON RESTRICTION CONFIGURATION ===");
+            AppDebug.Log("WeaponConfig", $"Threshold: {theInstance.gameFullWeaponThreshold} players");
+            AppDebug.Log("WeaponConfig", "");
+            AppDebug.Log("WeaponConfig", "PISTOLS:");
+            AppDebug.Log("WeaponConfig", $"  Colt .45: Full={theInstance.weaponColt45}, Limited={theInstance.restrictedWeaponColt45}");
+            AppDebug.Log("WeaponConfig", $"  M9 Beretta: Full={theInstance.weaponM9Beretta}, Limited={theInstance.restrictedWeaponM9Beretta}");
+            AppDebug.Log("WeaponConfig", "");
+            AppDebug.Log("WeaponConfig", "RIFLES:");
+            AppDebug.Log("WeaponConfig", $"  CAR-15: Full={theInstance.weaponCar15}, Limited={theInstance.restrictedWeaponCar15}");
+            AppDebug.Log("WeaponConfig", $"  CAR-15 M203: Full={theInstance.weaponCar15203}, Limited={theInstance.restrictedWeaponCar15203}");
+            AppDebug.Log("WeaponConfig", $"  M16: Full={theInstance.weaponM16}, Limited={theInstance.restrictedWeaponM16}");
+            AppDebug.Log("WeaponConfig", $"  M16 M203: Full={theInstance.weaponM16203}, Limited={theInstance.restrictedWeaponM16203}");
+            AppDebug.Log("WeaponConfig", $"  G3: Full={theInstance.weaponG3}, Limited={theInstance.restrictedWeaponG3}");
+            AppDebug.Log("WeaponConfig", $"  G36: Full={theInstance.weaponG36}, Limited={theInstance.restrictedWeaponG36}");
+            AppDebug.Log("WeaponConfig", $"  MP5: Full={theInstance.weaponMP5}, Limited={theInstance.restrictedWeaponMP5}");
+            AppDebug.Log("WeaponConfig", "");
+            AppDebug.Log("WeaponConfig", "SNIPERS:");
+            AppDebug.Log("WeaponConfig", $"  M21: Full={theInstance.weaponM21}, Limited={theInstance.restrictedWeaponM21}");
+            AppDebug.Log("WeaponConfig", $"  M24: Full={theInstance.weaponM24}, Limited={theInstance.restrictedWeaponM24}");
+            AppDebug.Log("WeaponConfig", $"  McMillan .300: Full={theInstance.weaponMCRT300}, Limited={theInstance.restrictedWeaponMCRT300}");
+            AppDebug.Log("WeaponConfig", $"  Barrett: Full={theInstance.weaponBarrett}, Limited={theInstance.restrictedWeaponBarrett}");
+            AppDebug.Log("WeaponConfig", $"  PSG-1: Full={theInstance.weaponPSG1}, Limited={theInstance.restrictedWeaponPSG1}");
+            AppDebug.Log("WeaponConfig", "");
+            AppDebug.Log("WeaponConfig", "MACHINE GUNS:");
+            AppDebug.Log("WeaponConfig", $"  SAW: Full={theInstance.weaponSAW}, Limited={theInstance.restrictedWeaponSAW}");
+            AppDebug.Log("WeaponConfig", $"  M60: Full={theInstance.weaponM60}, Limited={theInstance.restrictedWeaponM60}");
+            AppDebug.Log("WeaponConfig", $"  M240: Full={theInstance.weaponM240}, Limited={theInstance.restrictedWeaponM240}");
+            AppDebug.Log("WeaponConfig", "");
+            AppDebug.Log("WeaponConfig", "OTHER:");
+            AppDebug.Log("WeaponConfig", $"  Shotgun: Full={theInstance.weaponShotgun}, Limited={theInstance.restrictedWeaponShotgun}");
+            AppDebug.Log("WeaponConfig", $"  AT4: Full={theInstance.weaponAT4}, Limited={theInstance.restrictedWeaponAT4}");
+            AppDebug.Log("WeaponConfig", $"  Frag Grenade: Full={theInstance.weaponFragGrenade}, Limited={theInstance.restrictedWeaponFragGrenade}");
+            AppDebug.Log("WeaponConfig", $"  Smoke Grenade: Full={theInstance.weaponSmokeGrenade}, Limited={theInstance.restrictedWeaponSmokeGrenade}");
+            AppDebug.Log("WeaponConfig", $"  Flash Grenade: Full={theInstance.weaponFlashGrenade}, Limited={theInstance.restrictedWeaponFlashGrenade}");
+            AppDebug.Log("WeaponConfig", $"  Claymore: Full={theInstance.weaponClaymore}, Limited={theInstance.restrictedWeaponClaymore}");
+            AppDebug.Log("WeaponConfig", $"  Satchel: Full={theInstance.weaponSatchelCharges}, Limited={theInstance.restrictedWeaponSatchelCharges}");
+            AppDebug.Log("WeaponConfig", "=== END CONFIG ===");
         }
 
         /// <summary>

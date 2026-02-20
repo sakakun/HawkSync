@@ -38,7 +38,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 Medic: gamePlayTab.cb_roleMedic.Checked
             );
 
-            var weapons = new WeaponRestrictions(
+            var weapons = new WeaponEnablement(
                 Colt45: gamePlayTab.cb_weapColt45.Checked,
                 M9Beretta: gamePlayTab.cb_weapM9Bereatta.Checked,
                 CAR15: gamePlayTab.cb_weapCAR15.Checked,
@@ -85,7 +85,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 FriendlyFire: friendlyFire,
                 Roles: roles,
                 Weapons: weapons,
-                LimitedWeapons: new LimitedWeaponRestrictions(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
+                RestrictedWeapons: new RestrictedWeapons(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
             );
         }
 
@@ -122,7 +122,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 Medic: instance.roleMedic
             );
 
-            var weapons = new WeaponRestrictions(
+            var weapons = new WeaponEnablement(
                 Colt45: instance.weaponColt45,
                 M9Beretta: instance.weaponM9Beretta,
                 CAR15: instance.weaponCar15,
@@ -169,19 +169,19 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 FriendlyFire: friendlyFire,
                 Roles: roles,
                 Weapons: weapons,
-                LimitedWeapons: new LimitedWeaponRestrictions(
-                    instance.limitedWeaponColt45, instance.limitedWeaponM9Beretta,
-                    instance.limitedWeaponCar15, instance.limitedWeaponCar15203,
-                    instance.limitedWeaponM16, instance.limitedWeaponM16203,
-                    instance.limitedWeaponG3, instance.limitedWeaponG36,
-                    instance.limitedWeaponM60, instance.limitedWeaponM240,
-                    instance.limitedWeaponMP5, instance.limitedWeaponSAW,
-                    instance.limitedWeaponMCRT300, instance.limitedWeaponM21,
-                    instance.limitedWeaponM24, instance.limitedWeaponBarrett,
-                    instance.limitedWeaponPSG1, instance.limitedWeaponShotgun,
-                    instance.limitedWeaponFragGrenade, instance.limitedWeaponSmokeGrenade,
-                    instance.limitedWeaponSatchelCharges, instance.limitedWeaponAT4,
-                    instance.limitedWeaponFlashGrenade, instance.limitedWeaponClaymore
+                RestrictedWeapons: new RestrictedWeapons(
+                    instance.restrictedWeaponColt45, instance.restrictedWeaponM9Beretta,
+                    instance.restrictedWeaponCar15, instance.restrictedWeaponCar15203,
+                    instance.restrictedWeaponM16, instance.restrictedWeaponM16203,
+                    instance.restrictedWeaponG3, instance.restrictedWeaponG36,
+                    instance.restrictedWeaponM60, instance.restrictedWeaponM240,
+                    instance.restrictedWeaponMP5, instance.restrictedWeaponSAW,
+                    instance.restrictedWeaponMCRT300, instance.restrictedWeaponM21,
+                    instance.restrictedWeaponM24, instance.restrictedWeaponBarrett,
+                    instance.restrictedWeaponPSG1, instance.restrictedWeaponShotgun,
+                    instance.restrictedWeaponFragGrenade, instance.restrictedWeaponSmokeGrenade,
+                    instance.restrictedWeaponSatchelCharges, instance.restrictedWeaponAT4,
+                    instance.restrictedWeaponFlashGrenade, instance.restrictedWeaponClaymore
                 )
             );
         }

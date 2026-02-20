@@ -55,9 +55,9 @@ public record WeaponRestrictionsDTO(
 );
 
 /// <summary>
-/// Limited weapon restrictions DTO (allowed when below threshold)
+/// Restricted weapon restrictions DTO (allowed when below threshold - Gold state)
 /// </summary>
-public record LimitedWeaponRestrictionsDTO(
+public record RestrictedWeaponRestrictionsDTO(
     bool Colt45, bool M9Beretta,
     bool CAR15, bool CAR15203,
     bool M16, bool M16203,
@@ -103,7 +103,7 @@ public class GamePlaySettingsRequest
     public FriendlyFireSettingsDTO FriendlyFire { get; set; } = new(false, 0, false, false);
     public RoleRestrictionsDTO Roles { get; set; } = new(false, false, false, false);
     public WeaponRestrictionsDTO Weapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
-    public LimitedWeaponRestrictionsDTO LimitedWeapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+    public RestrictedWeaponRestrictionsDTO RestrictedWeapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
 }
 
 /// <summary>
@@ -137,7 +137,7 @@ public class GamePlaySettingsData
     public FriendlyFireSettingsDTO FriendlyFire { get; set; } = new(false, 0, false, false);
     public RoleRestrictionsDTO Roles { get; set; } = new(false, false, false, false);
     public WeaponRestrictionsDTO Weapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
-    public LimitedWeaponRestrictionsDTO LimitedWeapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+    public RestrictedWeaponRestrictionsDTO RestrictedWeapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
 }
 
 /// <summary>

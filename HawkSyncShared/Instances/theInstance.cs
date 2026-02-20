@@ -144,31 +144,31 @@ namespace HawkSyncShared.Instances
         public bool             weaponAT4                   { get; set; } = true;
         public bool             weaponClaymore              { get; set; } = true;
 
-        // Limited Weapon Restrictions (allowed when below threshold)
-        public bool             limitedWeaponColt45         { get; set; } = false;
-        public bool             limitedWeaponM9Beretta      { get; set; } = false;
-        public bool             limitedWeaponCar15          { get; set; } = false;
-        public bool             limitedWeaponCar15203       { get; set; } = false;
-        public bool             limitedWeaponM16            { get; set; } = false;
-        public bool             limitedWeaponM16203         { get; set; } = false;
-        public bool             limitedWeaponG3             { get; set; } = false;
-        public bool             limitedWeaponG36            { get; set; } = false;
-        public bool             limitedWeaponM60            { get; set; } = false;
-        public bool             limitedWeaponM240           { get; set; } = false;
-        public bool             limitedWeaponMP5            { get; set; } = false;
-        public bool             limitedWeaponSAW            { get; set; } = false;
-        public bool             limitedWeaponMCRT300        { get; set; } = false;
-        public bool             limitedWeaponM21            { get; set; } = false;
-        public bool             limitedWeaponM24            { get; set; } = false;
-        public bool             limitedWeaponBarrett        { get; set; } = false;
-        public bool             limitedWeaponPSG1           { get; set; } = false;
-        public bool             limitedWeaponShotgun        { get; set; } = false;
-        public bool             limitedWeaponFragGrenade    { get; set; } = false;
-        public bool             limitedWeaponSmokeGrenade   { get; set; } = false;
-        public bool             limitedWeaponFlashGrenade   { get; set; } = false;
-        public bool             limitedWeaponSatchelCharges { get; set; } = false;
-        public bool             limitedWeaponAT4            { get; set; } = false;
-        public bool             limitedWeaponClaymore       { get; set; } = false;
+        // Restricted Weapon Restrictions (allowed when below threshold - Gold state)
+        public bool             restrictedWeaponColt45         { get; set; } = false;
+        public bool             restrictedWeaponM9Beretta      { get; set; } = false;
+        public bool             restrictedWeaponCar15          { get; set; } = false;
+        public bool             restrictedWeaponCar15203       { get; set; } = false;
+        public bool             restrictedWeaponM16            { get; set; } = false;
+        public bool             restrictedWeaponM16203         { get; set; } = false;
+        public bool             restrictedWeaponG3             { get; set; } = false;
+        public bool             restrictedWeaponG36            { get; set; } = false;
+        public bool             restrictedWeaponM60            { get; set; } = false;
+        public bool             restrictedWeaponM240           { get; set; } = false;
+        public bool             restrictedWeaponMP5            { get; set; } = false;
+        public bool             restrictedWeaponSAW            { get; set; } = false;
+        public bool             restrictedWeaponMCRT300        { get; set; } = false;
+        public bool             restrictedWeaponM21            { get; set; } = false;
+        public bool             restrictedWeaponM24            { get; set; } = false;
+        public bool             restrictedWeaponBarrett        { get; set; } = false;
+        public bool             restrictedWeaponPSG1           { get; set; } = false;
+        public bool             restrictedWeaponShotgun        { get; set; } = false;
+        public bool             restrictedWeaponFragGrenade    { get; set; } = false;
+        public bool             restrictedWeaponSmokeGrenade   { get; set; } = false;
+        public bool             restrictedWeaponFlashGrenade   { get; set; } = false;
+        public bool             restrictedWeaponSatchelCharges { get; set; } = false;
+        public bool             restrictedWeaponAT4            { get; set; } = false;
+        public bool             restrictedWeaponClaymore       { get; set; } = false;
 
         // Role Restrictions
         public bool             roleCQB                     { get; set; } = true;

@@ -97,7 +97,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     /// <summary>
     /// Weapon restrictions
     /// </summary>
-    public record WeaponRestrictions(
+    public record WeaponEnablement(
         bool Colt45, bool M9Beretta,
         bool CAR15, bool CAR15203,
         bool M16, bool M16203,
@@ -115,7 +115,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
     /// <summary>
     /// Limited weapon restrictions (allowed when below player threshold)
     /// </summary>
-    public record LimitedWeaponRestrictions(
+    public record RestrictedWeapons(
         bool Colt45, bool M9Beretta,
         bool CAR15, bool CAR15203,
         bool M16, bool M16203,
@@ -159,8 +159,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         ServerOptions Options,
         FriendlyFireSettings FriendlyFire,
         RoleRestrictions Roles,
-        WeaponRestrictions Weapons,
-        LimitedWeaponRestrictions LimitedWeapons
+        WeaponEnablement Weapons,
+        RestrictedWeapons RestrictedWeapons
     );
 
     // ================================================================================
@@ -480,7 +480,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     Medic: ServerSettings.Get("roleMedic", true)
                 );
 
-                var weapons = new WeaponRestrictions(
+                var weapons = new WeaponEnablement(
                     Colt45: ServerSettings.Get("weaponColt45", true),
                     M9Beretta: ServerSettings.Get("weaponM9Beretta", true),
                     CAR15: ServerSettings.Get("weaponCar15", true),
@@ -507,31 +507,31 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     Claymore: ServerSettings.Get("weaponClaymore", true)
                 );
 
-                var limitedWeapons = new LimitedWeaponRestrictions(
-                    Colt45: ServerSettings.Get("limitedWeaponColt45", false),
-                    M9Beretta: ServerSettings.Get("limitedWeaponM9Beretta", false),
-                    CAR15: ServerSettings.Get("limitedWeaponCar15", false),
-                    CAR15203: ServerSettings.Get("limitedWeaponCar15203", false),
-                    M16: ServerSettings.Get("limitedWeaponM16", false),
-                    M16203: ServerSettings.Get("limitedWeaponM16203", false),
-                    G3: ServerSettings.Get("limitedWeaponG3", false),
-                    G36: ServerSettings.Get("limitedWeaponG36", false),
-                    M60: ServerSettings.Get("limitedWeaponM60", false),
-                    M240: ServerSettings.Get("limitedWeaponM240", false),
-                    MP5: ServerSettings.Get("limitedWeaponMP5", false),
-                    SAW: ServerSettings.Get("limitedWeaponSAW", false),
-                    MCRT300: ServerSettings.Get("limitedWeaponMCRT300", false),
-                    M21: ServerSettings.Get("limitedWeaponM21", false),
-                    M24: ServerSettings.Get("limitedWeaponM24", false),
-                    Barrett: ServerSettings.Get("limitedWeaponBarrett", false),
-                    PSG1: ServerSettings.Get("limitedWeaponPSG1", false),
-                    Shotgun: ServerSettings.Get("limitedWeaponShotgun", false),
-                    FragGrenade: ServerSettings.Get("limitedWeaponFragGrenade", false),
-                    SmokeGrenade: ServerSettings.Get("limitedWeaponSmokeGrenade", false),
-                    Satchel: ServerSettings.Get("limitedWeaponSatchelCharges", false),
-                    AT4: ServerSettings.Get("limitedWeaponAT4", false),
-                    FlashBang: ServerSettings.Get("limitedWeaponFlashGrenade", false),
-                    Claymore: ServerSettings.Get("limitedWeaponClaymore", false)
+                var RestrictedWeapons = new RestrictedWeapons (
+                    Colt45: ServerSettings.Get("restrictedWeaponColt45", false),
+                    M9Beretta: ServerSettings.Get("restrictedWeaponM9Beretta", false),
+                    CAR15: ServerSettings.Get("restrictedWeaponCar15", false),
+                    CAR15203: ServerSettings.Get("restrictedWeaponCar15203", false),
+                    M16: ServerSettings.Get("restrictedWeaponM16", false),
+                    M16203: ServerSettings.Get("restrictedWeaponM16203", false),
+                    G3: ServerSettings.Get("restrictedWeaponG3", false),
+                    G36: ServerSettings.Get("restrictedWeaponG36", false),
+                    M60: ServerSettings.Get("restrictedWeaponM60", false),
+                    M240: ServerSettings.Get("restrictedWeaponM240", false),
+                    MP5: ServerSettings.Get("restrictedWeaponMP5", false),
+                    SAW: ServerSettings.Get("RestrictedWeaponsAW", false),
+                    MCRT300: ServerSettings.Get("restrictedWeaponMCRT300", false),
+                    M21: ServerSettings.Get("restrictedWeaponM21", false),
+                    M24: ServerSettings.Get("restrictedWeaponM24", false),
+                    Barrett: ServerSettings.Get("restrictedWeaponBarrett", false),
+                    PSG1: ServerSettings.Get("restrictedWeaponPSG1", false),
+                    Shotgun: ServerSettings.Get("RestrictedWeaponshotgun", false),
+                    FragGrenade: ServerSettings.Get("restrictedWeaponFragGrenade", false),
+                    SmokeGrenade: ServerSettings.Get("RestrictedWeaponsmokeGrenade", false),
+                    Satchel: ServerSettings.Get("RestrictedWeaponsatchelCharges", false),
+                    AT4: ServerSettings.Get("restrictedWeaponAT4", false),
+                    FlashBang: ServerSettings.Get("restrictedWeaponFlashGrenade", false),
+                    Claymore: ServerSettings.Get("restrictedWeaponClaymore", false)
                 );
 
                 var settings = new GamePlaySettings(
@@ -554,7 +554,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     FriendlyFire: friendlyFire,
                     Roles: roles,
                     Weapons: weapons,
-                    LimitedWeapons: limitedWeapons
+                    RestrictedWeapons: RestrictedWeapons
                 );
 
                 // Update instance
@@ -656,30 +656,30 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("weaponClaymore", settings.Weapons.Claymore);
 
                 // Save limited weapon restrictions
-                ServerSettings.Set("limitedWeaponColt45", settings.LimitedWeapons.Colt45);
-                ServerSettings.Set("limitedWeaponM9Beretta", settings.LimitedWeapons.M9Beretta);
-                ServerSettings.Set("limitedWeaponCar15", settings.LimitedWeapons.CAR15);
-                ServerSettings.Set("limitedWeaponCar15203", settings.LimitedWeapons.CAR15203);
-                ServerSettings.Set("limitedWeaponM16", settings.LimitedWeapons.M16);
-                ServerSettings.Set("limitedWeaponM16203", settings.LimitedWeapons.M16203);
-                ServerSettings.Set("limitedWeaponG3", settings.LimitedWeapons.G3);
-                ServerSettings.Set("limitedWeaponG36", settings.LimitedWeapons.G36);
-                ServerSettings.Set("limitedWeaponM60", settings.LimitedWeapons.M60);
-                ServerSettings.Set("limitedWeaponM240", settings.LimitedWeapons.M240);
-                ServerSettings.Set("limitedWeaponMP5", settings.LimitedWeapons.MP5);
-                ServerSettings.Set("limitedWeaponSAW", settings.LimitedWeapons.SAW);
-                ServerSettings.Set("limitedWeaponMCRT300", settings.LimitedWeapons.MCRT300);
-                ServerSettings.Set("limitedWeaponM21", settings.LimitedWeapons.M21);
-                ServerSettings.Set("limitedWeaponM24", settings.LimitedWeapons.M24);
-                ServerSettings.Set("limitedWeaponBarrett", settings.LimitedWeapons.Barrett);
-                ServerSettings.Set("limitedWeaponPSG1", settings.LimitedWeapons.PSG1);
-                ServerSettings.Set("limitedWeaponShotgun", settings.LimitedWeapons.Shotgun);
-                ServerSettings.Set("limitedWeaponFragGrenade", settings.LimitedWeapons.FragGrenade);
-                ServerSettings.Set("limitedWeaponSmokeGrenade", settings.LimitedWeapons.SmokeGrenade);
-                ServerSettings.Set("limitedWeaponSatchelCharges", settings.LimitedWeapons.Satchel);
-                ServerSettings.Set("limitedWeaponAT4", settings.LimitedWeapons.AT4);
-                ServerSettings.Set("limitedWeaponFlashGrenade", settings.LimitedWeapons.FlashBang);
-                ServerSettings.Set("limitedWeaponClaymore", settings.LimitedWeapons.Claymore);
+                ServerSettings.Set("restrictedWeaponColt45", settings.RestrictedWeapons.Colt45);
+                ServerSettings.Set("restrictedWeaponM9Beretta", settings.RestrictedWeapons.M9Beretta);
+                ServerSettings.Set("restrictedWeaponCar15", settings.RestrictedWeapons.CAR15);
+                ServerSettings.Set("restrictedWeaponCar15203", settings.RestrictedWeapons.CAR15203);
+                ServerSettings.Set("restrictedWeaponM16", settings.RestrictedWeapons.M16);
+                ServerSettings.Set("restrictedWeaponM16203", settings.RestrictedWeapons.M16203);
+                ServerSettings.Set("restrictedWeaponG3", settings.RestrictedWeapons.G3);
+                ServerSettings.Set("restrictedWeaponG36", settings.RestrictedWeapons.G36);
+                ServerSettings.Set("restrictedWeaponM60", settings.RestrictedWeapons.M60);
+                ServerSettings.Set("restrictedWeaponM240", settings.RestrictedWeapons.M240);
+                ServerSettings.Set("restrictedWeaponMP5", settings.RestrictedWeapons.MP5);
+                ServerSettings.Set("RestrictedWeaponsAW", settings.RestrictedWeapons.SAW);
+                ServerSettings.Set("restrictedWeaponMCRT300", settings.RestrictedWeapons.MCRT300);
+                ServerSettings.Set("restrictedWeaponM21", settings.RestrictedWeapons.M21);
+                ServerSettings.Set("restrictedWeaponM24", settings.RestrictedWeapons.M24);
+                ServerSettings.Set("restrictedWeaponBarrett", settings.RestrictedWeapons.Barrett);
+                ServerSettings.Set("restrictedWeaponPSG1", settings.RestrictedWeapons.PSG1);
+                ServerSettings.Set("RestrictedWeaponshotgun", settings.RestrictedWeapons.Shotgun);
+                ServerSettings.Set("restrictedWeaponFragGrenade", settings.RestrictedWeapons.FragGrenade);
+                ServerSettings.Set("RestrictedWeaponsmokeGrenade", settings.RestrictedWeapons.SmokeGrenade);
+                ServerSettings.Set("RestrictedWeaponsatchelCharges", settings.RestrictedWeapons.Satchel);
+                ServerSettings.Set("restrictedWeaponAT4", settings.RestrictedWeapons.AT4);
+                ServerSettings.Set("restrictedWeaponFlashGrenade", settings.RestrictedWeapons.FlashBang);
+                ServerSettings.Set("restrictedWeaponClaymore", settings.RestrictedWeapons.Claymore);
 
                 // Update instance
                 ApplyGamePlaySettingsToInstance(settings);
@@ -764,7 +764,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.roleSniper, theInstance.roleMedic
                 );
 
-                var weapons = new WeaponRestrictions(
+                var weapons = new WeaponEnablement(
                     theInstance.weaponColt45, theInstance.weaponM9Beretta,
                     theInstance.weaponCar15, theInstance.weaponCar15203,
                     theInstance.weaponM16, theInstance.weaponM16203,
@@ -779,19 +779,19 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.weaponFlashGrenade, theInstance.weaponClaymore
                 );
 
-                var limitedWeapons = new LimitedWeaponRestrictions(
-                    theInstance.limitedWeaponColt45, theInstance.limitedWeaponM9Beretta,
-                    theInstance.limitedWeaponCar15, theInstance.limitedWeaponCar15203,
-                    theInstance.limitedWeaponM16, theInstance.limitedWeaponM16203,
-                    theInstance.limitedWeaponG3, theInstance.limitedWeaponG36,
-                    theInstance.limitedWeaponM60, theInstance.limitedWeaponM240,
-                    theInstance.limitedWeaponMP5, theInstance.limitedWeaponSAW,
-                    theInstance.limitedWeaponMCRT300, theInstance.limitedWeaponM21,
-                    theInstance.limitedWeaponM24, theInstance.limitedWeaponBarrett,
-                    theInstance.limitedWeaponPSG1, theInstance.limitedWeaponShotgun,
-                    theInstance.limitedWeaponFragGrenade, theInstance.limitedWeaponSmokeGrenade,
-                    theInstance.limitedWeaponSatchelCharges, theInstance.limitedWeaponAT4,
-                    theInstance.limitedWeaponFlashGrenade, theInstance.limitedWeaponClaymore
+                var RestrictedWeapons = new RestrictedWeapons (
+                    theInstance.restrictedWeaponColt45, theInstance.restrictedWeaponM9Beretta,
+                    theInstance.restrictedWeaponCar15, theInstance.restrictedWeaponCar15203,
+                    theInstance.restrictedWeaponM16, theInstance.restrictedWeaponM16203,
+                    theInstance.restrictedWeaponG3, theInstance.restrictedWeaponG36,
+                    theInstance.restrictedWeaponM60, theInstance.restrictedWeaponM240,
+                    theInstance.restrictedWeaponMP5, theInstance.restrictedWeaponSAW,
+                    theInstance.restrictedWeaponMCRT300, theInstance.restrictedWeaponM21,
+                    theInstance.restrictedWeaponM24, theInstance.restrictedWeaponBarrett,
+                    theInstance.restrictedWeaponPSG1, theInstance.restrictedWeaponShotgun,
+                    theInstance.restrictedWeaponFragGrenade, theInstance.restrictedWeaponSmokeGrenade,
+                    theInstance.restrictedWeaponSatchelCharges, theInstance.restrictedWeaponAT4,
+                    theInstance.restrictedWeaponFlashGrenade, theInstance.restrictedWeaponClaymore
                 );
 
                 var settings = new GamePlaySettings(
@@ -801,7 +801,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.gameRespawnTime, theInstance.gameScoreBoardDelay, theInstance.gameMaxSlots,
                     theInstance.gamePSPTOTimer, theInstance.gameFlagReturnTime, theInstance.gameMaxTeamLives,
                     theInstance.gameFullWeaponThreshold,
-                    options, friendlyFire, roles, weapons, limitedWeapons
+                    options, friendlyFire, roles, weapons, RestrictedWeapons
                 );
 
                 var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
@@ -851,7 +851,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             try
             {
-                var allEnabled = new WeaponRestrictions(
+                var allEnabled = new WeaponEnablement(
                     true, true, true, true, true, true,
                     true, true, true, true, true, true,
                     true, true, true, true, true, true,
@@ -877,7 +877,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             try
             {
-                var allDisabled = new WeaponRestrictions(
+                var allDisabled = new WeaponEnablement(
                     false, false, false, false, false, false,
                     false, false, false, false, false, false,
                     false, false, false, false, false, false,
@@ -1109,10 +1109,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             // Weapons
             ApplyWeaponRestrictionsToInstance(settings.Weapons);
-            ApplyLimitedWeaponRestrictionsToInstance(settings.LimitedWeapons);
+            ApplyrestrictedWeaponRestrictionsToInstance(settings.RestrictedWeapons);
         }
 
-        private static void ApplyWeaponRestrictionsToInstance(WeaponRestrictions weapons)
+        private static void ApplyWeaponRestrictionsToInstance(WeaponEnablement weapons)
         {
             theInstance.weaponColt45 = weapons.Colt45;
             theInstance.weaponM9Beretta = weapons.M9Beretta;
@@ -1140,32 +1140,32 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             theInstance.weaponClaymore = weapons.Claymore;
         }
 
-        private static void ApplyLimitedWeaponRestrictionsToInstance(LimitedWeaponRestrictions limitedWeapons)
+        private static void ApplyrestrictedWeaponRestrictionsToInstance(RestrictedWeapons RestrictedWeapons)
         {
-            theInstance.limitedWeaponColt45 = limitedWeapons.Colt45;
-            theInstance.limitedWeaponM9Beretta = limitedWeapons.M9Beretta;
-            theInstance.limitedWeaponCar15 = limitedWeapons.CAR15;
-            theInstance.limitedWeaponCar15203 = limitedWeapons.CAR15203;
-            theInstance.limitedWeaponM16 = limitedWeapons.M16;
-            theInstance.limitedWeaponM16203 = limitedWeapons.M16203;
-            theInstance.limitedWeaponG3 = limitedWeapons.G3;
-            theInstance.limitedWeaponG36 = limitedWeapons.G36;
-            theInstance.limitedWeaponM60 = limitedWeapons.M60;
-            theInstance.limitedWeaponM240 = limitedWeapons.M240;
-            theInstance.limitedWeaponMP5 = limitedWeapons.MP5;
-            theInstance.limitedWeaponSAW = limitedWeapons.SAW;
-            theInstance.limitedWeaponMCRT300 = limitedWeapons.MCRT300;
-            theInstance.limitedWeaponM21 = limitedWeapons.M21;
-            theInstance.limitedWeaponM24 = limitedWeapons.M24;
-            theInstance.limitedWeaponBarrett = limitedWeapons.Barrett;
-            theInstance.limitedWeaponPSG1 = limitedWeapons.PSG1;
-            theInstance.limitedWeaponShotgun = limitedWeapons.Shotgun;
-            theInstance.limitedWeaponFragGrenade = limitedWeapons.FragGrenade;
-            theInstance.limitedWeaponSmokeGrenade = limitedWeapons.SmokeGrenade;
-            theInstance.limitedWeaponSatchelCharges = limitedWeapons.Satchel;
-            theInstance.limitedWeaponAT4 = limitedWeapons.AT4;
-            theInstance.limitedWeaponFlashGrenade = limitedWeapons.FlashBang;
-            theInstance.limitedWeaponClaymore = limitedWeapons.Claymore;
+            theInstance.restrictedWeaponColt45 = RestrictedWeapons.Colt45;
+            theInstance.restrictedWeaponM9Beretta = RestrictedWeapons.M9Beretta;
+            theInstance.restrictedWeaponCar15 = RestrictedWeapons.CAR15;
+            theInstance.restrictedWeaponCar15203 = RestrictedWeapons.CAR15203;
+            theInstance.restrictedWeaponM16 = RestrictedWeapons.M16;
+            theInstance.restrictedWeaponM16203 = RestrictedWeapons.M16203;
+            theInstance.restrictedWeaponG3 = RestrictedWeapons.G3;
+            theInstance.restrictedWeaponG36 = RestrictedWeapons.G36;
+            theInstance.restrictedWeaponM60 = RestrictedWeapons.M60;
+            theInstance.restrictedWeaponM240 = RestrictedWeapons.M240;
+            theInstance.restrictedWeaponMP5 = RestrictedWeapons.MP5;
+            theInstance.restrictedWeaponSAW = RestrictedWeapons.SAW;
+            theInstance.restrictedWeaponMCRT300 = RestrictedWeapons.MCRT300;
+            theInstance.restrictedWeaponM21 = RestrictedWeapons.M21;
+            theInstance.restrictedWeaponM24 = RestrictedWeapons.M24;
+            theInstance.restrictedWeaponBarrett = RestrictedWeapons.Barrett;
+            theInstance.restrictedWeaponPSG1 = RestrictedWeapons.PSG1;
+            theInstance.restrictedWeaponShotgun = RestrictedWeapons.Shotgun;
+            theInstance.restrictedWeaponFragGrenade = RestrictedWeapons.FragGrenade;
+            theInstance.restrictedWeaponSmokeGrenade = RestrictedWeapons.SmokeGrenade;
+            theInstance.restrictedWeaponSatchelCharges = RestrictedWeapons.Satchel;
+            theInstance.restrictedWeaponAT4 = RestrictedWeapons.AT4;
+            theInstance.restrictedWeaponFlashGrenade = RestrictedWeapons.FlashBang;
+            theInstance.restrictedWeaponClaymore = RestrictedWeapons.Claymore;
         }
 
         // ================================================================================

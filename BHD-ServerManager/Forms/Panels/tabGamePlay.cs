@@ -209,9 +209,9 @@ namespace BHD_ServerManager.Forms.Panels
         }
 
         /// <summary>
-        /// Helper to set all weapon checkboxes from WeaponRestrictions
+        /// Helper to set all weapon checkboxes from WeaponEnablement
         /// </summary>
-        private void SetWeaponCheckboxes(WeaponRestrictions weapons)
+        private void SetWeaponCheckboxes(WeaponEnablement weapons)
         {
             cb_weapColt45.Checked = weapons.Colt45;
             cb_weapM9Bereatta.Checked = weapons.M9Beretta;
