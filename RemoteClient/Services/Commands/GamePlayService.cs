@@ -159,5 +159,12 @@ public class GamePlayService
         return await _apiClient.SendCommandAsync("/api/gameplay/stop-server", new { });
     }
 
+    /// <summary>
+    /// Toggle match state (pause/resume match)
+    /// </summary>
+    public async Task<CommandResult> ToggleMatchStateAsync()
+    {
+        return await _apiClient.SendCommandAsync("/api/gameplay/toggle-match-state", new { });
+    }
 
 }

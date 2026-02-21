@@ -36,7 +36,7 @@ partial class tabGamePlayV2
 		btn_ResetSettings = new Button();
 		btn_SaveSettings = new Button();
 		tableLayoutPanel2 = new TableLayoutPanel();
-		button12 = new Button();
+		btn_MatchStateToggle = new Button();
 		btn_ServerUpdate = new Button();
 		btn_serverControl = new Button();
 		btn_LockLobby = new Button();
@@ -265,7 +265,7 @@ partial class tabGamePlayV2
 		// 
 		tableLayoutPanel2.ColumnCount = 1;
 		tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle());
-		tableLayoutPanel2.Controls.Add(button12, 0, 5);
+		tableLayoutPanel2.Controls.Add(btn_MatchStateToggle, 0, 5);
 		tableLayoutPanel2.Controls.Add(btn_ServerUpdate, 0, 2);
 		tableLayoutPanel2.Controls.Add(btn_serverControl, 0, 1);
 		tableLayoutPanel2.Controls.Add(btn_LockLobby, 0, 4);
@@ -283,17 +283,18 @@ partial class tabGamePlayV2
 		tableLayoutPanel2.Size = new Size(95, 416);
 		tableLayoutPanel2.TabIndex = 1;
 		// 
-		// button12
+		// btn_MatchStateToggle
 		// 
-		button12.Dock = DockStyle.Fill;
-		button12.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-		button12.Location = new Point(3, 298);
-		button12.Name = "button12";
-		button12.Size = new Size(90, 53);
-		button12.TabIndex = 8;
-		button12.Text = "PAUSE MATCH";
-		button12.UseVisualStyleBackColor = true;
-		button12.Visible = false;
+		btn_MatchStateToggle.Dock = DockStyle.Fill;
+		btn_MatchStateToggle.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+		btn_MatchStateToggle.Location = new Point(3, 298);
+		btn_MatchStateToggle.Name = "btn_MatchStateToggle";
+		btn_MatchStateToggle.Size = new Size(90, 53);
+		btn_MatchStateToggle.TabIndex = 8;
+		btn_MatchStateToggle.Text = "PAUSE MATCH";
+		btn_MatchStateToggle.UseVisualStyleBackColor = true;
+		btn_MatchStateToggle.Visible = false;
+		btn_MatchStateToggle.Click += BtnMatchStateToggle_Click;
 		// 
 		// btn_ServerUpdate
 		// 
@@ -1897,5 +1898,5 @@ partial class tabGamePlayV2
 	public NumericUpDown num_maxFFKills;
 	public Label label3;
 	public NumericUpDown num_FullWeaponThreshold;
-	public Button button12;
+	public Button btn_MatchStateToggle;
 }

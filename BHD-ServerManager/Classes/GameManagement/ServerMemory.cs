@@ -1057,8 +1057,31 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
         }
-        // Function: UpdateScoreBoardTimer
-        public static void UpdateScoreBoardTimer()
+        // Function: Update Start Delay Timer
+        public static void ReadStartDelayTimer()
+        {
+            byte[] currentStartDelayCountBytes = new byte[4];
+            int currentStartDelayCountRead = 0;
+
+            int StartDelayCounterPtr = baseAddr + 0x5DAE04;
+
+            ReadProcessMemory((int)processHandle, StartDelayCounterPtr, currentStartDelayCountBytes, currentStartDelayCountBytes.Length, ref currentStartDelayCountRead);
+
+            int currentStartDelayCount = BitConverter.ToInt32(currentStartDelayCountBytes, 0);
+
+            thisInstance.gameInfoStartDelayTimer = currentStartDelayCount;
+
+        }
+        // Function: Update Start Delay Timer
+        public static void UpdateStartDelayTimer(int value)
+        {
+            var instanceTimer = baseAddr + 0x5DAE04;
+            byte[] endTimerBytes = BitConverter.GetBytes(value);
+            int bytesWritten = 0;
+            WriteProcessMemory((int)processHandle, instanceTimer, endTimerBytes, endTimerBytes.Length, ref bytesWritten);
+        }
+		// Function: UpdateScoreBoardTimer
+		public static void UpdateScoreBoardTimer()
         {
 
 

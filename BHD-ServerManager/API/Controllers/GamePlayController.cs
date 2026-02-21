@@ -562,6 +562,62 @@ public class GamePlayController : ControllerBase
             LogGamePlayAction("StopServer", "Stopped game server", success, message);
         }
     }
+
+    /// <summary>
+    /// Toggle match state (pause/resume match)
+    /// </summary>
+    [HttpPost("toggle-match-state")]
+    public ActionResult<CommandResult> ToggleMatchState()
+    {
+        if(!HasPermission("gameplay")) return Forbid();
+
+        bool success = false;
+        string message = string.Empty;
+        try
+        {
+            var instance = CommonCore.theInstance;
+            if (instance == null || instance.instanceStatus == InstanceStatus.OFFLINE)
+            {
+                message = "Server is not running. Cannot toggle match state.";
+                return Ok(new CommandResult { Success = false, Message = message });
+            }
+
+            // Use the current timer value from theInstance to determine current match state
+            int currentTimer = instance.gameInfoStartDelayTimer;
+
+            // If timer > 15, match is currently paused, so we want to resume (set to 0)
+            bool isCurrentlyPaused = currentTimer > 15;
+
+            if (isCurrentlyPaused)
+            {
+                // Resume Match
+                ServerMemory.UpdateStartDelayTimer(0);
+                instance.gameInfoStartDelayTimer = 0; // Update local instance value immediately
+                success = true;
+                message = "Match resumed successfully.";
+            }
+            else
+            {
+                // Pause Match
+                ServerMemory.UpdateStartDelayTimer(240);
+                instance.gameInfoStartDelayTimer = 240; // Update local instance value immediately
+                success = true;
+                message = "Match paused successfully.";
+            }
+
+            return Ok(new CommandResult { Success = success, Message = message });
+        }
+        catch (Exception ex)
+        {
+            message = $"Error toggling match state: {ex.Message}";
+            return Ok(new CommandResult { Success = false, Message = message });
+        }
+        finally
+        {
+            LogGamePlayAction("ToggleMatchState", "Toggled match pause/resume state", success, message);
+        }
+    }
+
     private bool HasPermission(string permission)
     {
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();

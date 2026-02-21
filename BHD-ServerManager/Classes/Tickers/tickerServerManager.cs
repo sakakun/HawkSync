@@ -70,7 +70,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     // --- Server is online: run status-specific logic in order ---
                     // 1. Always update status and basic info
                     ServerMemory.ReadMemoryServerStatus();                                  // Server Status
-                }
+                    ServerMemory.ReadStartDelayTimer();                                     // Start Delay Timer Value
+				}
 
                 if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
                 {

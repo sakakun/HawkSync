@@ -303,10 +303,30 @@ public partial class tabGamePlayV2 : UserControl
             return;
         }
 
-        // Show update and lock lobby buttons only when server is running (not OFFLINE)
+        // Show update, lock lobby, and match state toggle buttons only when server is running (not OFFLINE)
         bool isServerRunning = theInstance.instanceStatus != InstanceStatus.OFFLINE;
         btn_ServerUpdate.Visible = isServerRunning;
         btn_LockLobby.Visible = isServerRunning;
+        btn_MatchStateToggle.Visible = isServerRunning;
+
+        // Update match state toggle button text based on current timer value
+        if (isServerRunning)
+        {
+            try
+            {
+                // Use current timer value from theInstance (updated by ticker)
+                int currentTimer = theInstance.gameInfoStartDelayTimer;
+
+                // If timer > 200, match is paused
+                bool isMatchPaused = currentTimer > 200;
+                btn_MatchStateToggle.Text = isMatchPaused ? "RESUME MATCH" : "PAUSE MATCH";
+            }
+            catch
+            {
+                // If reading fails, default to pause button
+                btn_MatchStateToggle.Text = "PAUSE MATCH";
+            }
+        }
     }
 
     // ================================================================================
@@ -919,5 +939,50 @@ public partial class tabGamePlayV2 : UserControl
 
         bool isOffline = theInstance.instanceStatus == InstanceStatus.OFFLINE;
         btn_serverControl.Text = isOffline ? "START" : "STOP";
+    }
+
+    private async void BtnMatchStateToggle_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            // Disable button during operation
+            btn_MatchStateToggle.Enabled = false;
+            var originalText = btn_MatchStateToggle.Text;
+            btn_MatchStateToggle.Text = "TOGGLING...";
+
+            // Call API to toggle match state
+            var result = await ApiCore.ApiClient!.GamePlay.ToggleMatchStateAsync();
+
+            if (result.Success)
+            {
+                MessageBox.Show(
+                    result.Message,
+                    "Success",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(
+                    $"Failed to toggle match state:\n\n{result.Message}",
+                    "Toggle Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Error toggling match state:\n\n{ex.Message}",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btn_MatchStateToggle.Enabled = true;
+            // Button text will be updated by the next snapshot/ticker update
+            UpdateServerControlVisibility();
+        }
     }
 }
