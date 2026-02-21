@@ -129,28 +129,59 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
 
-            dg_NetlimiterConnectionLog.Rows.Clear();
-
             var Connections = instanceBans!.NetLimiterConnectionLogs.ToList();
 
             AppDebug.Log("tabBans", $"Refreshing NetLimiter connections log with {Connections.Count} entries.");
             try
             {
-                
-                foreach (var Conn in Connections)
+                // Create a dictionary of new data keyed by IP address for quick lookup
+                var connectionDict = Connections
+                    .Where(c => c != null)
+                    .ToDictionary(c => c.NL_ipAddress ?? string.Empty, c => c);
+
+                // Track which rows to remove
+                var rowsToRemove = new List<DataGridViewRow>();
+
+                // Update existing rows or mark for removal
+                foreach (DataGridViewRow row in dg_NetlimiterConnectionLog.Rows)
                 {
-                    var ip = Conn?.NL_ipAddress ?? string.Empty;
-                    var vpnStatus = Conn?.NL_vpnStatus ?? string.Empty;
-                    var notes = Conn?.NL_notes ?? string.Empty;
-                    var rowId = Conn?.NL_rowID ?? 0;
-                    var numCons = Conn?.NL_numCons ?? 0;
-                    
+                    if (row.IsNewRow) continue;
+
+                    var existingIp = row.Cells[1].Value?.ToString() ?? string.Empty;
+
+                    if (connectionDict.TryGetValue(existingIp, out var conn))
+                    {
+                        // Update existing row
+                        row.Cells[0].Value = conn.NL_rowID;
+                        row.Cells[2].Value = conn.NL_numCons;
+                        row.Cells[3].Value = conn.NL_vpnStatus ?? string.Empty;
+                        row.Cells[4].Value = conn.NL_notes ?? string.Empty;
+
+                        // Remove from dictionary so we know it's been processed
+                        connectionDict.Remove(existingIp);
+                    }
+                    else
+                    {
+                        // This row no longer exists in the data
+                        rowsToRemove.Add(row);
+                    }
+                }
+
+                // Remove rows that no longer exist
+                foreach (var row in rowsToRemove)
+                {
+                    dg_NetlimiterConnectionLog.Rows.Remove(row);
+                }
+
+                // Add new rows that weren't in the grid
+                foreach (var conn in connectionDict.Values)
+                {
                     dg_NetlimiterConnectionLog.Rows.Add(
-                        rowId,
-                        ip,
-                        numCons,
-                        vpnStatus,
-                        notes
+                        conn.NL_rowID,
+                        conn.NL_ipAddress ?? string.Empty,
+                        conn.NL_numCons,
+                        conn.NL_vpnStatus ?? string.Empty,
+                        conn.NL_notes ?? string.Empty
                     );
                 }
             }

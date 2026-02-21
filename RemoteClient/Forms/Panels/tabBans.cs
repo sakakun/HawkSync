@@ -224,19 +224,63 @@ namespace RemoteClient.Forms.Panels
             if (banInstance == null || banInstance.NetLimiterConnectionLogs == null)
                 return;
 
-            dg_NetlimiterConnectionLog.Rows.Clear();
-
-
-            // Add new connection log entries that are not already in the DataGridView
-            foreach (var log in banInstance.NetLimiterConnectionLogs)
+            try
             {
-                dg_NetlimiterConnectionLog.Rows.Add(
-                    log.NL_rowID,
-                    log.NL_ipAddress,
-                    log.NL_numCons,
-                    log.NL_vpnStatus,
-                    log.NL_notes
-                );
+                // Create a dictionary of new data keyed by IP address for quick lookup
+                var connectionDict = banInstance.NetLimiterConnectionLogs
+                    .Where(c => c != null)
+                    .ToDictionary(c => c.NL_ipAddress ?? string.Empty, c => c);
+
+                // Track which rows to remove
+                var rowsToRemove = new List<DataGridViewRow>();
+
+                // Update existing rows or mark for removal
+                foreach (DataGridViewRow row in dg_NetlimiterConnectionLog.Rows)
+                {
+                    if (row.IsNewRow) continue;
+
+                    var existingIp = row.Cells[1].Value?.ToString() ?? string.Empty;
+
+                    if (connectionDict.TryGetValue(existingIp, out var conn))
+                    {
+                        // Update existing row
+                        row.Cells[0].Value = conn.NL_rowID;
+                        row.Cells[2].Value = conn.NL_numCons;
+                        row.Cells[3].Value = conn.NL_vpnStatus ?? string.Empty;
+                        row.Cells[4].Value = conn.NL_notes ?? string.Empty;
+
+                        // Remove from dictionary so we know it's been processed
+                        connectionDict.Remove(existingIp);
+                    }
+                    else
+                    {
+                        // This row no longer exists in the data
+                        rowsToRemove.Add(row);
+                    }
+                }
+
+                // Remove rows that no longer exist
+                foreach (var row in rowsToRemove)
+                {
+                    dg_NetlimiterConnectionLog.Rows.Remove(row);
+                }
+
+                // Add new rows that weren't in the grid
+                foreach (var conn in connectionDict.Values)
+                {
+                    dg_NetlimiterConnectionLog.Rows.Add(
+                        conn.NL_rowID,
+                        conn.NL_ipAddress ?? string.Empty,
+                        conn.NL_numCons,
+                        conn.NL_vpnStatus ?? string.Empty,
+                        conn.NL_notes ?? string.Empty
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error if you have a logging mechanism
+                // For now, silently fail to avoid disrupting the UI
             }
         }
 
@@ -245,9 +289,6 @@ namespace RemoteClient.Forms.Panels
             banInstance!.ForceUIUpdates = true;
             UpdateUIElements();
         }
-        /// ========================================== ///
-        /// Black List Functions
-        /// ========================================== ///
 
         // ================================================================================
         // BLACKLIST FUNCTIONALITY
