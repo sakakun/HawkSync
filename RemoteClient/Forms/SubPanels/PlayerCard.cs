@@ -3,6 +3,7 @@ using HawkSyncShared.DTOs;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
+using RemoteClient.Classes.Helpers;
 using RemoteClient.Core;
 using RemoteClient.Services;
 using System.Diagnostics;
@@ -26,6 +27,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
         private PlayerObject? LastPlayerData = null;
         private bool LastVisible = true;
+        private string? _lastCountryCode = null;
 
         private bool IsGod = false;
 
@@ -383,12 +385,70 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             }
         }
 
+        /// <summary>
+        /// Fetch and update country code and flag for new player
+        /// </summary>
+        private async Task UpdateCountryDataAsync(string ipAddress, string? countryCode)
+        {
+            // Only update flag if country code changed
+            if (countryCode != _lastCountryCode)
+            {
+                _lastCountryCode = countryCode;
+                await UpdateCountryFlagAsync(countryCode);
+            }
+        }
+
+        /// <summary>
+        /// Update country flag based on ISO code
+        /// </summary>
+        private async Task UpdateCountryFlagAsync(string? countryIsoCode)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(countryIsoCode))
+                {
+                    playerFlagIcon.Image?.Dispose();
+                    playerFlagIcon.Image = null;
+                    playerFlagIcon.Visible = false;
+                    return;
+                }
+
+                var flag = await FlagHelper.GetFlagAsync(countryIsoCode);
+                
+                if (flag != null)
+                {
+                    var oldImage = playerFlagIcon.Image;
+                    playerFlagIcon.Image = flag;
+                    oldImage?.Dispose();
+                    playerFlagIcon.Visible = true;
+                    player_Tooltip.SetToolTip(playerFlagIcon, $"{countryIsoCode.ToUpper()}");
+                }
+                else
+                {
+                    playerFlagIcon.Image?.Dispose();
+                    playerFlagIcon.Image = null;
+                    playerFlagIcon.Visible = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("PlayerCard", $"Error loading flag for {countryIsoCode}: {ex.Message}");
+                playerFlagIcon.Image?.Dispose();
+                playerFlagIcon.Image = null;
+                playerFlagIcon.Visible = false;
+            }
+        }
+
         // ================================================================================
         // PLAYER CARD UI UPDATE METHODS
         // ================================================================================
 
         public async void UpdateStatus(PlayerObject playerInfo)
         {
+            bool isNewPlayer = LastPlayerData == null || 
+                               LastPlayerData.PlayerName != playerInfo.PlayerName || 
+                               LastPlayerData.PlayerIPAddress != playerInfo.PlayerIPAddress;
+
             Player = playerInfo;
 
             // Decode Base64 and interpret as Windows-1252
@@ -403,6 +463,12 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             
             // Update icon based on proxy detection and team
             await UpdatePlayerIconAsync(Player.PlayerIPAddress, Player.PlayerTeam);
+
+            // Only fetch country data for new players
+            if (isNewPlayer)
+            {
+                await UpdateCountryDataAsync(Player.PlayerIPAddress, Player.CountryCode);
+            }
             
             ContextMenu.Items[0].Text = decodedPlayerName;
             ContextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms";
@@ -430,6 +496,12 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             // Reset to default icon
             playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonHiking;
             playerTeamIcon.IconColor = Color.Black;
+            
+            // Reset flag and country code
+            playerFlagIcon.Image?.Dispose();
+            playerFlagIcon.Image = null;
+            playerFlagIcon.Visible = false;
+            _lastCountryCode = null;
             
             playerContextMenuIcon.Visible = false;
         }

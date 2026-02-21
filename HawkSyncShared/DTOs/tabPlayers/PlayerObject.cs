@@ -21,6 +21,7 @@ namespace HawkSyncShared.DTOs.tabPlayers
         // God Mode
         public bool IsGod { get; set; } = false;
         public bool IsProxyDetected { get; set; } = false;
+        public string? CountryCode { get; set; }
 
         // Character Information
         public int RoleID { get; set; }

@@ -1720,10 +1720,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                     {
                         try
                         {
-                            // Try to preserve PlayerJoined if player already exists in the persistent list
+                            // Try to preserve PlayerJoined and CountryCode if player already exists in the persistent list
                             if (playerInstance.PlayerList.TryGetValue(playerSlot, out var existingPlayer))
                             {
                                 PlayerStats.PlayerJoined = existingPlayer.PlayerJoined;
+                                PlayerStats.CountryCode = existingPlayer.CountryCode;
                             }
                             // Final Touches
                             PlayerStats.PlayerLastSeen = DateTime.Now;

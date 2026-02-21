@@ -17,6 +17,10 @@
             {
                 components.Dispose();
             }
+            if (disposing)
+            {
+                playerFlagIcon.Image?.Dispose();
+            }
             base.Dispose(disposing);
         }
 
@@ -31,12 +35,14 @@
             components = new System.ComponentModel.Container();
             playerTeamIcon = new FontAwesome.Sharp.IconPictureBox();
             playerContextMenuIcon = new FontAwesome.Sharp.IconPictureBox();
+            playerFlagIcon = new PictureBox();
             label_dataPlayerNameRole = new Label();
             label_dataIPinfo = new Label();
             label_dataSlotNum = new Label();
             player_Tooltip = new ToolTip(components);
             ((System.ComponentModel.ISupportInitialize)playerTeamIcon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)playerContextMenuIcon).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)playerFlagIcon).BeginInit();
             SuspendLayout();
             // 
             // playerTeamIcon
@@ -72,14 +78,25 @@
             playerContextMenuIcon.TabIndex = 1;
             playerContextMenuIcon.TabStop = false;
             // 
+            // playerFlagIcon
+            // 
+            playerFlagIcon.BackColor = Color.Transparent;
+            playerFlagIcon.Location = new Point(51, 4);
+            playerFlagIcon.Name = "playerFlagIcon";
+            playerFlagIcon.Size = new Size(20, 15);
+            playerFlagIcon.SizeMode = PictureBoxSizeMode.Zoom;
+            playerFlagIcon.TabIndex = 5;
+            playerFlagIcon.TabStop = false;
+            playerFlagIcon.Visible = false;
+            // 
             // label_dataPlayerNameRole
             // 
             label_dataPlayerNameRole.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label_dataPlayerNameRole.BackColor = Color.Transparent;
             label_dataPlayerNameRole.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label_dataPlayerNameRole.Location = new Point(50, 4);
+            label_dataPlayerNameRole.Location = new Point(71, 4);
             label_dataPlayerNameRole.Name = "label_dataPlayerNameRole";
-            label_dataPlayerNameRole.Size = new Size(100, 15);
+            label_dataPlayerNameRole.Size = new Size(83, 15);
             label_dataPlayerNameRole.TabIndex = 2;
             label_dataPlayerNameRole.Text = "Slot Empty";
             label_dataPlayerNameRole.TextAlign = ContentAlignment.MiddleLeft;
@@ -88,9 +105,9 @@
             // 
             label_dataIPinfo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label_dataIPinfo.BackColor = Color.Transparent;
-            label_dataIPinfo.Location = new Point(50, 19);
+            label_dataIPinfo.Location = new Point(48, 19);
             label_dataIPinfo.Name = "label_dataIPinfo";
-            label_dataIPinfo.Size = new Size(100, 15);
+            label_dataIPinfo.Size = new Size(89, 15);
             label_dataIPinfo.TabIndex = 3;
             label_dataIPinfo.Text = "000.000.000.000";
             label_dataIPinfo.TextAlign = ContentAlignment.MiddleLeft;
@@ -113,6 +130,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BorderStyle = BorderStyle.FixedSingle;
+            Controls.Add(playerFlagIcon);
             Controls.Add(playerContextMenuIcon);
             Controls.Add(label_dataSlotNum);
             Controls.Add(playerTeamIcon);
@@ -122,6 +140,7 @@
             Size = new Size(193, 42);
             ((System.ComponentModel.ISupportInitialize)playerTeamIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)playerContextMenuIcon).EndInit();
+            ((System.ComponentModel.ISupportInitialize)playerFlagIcon).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -130,6 +149,7 @@
 
         private FontAwesome.Sharp.IconPictureBox playerTeamIcon;
         private FontAwesome.Sharp.IconPictureBox playerContextMenuIcon;
+        private PictureBox playerFlagIcon;
         private Label label_dataPlayerNameRole;
         private Label label_dataIPinfo;
         private Label label_dataSlotNum;
