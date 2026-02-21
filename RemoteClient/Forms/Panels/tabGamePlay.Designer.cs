@@ -1,6 +1,6 @@
 namespace RemoteClient.Forms.Panels;
 
-partial class tabGamePlayV2
+partial class tabGamePlay
 {
 	/// <summary> 
 	/// Required designer variable.
@@ -172,17 +172,19 @@ partial class tabGamePlayV2
 		// 
 		// tableGamePlay_Layer1
 		// 
-		tableGamePlay_Layer1.ColumnCount = 6;
+		tableGamePlay_Layer1.ColumnCount = 8;
+		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
-		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 49.9894F));
+		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 343F));
 		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 335F));
-		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50.0106049F));
+		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
-		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel5, 0, 0);
-		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel2, 5, 0);
-		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel1, 3, 0);
-		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel6, 2, 0);
+		tableGamePlay_Layer1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel5, 1, 0);
+		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel2, 6, 0);
+		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel1, 4, 0);
+		tableGamePlay_Layer1.Controls.Add(tableLayoutPanel6, 3, 0);
 		tableGamePlay_Layer1.Dock = DockStyle.Fill;
 		tableGamePlay_Layer1.Location = new Point(0, 0);
 		tableGamePlay_Layer1.Name = "tableGamePlay_Layer1";
@@ -200,7 +202,7 @@ partial class tabGamePlayV2
 		tableLayoutPanel5.Controls.Add(btn_ResetSettings, 0, 3);
 		tableLayoutPanel5.Controls.Add(btn_SaveSettings, 0, 4);
 		tableLayoutPanel5.Dock = DockStyle.Fill;
-		tableLayoutPanel5.Location = new Point(3, 3);
+		tableLayoutPanel5.Location = new Point(25, 3);
 		tableLayoutPanel5.Name = "tableLayoutPanel5";
 		tableLayoutPanel5.RowCount = 7;
 		tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857113F));
@@ -270,7 +272,7 @@ partial class tabGamePlayV2
 		tableLayoutPanel2.Controls.Add(btn_serverControl, 0, 1);
 		tableLayoutPanel2.Controls.Add(btn_LockLobby, 0, 4);
 		tableLayoutPanel2.Dock = DockStyle.Fill;
-		tableLayoutPanel2.Location = new Point(868, 3);
+		tableLayoutPanel2.Location = new Point(847, 3);
 		tableLayoutPanel2.Name = "tableLayoutPanel2";
 		tableLayoutPanel2.RowCount = 7;
 		tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857113F));
@@ -280,7 +282,7 @@ partial class tabGamePlayV2
 		tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857151F));
 		tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857151F));
 		tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 14.2857151F));
-		tableLayoutPanel2.Size = new Size(95, 416);
+		tableLayoutPanel2.Size = new Size(94, 416);
 		tableLayoutPanel2.TabIndex = 1;
 		// 
 		// btn_MatchStateToggle
@@ -342,7 +344,7 @@ partial class tabGamePlayV2
 		tableLayoutPanel1.Controls.Add(groupBox1, 0, 1);
 		tableLayoutPanel1.Controls.Add(groupBox2, 0, 0);
 		tableLayoutPanel1.Dock = DockStyle.Fill;
-		tableLayoutPanel1.Location = new Point(489, 3);
+		tableLayoutPanel1.Location = new Point(490, 3);
 		tableLayoutPanel1.Name = "tableLayoutPanel1";
 		tableLayoutPanel1.RowCount = 2;
 		tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 83.65385F));
@@ -943,7 +945,7 @@ partial class tabGamePlayV2
 		tableLayoutPanel6.Controls.Add(groupBox_lobbyPasswords, 0, 0);
 		tableLayoutPanel6.Controls.Add(groupBox4, 0, 2);
 		tableLayoutPanel6.Dock = DockStyle.Fill;
-		tableLayoutPanel6.Location = new Point(146, 3);
+		tableLayoutPanel6.Location = new Point(147, 3);
 		tableLayoutPanel6.Name = "tableLayoutPanel6";
 		tableLayoutPanel6.RowCount = 3;
 		tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 12.0192308F));
@@ -1742,14 +1744,14 @@ partial class tabGamePlayV2
 		toolTip_gamePlay.SetToolTip(num_FullWeaponThreshold, "The Number of Players Required for Full Weapons");
 		num_FullWeaponThreshold.Value = new decimal(new int[] { 10, 0, 0, 0 });
 		// 
-		// tabGamePlayV2
+		// tabGamePlay
 		// 
 		AutoScaleDimensions = new SizeF(7F, 15F);
 		AutoScaleMode = AutoScaleMode.Font;
 		Controls.Add(tableGamePlay_Layer1);
 		MaximumSize = new Size(966, 422);
 		MinimumSize = new Size(966, 422);
-		Name = "tabGamePlayV2";
+		Name = "tabGamePlay";
 		Size = new Size(966, 422);
 		tableGamePlay_Layer1.ResumeLayout(false);
 		tableLayoutPanel5.ResumeLayout(false);

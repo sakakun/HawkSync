@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace BHD_ServerManager.Forms.Panels
 {
-	public partial class tabGamePlayV2 : UserControl
+	public partial class tabGamePlay : UserControl
 	{
 		// --- Instance Objects ---
 		private theInstance? theInstance => CommonCore.theInstance;
@@ -21,7 +21,7 @@ namespace BHD_ServerManager.Forms.Panels
 		private List<Button> weaponButtons = new();
 		private List<Button> roleButtons = new();
 
-		public tabGamePlayV2()
+		public tabGamePlay()
 		{
 			InitializeComponent();
 

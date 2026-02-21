@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace RemoteClient.Forms.Panels;
 
-public partial class tabGamePlayV2 : UserControl
+public partial class tabGamePlay : UserControl
 {
     private theInstance theInstance => CommonCore.theInstance!;
 
@@ -26,7 +26,7 @@ public partial class tabGamePlayV2 : UserControl
     private List<Button> optionButtons = new();
     private List<Button> friendlyFireButtons = new();
 
-    public tabGamePlayV2()
+    public tabGamePlay()
     {
         InitializeComponent();
 
