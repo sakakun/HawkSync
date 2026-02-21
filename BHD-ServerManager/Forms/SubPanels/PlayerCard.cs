@@ -42,6 +42,9 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             playerContextMenuIcon.Click -= PlayerContextMenuIcon_Click;
             playerContextMenuIcon.Click += PlayerContextMenuIcon_Click;
 
+            label_dataIPinfo.Cursor = Cursors.Hand;
+            label_dataIPinfo.Click += Label_dataIPinfo_Click;
+
             BuildContextMenu();
 
             this.ResetStatus();
@@ -97,6 +100,14 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
         private void PlayerContextMenuIcon_Click(object? sender, EventArgs e)
         {
             ContextMenu.Show(this, new Point(playerContextMenuIcon.Location.X, playerContextMenuIcon.Location.Y));
+        }
+
+        private void Label_dataIPinfo_Click(object? sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(label_dataIPinfo.Text))
+            {
+                Clipboard.SetText(label_dataIPinfo.Text);
+            }
         }
 
         // ================================================================================
