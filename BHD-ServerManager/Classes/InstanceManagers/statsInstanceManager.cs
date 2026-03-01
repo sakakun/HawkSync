@@ -491,11 +491,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (!string.IsNullOrEmpty(response))
                 {
                     AppDebug.Log("StatsManager", $"Babstats Report Response: {response}");
-                    string[] messages = response.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] messages = response.Split(new[] { "__&__" }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var message in messages)
                     {
-                        AddStatsLogRowSafe(thisServer, DateTime.Now, message);
-                    }
+                        chatInstanceManager.SendChatMessage(message.Trim(), 1);
+					}
                     return response;
                 }
             }
@@ -567,7 +567,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 return $"Error sending data to Babstats server: {e.Message}";
             }
 
-            string responseContent = await response.Content.ReadAsStringAsync();
+            var responseBytes = await response.Content.ReadAsByteArrayAsync();
+            string responseContent = Encoding.GetEncoding("Windows-1252").GetString(responseBytes);
             AppDebug.Log("StatsManager", $"Babstats Response: {responseContent}");
 
             return responseContent;
