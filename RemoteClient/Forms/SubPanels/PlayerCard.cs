@@ -407,34 +407,47 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             {
                 if (string.IsNullOrEmpty(countryIsoCode))
                 {
-                    playerFlagIcon.Image?.Dispose();
-                    playerFlagIcon.Image = null;
+                    if (playerFlagIcon.Image != null)
+                    {
+                        playerFlagIcon.Image.Dispose();
+                        playerFlagIcon.Image = null;
+                    }
                     playerFlagIcon.Visible = false;
                     return;
                 }
 
                 var flag = await FlagHelper.GetFlagAsync(countryIsoCode);
-                
+
+                // Only assign if flag is valid (not null)
                 if (flag != null)
                 {
-                    var oldImage = playerFlagIcon.Image;
+                    if (playerFlagIcon.Image != null)
+                    {
+                        playerFlagIcon.Image.Dispose();
+                        playerFlagIcon.Image = null;
+                    }
                     playerFlagIcon.Image = flag;
-                    oldImage?.Dispose();
                     playerFlagIcon.Visible = true;
                     player_Tooltip.SetToolTip(playerFlagIcon, $"{countryIsoCode.ToUpper()}");
                 }
                 else
                 {
-                    playerFlagIcon.Image?.Dispose();
-                    playerFlagIcon.Image = null;
+                    if (playerFlagIcon.Image != null)
+                    {
+                        playerFlagIcon.Image.Dispose();
+                        playerFlagIcon.Image = null;
+                    }
                     playerFlagIcon.Visible = false;
                 }
             }
             catch (Exception ex)
             {
                 AppDebug.Log("PlayerCard", $"Error loading flag for {countryIsoCode}: {ex.Message}");
-                playerFlagIcon.Image?.Dispose();
-                playerFlagIcon.Image = null;
+                if (playerFlagIcon.Image != null)
+                {
+                    playerFlagIcon.Image.Dispose();
+                    playerFlagIcon.Image = null;
+                }
                 playerFlagIcon.Visible = false;
             }
         }
