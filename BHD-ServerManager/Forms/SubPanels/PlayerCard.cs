@@ -574,9 +574,17 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             playerTeamIcon.IconColor = Color.Black;
             
             // Reset flag and country code
-            playerFlagIcon.Image?.Dispose();
-            playerFlagIcon.Image = null;
-            playerFlagIcon.Visible = false;
+            try
+            {
+                if (!playerFlagIcon.IsDisposed)
+                {
+                    var img = playerFlagIcon.Image;
+                    playerFlagIcon.Image = null;
+                    img?.Dispose();
+                    playerFlagIcon.Visible = false;
+                }
+            }
+            catch { /* swallow UI exceptions */ }
             _lastCountryCode = null;
             
             playerContextMenuIcon.Visible = false;
