@@ -1277,8 +1277,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             int colorbuffer_written = 0;
             byte[] colorcode;
 
-
-
             switch (MsgLocation)
             {
                 case 1: // Yellow Message
