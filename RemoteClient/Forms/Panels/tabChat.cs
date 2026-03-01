@@ -254,11 +254,11 @@ namespace RemoteClient.Forms.Panels
         {
             return selectedIndex switch
             {
-                1 => 1, // Global
-                2 => 2, // Blue
-                3 => 3, // Red
-                0 => 0, // Server
-                _ => 0  // Default to server
+                1 => 3, // Global
+                2 => 4, // Blue
+                3 => 5, // Red
+                0 => 1, // Server
+                _ => 1  // Default to server
             };
         }
 

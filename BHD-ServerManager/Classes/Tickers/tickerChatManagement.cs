@@ -203,7 +203,7 @@ namespace BHD_ServerManager.Classes.Tickers
 
                     if (elapsedMinutes >= autoMsg.AutoMessageTigger)
                     {
-                        ServerMemory.WriteMemorySendChatMessage(1, autoMsg.AutoMessageText);
+                        chatInstanceManager.SendChatMessage(autoMsg.AutoMessageText, 3);
                         instanceChat.AutoMessageCounter++;
                         instanceChat.lastAutoMessageSent = DateTime.Now;
                     }

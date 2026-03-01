@@ -180,7 +180,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new OperationResult(false, "Warning message cannot be empty.");
 
                 string fullMessage = $"{playerName}, {warningMessage}";
-                ServerMemory.WriteMemorySendChatMessage(1, fullMessage);
+                chatInstanceManager.SendChatMessage(fullMessage, 3);
 
                 AppDebug.Log("playerInstanceManager", $"Warning sent to player {playerName}: {warningMessage}");
                 return new OperationResult(true, $"Warning sent to {playerName}.");
@@ -307,7 +307,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         
                         ArmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                         
-                        ServerMemory.WriteMemorySendChatMessage(1, $"{playerInfo.PlayerName} re-armed.");
+                        chatInstanceManager.SendChatMessage($"{playerInfo.PlayerName} re-armed.", 3);
                         
                         AppDebug.Log("CheckWeaponRestriction", 
                             $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
@@ -376,7 +376,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 
                                 // Send message
                                 string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+.";
-                                ServerMemory.WriteMemorySendChatMessage(1, message);
+                                chatInstanceManager.SendChatMessage(message, 3);
                                 
                                 AppDebug.Log("CheckWeaponRestriction", 
                                     $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
@@ -406,7 +406,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 
                                 ArmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                                 
-                                ServerMemory.WriteMemorySendChatMessage(1, $"{playerInfo.PlayerName} re-armed.");
+                                chatInstanceManager.SendChatMessage($"{playerInfo.PlayerName} re-armed.", 3);
                                 
                                 AppDebug.Log("CheckWeaponRestriction", 
                                     $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
@@ -457,8 +457,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         // Send message
                         string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+ players.";
-                        ServerMemory.WriteMemorySendChatMessage(1, message);
-                        weaponDisarmedPlayers[playerInfo.PlayerSlot].MessageSent = true;
+                        chatInstanceManager.SendChatMessage(message, 3);
+						weaponDisarmedPlayers[playerInfo.PlayerSlot].MessageSent = true;
 
                         AppDebug.Log("CheckWeaponRestriction", 
                             $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
@@ -709,8 +709,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     ArmPlayer(slot, player.PlayerName);
                     
                     string rearmMessage = $"{player.PlayerName} re-armed. Full weapons available ({currentPlayers}/{threshold} players).";
-                    ServerMemory.WriteMemorySendChatMessage(1, rearmMessage);
-                    AppDebug.Log("CheckWeaponRestriction", rearmMessage);
+                    chatInstanceManager.SendChatMessage(rearmMessage, 3);
+					AppDebug.Log("CheckWeaponRestriction", rearmMessage);
                 }
             }
             

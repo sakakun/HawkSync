@@ -294,15 +294,39 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
         }
 
+        private static void SendLongMessage(string message, int channel, int maxLength)
+        {
+            for (int i = 0; i < message.Length; i += maxLength)
+            {
+                int remainingLength = message.Length - i;
+                int chunkLength = Math.Min(maxLength, remainingLength);
+
+                if (chunkLength == maxLength && i + maxLength < message.Length)
+                {
+                    int lastSpace = message.LastIndexOf(' ', i + maxLength, maxLength);
+                    if (lastSpace > i)
+                    {
+                        chunkLength = lastSpace - i;
+                    }
+                }
+
+                string chunk = message.Substring(i, chunkLength).Trim();
+                AppDebug.Log("chatInstanceManager", $"Sending chunk to channel {channel}: {chunk}");
+                ServerMemory.WriteMemorySendChatMessage(channel, chunk);
+
+                System.Threading.Thread.Sleep(1000);
+            }
+        }
+
         public static int MapChannelIndexToChannel(int selectedIndex)
         {
             return selectedIndex switch
             {
-                1 => 1,
-                2 => 2,
-                3 => 3,
-                0 => 0,
-                _ => 0
+                1 => 3,
+                2 => 4,
+                3 => 5,
+                0 => 1,
+                _ => 1
             };
         }
 
@@ -367,30 +391,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 AppDebug.Log("chatInstanceManager", $"Error parsing player slot replacements: {ex.Message}");
                 return (false, message, ex.Message);
-            }
-        }
-
-        private static void SendLongMessage(string message, int channel, int maxLength)
-        {
-            for (int i = 0; i < message.Length; i += maxLength)
-            {
-                int remainingLength = message.Length - i;
-                int chunkLength = Math.Min(maxLength, remainingLength);
-
-                if (chunkLength == maxLength && i + maxLength < message.Length)
-                {
-                    int lastSpace = message.LastIndexOf(' ', i + maxLength, maxLength);
-                    if (lastSpace > i)
-                    {
-                        chunkLength = lastSpace - i;
-                    }
-                }
-
-                string chunk = message.Substring(i, chunkLength).Trim();
-                AppDebug.Log("chatInstanceManager", $"Sending chunk to channel {channel}: {chunk}");
-                ServerMemory.WriteMemorySendChatMessage(channel, chunk);
-
-                System.Threading.Thread.Sleep(1000);
             }
         }
 

@@ -1277,25 +1277,16 @@ namespace BHD_ServerManager.Classes.GameManagement
             int colorbuffer_written = 0;
             byte[] colorcode;
 
-            switch (MsgLocation)
-            {
-                case 1: // Yellow Message
-                    colorcode = Functions.ToByteArray("6A 03".Replace(" ", ""));
-                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
-                    break;
-                case 2: // Team Chat: Red
-                    colorcode = Functions.ToByteArray("6A 04".Replace(" ", ""));
-                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
-                    break;
-                case 3: // Team Chat: Blue
-                    colorcode = Functions.ToByteArray("6A 05".Replace(" ", ""));
-                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
-                    break;
-                default: // White
-                    colorcode = Functions.ToByteArray("6A 01".Replace(" ", ""));
-                    WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
-                    break;
-            }
+			/*
+             * 6A 01 - White
+			 * 6A 03 - Yellow
+             * 6A 04 - Red
+             * 6A 05 - Blue
+             */
+
+            colorcode = Functions.ToByteArray($"6A 0{MsgLocation}".Replace(" ", ""));
+            WriteProcessMemory((int)processHandle, 0x00462ABA, colorcode, colorcode.Length, ref colorbuffer_written);
+
             // post message
             PostMessage(windowHandle, (ushort)WM_KEYDOWN, chatConsole, 0);
             PostMessage(windowHandle, (ushort)WM_KEYUP, chatConsole, 0);

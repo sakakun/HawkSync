@@ -138,9 +138,9 @@ namespace BHD_ServerManager.Classes.Tickers
                         // Send chat message
                         string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} has been disarmed for 10 seconds - Left leaning is not allowed!";
 
-                        SendLongMessage(message, 59);
+                        chatInstanceManager.SendChatMessage(message, 3);
 
-                        AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for left leaning");
+						AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for left leaning");
                     }
                     // Check for right leaning violation
                     else if (checkRightLeaning && isRightLeaning)
@@ -154,9 +154,9 @@ namespace BHD_ServerManager.Classes.Tickers
                         // Send chat message
                         string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} has been disarmed for 10 seconds - Right leaning is not allowed!";
 
-                        SendLongMessage(message, 59);
+                        chatInstanceManager.SendChatMessage(message, 3);
 
-                        AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for right leaning");
+						AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for right leaning");
                     }
                 }
                 catch (Exception ex)
@@ -218,37 +218,6 @@ namespace BHD_ServerManager.Classes.Tickers
             }
 
             AppDebug.Log("WeaponRestrictionCheck", $"=== CheckWeaponRestrictions END === Checked {checkedCount} players");
-        }
-
-        private static void SendLongMessage(string message, int maxLength = 59)
-        {
-            if (message.Length <= maxLength)
-            {
-                ServerMemory.WriteMemorySendChatMessage(1, message);
-                return;
-            }
-
-            for (int i = 0; i < message.Length; i += maxLength)
-            {
-                
-                int remainingLength = message.Length - i;
-                int chunkLength = Math.Min(maxLength, remainingLength);
-        
-                // Try to find a space to break at (word boundary)
-                if (chunkLength == maxLength && i + maxLength < message.Length)
-                {
-                    int lastSpace = message.LastIndexOf(' ', i + maxLength, maxLength);
-                    if (lastSpace > i)
-                    {
-                        chunkLength = lastSpace - i;
-                    }
-                }
-        
-                string chunk = message.Substring(i, chunkLength).Trim();
-                AppDebug.Log("SendLongMessage", $"Message being sent: {chunk}");
-                ServerMemory.WriteMemorySendChatMessage(1, chunk);
-                Thread.Sleep(1000); // Delay between chunks
-            }
         }
 
     }
