@@ -156,13 +156,4 @@ public partial class LoginForm : Form
             "HawkSync", "client-settings.txt");
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _apiClient?.Dispose();
-            components?.Dispose();
-        }
-        base.Dispose(disposing);
-    }
 }
