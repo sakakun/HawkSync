@@ -477,11 +477,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             // Update icon based on proxy detection and team
             await UpdatePlayerIconAsync(Player.PlayerIPAddress, Player.PlayerTeam);
 
-            // Only fetch country data for new players
-            if (isNewPlayer)
-            {
-                await UpdateCountryDataAsync(Player.PlayerIPAddress, Player.CountryCode);
-            }
+            await UpdateCountryDataAsync(Player.PlayerIPAddress, Player.CountryCode);
             
             ContextMenu.Items[0].Text = decodedPlayerName;
             ContextMenu.Items[1].Text = $"Ping: {Player.PlayerPing} ms";
@@ -545,14 +541,11 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 LastVisible = visible;
             }
 
-            // Only update player data if the reference or key properties have changed
+            // Always update player data if not null
             if (playerInfo != null)
             {
-                if (!ReferenceEquals(playerInfo, LastPlayerData) || !IsSamePlayer(playerInfo, LastPlayerData))
-                {
-                    UpdateStatus(playerInfo);
-                    LastPlayerData = playerInfo;
-                }
+                UpdateStatus(playerInfo);
+                LastPlayerData = playerInfo;
             }
             else if (LastPlayerData != null && playerInfo == null)
             {
@@ -560,14 +553,5 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             }
         }
 
-        private static bool IsSamePlayer(PlayerObject? a, PlayerObject? b)
-        {
-            if (a == null || b == null) return false;
-            return a.PlayerSlot == b.PlayerSlot &&
-                   a.PlayerName == b.PlayerName &&
-                   a.PlayerIPAddress == b.PlayerIPAddress &&
-                   a.PlayerTeam == b.PlayerTeam &&
-                   a.PlayerPing == b.PlayerPing;
-        }
     }
 }

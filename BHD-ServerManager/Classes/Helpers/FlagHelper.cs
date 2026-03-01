@@ -34,9 +34,9 @@ namespace BHD_ServerManager.Classes.Helpers
 
             var normalizedCode = countryCode.ToLowerInvariant();
 
-            // Check cache first
+            // Check cache first - return a clone so each caller owns an independent copy
             if (_flagCache.TryGetValue(normalizedCode, out var cachedFlag))
-                return cachedFlag;
+                return cachedFlag != null ? new Bitmap(cachedFlag) : null;
 
             try
             {
@@ -46,13 +46,19 @@ namespace BHD_ServerManager.Classes.Helpers
                 if (response.IsSuccessStatusCode)
                 {
                     var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                    using var ms = new MemoryStream(imageBytes);
-                    var flag = Image.FromStream(ms);
-                    
-                    // Cache the result
+                    Bitmap flag;
+                    using (var ms = new MemoryStream(imageBytes))
+                    using (var tempImage = Image.FromStream(ms))
+                    {
+                        // Create an independent Bitmap copy not tied to the MemoryStream
+                        flag = new Bitmap(tempImage);
+                    }
+
+                    // Cache the independent copy
                     _flagCache[normalizedCode] = flag;
-                    
-                    return flag;
+
+                    // Return a clone so each caller owns their own copy
+                    return new Bitmap(flag);
                 }
                 else
                 {

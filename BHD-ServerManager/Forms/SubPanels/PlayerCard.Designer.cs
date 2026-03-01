@@ -96,7 +96,7 @@
 			label_dataPlayerNameRole.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
 			label_dataPlayerNameRole.Location = new Point(71, 4);
 			label_dataPlayerNameRole.Name = "label_dataPlayerNameRole";
-			label_dataPlayerNameRole.Size = new Size(83, 15);
+			label_dataPlayerNameRole.Size = new Size(95, 15);
 			label_dataPlayerNameRole.TabIndex = 2;
 			label_dataPlayerNameRole.Text = "Slot Empty";
 			label_dataPlayerNameRole.TextAlign = ContentAlignment.MiddleLeft;
@@ -130,11 +130,11 @@
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BorderStyle = BorderStyle.FixedSingle;
+			Controls.Add(label_dataPlayerNameRole);
 			Controls.Add(playerFlagIcon);
 			Controls.Add(playerContextMenuIcon);
 			Controls.Add(label_dataSlotNum);
 			Controls.Add(playerTeamIcon);
-			Controls.Add(label_dataPlayerNameRole);
 			Controls.Add(label_dataIPinfo);
 			Name = "PlayerCard";
 			Size = new Size(193, 42);
