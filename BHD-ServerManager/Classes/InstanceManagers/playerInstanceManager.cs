@@ -375,8 +375,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 DisarmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                                 
                                 // Send message
-                                string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+.";
+                                string message = $"{playerInfo.PlayerName} disarmed.";
+                                string message2 = "Weapon restricted, requires {threshold}+ players.";
                                 chatInstanceManager.SendChatMessage(message, 3);
+                                chatInstanceManager.SendChatMessage(message2, 3);
                                 
                                 AppDebug.Log("CheckWeaponRestriction", 
                                     $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
@@ -456,8 +458,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     if (result.Success)
                     {
                         // Send message
-                        string message = $"{playerInfo.PlayerName} disarmed. Weapon restricted, requires {threshold}+ players.";
+                        string message = $"{playerInfo.PlayerName} disarmed.";
+                        string message2 = "Weapon restricted, requires {threshold}+ players.";
                         chatInstanceManager.SendChatMessage(message, 3);
+                        chatInstanceManager.SendChatMessage(message2, 3);
 						weaponDisarmedPlayers[playerInfo.PlayerSlot].MessageSent = true;
 
                         AppDebug.Log("CheckWeaponRestriction", 
