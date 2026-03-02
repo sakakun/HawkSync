@@ -262,9 +262,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (string.IsNullOrWhiteSpace(message))
                     return new OperationResult(false, "Message cannot be empty.");
 
-                if (channel < 0 || channel > 3)
-                    return new OperationResult(false, "Invalid channel. Must be 0-3 (Server, Global, Blue, Red).");
-
                 var (parseSuccess, parsedMessage, parseError) = ParsePlayerSlotReplacements(message);
                 if (!parseSuccess)
                     return new OperationResult(false, parseError);
@@ -272,9 +269,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (parsedMessage.Length <= maxLength)
                 {
                     // Use control characters for Red/Blue team
-                    if (channel == 2) // Red team
+                    if (channel == 4) // Red team
                         parsedMessage = "R~" + parsedMessage;
-                    else if (channel == 3) // Blue team
+                    else if (channel == 5) // Blue team
                         parsedMessage = "B~" + parsedMessage;
 
                     ServerMemory.WriteMemorySendChatMessage(channel, parsedMessage);

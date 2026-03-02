@@ -494,7 +494,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     string[] messages = response.Split(new[] { "__&__" }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var message in messages)
                     {
-                        chatInstanceManager.SendChatMessage(message.Trim(), 1);
+                        chatInstanceManager.SendChatMessage(message.Trim(), 8, 55);
 					}
                     return response;
                 }

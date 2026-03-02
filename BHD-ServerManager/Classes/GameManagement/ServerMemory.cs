@@ -1282,6 +1282,8 @@ namespace BHD_ServerManager.Classes.GameManagement
 			 * 6A 03 - Yellow
              * 6A 04 - Red
              * 6A 05 - Blue
+             * 6A 08 - Server Orange (55)
+             * 6A 09 - Server White
              */
 
             colorcode = Functions.ToByteArray($"6A 0{MsgLocation}".Replace(" ", ""));
