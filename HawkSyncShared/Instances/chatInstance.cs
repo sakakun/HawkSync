@@ -15,7 +15,21 @@ namespace HawkSyncShared.Instances
         public int lastChatLogIndex { get; set; } = 0;
         [JsonIgnore]
         public DateTime lastAutoMessageSent { get; set; } = DateTime.MinValue;
+        [JsonIgnore]
+        public Queue<QueuedChatMessage> MessageQueue { get; set; } = new Queue<QueuedChatMessage>();
+        [JsonIgnore]
+        public DateTime LastMessageSent { get; set; } = DateTime.MinValue;
+        [JsonIgnore]
+        public bool IsProcessingMessage { get; set; } = false;
 
+    }
+
+    public class QueuedChatMessage
+    {
+        public string Message { get; set; } = string.Empty;
+        public int Channel { get; set; }
+        public int MaxLength { get; set; } = 59;
+        public DateTime QueuedAt { get; set; } = DateTime.Now;
     }
 
     public class ChatLogObject

@@ -376,7 +376,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 
                                 // Send message
                                 string message = $"{playerInfo.PlayerName} disarmed.";
-                                string message2 = "Weapon restricted, requires {threshold}+ players.";
+                                string message2 = $"Weapon restricted, requires {threshold}+ players.";
                                 chatInstanceManager.SendChatMessage(message, 3);
                                 chatInstanceManager.SendChatMessage(message2, 3);
                                 
@@ -459,7 +459,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         // Send message
                         string message = $"{playerInfo.PlayerName} disarmed.";
-                        string message2 = "Weapon restricted, requires {threshold}+ players.";
+                        string message2 = $"Weapon restricted, requires {threshold}+ players.";
                         chatInstanceManager.SendChatMessage(message, 3);
                         chatInstanceManager.SendChatMessage(message2, 3);
 						weaponDisarmedPlayers[playerInfo.PlayerSlot].MessageSent = true;

@@ -256,79 +256,89 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             try
             {
                 var (canSend, statusError) = CanSendMessage();
-                if (!canSend)
-                    return new OperationResult(false, statusError);
+                if (!canSend) return new OperationResult(false, statusError);
 
                 if (string.IsNullOrWhiteSpace(message))
                     return new OperationResult(false, "Message cannot be empty.");
 
                 var (parseSuccess, parsedMessage, parseError) = ParsePlayerSlotReplacements(message);
-                if (!parseSuccess)
-                    return new OperationResult(false, parseError);
+                if (!parseSuccess) return new OperationResult(false, parseError);
 
-                // Add team prefix first, then check length (59 char display limit includes prefix)
-                string prefix = string.Empty;
-                if (channel == 4) // Red team
-                    prefix = "R~";
-                else if (channel == 5) // Blue team
-                    prefix = "B~";
-
-                string messageWithPrefix = prefix + parsedMessage;
-
-                if (messageWithPrefix.Length <= maxLength)
+                // Queue the message instead of sending immediately
+                lock (instanceChat.MessageQueue)
                 {
-                    ServerMemory.WriteMemorySendChatMessage(channel, messageWithPrefix);
-                    AppDebug.Log("chatInstanceManager", $"Sent message to channel {channel}: {messageWithPrefix}");
-                }
-                else
-                {
-                    SendLongMessage(parsedMessage, channel, maxLength, prefix);
+                    instanceChat.MessageQueue.Enqueue(new QueuedChatMessage
+                    {
+                        Message = parsedMessage,
+                        Channel = channel,
+                        MaxLength = maxLength,
+                        QueuedAt = DateTime.Now
+                    });
                 }
 
-                return new OperationResult(true, "Message sent successfully.");
+                AppDebug.Log("chatInstanceManager", $"Queued message for channel {channel} (Queue size: {instanceChat.MessageQueue.Count})");
+                return new OperationResult(true, "Message queued successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error sending chat message: {ex.Message}");
+                AppDebug.Log("chatInstanceManager", $"Error queuing chat message: {ex.Message}");
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
+            }
+        }
+
+        // --- Internal message sending (called by ticker) ---
+        internal static void ProcessQueuedMessage(QueuedChatMessage queuedMessage)
+        {
+            string prefix = queuedMessage.Channel switch { 4 => "R~", 5 => "B~", _ => string.Empty };
+            string messageWithPrefix = prefix + queuedMessage.Message;
+
+            if (messageWithPrefix.Length <= queuedMessage.MaxLength)
+            {
+                ServerMemory.WriteMemorySendChatMessage(queuedMessage.Channel, messageWithPrefix);
+                AppDebug.Log("chatInstanceManager", $"Sent message to channel {queuedMessage.Channel}: {messageWithPrefix}");
+            }
+            else
+            {
+                SendLongMessage(queuedMessage.Message, queuedMessage.Channel, queuedMessage.MaxLength, prefix);
             }
         }
 
         private static void SendLongMessage(string message, int channel, int maxLength, string prefix)
         {
-            int prefixLength = prefix.Length;
-            int maxContentLength = maxLength - prefixLength;
-            int i = 0;
+            message = message.Trim();
+            int maxContentLength = maxLength - prefix.Length;
+            int position = 0;
+            int chunkNum = 1;
 
-            while (i < message.Length)
+            AppDebug.Log("chatInstanceManager", $"Breaking long message into chunks (max: {maxContentLength} chars)");
+
+            while (position < message.Length)
             {
-                int remainingLength = message.Length - i;
-                int chunkLength = Math.Min(maxContentLength, remainingLength);
+                int chunkLength = Math.Min(maxContentLength, message.Length - position);
 
-                if (chunkLength == maxContentLength && i + maxContentLength < message.Length)
+                // Break at word boundary if not the last chunk
+                if (chunkLength == maxContentLength && position + chunkLength < message.Length)
                 {
-                    int lastSpace = message.LastIndexOf(' ', i + maxContentLength - 1, maxContentLength);
-                    if (lastSpace > i)
-                    {
-                        chunkLength = lastSpace - i;
-                    }
+                    int lastSpace = message.LastIndexOf(' ', position + chunkLength - 1, chunkLength);
+                    if (lastSpace > position && (lastSpace - position) >= (maxContentLength / 2))
+                        chunkLength = lastSpace - position;
                 }
 
-                string chunk = message.Substring(i, chunkLength).Trim();
-                string messageToSend = prefix + chunk;
-                
-                AppDebug.Log("chatInstanceManager", $"Sending chunk to channel {channel}: {messageToSend}");
-                ServerMemory.WriteMemorySendChatMessage(channel, messageToSend);
+                string chunk = message.Substring(position, chunkLength).TrimEnd();
+                ServerMemory.WriteMemorySendChatMessage(channel, prefix + chunk);
+                AppDebug.Log("chatInstanceManager", $"Chunk {chunkNum++}: '{prefix}{chunk}' ({prefix.Length + chunk.Length} chars)");
 
-                i += chunkLength;
-                
-                // Skip any spaces at the start of the next chunk
-                while (i < message.Length && message[i] == ' ')
-                    i++;
+                position += chunkLength;
+                while (position < message.Length && message[position] == ' ') position++;
 
-                if (i < message.Length)
+                if (position < message.Length)
+                {
+                    AppDebug.Log("chatInstanceManager", "Waiting 1 second before next chunk...");
                     System.Threading.Thread.Sleep(1000);
+                }
             }
+
+            AppDebug.Log("chatInstanceManager", "Finished sending long message");
         }
 
         public static int MapChannelIndexToChannel(int selectedIndex)

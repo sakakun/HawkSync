@@ -38,6 +38,9 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Recover auto message counter before processing auto messages
                 RecoverAutoMessageCounter();
 
+                // Process queued outgoing messages first (with rate limiting)
+                ProcessMessageQueue();
+
                 // Process auto messages (non-blocking to avoid ticker delays)
                 Task.Run(ProcessAutoMessages);
 
@@ -249,12 +252,55 @@ namespace BHD_ServerManager.Classes.Tickers
             _autoMessageRecoveryDone = true;
         }
 
+        public static void ProcessMessageQueue()
+        {
+            // Don't process messages if one is currently being sent (long message chunking)
+            if (instanceChat.IsProcessingMessage)
+                return;
+
+            // Rate limiting: Wait at least 1.2 seconds between messages
+            if (instanceChat.LastMessageSent != DateTime.MinValue &&
+                (DateTime.Now - instanceChat.LastMessageSent).TotalSeconds < 1.2)
+            {
+                return;
+            }
+
+            QueuedChatMessage? nextMessage = null;
+            lock (instanceChat.MessageQueue)
+            {
+                if (instanceChat.MessageQueue.Count > 0)
+                    nextMessage = instanceChat.MessageQueue.Dequeue();
+            }
+
+            if (nextMessage != null)
+            {
+                instanceChat.IsProcessingMessage = true;
+                try
+                {
+                    chatInstanceManager.ProcessQueuedMessage(nextMessage);
+                    instanceChat.LastMessageSent = DateTime.Now;
+                    AppDebug.Log("tickerChatManagement", $"Processed queued message (Remaining: {instanceChat.MessageQueue.Count})");
+                }
+                finally
+                {
+                    instanceChat.IsProcessingMessage = false;
+                }
+            }
+        }
+
         public static void ResetDeduplication()
         {
             _lastProcessedPlayerName = null;
             _lastProcessedMessageText = null;
             _lastProcessedMessageTime = DateTime.MinValue;
             _autoMessageRecoveryDone = false;
+
+            // Clear message queue on reset
+            lock (instanceChat.MessageQueue)
+            {
+                instanceChat.MessageQueue.Clear();
+            }
+            instanceChat.IsProcessingMessage = false;
         }
     }
 }
