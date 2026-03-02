@@ -396,7 +396,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             string reportData = string.Empty;
             reportData += "1\n";
-            reportData += "DFBHD";
+            reportData += "DFBHD\n";
             foreach (var playerStat in instanceStats.playerStatsList.Values)
             {
                 PlayerObject Player = playerStat.PlayerStatsCurrent;
@@ -488,6 +488,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             try
             {
                 var response = await SendBabstatsData(POST_URL, DATA);
+                AddStatsLogRowSafe(thisServer, DateTime.Now, "Report Sent.");
                 if (!string.IsNullOrEmpty(response))
                 {
                     AppDebug.Log("StatsManager", $"Babstats Report Response: {response}");
@@ -496,6 +497,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         chatInstanceManager.SendChatMessage(message.Trim(), 8, 55);
 					}
+                    AddStatsLogRowSafe(thisServer, DateTime.Now, "Announcements Made.");
                     return response;
                 }
             }
@@ -584,23 +586,47 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     ReportContent = message
                 };
 
-            string dateTimeString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string dateTimeString = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
 
             CommonCore.instanceStats!.WebStatsLog.Add(logRecord);
 
             if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
             {
                 thisServer.StatsTab.dg_statsLog.Invoke(new Action(() =>
-                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message)
-                ));
+                {
+                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message);
+                    ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
+                }));
             }
             else
             {
                 thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message);
+                ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
             }
+        }
 
-            
+        private static void ApplySortToStatsLog(DataGridView grid)
+        {
+            if (grid.Rows.Count == 0)
+                return;
 
+            var sortColumn = grid.SortedColumn;
+            var sortOrder = grid.SortOrder;
+
+            if (sortColumn == null || sortOrder == SortOrder.None)
+            {
+                if (grid.Columns.Count > 0)
+                {
+                    grid.Sort(grid.Columns[0], System.ComponentModel.ListSortDirection.Descending);
+                }
+            }
+            else
+            {
+                var direction = sortOrder == SortOrder.Ascending 
+                    ? System.ComponentModel.ListSortDirection.Ascending 
+                    : System.ComponentModel.ListSortDirection.Descending;
+                grid.Sort(sortColumn, direction);
+            }
         }
 
     }

@@ -154,6 +154,9 @@ namespace RemoteClient.Forms.Panels
                     dg_statsLog.Rows.RemoveAt(i);
             }
 
+            // Track if we added any new rows
+            bool rowsAdded = false;
+
             // Add new log entries that are not already present
             foreach (var entry in logEntries)
             {
@@ -162,7 +165,40 @@ namespace RemoteClient.Forms.Panels
                 if (!currentRows.Contains(key))
                 {
                     dg_statsLog.Rows.Add(dateStr, entry.ReportContent);
+                    rowsAdded = true;
                 }
+            }
+
+            // Apply sort to maintain order (or set default to most recent first)
+            if (rowsAdded || dg_statsLog.SortedColumn == null)
+            {
+                ApplySortToStatsLog(dg_statsLog);
+            }
+        }
+
+        private void ApplySortToStatsLog(DataGridView grid)
+        {
+            if (grid.Rows.Count == 0)
+                return;
+
+            var sortColumn = grid.SortedColumn;
+            var sortOrder = grid.SortOrder;
+
+            if (sortColumn == null || sortOrder == SortOrder.None)
+            {
+                // Default to showing most recent entries at the top
+                if (grid.Columns.Count > 0)
+                {
+                    grid.Sort(grid.Columns[0], System.ComponentModel.ListSortDirection.Descending);
+                }
+            }
+            else
+            {
+                // Maintain current sort order
+                var direction = sortOrder == SortOrder.Ascending 
+                    ? System.ComponentModel.ListSortDirection.Ascending 
+                    : System.ComponentModel.ListSortDirection.Descending;
+                grid.Sort(sortColumn, direction);
             }
         }
 

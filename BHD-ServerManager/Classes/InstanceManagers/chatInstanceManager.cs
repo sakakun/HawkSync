@@ -266,20 +266,23 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (!parseSuccess)
                     return new OperationResult(false, parseError);
 
-                if (parsedMessage.Length <= maxLength)
-                {
-                    // Use control characters for Red/Blue team
-                    if (channel == 4) // Red team
-                        parsedMessage = "R~" + parsedMessage;
-                    else if (channel == 5) // Blue team
-                        parsedMessage = "B~" + parsedMessage;
+                // Add team prefix first, then check length (59 char display limit includes prefix)
+                string prefix = string.Empty;
+                if (channel == 4) // Red team
+                    prefix = "R~";
+                else if (channel == 5) // Blue team
+                    prefix = "B~";
 
-                    ServerMemory.WriteMemorySendChatMessage(channel, parsedMessage);
-                    AppDebug.Log("chatInstanceManager", $"Sent message to channel {channel}: {parsedMessage}");
+                string messageWithPrefix = prefix + parsedMessage;
+
+                if (messageWithPrefix.Length <= maxLength)
+                {
+                    ServerMemory.WriteMemorySendChatMessage(channel, messageWithPrefix);
+                    AppDebug.Log("chatInstanceManager", $"Sent message to channel {channel}: {messageWithPrefix}");
                 }
                 else
                 {
-                    SendLongMessage(parsedMessage, channel, maxLength);
+                    SendLongMessage(parsedMessage, channel, maxLength, prefix);
                 }
 
                 return new OperationResult(true, "Message sent successfully.");
@@ -291,16 +294,20 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
         }
 
-        private static void SendLongMessage(string message, int channel, int maxLength)
+        private static void SendLongMessage(string message, int channel, int maxLength, string prefix)
         {
-            for (int i = 0; i < message.Length; i += maxLength)
+            int prefixLength = prefix.Length;
+            int maxContentLength = maxLength - prefixLength;
+            int i = 0;
+
+            while (i < message.Length)
             {
                 int remainingLength = message.Length - i;
-                int chunkLength = Math.Min(maxLength, remainingLength);
+                int chunkLength = Math.Min(maxContentLength, remainingLength);
 
-                if (chunkLength == maxLength && i + maxLength < message.Length)
+                if (chunkLength == maxContentLength && i + maxContentLength < message.Length)
                 {
-                    int lastSpace = message.LastIndexOf(' ', i + maxLength, maxLength);
+                    int lastSpace = message.LastIndexOf(' ', i + maxContentLength - 1, maxContentLength);
                     if (lastSpace > i)
                     {
                         chunkLength = lastSpace - i;
@@ -308,10 +315,19 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 }
 
                 string chunk = message.Substring(i, chunkLength).Trim();
-                AppDebug.Log("chatInstanceManager", $"Sending chunk to channel {channel}: {chunk}");
-                ServerMemory.WriteMemorySendChatMessage(channel, chunk);
+                string messageToSend = prefix + chunk;
+                
+                AppDebug.Log("chatInstanceManager", $"Sending chunk to channel {channel}: {messageToSend}");
+                ServerMemory.WriteMemorySendChatMessage(channel, messageToSend);
 
-                System.Threading.Thread.Sleep(1000);
+                i += chunkLength;
+                
+                // Skip any spaces at the start of the next chunk
+                while (i < message.Length && message[i] == ' ')
+                    i++;
+
+                if (i < message.Length)
+                    System.Threading.Thread.Sleep(1000);
             }
         }
 
