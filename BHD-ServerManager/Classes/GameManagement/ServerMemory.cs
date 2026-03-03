@@ -1302,6 +1302,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             PostMessage(windowHandle, (ushort)WM_KEYUP, VK_ENTER, 0);
 
             // change color to normal
+            Thread.Sleep(50);
             int revert_colorbuffer = 0;
             byte[] revert_colorcode = Functions.ToByteArray("6A 01".Replace(" ", ""));
             WriteProcessMemory((int)processHandle, 0x00462ABA, revert_colorcode, revert_colorcode.Length, ref revert_colorbuffer);

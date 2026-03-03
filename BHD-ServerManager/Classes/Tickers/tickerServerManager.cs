@@ -58,12 +58,13 @@ namespace BHD_ServerManager.Classes.Tickers
                 if (DateTime.Compare(theInstance.instanceNextUpdateTime, currentTime) >= 0)
                     return;
 
-                // If server process is not attached, set status to offline
-                // Note: Automatic process detection removed to avoid UI lockup
-                // Use the manual "Attach Process" button on the Profile tab instead
+                // If server process is not attached, set status to offline and update UI
                 if (!ServerMemory.ReadMemoryIsProcessAttached())
                 {
-                    theInstance.instanceStatus = InstanceStatus.OFFLINE;
+                    if (!StartServer.CheckForExistingProcess())
+                    {
+                        theInstance.instanceStatus = InstanceStatus.OFFLINE;
+                    }
                 } else
                 {
                     // --- Server is online: run status-specific logic in order ---
