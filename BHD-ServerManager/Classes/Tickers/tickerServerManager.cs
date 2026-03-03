@@ -61,10 +61,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 // If server process is not attached, set status to offline and update UI
                 if (!ServerMemory.ReadMemoryIsProcessAttached())
                 {
-                    if (!StartServer.CheckForExistingProcess())
-                    {
-                        theInstance.instanceStatus = InstanceStatus.OFFLINE;
-                    }
+                    theInstance.instanceStatus = InstanceStatus.OFFLINE;
                 } else
                 {
                     // --- Server is online: run status-specific logic in order ---

@@ -109,6 +109,7 @@
 			lblAuditStatus = new Label();
 			groupBox4 = new GroupBox();
 			tableLayoutPanel4 = new TableLayoutPanel();
+			btn_toggleProcessAttach = new Button();
 			btn_resetProfile = new Button();
 			btn_saveProfile = new Button();
 			folderProfileBrowserDialog = new FolderBrowserDialog();
@@ -1160,6 +1161,7 @@
 			tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
 			tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
 			tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+			tableLayoutPanel4.Controls.Add(btn_toggleProcessAttach, 4, 0);
 			tableLayoutPanel4.Controls.Add(btn_resetProfile, 1, 0);
 			tableLayoutPanel4.Controls.Add(btn_saveProfile, 0, 0);
 			tableLayoutPanel4.Dock = DockStyle.Fill;
@@ -1171,6 +1173,17 @@
 			tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 			tableLayoutPanel4.Size = new Size(506, 36);
 			tableLayoutPanel4.TabIndex = 0;
+			// 
+			// btn_toggleProcessAttach
+			// 
+			btn_toggleProcessAttach.Dock = DockStyle.Fill;
+			btn_toggleProcessAttach.Location = new Point(407, 3);
+			btn_toggleProcessAttach.Name = "btn_toggleProcessAttach";
+			btn_toggleProcessAttach.Size = new Size(96, 30);
+			btn_toggleProcessAttach.TabIndex = 2;
+			btn_toggleProcessAttach.Text = "Attach Game";
+			btn_toggleProcessAttach.UseVisualStyleBackColor = true;
+			btn_toggleProcessAttach.Click += Profile_ClickToggleProcessAttach;
 			// 
 			// btn_resetProfile
 			// 
@@ -1329,6 +1342,7 @@
 		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
 		private DataGridViewTextBoxColumn Description;
 		private DataGridViewTextBoxColumn Status;
+		private Button btn_toggleProcessAttach;
 	}
 }
 

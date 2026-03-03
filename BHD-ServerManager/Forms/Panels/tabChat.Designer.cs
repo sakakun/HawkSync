@@ -55,11 +55,13 @@
 			dg_slapMessages = new DataGridView();
 			slapMessageID = new DataGridViewTextBoxColumn();
 			slapMessages = new DataGridViewTextBoxColumn();
+			chatHistory1 = new BHD_ServerManager.Forms.SubPanels.ChatHistory();
 			chat_TabControl.SuspendLayout();
 			tabChatMessages.SuspendLayout();
 			tableLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)dataGridView_chatMessages).BeginInit();
 			tableLayoutPanel2.SuspendLayout();
+			tabHistory.SuspendLayout();
 			tabAutoMessages.SuspendLayout();
 			tableLayoutPanel3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)dg_autoMessages).BeginInit();
@@ -200,6 +202,7 @@
 			// 
 			// tabHistory
 			// 
+			tabHistory.Controls.Add(chatHistory1);
 			tabHistory.Location = new Point(4, 4);
 			tabHistory.Name = "tabHistory";
 			tabHistory.Size = new Size(935, 414);
@@ -378,6 +381,16 @@
 			slapMessages.Name = "slapMessages";
 			slapMessages.ReadOnly = true;
 			// 
+			// chatHistory1
+			// 
+			chatHistory1.Dock = DockStyle.Fill;
+			chatHistory1.Location = new Point(0, 0);
+			chatHistory1.MaximumSize = new Size(935, 414);
+			chatHistory1.MinimumSize = new Size(935, 414);
+			chatHistory1.Name = "chatHistory1";
+			chatHistory1.Size = new Size(935, 414);
+			chatHistory1.TabIndex = 0;
+			// 
 			// tabChat
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
@@ -392,6 +405,7 @@
 			((System.ComponentModel.ISupportInitialize)dataGridView_chatMessages).EndInit();
 			tableLayoutPanel2.ResumeLayout(false);
 			tableLayoutPanel2.PerformLayout();
+			tabHistory.ResumeLayout(false);
 			tabAutoMessages.ResumeLayout(false);
 			tableLayoutPanel3.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)dg_autoMessages).EndInit();
@@ -434,6 +448,6 @@
         private DataGridViewTextBoxColumn autoTrigger;
         private DataGridViewTextBoxColumn autoMessageText;
         private TabPage tabHistory;
-        private SubPanels.ChatHistory chatHistory;
-    }
+		private SubPanels.ChatHistory chatHistory1;
+	}
 }

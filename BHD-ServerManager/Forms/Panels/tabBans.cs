@@ -2803,7 +2803,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             // Start Process via manager
-            var startResult = NetLimiter_StartBridge();
+            var startResult = await NetLimiter_StartBridge();
             if (!startResult)
             {
                 MessageBox.Show("Failed to start/access the NetLimiter Bridge process. Please ensure NetLimiter is installed and try again.",
@@ -2832,13 +2832,13 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
-        public bool NetLimiter_StartBridge()
+        public async Task<bool> NetLimiter_StartBridge()
         {
             if (theInstance == null)
                 return false;
 
             // Start via manager
-            var result = banInstanceManager.StartNetLimiterBridge(
+            var result = await banInstanceManager.StartNetLimiterBridgeAsync(
                 theInstance.netLimiterHost,
                 theInstance.netLimiterPort,
                 theInstance.netLimiterUsername,

@@ -1227,7 +1227,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Start NetLimiter bridge process
         /// </summary>
-        public static OperationResult StartNetLimiterBridge(string host, int port, string username, string password)
+        public static async Task<OperationResult> StartNetLimiterBridgeAsync(string host, int port, string username, string password)
         {
             try
             {
@@ -1237,7 +1237,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new OperationResult(true, "NetLimiter bridge already running.");
                 }
 
-                NetLimiterClient.StartBridgeProcess(host, (ushort)port, username, password);
+                await NetLimiterClient.StartBridgeProcessAsync(host, (ushort)port, username, password);
 
                 if (NetLimiterClient._bridgeProcess != null)
                 {
@@ -1249,7 +1249,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error starting NetLimiter bridge: {ex}");
+                AppDebug.Log("banInstanceManager", "Error starting NetLimiter bridge: {ex}");
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }

@@ -187,7 +187,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 	        public string? End { get; set; }
         }
 
-        public static void StartBridgeProcess(string hostname = "localhost", ushort port = 11111, string username = "", string password = "")
+        public static async Task StartBridgeProcessAsync(string hostname = "localhost", ushort port = 11111, string username = "", string password = "")
 		{
 
 		    if (_bridgeProcess != null && !_bridgeProcess.HasExited)
@@ -240,8 +240,8 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		        
 		        AppDebug.Log("NetLimiterClient", "Bridge process started");
 		        
-		        // Give it time to initialize
-		        Task.Delay(1000).Wait();
+        // Give it time to initialize
+        await Task.Delay(1000);
 		    }
 		    catch (Exception ex)
 		    {
