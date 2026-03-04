@@ -505,8 +505,8 @@ public partial class tabProfile : UserControl
 			// Build request
 			var request = new AuditLogRequest
 			{
-				StartDate = DateTime.Now.AddHours(-24),
-				EndDate = DateTime.Now,
+				StartDate = DateTime.UtcNow.AddHours(-24),
+				EndDate = DateTime.UtcNow,
 				UsernameFilter = string.IsNullOrWhiteSpace(_currentUserFilter) ? null : _currentUserFilter,
 				CategoryFilter = _currentCategoryFilter == "All" ? null : _currentCategoryFilter,
 				Limit = 500
@@ -541,7 +541,7 @@ public partial class tabProfile : UserControl
 			foreach (var log in response.Logs)
 			{
 				var rowIndex = dgvAuditLogs.Rows.Add(
-					log.Timestamp.ToString("HH:mm:ss"),
+					log.Timestamp.ToLocalTime().ToString("HH:mm:ss"),
 					log.Username,
 					log.ActionCategory,
 					log.ActionType,
@@ -566,7 +566,7 @@ public partial class tabProfile : UserControl
 				}
 
 				// Add tooltip with full timestamp
-				row.Cells["Time"].ToolTipText = log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+				row.Cells["Time"].ToolTipText = log.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
 
 				// Add tooltip with full description if truncated
 				if (log.ActionDescription.Length > 40)

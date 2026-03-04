@@ -2318,8 +2318,8 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     UserID = reader.GetInt32(0),
                     Username = reader.GetString(1),
                     IsActive = reader.GetInt32(2) == 1,
-                    Created = reader.IsDBNull(3) ? DateTime.MinValue : DateTime.Parse(reader.GetString(3)),
-                    LastLogin = reader.IsDBNull(4) ? null : DateTime.Parse(reader.GetString(4)),
+                    Created = reader.IsDBNull(3) ? DateTime.MinValue : DateTime.SpecifyKind(DateTime.Parse(reader.GetString(3)), DateTimeKind.Utc),
+                    LastLogin = reader.IsDBNull(4) ? null : DateTime.SpecifyKind(DateTime.Parse(reader.GetString(4)), DateTimeKind.Utc),
                     Notes = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
                 });
             }
@@ -2358,8 +2358,8 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     PasswordHash = reader.GetString(2),
                     Salt = reader.GetString(3),
                     IsActive = reader.GetInt32(4) == 1,
-                    Created = reader.IsDBNull(5) ? DateTime.MinValue : DateTime.Parse(reader.GetString(5)),
-                    LastLogin = reader.IsDBNull(6) ? null : DateTime.Parse(reader.GetString(6)),
+                    Created = reader.IsDBNull(5) ? DateTime.MinValue : DateTime.SpecifyKind(DateTime.Parse(reader.GetString(5)), DateTimeKind.Utc),
+                    LastLogin = reader.IsDBNull(6) ? null : DateTime.SpecifyKind(DateTime.Parse(reader.GetString(6)), DateTimeKind.Utc),
                     Notes = reader.IsDBNull(7) ? string.Empty : reader.GetString(7)
                 };
             }
@@ -2397,8 +2397,8 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     PasswordHash = reader.GetString(2),
                     Salt = reader.GetString(3),
                     IsActive = reader.GetInt32(4) == 1,
-                    Created = reader.IsDBNull(5) ? DateTime.MinValue : DateTime.Parse(reader.GetString(5)),
-                    LastLogin = reader.IsDBNull(6) ? null : DateTime.Parse(reader.GetString(6)),
+                    Created = reader.IsDBNull(5) ? DateTime.MinValue : DateTime.SpecifyKind(DateTime.Parse(reader.GetString(5)), DateTimeKind.Utc),
+                    LastLogin = reader.IsDBNull(6) ? null : DateTime.SpecifyKind(DateTime.Parse(reader.GetString(6)), DateTimeKind.Utc),
                     Notes = reader.IsDBNull(7) ? string.Empty : reader.GetString(7)
                 };
             }
@@ -2819,7 +2819,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                      $TargetType, $TargetID, $TargetName, $OldValue, $NewValue, $IPAddress,
                      $Success, $ErrorMessage, $Metadata)";
 
-                cmd.Parameters.AddWithValue("$Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$Timestamp", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
                 cmd.Parameters.AddWithValue("$UserID", userId.HasValue ? userId.Value : DBNull.Value);
                 cmd.Parameters.AddWithValue("$Username", username);
                 cmd.Parameters.AddWithValue("$ActionCategory", category);
@@ -2934,7 +2934,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     logs.Add(new AuditLogDTO
                     {
                         LogID = reader.GetInt32(0),
-                        Timestamp = DateTime.Parse(reader.GetString(1)),
+                        Timestamp = DateTime.SpecifyKind(DateTime.Parse(reader.GetString(1)), DateTimeKind.Utc),
                         UserID = reader.IsDBNull(2) ? null : reader.GetInt32(2),
                         Username = reader.GetString(3),
                         ActionCategory = reader.GetString(4),

@@ -352,9 +352,9 @@ namespace BHD_ServerManager.Forms.Panels
 					return;
 				}
 
-				// Get logs from last 24 hours
-				var startDate = DateTime.Now.AddHours(-24);
-				var endDate = DateTime.Now;
+			// Get logs from last 24 hours
+				var startDate = DateTime.UtcNow.AddHours(-24);
+				var endDate = DateTime.UtcNow;
 
 				// Apply filters
 				string? categoryFilter = _currentCategoryFilter == "All" ? null : _currentCategoryFilter;
@@ -377,8 +377,8 @@ namespace BHD_ServerManager.Forms.Panels
 
 				foreach (var log in logs)
 				{
-					var rowIndex = dgvAuditLogs.Rows.Add(
-						log.Timestamp.ToString("HH:mm:ss"),
+				var rowIndex = dgvAuditLogs.Rows.Add(
+						log.Timestamp.ToLocalTime().ToString("HH:mm:ss"),
 						log.Username,
 						log.ActionCategory,
 						log.ActionType,
@@ -402,8 +402,8 @@ namespace BHD_ServerManager.Forms.Panels
 						row.Cells["Status"].Style.ForeColor = Color.Green;
 					}
 
-					// Add tooltip with full timestamp
-					row.Cells["Time"].ToolTipText = log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+				// Add tooltip with full timestamp
+					row.Cells["Time"].ToolTipText = log.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
 
 					// Add tooltip with full description if truncated
 					if (log.ActionDescription.Length > 40)

@@ -241,7 +241,7 @@ namespace BHD_ServerManager.Forms.SubPanels
             foreach (var log in _currentLogs)
             {
                 dataGridView_History.Rows.Add(
-                    log.MessageTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),
+                    log.MessageTimeStamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
                     log.TeamDisplay ?? "Unknown",
                     log.PlayerName,
                     log.MessageText

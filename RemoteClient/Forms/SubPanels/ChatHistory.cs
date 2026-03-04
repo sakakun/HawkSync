@@ -240,13 +240,13 @@ namespace RemoteClient.Forms.SubPanels
 
 			return comboBox_DateRange.SelectedIndex switch
 			{
-				0 => (DateTime.Today, DateTime.Now),                    // Today
-				1 => (DateTime.Today.AddDays(-1), DateTime.Today),      // Yesterday
-				2 => (DateTime.Today.AddDays(-3), DateTime.Now),        // Last 3 Days
-				3 => (DateTime.Today.AddDays(-7), DateTime.Now),        // Last 7 Days
-				4 => (DateTime.Today.AddDays(-30), DateTime.Now),       // Last 30 Days
-				5 => (null, null),                                      // All Time
-				6 => (dateTimePicker_From.Value, dateTimePicker_To.Value), // Custom
+				0 => (DateTime.UtcNow.Date, DateTime.UtcNow),                                                        // Today
+				1 => (DateTime.UtcNow.Date.AddDays(-1), DateTime.UtcNow.Date),                                      // Yesterday
+				2 => (DateTime.UtcNow.Date.AddDays(-3), DateTime.UtcNow),                                           // Last 3 Days
+				3 => (DateTime.UtcNow.Date.AddDays(-7), DateTime.UtcNow),                                           // Last 7 Days
+				4 => (DateTime.UtcNow.Date.AddDays(-30), DateTime.UtcNow),                                          // Last 30 Days
+				5 => (null, null),                                                                                   // All Time
+				6 => (dateTimePicker_From.Value.ToUniversalTime(), dateTimePicker_To.Value.ToUniversalTime()),       // Custom
 				_ => (null, null)
 			};
 		}
@@ -261,7 +261,7 @@ namespace RemoteClient.Forms.SubPanels
 			foreach (var log in _currentLogs)
 			{
 				dataGridView_History.Rows.Add(
-					log.MessageTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"),
+				log.MessageTimeStamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
 					log.TeamDisplay ?? "Unknown",
 					log.PlayerName,
 					log.MessageText

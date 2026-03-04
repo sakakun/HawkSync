@@ -31,8 +31,8 @@ public class AuditController : ControllerBase
         AppDebug.Log("AuditController", "Permission check passed");
 
         // Default to last 24 hours if no dates specified
-        var startDate = request.StartDate ?? DateTime.Now.AddHours(-24);
-        var endDate = request.EndDate ?? DateTime.Now;
+        var startDate = request.StartDate ?? DateTime.UtcNow.AddHours(-24);
+        var endDate = request.EndDate ?? DateTime.UtcNow;
 
         AppDebug.Log("AuditController", $"Calling DatabaseManager.GetAuditLogs - Start: {startDate}, End: {endDate}, User: {request.UsernameFilter}, Category: {request.CategoryFilter}");
 
