@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
+using BHD_ServerManager.API.Services;
 using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
@@ -17,8 +18,6 @@ namespace BHD_ServerManager.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private const string JwtKey = "YourSuperSecretKeyThatIsAtLeast32CharactersLongForJWT!";
-
     [HttpPost("login")]
     public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
     {
@@ -114,7 +113,7 @@ public class AuthController : ControllerBase
 
     private string GenerateJwtToken(UserDTO user)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKeyProvider.JwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>

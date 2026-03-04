@@ -25,8 +25,6 @@ public class EmbeddedApiHost
     /// </summary>
     public void Start(int port = 5000)
     {
-        var jwtKey = "YourSuperSecretKeyThatIsAtLeast32CharactersLongForJWT!";
-
         _host = Host.CreateDefaultBuilder()
             .ConfigureWebHostDefaults(webBuilder =>
             {
@@ -47,7 +45,7 @@ public class EmbeddedApiHost
                                 ValidateIssuerSigningKey = true,
                                 ValidIssuer = "BHD.ServerManager",
                                 ValidAudience = "BHD.RemoteClient",
-                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKeyProvider.JwtKey))
                             };
 
                             options.Events = new JwtBearerEvents
