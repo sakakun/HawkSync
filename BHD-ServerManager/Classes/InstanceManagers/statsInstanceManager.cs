@@ -589,6 +589,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             string dateTimeString = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
 
             CommonCore.instanceStats!.WebStatsLog.Add(logRecord);
+            CommonCore.instanceStats.TrimWebStatsLog();
 
             if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
             {

@@ -14,6 +14,12 @@ namespace HawkSyncShared.Instances
         // Web Stats Log Records
         public List<StatReportObject> WebStatsLog { get; set; } = new List<StatReportObject>();
 
+        public void TrimWebStatsLog()
+        {
+            var cutoff = DateTime.Now.AddHours(-1);
+            WebStatsLog.RemoveAll(e => e.ReportDate < cutoff);
+        }
+
         // Force Update Flag
         public bool ForceUIUpdate { get; set; } = false;
 
