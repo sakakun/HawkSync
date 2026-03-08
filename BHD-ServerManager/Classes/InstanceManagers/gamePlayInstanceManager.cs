@@ -80,7 +80,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 MaxSlots: instance.gameMaxSlots,
                 PSPTakeoverTimer: instance.gamePSPTOTimer,
                 FlagReturnTime: instance.gameFlagReturnTime,
-                MaxTeamLives: instance.gameMaxTeamLives,
                 FullWeaponThreshold: instance.gameFullWeaponThreshold,
                 Options: options,
                 FriendlyFire: friendlyFire,

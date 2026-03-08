@@ -109,9 +109,15 @@ namespace BHD_ServerManager.Classes.Tickers
                     {
                         mapInstance.ActualPlayingMapIndex = mapInstance.CurrentMapIndex;    // Set the actual playing map index
                         theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
+                        if (Debugger.IsAttached)
+                        {
+                             StartServer.readAutoRes();
+                        }
                     }
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
                     ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
+
+
 
                 }
                 // 4. Online (game in progress)

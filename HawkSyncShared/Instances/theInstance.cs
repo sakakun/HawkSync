@@ -61,7 +61,8 @@ namespace HawkSyncShared.Instances
 		// Game Settings
         public int              gameMatchID                 { get; set; } = 0;
 		public int              gameMatchWinner             { get; set; } = 0;
-        public string           gameServerName              { get; set; } = "Untitled Server";
+        public int              gameNumTeams                { get; set; } = 0;
+		public string           gameServerName              { get; set; } = "Untitled Server";
         public string           gameMOTD                    { get; set; } = "Welcome to the server!";
         public string           gameCountryCode             { get; set; } = "US";
         public string           gameHostName                { get; set; } = "HostName";
@@ -84,8 +85,8 @@ namespace HawkSyncShared.Instances
         public int              gameScoreBoardDelay         { get; set; } = 20;  /* Score Board Delay in Seconds */
         public int              gamePSPTOTimer              { get; set; } = 20;  /* PSP Take Over Timer in Seconds */
         public int              gameFlagReturnTime          { get; set; } = 4;   /* Flag return time in minutes */
-        public int              gameMaxTeamLives            { get; set; } = 20;  /* Max Team Lives */
-        public int              gameFullWeaponThreshold     { get; set; } = 10;  /* Number of players required for full weapons */
+        public int              gameMaxTeamLives            { get; set; } = 100; /* Not Used by DFBHD, kept for legacy reasons */
+		public int              gameFullWeaponThreshold     { get; set; } = 10;  /* Number of players required for full weapons */
 
         // Game Settings: Misc Settings
         public bool             gameOneShotKills            { get; set; } = false;

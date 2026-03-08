@@ -1,15 +1,15 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
+﻿using BHD_ServerManager.Classes.GameManagement.Patcher;
 using BHD_ServerManager.Classes.InstanceManagers;
-using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms.Panels;
+using HawkSyncShared;
+using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 using Salaros.Configuration;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-
 
 namespace BHD_ServerManager.Classes.GameManagement
 {
@@ -27,13 +27,12 @@ namespace BHD_ServerManager.Classes.GameManagement
         private static mapInstance mapInstance => CommonCore.instanceMaps!;
         private static tabProfile  tabProfile  => Program.ServerManagerUI!.ProfileTab;
 
-		// Function: createAutoRes
-		public static bool createAutoRes()
+        public static bool createAutoRes()
         {
-
             try
             {
-                if (mapInstance.Playlists[mapInstance.ActivePlaylist] == null || mapInstance.Playlists[mapInstance.ActivePlaylist].Count == 0)
+                if (mapInstance.Playlists[mapInstance.ActivePlaylist] == null ||
+                    mapInstance.Playlists[mapInstance.ActivePlaylist].Count == 0)
                 {
                     AppDebug.Log("StartServer", "currentMapPlaylist is empty. Cannot create autores.bin.");
                     return false;
@@ -49,28 +48,38 @@ namespace BHD_ServerManager.Classes.GameManagement
                 text = text.Replace("// MAP", "[infoCurrentMapName]");
                 text = text.Replace("// SYSTEM", "[System]");
 
-                var configFileFromString = new ConfigParser(text,
-                  new ConfigParserSettings
-                  {
-                      MultiLineValues = MultiLineValues.Simple | MultiLineValues.AllowValuelessKeys | MultiLineValues.QuoteDelimitedValues
-                  });
-                // get string vars
+                var configFileFromString = new ConfigParser(
+                    text,
+                    new ConfigParserSettings
+                    {
+                        MultiLineValues = MultiLineValues.Simple
+                            | MultiLineValues.AllowValuelessKeys
+                            | MultiLineValues.QuoteDelimitedValues
+                    });
+
                 string hw3d_name = configFileFromString.GetValue("Display", "hw3d_name");
                 string hw3d_guid = configFileFromString.GetValue("Display", "hw3d_guid");
 
-                // delete existing autores file if it exists
                 if (File.Exists(autoResPath))
-                {
                     File.Delete(autoResPath);
-                }
 
-                MemoryStream ms = new MemoryStream();
+                var activePlaylist = mapInstance.Playlists[mapInstance.ActivePlaylist];
+                var firstMap = activePlaylist[0];
+
                 int dedicatedSlots = theInstance.gameMaxSlots + Convert.ToInt32(theInstance.gameDedicated);
                 int loopMaps = theInstance.gameLoopMaps;
-                int gamePlayOptions = 0;
+
+                int gamePlayOptions;
                 try
                 {
-                    gamePlayOptions = Functions.CalulateGameOptions(theInstance.gameOptionAutoBalance, theInstance.gameOptionFF, theInstance.gameOptionFriendlyTags, theInstance.gameOptionFFWarn, theInstance.gameOptionShowTracers, theInstance.gameShowTeamClays, theInstance.gameOptionAutoRange);
+                    gamePlayOptions = Functions.CalulateGameOptions(
+                        theInstance.gameOptionAutoBalance,
+                        theInstance.gameOptionFF,
+                        theInstance.gameOptionFriendlyTags,
+                        theInstance.gameOptionFFWarn,
+                        theInstance.gameOptionShowTracers,
+                        theInstance.gameShowTeamClays,
+                        theInstance.gameOptionAutoRange);
                 }
                 catch (Exception ex)
                 {
@@ -78,10 +87,62 @@ namespace BHD_ServerManager.Classes.GameManagement
                     return false;
                 }
 
+                // -----------------------------------------------------------------
+                // Layout constants
+                // -----------------------------------------------------------------
+                const int MAX_MAPS = 128;
+
+                const int OFFSET_HEADER = 0x0000;
+                const int OFFSET_PLAYLIST_META = 0x1347;
+                const int OFFSET_CURRENT_MAP = 0x187F;
+                const int OFFSET_MAP_TABLE = 0x1883;
+
+                // Server rules offsets inside unk_9F1F28
+                const int RULE_UNKNOWN_160B = 0x160B;
+                const int RULE_MAX_SLOTS = 0x160F;          // 0x000D97A0
+                const int RULE_DEDICATED = 0x1613;          
+                const int RULE_MAX_TEAM_LIVES = 0x161F;     // 0x000D8554
+                const int RULE_FLAG_SCORE = 0x1623;         // 0x5F21AC / 0x6034B8 
+                const int RULE_START_DELAY = 0x1627;        // 0x000D7F00
+                const int RULE_UNKNOWN_162F = 0x162F;       
+                const int RULE_FLAG_RETURN_TIME = 0x1633;   // 0x000DB6AC
+                const int RULE_UNKNOWN_1637 = 0x1637;
+                const int RULE_UNKNOWN_163B = 0x163B;
+                const int RULE_TIME_LIMIT = 0x163F;         // 0x000DD1DC
+                const int RULE_ZONE_TIMER = 0x1643;         // 0x5F21B8 / 0x6344B4
+                const int RULE_RESPAWN_TIME = 0x1647;       // 0x000DD4E8 
+                const int RULE_DESTROY_BUILDINGS = 0x164B;  // 0x000D99B8
+                const int RULE_UNKNOWN_1693 = 0x1693;
+                const int RULE_UNKNOWN_1697 = 0x1697;
+                const int RULE_UNKNOWN_169B = 0x169B;
+                const int RULE_UNKNOWN_16B7 = 0x16B7;
+                const int RULE_UNKNOWN_16BB = 0x16BB;
+                const int RULE_UNKNOWN_16C7 = 0x16C7;
+                const int RULE_UNKNOWN_16CB = 0x16CB;
+                const int RULE_GAME_PORT = 0x16CF;
+                const int RULE_ALLOW_CUSTOM_SKINS = 0x16D7; // 0x000AD760
+                const int RULE_REQUIRE_NOVA_LOGIN = 0x16DB; // 0x000D9960
+                const int RULE_LAN_MODE = 0x16EF;
+                const int RULE_MIN_PING_VALUE = 0x16F3;     // 0x000D7FB8
+                const int RULE_ENABLE_MIN_PING = 0x16F7;    // 0x000D9A60
+                const int RULE_MAX_PING_VALUE = 0x16FB;     // 0x000DB634
+                const int RULE_ENABLE_MAX_PING = 0x16FF;    // 0x000DB634
+                const int RULE_UNKNOWN_1703 = 0x1703;
+                const int RULE_UNKNOWN_1707 = 0x1707;
+                const int RULE_MOTD = 0x170B;               // 0x000D9AAC
+
+                // -----------------------------------------------------------------
+                // Original blobs - unchanged
+                // -----------------------------------------------------------------
                 string _miscGraphicSettings = "00 0E 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CD CC 4C 3F 06 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 00 10 00 00 00 10 00 00 00 10 00 00 08 00 00 00 01 00 00 00 00 10 00 00 00 00 D0 1E 01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 01 00 00 00 1E 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 02 00 00 00 02 00 00 00 00 00 00 00 03 00 00 00 03 00 00 00 02 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 03 00 00 00 02 00 00 00 00 00 00 00 03 00 00 00 03 00 00 00 02 00 00 00 04 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF 00 00 00 C0 00 00 00 C0 00 00 00 C0 00 00 00 C0 00 00 00 02 00 00 00 01 00 00 00";
                 string applicationSettings = "01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00";
 
+                // -----------------------------------------------------------------
+                // Byte arrays
+                // -----------------------------------------------------------------
                 byte[] autoRestart = Encoding.Default.GetBytes("autorestartV0.0");
+
+                // Keep original working behavior: 128
                 byte[] numberOfMapsBytes = BitConverter.GetBytes(128);
 
                 byte[] graphicsSetup_Name = Encoding.Default.GetBytes(hw3d_name);
@@ -89,26 +150,24 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] graphicsSetupMisc_Settings = Functions.ToByteArray(_miscGraphicSettings.Replace(" ", ""));
                 byte[] applicationSettingBytes = Functions.ToByteArray(applicationSettings.Replace(" ", ""));
                 byte[] windowedModeBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameWindowedMode));
-                byte[] ServerNameBytes = Encoding.Default.GetBytes(theInstance.gameServerName);
+                byte[] serverNameBytes = Encoding.Default.GetBytes(theInstance.gameServerName);
                 byte[] countryCodeBytes = Encoding.Default.GetBytes(theInstance.gameCountryCode);
-                byte[] BindAddress = Encoding.Default.GetBytes(theInstance.profileBindIP!);
-                byte[] firstMapFile = Encoding.Default.GetBytes(mapInstance.Playlists[mapInstance.ActivePlaylist][0].MapFile!);
+                byte[] bindAddressBytes = Encoding.Default.GetBytes(theInstance.profileBindIP!);
+                byte[] firstMapFileBytes = Encoding.Default.GetBytes(firstMap.MapFile!);
                 byte[] maxSlotsBytes = BitConverter.GetBytes(theInstance.gameMaxSlots);
                 byte[] dedicatedBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDedicated));
-                byte[] GameScoreBytes = BitConverter.GetBytes(theInstance.gameScoreKills);
-                byte[] StartDelayBytes = BitConverter.GetBytes(theInstance.gameStartDelay);
+                byte[] gameScoreBytes = BitConverter.GetBytes(theInstance.gameScoreKills);
                 byte[] serverPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordLobby!);
                 byte[] redTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordRed!);
                 byte[] blueTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordBlue!);
                 byte[] gamePlayOptionsBytes = BitConverter.GetBytes(gamePlayOptions);
-                byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps > 0 ? 1 : 0);
-
-                byte[] gameTypeBytes = BitConverter.GetBytes(mapInstance.Playlists[mapInstance.ActivePlaylist][0].MapType);
+                byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps > 0 ? 1 : 0); // preserved for parity
+                byte[] gameTypeBytes = BitConverter.GetBytes(firstMap.MapType);
                 byte[] timeLimitBytes = BitConverter.GetBytes(theInstance.gameTimeLimit);
                 byte[] respawnTimeBytes = BitConverter.GetBytes(theInstance.gameRespawnTime);
                 byte[] allowCustomSkinsBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameCustomSkins));
                 byte[] requireNovaLoginBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameRequireNova));
-                byte[] MOTDBytes = Encoding.Default.GetBytes(theInstance.gameMOTD);
+                byte[] motdBytes = Encoding.Default.GetBytes(theInstance.gameMOTD);
                 byte[] sessionTypeBytes = BitConverter.GetBytes(false);
                 byte[] dedicatedSlotsBytes = BitConverter.GetBytes(dedicatedSlots);
                 byte[] graphicsHeaderSettings = BitConverter.GetBytes(-1);
@@ -121,256 +180,316 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] gamePortBytes = BitConverter.GetBytes(theInstance.profileBindPort);
                 byte[] flagBallScoreBytes = BitConverter.GetBytes(theInstance.gameScoreFlags);
                 byte[] zoneTimerBytes = BitConverter.GetBytes(theInstance.gameScoreZoneTime);
-                byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(mapInstance.Playlists[mapInstance.ActivePlaylist][0].ModType==9?1:0));
+                byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(firstMap.ModType == 9 ? 1 : 0));
+                byte[] allowDestroyingBuildings = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDestroyBuildings));
+                byte[] flagreturntime = BitConverter.GetBytes(theInstance.gameFlagReturnTime);
 
-                byte[] mapListPrehandle = BitConverter.GetBytes(10621344);
+				// Keep original working behavior
+				byte[] mapListPrehandle = BitConverter.GetBytes(10621344);
+
                 byte[] finalAppSetup = Functions.ToByteArray("00 00 00 00 00 00 00 00 05 00 00 00 00".Replace(" ", ""));
                 byte[] resolutionSetup = Functions.ToByteArray("02 00 00 00 00 01 00 00 00".Replace(" ", ""));
                 byte[] graphicsPrehandle = Functions.ToByteArray("02 00 00 00 01 00 00 00".Replace(" ", ""));
-                byte[] defaultWeaponSetup = Functions.ToByteArray("05 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00".Replace(" ", ""));
-                byte[] endOfMapCfg = Functions.ToByteArray("20 B5 B6 01".Replace(" ", ""));
-                byte[] endOfMapCfg2 = Functions.ToByteArray("53 01 00 00 00 13 00 00 00 13 00 00 00 04 00 00 00".Replace(" ", ""));
+                byte[] defaultWeaponSetup = Functions.ToByteArray("05 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00".Replace(" ", ""));
+                byte[] endOfMap = Functions.ToByteArray("20 B5 B6 01 00 00 00 00 53 01 00 00 00 13 00 00 00 13 00 00 00 04 00 00 00".Replace(" ", ""));
 
+                // -----------------------------------------------------------------
+                // Keep original MemoryStream sparse write behavior
+                // -----------------------------------------------------------------
+                MemoryStream ms = new MemoryStream();
 
-                ms.Seek(0, SeekOrigin.Begin);
-                // autorestart header + Number of Total Maps
+                void WriteAt(int offset, byte[] bytes)
+                {
+                    ms.Seek(offset, SeekOrigin.Begin);
+                    ms.Write(bytes, 0, bytes.Length);
+                }
+
+                // Header + count
+                ms.Seek(OFFSET_HEADER, SeekOrigin.Begin);
                 ms.Write(autoRestart, 0, autoRestart.Length);
                 ms.Write(numberOfMapsBytes, 0, numberOfMapsBytes.Length);
 
-                ms.Seek(0x4D, SeekOrigin.Begin);
-                ms.Write(firstMapFile, 0, firstMapFile.Length);
+                // Base values / application area
+                WriteAt(0x004D, firstMapFileBytes);
+                WriteAt(0x00AF, customMapFlagBytes);
+                WriteAt(0x068F, resolutionSetup);
+                WriteAt(0x0277, sessionTypeBytes);
+                WriteAt(0x01C7, applicationSettingBytes);
+                WriteAt(0x0283, dedicatedSlotsBytes);
+                WriteAt(0x028F, gameTypeBytes);
+                WriteAt(0x0293, finalAppSetup);
 
-                ms.Seek(0xAF, SeekOrigin.Begin);
-                ms.Write(customMapFlagBytes, 0, customMapFlagBytes.Length);
-
-                ms.Seek(0x68F, SeekOrigin.Begin);
-                ms.Write(resolutionSetup, 0, resolutionSetup.Length);
-
-                ms.Seek(0x277, SeekOrigin.Begin);
-                ms.Write(sessionTypeBytes, 0, sessionTypeBytes.Length);
-
-                ms.Seek(0x1C7, SeekOrigin.Begin);
-                ms.Write(applicationSettingBytes, 0, applicationSettingBytes.Length);
-
-                ms.Seek(0x283, SeekOrigin.Begin);
-                ms.Write(dedicatedSlotsBytes, 0, dedicatedSlotsBytes.Length);
-
-                ms.Seek(0x28F, SeekOrigin.Begin);
-                ms.Write(gameTypeBytes, 0, gameTypeBytes.Length);
-
-                ms.Seek(0x293, SeekOrigin.Begin);
-                ms.Write(finalAppSetup, 0, finalAppSetup.Length);
-
-                ms.Seek(0x1347, SeekOrigin.Begin);
-                ms.Write(graphicsPrehandle, 0, graphicsPrehandle.Length);
-
-                ms.Seek(0x134F, SeekOrigin.Begin);
-                ms.Write(graphicsHeaderSettings, 0, graphicsHeaderSettings.Length);
-
-                ms.Seek(0x1353, SeekOrigin.Begin);
-                ms.Write(graphicsSetting_1, 0, graphicsSetting_1.Length);
-
-                ms.Seek(0x1357, SeekOrigin.Begin);
-                ms.Write(windowedModeBytes, 0, windowedModeBytes.Length);
-
-                ms.Seek(0x135F, SeekOrigin.Begin);
-                ms.Write(graphicsSetup_Name, 0, graphicsSetup_Name.Length);
+                // Graphics / playlist meta area
+                WriteAt(OFFSET_PLAYLIST_META + 0x0000, graphicsPrehandle);
+                WriteAt(OFFSET_PLAYLIST_META + 0x0008, graphicsHeaderSettings);
+                WriteAt(OFFSET_PLAYLIST_META + 0x000C, graphicsSetting_1);
+                WriteAt(OFFSET_PLAYLIST_META + 0x0010, windowedModeBytes);
+                WriteAt(0x135F, graphicsSetup_Name);
 
                 ms.Seek(0x137F, SeekOrigin.Begin);
                 ms.Write(graphicsSetup_GUID, 0, graphicsSetup_GUID.Length);
                 ms.Write(graphicsSetupMisc_Settings, 0, graphicsSetupMisc_Settings.Length);
 
-                ms.Seek(0x152F, SeekOrigin.Begin);
-                ms.Write(serverPasswordBytes, 0, serverPasswordBytes.Length);
+                // Strings / passwords / server identity
+                WriteAt(0x151F, gamePlayOptionsBytes);
+                WriteAt(0x152F, serverPasswordBytes);
+                WriteAt(0x1562, redTeamPasswordBytes);
+                WriteAt(0x1573, blueTeamPasswordBytes);
+                WriteAt(0x15A6, serverNameBytes);
+                WriteAt(0x15C6, countryCodeBytes);
+                WriteAt(0x15EA, bindAddressBytes);
 
-                ms.Seek(0x1562, SeekOrigin.Begin);
-                ms.Write(redTeamPasswordBytes, 0, redTeamPasswordBytes.Length);
+                // Server rules block
+                WriteAt(RULE_UNKNOWN_160B, BitConverter.GetBytes(1));
+                WriteAt(RULE_MAX_SLOTS, BitConverter.GetBytes(80));             // Must be set 80 for the memory allocation to work correctly
+				WriteAt(RULE_DEDICATED, dedicatedBytes);
+                WriteAt(RULE_MAX_TEAM_LIVES, BitConverter.GetBytes(100));
+                WriteAt(RULE_FLAG_SCORE, flagBallScoreBytes);
+                WriteAt(RULE_START_DELAY, startDelayBytes);
+                WriteAt(RULE_UNKNOWN_162F, BitConverter.GetBytes(1));
+                WriteAt(RULE_FLAG_RETURN_TIME, flagreturntime);
+                WriteAt(RULE_UNKNOWN_1637, BitConverter.GetBytes(1));
+                WriteAt(RULE_UNKNOWN_163B, BitConverter.GetBytes(2));
+                WriteAt(RULE_TIME_LIMIT, timeLimitBytes);
+                WriteAt(RULE_ZONE_TIMER, zoneTimerBytes);
+                WriteAt(RULE_RESPAWN_TIME, respawnTimeBytes);
+                WriteAt(RULE_DESTROY_BUILDINGS, allowDestroyingBuildings);     // A3449C = destroybuild
+                WriteAt(RULE_UNKNOWN_1693, BitConverter.GetBytes(1));
+                WriteAt(RULE_UNKNOWN_1697, BitConverter.GetBytes(1));
+                WriteAt(RULE_UNKNOWN_169B, BitConverter.GetBytes(15));
+                WriteAt(RULE_UNKNOWN_16B7, BitConverter.GetBytes(2));
+                WriteAt(RULE_UNKNOWN_16BB, BitConverter.GetBytes(1));
+                WriteAt(RULE_UNKNOWN_16C7, BitConverter.GetBytes(1));
+                WriteAt(RULE_UNKNOWN_16CB, BitConverter.GetBytes(2));
+                WriteAt(RULE_GAME_PORT, gamePortBytes);
+                WriteAt(RULE_ALLOW_CUSTOM_SKINS, allowCustomSkinsBytes);
+                WriteAt(RULE_REQUIRE_NOVA_LOGIN, requireNovaLoginBytes);
+                WriteAt(RULE_LAN_MODE, BitConverter.GetBytes(4));               // A34560 = lanmode (1, 2, 4)
+                WriteAt(RULE_MIN_PING_VALUE, minPingValueBytes);
+                WriteAt(RULE_ENABLE_MIN_PING, enableMinPingBytes);
+                WriteAt(RULE_MAX_PING_VALUE, maxPingValueBytes);
+                WriteAt(RULE_ENABLE_MAX_PING, enableMaxPingBytes);
+                WriteAt(RULE_UNKNOWN_1703, BitConverter.GetBytes(1));
+                WriteAt(RULE_UNKNOWN_1707, BitConverter.GetBytes(1));
+                WriteAt(RULE_MOTD, motdBytes);
 
-                ms.Seek(0x1573, SeekOrigin.Begin);
-                ms.Write(blueTeamPasswordBytes, 0, blueTeamPasswordBytes.Length);
+                // Keep original working writes that may overlap intentionally
+                WriteAt(0x16F4, BitConverter.GetBytes(1));
+                WriteAt(0x16FC, BitConverter.GetBytes(1));
 
-                ms.Seek(0x151F, SeekOrigin.Begin);
-                ms.Write(gamePlayOptionsBytes, 0, gamePlayOptionsBytes.Length);
+                WriteAt(0x1DA4, gameScoreBytes);
+                WriteAt(0x178B, defaultWeaponSetup);
 
-                ms.Seek(0x15A6, SeekOrigin.Begin);
-                ms.Write(ServerNameBytes, 0, ServerNameBytes.Length);
+                // Keep original working current-map prehandle
+                WriteAt(OFFSET_CURRENT_MAP, mapListPrehandle);
 
-                ms.Seek(0x15C6, SeekOrigin.Begin);
-                ms.Write(countryCodeBytes, 0, countryCodeBytes.Length);
-
-                ms.Seek(0x1613, SeekOrigin.Begin);
-                ms.Write(dedicatedBytes, 0, dedicatedBytes.Length);
-
-                ms.Seek(0x15EA, SeekOrigin.Begin);
-                ms.Write(BindAddress, 0, BindAddress.Length);
-
-                ms.Seek(0x160B, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x161F, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(100), 0, BitConverter.GetBytes(100).Length);
-
-                ms.Seek(0x162F, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x1633, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(210), 0, BitConverter.GetBytes(210).Length);
-
-                ms.Seek(0x1637, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x163B, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(2), 0, BitConverter.GetBytes(2).Length);
-
-                ms.Seek(0x164B, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x1693, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x1697, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x169B, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(15), 0, BitConverter.GetBytes(15).Length);
-
-                ms.Seek(0x16B7, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(2), 0, BitConverter.GetBytes(2).Length);
-
-                ms.Seek(0x16BB, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x16C7, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x16CB, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(2), 0, BitConverter.GetBytes(2).Length);
-
-                ms.Seek(0x16EF, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(4), 0, BitConverter.GetBytes(4).Length);
-
-                ms.Seek(0x16F4, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x16FC, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x1703, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x1707, SeekOrigin.Begin);
-                ms.Write(BitConverter.GetBytes(1), 0, BitConverter.GetBytes(1).Length);
-
-                ms.Seek(0x1627, SeekOrigin.Begin);
-                ms.Write(startDelayBytes, 0, startDelayBytes.Length);
-
-                ms.Seek(0x16F3, SeekOrigin.Begin);
-                ms.Write(minPingValueBytes, 0, minPingValueBytes.Length);
-
-                ms.Seek(0x16F7, SeekOrigin.Begin);
-                ms.Write(enableMinPingBytes, 0, enableMinPingBytes.Length);
-
-                ms.Seek(0x16FB, SeekOrigin.Begin);
-                ms.Write(maxPingValueBytes, 0, maxPingValueBytes.Length);
-
-                ms.Seek(0x16FF, SeekOrigin.Begin);
-                ms.Write(enableMaxPingBytes, 0, enableMaxPingBytes.Length);
-
-                ms.Seek(0x160F, SeekOrigin.Begin);
-                ms.Write(maxSlotsBytes, 0, maxSlotsBytes.Length);
-
-                ms.Seek(0x16CF, SeekOrigin.Begin);
-                ms.Write(gamePortBytes, 0, gamePortBytes.Length);
-
-                ms.Seek(0x16DB, SeekOrigin.Begin);
-                ms.Write(requireNovaLoginBytes, 0, requireNovaLoginBytes.Length);
-
-                ms.Seek(0x16D7, SeekOrigin.Begin);
-                ms.Write(allowCustomSkinsBytes, 0, allowCustomSkinsBytes.Length);
-
-                ms.Seek(0x170B, SeekOrigin.Begin);
-                ms.Write(MOTDBytes, 0, MOTDBytes.Length);
-
-                ms.Seek(0x1623, SeekOrigin.Begin);
-                ms.Write(flagBallScoreBytes, 0, flagBallScoreBytes.Length);
-
-                ms.Seek(0x1643, SeekOrigin.Begin);
-                ms.Write(zoneTimerBytes, 0, zoneTimerBytes.Length);
-
-                ms.Seek(0x1647, SeekOrigin.Begin);
-                ms.Write(respawnTimeBytes, 0, respawnTimeBytes.Length);
-
-                ms.Seek(0x163F, SeekOrigin.Begin);
-                ms.Write(timeLimitBytes, 0, timeLimitBytes.Length);
-
-                ms.Seek(0x1DA4, SeekOrigin.Begin);
-                ms.Write(GameScoreBytes, 0, GameScoreBytes.Length);
-
-                ms.Seek(0x178B, SeekOrigin.Begin);
-                ms.Write(defaultWeaponSetup, 0, defaultWeaponSetup.Length);
-
-                ms.Seek(0x187F, SeekOrigin.Begin);
-                ms.Write(mapListPrehandle, 0, mapListPrehandle.Length);
-
-                byte[] endOfMap = Functions.ToByteArray("20 B5 B6 01 00 00 00 00 53 01 00 00 00 13 00 00 00 13 00 00 00 04 00 00 00".Replace(" ", ""));
-
-                foreach (var map in mapInstance.Playlists[mapInstance.ActivePlaylist])
+                // -----------------------------------------------------------------
+                // Map table
+                // -----------------------------------------------------------------
+                void WriteMapEntryBytes(string mapFile, string mapName, bool isCustom)
                 {
+                    byte[] mapFileBytes = Encoding.GetEncoding("Windows-1252").GetBytes(mapFile);
+                    ms.Write(mapFileBytes, 0, mapFileBytes.Length);
 
-                    byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes(map.MapFile);
-                    ms.Write(mapFile, 0, mapFile.Length);
+                    ms.Seek(ms.Position + (0x20F - mapFileBytes.Length), SeekOrigin.Begin);
 
-                    ms.Seek(ms.Position + (0x20F - mapFile.Length), SeekOrigin.Begin);
-                    byte[] mapName = Encoding.GetEncoding("Windows-1252").GetBytes(map.MapName);
-                    ms.Write(mapName, 0, mapName.Length);
+                    byte[] mapNameBytes = Encoding.GetEncoding("Windows-1252").GetBytes(mapName);
+                    ms.Write(mapNameBytes, 0, mapNameBytes.Length);
 
-                    ms.Seek(ms.Position + (0x305 - mapName.Length), SeekOrigin.Begin);
+                    ms.Seek(ms.Position + (0x305 - mapNameBytes.Length), SeekOrigin.Begin);
                     ms.Write(endOfMap, 0, endOfMap.Length);
 
                     ms.Seek(ms.Position + 0x1E3, SeekOrigin.Begin);
-                    byte[] customMap = BitConverter.GetBytes(Convert.ToInt32(map.ModType==9?1:0));
+                    byte[] customMap = BitConverter.GetBytes(Convert.ToInt32(isCustom));
                     ms.Write(customMap, 0, customMap.Length);
 
-                    // prepare for next entry
                     ms.Seek(ms.Position + 0x1C, SeekOrigin.Begin);
                 }
 
-                for (int i = mapInstance.Playlists[mapInstance.ActivePlaylist].Count; i < 128; i++)
+                ms.Seek(OFFSET_MAP_TABLE, SeekOrigin.Begin);
+
+                foreach (var map in activePlaylist)
                 {
-                    byte[] mapFile = Encoding.GetEncoding("Windows-1252").GetBytes("NA.bms");
-                    ms.Write(mapFile, 0, mapFile.Length);
-
-                    ms.Seek(ms.Position + (0x20F - mapFile.Length), SeekOrigin.Begin);
-                    byte[] mapName = Encoding.GetEncoding("Windows-1252").GetBytes("NA");
-                    ms.Write(mapName, 0, mapName.Length);
-
-                    ms.Seek(ms.Position + (0x305 - mapName.Length), SeekOrigin.Begin);
-                    ms.Write(endOfMap, 0, endOfMap.Length);
-
-                    ms.Seek(ms.Position + 0x1E3, SeekOrigin.Begin);
-                    byte[] customMap = BitConverter.GetBytes(Convert.ToInt32(false));
-                    ms.Write(customMap, 0, customMap.Length);
-
-                    // prepare for next entry
-                    ms.Seek(ms.Position + 0x1C, SeekOrigin.Begin);
+                    WriteMapEntryBytes(
+                        map.MapFile ?? "NA.bms",
+                        map.MapName ?? "NA",
+                        map.ModType == 9);
                 }
 
-                BinaryWriter writer = new BinaryWriter(File.Open(autoResPath, FileMode.OpenOrCreate, FileAccess.ReadWrite));
-                writer.Seek(0, SeekOrigin.Begin);
-                writer.Write(ms.ToArray());
-                writer.Close();
+                for (int i = activePlaylist.Count; i < MAX_MAPS; i++)
+                {
+                    WriteMapEntryBytes("NA.bms", "NA", false);
+                }
 
-                Thread.Sleep(1000); // sleep 100ms to allow flushing the file to complete
+                using (BinaryWriter writer = new BinaryWriter(File.Open(autoResPath, FileMode.OpenOrCreate, FileAccess.ReadWrite)))
+                {
+                    writer.Seek(0, SeekOrigin.Begin);
+                    writer.Write(ms.ToArray());
+                }
 
+                Thread.Sleep(1000);
                 return true;
-
             }
             catch (Exception e)
             {
-                AppDebug.Log("StartServer", "Error creating autores.bin file: " + e.ToString());
+                AppDebug.Log("StartServer", "Error creating autores.bin file: " + e);
                 return false;
             }
+        }
 
+        public static bool readAutoRes()
+        {
+            try
+            {
+                string autoResPath = Path.Combine(theInstance.profileServerPath!, "autores.bin");
+                string dumpPath = Path.Combine(theInstance.profileServerPath!, "autores_dump.txt");
+
+                if (!File.Exists(autoResPath))
+                {
+                    AppDebug.Log("ReadAutoRes", "autores.bin file does not exist.");
+                    return false;
+                }
+
+                byte[] fileData = File.ReadAllBytes(autoResPath);
+
+                using (StreamWriter writer = new StreamWriter(dumpPath, false, Encoding.UTF8))
+                {
+                    writer.WriteLine("==================== AUTORES.BIN DUMP ====================");
+                    writer.WriteLine($"File Size: {fileData.Length} bytes");
+                    writer.WriteLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                    writer.WriteLine("==========================================================");
+                    writer.WriteLine();
+
+                    // Header and map count (matches createAutoRes order)
+                    writer.WriteLine($"0x0000: {Encoding.Default.GetString(fileData, 0x0000, 15)}");
+                    writer.WriteLine($"0x000F: {BitConverter.ToInt32(fileData, 0x000F)}");
+
+                    // Base values / application area
+                    writer.WriteLine($"0x004D: {ReadNullTerminatedString(fileData, 0x004D)}");
+                    writer.WriteLine($"0x00AF: {BitConverter.ToInt32(fileData, 0x00AF)}");
+                    writer.WriteLine($"0x068F: {BitConverter.ToInt32(fileData, 0x068F)}");
+                    writer.WriteLine($"0x0277: {BitConverter.ToInt32(fileData, 0x0277)}");
+                    writer.WriteLine($"0x01C7: {FormatByteArray(fileData, 0x01C7, 188)}");
+                    writer.WriteLine($"0x0283: {BitConverter.ToInt32(fileData, 0x0283)}");
+                    writer.WriteLine($"0x028F: {BitConverter.ToInt32(fileData, 0x028F)}");
+                    writer.WriteLine($"0x0293: {FormatByteArray(fileData, 0x0293, 13)}");
+
+                    // Graphics / playlist meta area
+                    writer.WriteLine($"0x1347: {FormatByteArray(fileData, 0x1347, 8)}");
+                    writer.WriteLine($"0x134F: {BitConverter.ToInt32(fileData, 0x134F)}");
+                    writer.WriteLine($"0x1353: {BitConverter.ToInt32(fileData, 0x1353)}");
+                    writer.WriteLine($"0x1357: {BitConverter.ToInt32(fileData, 0x1357)}");
+                    writer.WriteLine($"0x135F: {ReadNullTerminatedString(fileData, 0x135F)}");
+                    writer.WriteLine($"0x137F: {ReadNullTerminatedString(fileData, 0x137F)}");
+
+                    // Strings / passwords / server identity
+                    writer.WriteLine($"0x151F: {BitConverter.ToInt32(fileData, 0x151F)}");
+                    writer.WriteLine($"0x152F: {ReadNullTerminatedString(fileData, 0x152F)}");
+                    writer.WriteLine($"0x1562: {ReadNullTerminatedString(fileData, 0x1562)}");
+                    writer.WriteLine($"0x1573: {ReadNullTerminatedString(fileData, 0x1573)}");
+                    writer.WriteLine($"0x15A6: {ReadNullTerminatedString(fileData, 0x15A6)}");
+                    writer.WriteLine($"0x15C6: {ReadNullTerminatedString(fileData, 0x15C6)}");
+                    writer.WriteLine($"0x15EA: {ReadNullTerminatedString(fileData, 0x15EA)}");
+
+                    // Server rules block (in exact write order from createAutoRes)
+                    writer.WriteLine($"0x160B: {BitConverter.ToInt32(fileData, 0x160B)}");
+                    writer.WriteLine($"0x160F: {BitConverter.ToInt32(fileData, 0x160F)}");
+                    writer.WriteLine($"0x1613: {BitConverter.ToInt32(fileData, 0x1613)}");
+                    writer.WriteLine($"0x161F: {BitConverter.ToInt32(fileData, 0x161F)}");
+                    writer.WriteLine($"0x1623: {BitConverter.ToInt32(fileData, 0x1623)}");
+                    writer.WriteLine($"0x1627: {BitConverter.ToInt32(fileData, 0x1627)}");
+                    writer.WriteLine($"0x162F: {BitConverter.ToInt32(fileData, 0x162F)}");
+                    writer.WriteLine($"0x1633: {BitConverter.ToInt32(fileData, 0x1633)}");
+                    writer.WriteLine($"0x1637: {BitConverter.ToInt32(fileData, 0x1637)}");
+                    writer.WriteLine($"0x163B: {BitConverter.ToInt32(fileData, 0x163B)}");
+                    writer.WriteLine($"0x163F: {BitConverter.ToInt32(fileData, 0x163F)}");
+                    writer.WriteLine($"0x1643: {BitConverter.ToInt32(fileData, 0x1643)}");
+                    writer.WriteLine($"0x1647: {BitConverter.ToInt32(fileData, 0x1647)}");
+                    writer.WriteLine($"0x164B: {BitConverter.ToInt32(fileData, 0x164B)}");
+                    writer.WriteLine($"0x1693: {BitConverter.ToInt32(fileData, 0x1693)}");
+                    writer.WriteLine($"0x1697: {BitConverter.ToInt32(fileData, 0x1697)}");
+                    writer.WriteLine($"0x169B: {BitConverter.ToInt32(fileData, 0x169B)}");
+                    writer.WriteLine($"0x16B7: {BitConverter.ToInt32(fileData, 0x16B7)}");
+                    writer.WriteLine($"0x16BB: {BitConverter.ToInt32(fileData, 0x16BB)}");
+                    writer.WriteLine($"0x16C7: {BitConverter.ToInt32(fileData, 0x16C7)}");
+                    writer.WriteLine($"0x16CB: {BitConverter.ToInt32(fileData, 0x16CB)}");
+                    writer.WriteLine($"0x16CF: {BitConverter.ToInt32(fileData, 0x16CF)}");
+                    writer.WriteLine($"0x16D7: {BitConverter.ToInt32(fileData, 0x16D7)}");
+                    writer.WriteLine($"0x16DB: {BitConverter.ToInt32(fileData, 0x16DB)}");
+                    writer.WriteLine($"0x16EF: {BitConverter.ToInt32(fileData, 0x16EF)}");
+                    writer.WriteLine($"0x16F3: {BitConverter.ToInt32(fileData, 0x16F3)}");
+                    writer.WriteLine($"0x16F7: {BitConverter.ToInt32(fileData, 0x16F7)}");
+                    writer.WriteLine($"0x16FB: {BitConverter.ToInt32(fileData, 0x16FB)}");
+                    writer.WriteLine($"0x16FF: {BitConverter.ToInt32(fileData, 0x16FF)}");
+                    writer.WriteLine($"0x1703: {BitConverter.ToInt32(fileData, 0x1703)}");
+                    writer.WriteLine($"0x1707: {BitConverter.ToInt32(fileData, 0x1707)}");
+                    writer.WriteLine($"0x170B: {ReadNullTerminatedString(fileData, 0x170B)}");
+
+                    // Additional writes from createAutoRes
+                    writer.WriteLine($"0x16F4: {BitConverter.ToInt32(fileData, 0x16F4)}");
+                    writer.WriteLine($"0x16FC: {BitConverter.ToInt32(fileData, 0x16FC)}");
+                    writer.WriteLine($"0x1DA4: {BitConverter.ToInt32(fileData, 0x1DA4)}");
+                    writer.WriteLine($"0x178B: {FormatByteArray(fileData, 0x178B, 188)}");
+                    writer.WriteLine($"0x187F: {BitConverter.ToInt32(fileData, 0x187F)}");
+
+                    writer.WriteLine();
+                    writer.WriteLine("==================== MAP TABLE (0x1883) ====================");
+                    
+                    // Map table entries (128 maps, each entry is 0x730 bytes)
+                    int mapTableOffset = 0x1883;
+                    int mapEntrySize = 0x730;
+                    for (int i = 0; i < 128; i++)
+                    {
+                        int offset = mapTableOffset + (i * mapEntrySize);
+                        if (offset + 0x20F < fileData.Length)
+                        {
+                            string mapFile = ReadNullTerminatedString(fileData, offset);
+                            string mapName = ReadNullTerminatedString(fileData, offset + 0x20F);
+                            int customFlag = BitConverter.ToInt32(fileData, offset + 0x514);
+                            
+                            if (mapFile != "NA.bms" || i == 0)
+                            {
+                                writer.WriteLine($"Map {i:D3} @ 0x{offset:X}: File=\"{mapFile}\", Name=\"{mapName}\", Custom={customFlag}");
+                            }
+                        }
+                    }
+
+                    writer.WriteLine();
+                    writer.WriteLine("==========================================================");
+                }
+
+                AppDebug.Log("ReadAutoRes", $"Dump written to: {dumpPath}");
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppDebug.Log("ReadAutoRes", "Error reading autores.bin file: " + e);
+                return false;
+            }
+        }
+
+        private static string FormatByteArray(byte[] data, int offset, int length)
+        {
+            if (offset + length > data.Length)
+                length = data.Length - offset;
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < length; i++)
+            {
+                if (i > 0) sb.Append(" ");
+                sb.Append(data[offset + i].ToString("X2"));
+            }
+            return sb.ToString();
+        }
+
+        private static string ReadNullTerminatedString(byte[] data, int offset)
+        {
+            int length = 0;
+            while (offset + length < data.Length && data[offset + length] != 0)
+            {
+                length++;
+            }
+            return Encoding.Default.GetString(data, offset, length);
         }
 
         // Function: CheckForExistingProcess
@@ -454,7 +573,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                 
                 if (CheckForExistingProcess()) { return true; }
 
-                Debug.WriteLine("No existing game process found, starting a new instance...");
+                bool wasPatched = DFBHDPatcher.Patch(FullFileName);
+                if (!wasPatched)
+                    AppDebug.Log("startGame", "Already patched, starting as-is.");
+
+                AppDebug.Log("startGame", "No existing game process found, starting a new instance...");
 
                 // Create the AutoRes File
                 createAutoRes();
@@ -530,6 +653,9 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: stopGame
         public static bool stopGame()
         {
+            string file_name = "dfbhd.exe";
+            string FullFileName = Path.Combine(theInstance.profileServerPath!, file_name);
+
             try
             {
                 if (theInstance.instanceAttachedPID.HasValue)
@@ -545,6 +671,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                             process.WaitForExit(5000); // Wait up to 5 seconds for exit
                         }
 
+                        DFBHDPatcher.Unpatch(FullFileName);
+
                     }
                     catch (ArgumentException)
                     {
@@ -552,7 +680,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     }
                     catch (Exception ex)
                     {
-                        AppDebug.Log("StartServer", "Error killing game process: " + ex.ToString());
+                        AppDebug.Log("StopServer", "Error: " + ex.ToString());
                         return false;
                     }
                     finally

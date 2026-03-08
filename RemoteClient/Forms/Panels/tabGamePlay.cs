@@ -676,7 +676,6 @@ public partial class tabGamePlay : UserControl
             num_maxPlayers.Value = theInstance.gameMaxSlots;
             num_pspTakeoverTimer.Value = theInstance.gamePSPTOTimer;
             num_flagReturnTime.Value = theInstance.gameFlagReturnTime;
-            num_maxTeamLives.Value = theInstance.gameMaxTeamLives;
             num_FullWeaponThreshold.Value = theInstance.gameFullWeaponThreshold;
 
             // Server Options (Buttons)

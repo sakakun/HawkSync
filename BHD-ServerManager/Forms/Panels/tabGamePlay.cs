@@ -147,7 +147,6 @@ namespace BHD_ServerManager.Forms.Panels
 			num_maxPlayers.Value = settings.MaxSlots;
 			num_pspTakeoverTimer.Value = settings.PSPTakeoverTimer;
 			num_flagReturnTime.Value = settings.FlagReturnTime;
-			num_maxTeamLives.Value = settings.MaxTeamLives;
 			num_FullWeaponThreshold.Value = settings.FullWeaponThreshold;
 			// Server Options
 			SetOptionButtons(settings.Options);
@@ -552,7 +551,6 @@ namespace BHD_ServerManager.Forms.Panels
 				MaxSlots: (int)num_maxPlayers.Value,
 				PSPTakeoverTimer: (int)num_pspTakeoverTimer.Value,
 				FlagReturnTime: (int)num_flagReturnTime.Value,
-				MaxTeamLives: (int)num_maxTeamLives.Value,
 				FullWeaponThreshold: (int)num_FullWeaponThreshold.Value,
 				Options: options,
 				FriendlyFire: friendlyFire,

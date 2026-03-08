@@ -103,7 +103,7 @@ public class GamePlayController : ControllerBase
             request.ScoreKOTH, request.ScoreDM, request.ScoreFB,
             request.TimeLimit, request.LoopMaps, request.StartDelay,
             request.RespawnTime, request.ScoreBoardDelay, request.MaxSlots,
-            request.PSPTakeoverTimer, request.FlagReturnTime, request.MaxTeamLives,
+            request.PSPTakeoverTimer, request.FlagReturnTime,
             request.FullWeaponThreshold,
             options, friendlyFire, roles, weapons, restrictedWeapons
         );
@@ -410,7 +410,7 @@ public class GamePlayController : ControllerBase
                 instance.gameScoreZoneTime, instance.gameScoreKills, instance.gameScoreFlags,
                 instance.gameTimeLimit, instance.gameLoopMaps, instance.gameStartDelay,
                 instance.gameRespawnTime, instance.gameScoreBoardDelay, instance.gameMaxSlots,
-                instance.gamePSPTOTimer, instance.gameFlagReturnTime, instance.gameMaxTeamLives,
+                instance.gamePSPTOTimer, instance.gameFlagReturnTime,
                 instance.gameFullWeaponThreshold,
                 options, friendlyFire, roles, weapons, restrictedWeapons
             );

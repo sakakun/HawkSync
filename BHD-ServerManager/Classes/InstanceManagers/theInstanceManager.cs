@@ -152,7 +152,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         int MaxSlots,
         int PSPTakeoverTimer,
         int FlagReturnTime,
-        int MaxTeamLives,
         int FullWeaponThreshold,
         
         // Grouped Settings
@@ -548,7 +547,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     MaxSlots: ServerSettings.Get("gameMaxSlots", 50),
                     PSPTakeoverTimer: ServerSettings.Get("gamePSPTOTimer", 20),
                     FlagReturnTime: ServerSettings.Get("gameFlagReturnTime", 210),
-                    MaxTeamLives: ServerSettings.Get("gameMaxTeamLives", 100),
                     FullWeaponThreshold: ServerSettings.Get("gameFullWeaponThreshold", 10),
                     Options: options,
                     FriendlyFire: friendlyFire,
@@ -602,7 +600,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("gameMaxSlots", settings.MaxSlots);
                 ServerSettings.Set("gamePSPTOTimer", settings.PSPTakeoverTimer);
                 ServerSettings.Set("gameFlagReturnTime", settings.FlagReturnTime);
-                ServerSettings.Set("gameMaxTeamLives", settings.MaxTeamLives);
                 ServerSettings.Set("gameFullWeaponThreshold", settings.FullWeaponThreshold);
 
                 // Save server options
@@ -724,8 +721,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 errors.Add("Start delay must be between 0 and 999 seconds.");
             if (settings.RespawnTime < 0 || settings.RespawnTime > 999)
                 errors.Add("Respawn time must be between 0 and 999 seconds.");
-            if (settings.MaxSlots < 1 || settings.MaxSlots > 50)
-                errors.Add("Max slots must be between 1 and 50.");
+            if (settings.MaxSlots < 1 || settings.MaxSlots > 100)
+                errors.Add("Max slots must be between 1 and 80.");
 
             // Validate friendly fire
             if (settings.FriendlyFire.MaxKills < 0 || settings.FriendlyFire.MaxKills > 999)
@@ -799,7 +796,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.gameScoreZoneTime, theInstance.gameScoreKills, theInstance.gameScoreFlags,
                     theInstance.gameTimeLimit, theInstance.gameLoopMaps, theInstance.gameStartDelay,
                     theInstance.gameRespawnTime, theInstance.gameScoreBoardDelay, theInstance.gameMaxSlots,
-                    theInstance.gamePSPTOTimer, theInstance.gameFlagReturnTime, theInstance.gameMaxTeamLives,
+                    theInstance.gamePSPTOTimer, theInstance.gameFlagReturnTime,
                     theInstance.gameFullWeaponThreshold,
                     options, friendlyFire, roles, weapons, RestrictedWeapons
                 );
@@ -1080,7 +1077,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             theInstance.gameMaxSlots = settings.MaxSlots;
             theInstance.gamePSPTOTimer = settings.PSPTakeoverTimer;
             theInstance.gameFlagReturnTime = settings.FlagReturnTime;
-            theInstance.gameMaxTeamLives = settings.MaxTeamLives;
             theInstance.gameFullWeaponThreshold = settings.FullWeaponThreshold;
 
             // Server options

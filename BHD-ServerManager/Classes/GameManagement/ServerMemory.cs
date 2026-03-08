@@ -333,27 +333,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
         }
-        // Function: UpdateMaxTeamLives
-        public static void UpdateMaxTeamLives()
-        {
-
-
-            byte[] Ptr1 = new byte[4];
-            int Ptr1Read = 0;
-            ReadProcessMemory((int)processHandle, baseAddr + 0x000D8554, Ptr1, Ptr1.Length, ref Ptr1Read);
-
-            int Ptr1Addr = BitConverter.ToInt32(Ptr1, 0);
-            byte[] MaxTeamLivesBytes = new byte[4];
-            int MaxTeamLivesRead = 0;
-            ReadProcessMemory((int)processHandle, Ptr1Addr, MaxTeamLivesBytes, MaxTeamLivesBytes.Length, ref MaxTeamLivesRead);
-            int MaxTeamLives = BitConverter.ToInt32(MaxTeamLivesBytes, 0);
-
-            int MaxTeamLivesWritten = 0;
-            byte[] MaxTeamLivesWrite = BitConverter.GetBytes(thisInstance.gameMaxTeamLives);
-            WriteProcessMemory((int)processHandle, Ptr1Addr, MaxTeamLivesWrite, MaxTeamLivesWrite.Length, ref MaxTeamLivesWritten);
-
-
-        }
         // Function: UpdateOneShotKills
         public static void UpdateOneShotKills()
         {
@@ -1072,6 +1051,33 @@ namespace BHD_ServerManager.Classes.GameManagement
             thisInstance.gameInfoStartDelayTimer = currentStartDelayCount;
 
         }
+
+        // Function: Read NumTeam State
+        public static void ReadNumTeams()
+        {
+            byte[] NumTeamsBytes = new byte[4];
+            int NumTeamsRead = 0;
+
+            int NumTeamsPtr = baseAddr + 0xA344C4;
+
+            ReadProcessMemory((int)processHandle, NumTeamsPtr, NumTeamsBytes, NumTeamsBytes.Length, ref NumTeamsRead);
+
+            int NumTeamsCount = BitConverter.ToInt32(NumTeamsBytes, 0);
+
+            thisInstance.gameNumTeams = NumTeamsCount;
+
+        }
+
+        // Function: Update NumTeam State
+        public static void UpdateNumTeams(int value)
+        {
+            var numTeams = baseAddr + 0xA344C4;
+            byte[] endTimerBytes = BitConverter.GetBytes(value);
+            int bytesWritten = 0;
+            WriteProcessMemory((int)processHandle, numTeams, endTimerBytes, endTimerBytes.Length, ref bytesWritten);
+        }
+
+
         // Function: Update Start Delay Timer
         public static void UpdateStartDelayTimer(int value)
         {

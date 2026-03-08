@@ -111,13 +111,10 @@ partial class tabGamePlay
 		btn_WarnOnFFKill = new Button();
 		btn_ShowFriendlyTags = new Button();
 		btn_FriendlyFireEnabled = new Button();
-		tableLayoutPanel12 = new TableLayoutPanel();
 		num_maxFFKills = new NumericUpDown();
 		label_maxFFkills = new Label();
 		tableLayoutPanel11 = new TableLayoutPanel();
 		label3 = new Label();
-		num_maxTeamLives = new NumericUpDown();
-		label2 = new Label();
 		num_flagReturnTime = new NumericUpDown();
 		label1 = new Label();
 		num_pspTakeoverTimer = new NumericUpDown();
@@ -156,10 +153,8 @@ partial class tabGamePlay
 		tableLayoutPanel8.SuspendLayout();
 		tableLayoutPanel9.SuspendLayout();
 		tableLayoutPanel10.SuspendLayout();
-		tableLayoutPanel12.SuspendLayout();
 		((System.ComponentModel.ISupportInitialize)num_maxFFKills).BeginInit();
 		tableLayoutPanel11.SuspendLayout();
-		((System.ComponentModel.ISupportInitialize)num_maxTeamLives).BeginInit();
 		((System.ComponentModel.ISupportInitialize)num_flagReturnTime).BeginInit();
 		((System.ComponentModel.ISupportInitialize)num_pspTakeoverTimer).BeginInit();
 		((System.ComponentModel.ISupportInitialize)num_maxPlayers).BeginInit();
@@ -1320,10 +1315,9 @@ partial class tabGamePlay
 		tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 		tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 		tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-		tableLayoutPanel10.Controls.Add(btn_WarnOnFFKill, 2, 0);
-		tableLayoutPanel10.Controls.Add(btn_ShowFriendlyTags, 1, 0);
-		tableLayoutPanel10.Controls.Add(btn_FriendlyFireEnabled, 0, 0);
-		tableLayoutPanel10.Controls.Add(tableLayoutPanel12, 3, 0);
+		tableLayoutPanel10.Controls.Add(btn_WarnOnFFKill, 3, 0);
+		tableLayoutPanel10.Controls.Add(btn_ShowFriendlyTags, 2, 0);
+		tableLayoutPanel10.Controls.Add(btn_FriendlyFireEnabled, 1, 0);
 		tableLayoutPanel10.Dock = DockStyle.Fill;
 		tableLayoutPanel10.Location = new Point(0, 231);
 		tableLayoutPanel10.Margin = new Padding(0);
@@ -1339,9 +1333,9 @@ partial class tabGamePlay
 		btn_WarnOnFFKill.Dock = DockStyle.Fill;
 		btn_WarnOnFFKill.FlatStyle = FlatStyle.Flat;
 		btn_WarnOnFFKill.Font = new Font("Segoe UI", 7F);
-		btn_WarnOnFFKill.Location = new Point(167, 3);
+		btn_WarnOnFFKill.Location = new Point(249, 3);
 		btn_WarnOnFFKill.Name = "btn_WarnOnFFKill";
-		btn_WarnOnFFKill.Size = new Size(76, 43);
+		btn_WarnOnFFKill.Size = new Size(79, 43);
 		btn_WarnOnFFKill.TabIndex = 11;
 		btn_WarnOnFFKill.Text = "Friendly Fire Warning";
 		toolTip_gamePlay.SetToolTip(btn_WarnOnFFKill, "Friendly Fire Warning");
@@ -1353,7 +1347,7 @@ partial class tabGamePlay
 		btn_ShowFriendlyTags.Dock = DockStyle.Fill;
 		btn_ShowFriendlyTags.FlatStyle = FlatStyle.Flat;
 		btn_ShowFriendlyTags.Font = new Font("Segoe UI", 7F);
-		btn_ShowFriendlyTags.Location = new Point(85, 3);
+		btn_ShowFriendlyTags.Location = new Point(167, 3);
 		btn_ShowFriendlyTags.Name = "btn_ShowFriendlyTags";
 		btn_ShowFriendlyTags.Size = new Size(76, 43);
 		btn_ShowFriendlyTags.TabIndex = 10;
@@ -1367,7 +1361,7 @@ partial class tabGamePlay
 		btn_FriendlyFireEnabled.Dock = DockStyle.Fill;
 		btn_FriendlyFireEnabled.FlatStyle = FlatStyle.Flat;
 		btn_FriendlyFireEnabled.Font = new Font("Segoe UI", 7F);
-		btn_FriendlyFireEnabled.Location = new Point(3, 3);
+		btn_FriendlyFireEnabled.Location = new Point(85, 3);
 		btn_FriendlyFireEnabled.Name = "btn_FriendlyFireEnabled";
 		btn_FriendlyFireEnabled.Size = new Size(76, 43);
 		btn_FriendlyFireEnabled.TabIndex = 9;
@@ -1375,29 +1369,12 @@ partial class tabGamePlay
 		toolTip_gamePlay.SetToolTip(btn_FriendlyFireEnabled, "Enable Friendly Fire");
 		btn_FriendlyFireEnabled.UseVisualStyleBackColor = false;
 		// 
-		// tableLayoutPanel12
-		// 
-		tableLayoutPanel12.ColumnCount = 1;
-		tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle());
-		tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-		tableLayoutPanel12.Controls.Add(num_maxFFKills, 0, 1);
-		tableLayoutPanel12.Controls.Add(label_maxFFkills, 0, 0);
-		tableLayoutPanel12.Dock = DockStyle.Fill;
-		tableLayoutPanel12.Location = new Point(246, 0);
-		tableLayoutPanel12.Margin = new Padding(0);
-		tableLayoutPanel12.Name = "tableLayoutPanel12";
-		tableLayoutPanel12.RowCount = 2;
-		tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-		tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-		tableLayoutPanel12.Size = new Size(85, 49);
-		tableLayoutPanel12.TabIndex = 12;
-		// 
 		// num_maxFFKills
 		// 
 		num_maxFFKills.Dock = DockStyle.Fill;
 		num_maxFFKills.Font = new Font("Segoe UI", 8F);
-		num_maxFFKills.Location = new Point(18, 24);
-		num_maxFFKills.Margin = new Padding(18, 0, 0, 0);
+		num_maxFFKills.Location = new Point(99, 207);
+		num_maxFFKills.Margin = new Padding(0);
 		num_maxFFKills.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
 		num_maxFFKills.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
 		num_maxFFKills.Name = "num_maxFFKills";
@@ -1411,10 +1388,10 @@ partial class tabGamePlay
 		label_maxFFkills.AutoSize = true;
 		label_maxFFkills.Dock = DockStyle.Fill;
 		label_maxFFkills.Font = new Font("Segoe UI", 7F);
-		label_maxFFkills.Location = new Point(0, 0);
+		label_maxFFkills.Location = new Point(0, 207);
 		label_maxFFkills.Margin = new Padding(0);
 		label_maxFFkills.Name = "label_maxFFkills";
-		label_maxFFkills.Size = new Size(85, 24);
+		label_maxFFkills.Size = new Size(99, 24);
 		label_maxFFkills.TabIndex = 8;
 		label_maxFFkills.Text = "Max Friendly Kills";
 		label_maxFFkills.TextAlign = ContentAlignment.MiddleRight;
@@ -1424,9 +1401,9 @@ partial class tabGamePlay
 		tableLayoutPanel11.ColumnCount = 2;
 		tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 59.6385536F));
 		tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40.3614464F));
-		tableLayoutPanel11.Controls.Add(label3, 0, 9);
-		tableLayoutPanel11.Controls.Add(num_maxTeamLives, 1, 8);
-		tableLayoutPanel11.Controls.Add(label2, 0, 8);
+		tableLayoutPanel11.Controls.Add(num_maxFFKills, 1, 9);
+		tableLayoutPanel11.Controls.Add(label3, 0, 8);
+		tableLayoutPanel11.Controls.Add(label_maxFFkills, 0, 9);
 		tableLayoutPanel11.Controls.Add(num_flagReturnTime, 1, 7);
 		tableLayoutPanel11.Controls.Add(label1, 0, 7);
 		tableLayoutPanel11.Controls.Add(num_pspTakeoverTimer, 1, 6);
@@ -1443,7 +1420,7 @@ partial class tabGamePlay
 		tableLayoutPanel11.Controls.Add(label_replayMaps, 0, 1);
 		tableLayoutPanel11.Controls.Add(num_gameTimeLimit, 1, 0);
 		tableLayoutPanel11.Controls.Add(label_timeLimit, 0, 0);
-		tableLayoutPanel11.Controls.Add(num_FullWeaponThreshold, 1, 9);
+		tableLayoutPanel11.Controls.Add(num_FullWeaponThreshold, 1, 8);
 		tableLayoutPanel11.Dock = DockStyle.Fill;
 		tableLayoutPanel11.Location = new Point(165, 0);
 		tableLayoutPanel11.Margin = new Padding(0);
@@ -1467,43 +1444,14 @@ partial class tabGamePlay
 		label3.AutoSize = true;
 		label3.Dock = DockStyle.Fill;
 		label3.Font = new Font("Segoe UI", 7F);
-		label3.Location = new Point(0, 207);
+		label3.Location = new Point(0, 184);
 		label3.Margin = new Padding(0);
 		label3.Name = "label3";
 		label3.Padding = new Padding(0, 0, 5, 0);
-		label3.Size = new Size(99, 24);
+		label3.Size = new Size(99, 23);
 		label3.TabIndex = 23;
 		label3.Text = "Full Weapons At";
 		label3.TextAlign = ContentAlignment.MiddleRight;
-		// 
-		// num_maxTeamLives
-		// 
-		num_maxTeamLives.BorderStyle = BorderStyle.FixedSingle;
-		num_maxTeamLives.Dock = DockStyle.Fill;
-		num_maxTeamLives.Font = new Font("Segoe UI", 8F);
-		num_maxTeamLives.Location = new Point(99, 184);
-		num_maxTeamLives.Margin = new Padding(0);
-		num_maxTeamLives.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
-		num_maxTeamLives.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-		num_maxTeamLives.Name = "num_maxTeamLives";
-		num_maxTeamLives.Size = new Size(67, 22);
-		num_maxTeamLives.TabIndex = 22;
-		num_maxTeamLives.TextAlign = HorizontalAlignment.Center;
-		num_maxTeamLives.Value = new decimal(new int[] { 100, 0, 0, 0 });
-		// 
-		// label2
-		// 
-		label2.AutoSize = true;
-		label2.Dock = DockStyle.Fill;
-		label2.Font = new Font("Segoe UI", 7F);
-		label2.Location = new Point(0, 184);
-		label2.Margin = new Padding(0);
-		label2.Name = "label2";
-		label2.Padding = new Padding(0, 0, 5, 0);
-		label2.Size = new Size(99, 23);
-		label2.TabIndex = 21;
-		label2.Text = "Max Team Lives";
-		label2.TextAlign = ContentAlignment.MiddleRight;
 		// 
 		// num_flagReturnTime
 		// 
@@ -1733,7 +1681,7 @@ partial class tabGamePlay
 		// num_FullWeaponThreshold
 		// 
 		num_FullWeaponThreshold.Font = new Font("Segoe UI", 8F);
-		num_FullWeaponThreshold.Location = new Point(99, 207);
+		num_FullWeaponThreshold.Location = new Point(99, 184);
 		num_FullWeaponThreshold.Margin = new Padding(0);
 		num_FullWeaponThreshold.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
 		num_FullWeaponThreshold.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
@@ -1775,12 +1723,9 @@ partial class tabGamePlay
 		tableLayoutPanel8.ResumeLayout(false);
 		tableLayoutPanel9.ResumeLayout(false);
 		tableLayoutPanel10.ResumeLayout(false);
-		tableLayoutPanel12.ResumeLayout(false);
-		tableLayoutPanel12.PerformLayout();
 		((System.ComponentModel.ISupportInitialize)num_maxFFKills).EndInit();
 		tableLayoutPanel11.ResumeLayout(false);
 		tableLayoutPanel11.PerformLayout();
-		((System.ComponentModel.ISupportInitialize)num_maxTeamLives).EndInit();
 		((System.ComponentModel.ISupportInitialize)num_flagReturnTime).EndInit();
 		((System.ComponentModel.ISupportInitialize)num_pspTakeoverTimer).EndInit();
 		((System.ComponentModel.ISupportInitialize)num_maxPlayers).EndInit();
@@ -1893,9 +1838,6 @@ partial class tabGamePlay
 		public NumericUpDown num_pspTakeoverTimer;
 		public Label label1;
 		public NumericUpDown num_flagReturnTime;
-		public Label label2;
-		public NumericUpDown num_maxTeamLives;
-	private TableLayoutPanel tableLayoutPanel12;
 	public Label label_maxFFkills;
 	public NumericUpDown num_maxFFKills;
 	public Label label3;
