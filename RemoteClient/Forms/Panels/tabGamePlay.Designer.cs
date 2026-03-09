@@ -1562,7 +1562,7 @@ partial class tabGamePlay
 		num_maxPlayers.Font = new Font("Segoe UI", 8F);
 		num_maxPlayers.Location = new Point(99, 115);
 		num_maxPlayers.Margin = new Padding(0);
-		num_maxPlayers.Maximum = new decimal(new int[] { 80, 0, 0, 0 });
+		num_maxPlayers.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
 		num_maxPlayers.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
 		num_maxPlayers.Name = "num_maxPlayers";
 		num_maxPlayers.Size = new Size(67, 22);

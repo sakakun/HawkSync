@@ -678,9 +678,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 
                 if (CheckForExistingProcess()) { return true; }
 
-                bool wasPatched = DFBHDPatcher.Patch(FullFileName);
-                if (!wasPatched)
-                    AppDebug.Log("startGame", "Already patched, starting as-is.");
+                // bool wasPatched = DFBHDPatcher.Patch(FullFileName);
+                // if (!wasPatched)
+                //    AppDebug.Log("startGame", "Already patched, starting as-is.");
 
                 AppDebug.Log("startGame", "No existing game process found, starting a new instance...");
 
