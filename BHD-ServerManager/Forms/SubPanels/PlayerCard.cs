@@ -525,7 +525,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 {
                     1 => Color.Blue,
                     2 => Color.Red,
-                    3 => Color.Yellow,
+                    3 => Color.Gold,
                     4 => Color.Violet,
                     _ => Color.Black
                 };
