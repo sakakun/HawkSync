@@ -40,6 +40,7 @@
 			comboBox_chatGroup = new ComboBox();
 			tb_chatMessage = new TextBox();
 			tabHistory = new TabPage();
+			chatHistory1 = new BHD_ServerManager.Forms.SubPanels.ChatHistory();
 			tabAutoMessages = new TabPage();
 			tableLayoutPanel3 = new TableLayoutPanel();
 			dg_autoMessages = new DataGridView();
@@ -55,7 +56,6 @@
 			dg_slapMessages = new DataGridView();
 			slapMessageID = new DataGridViewTextBoxColumn();
 			slapMessages = new DataGridViewTextBoxColumn();
-			chatHistory1 = new BHD_ServerManager.Forms.SubPanels.ChatHistory();
 			chat_TabControl.SuspendLayout();
 			tabChatMessages.SuspendLayout();
 			tableLayoutPanel1.SuspendLayout();
@@ -209,6 +209,16 @@
 			tabHistory.TabIndex = 3;
 			tabHistory.Text = "Chat History";
 			tabHistory.UseVisualStyleBackColor = true;
+			// 
+			// chatHistory1
+			// 
+			chatHistory1.Dock = DockStyle.Fill;
+			chatHistory1.Location = new Point(0, 0);
+			chatHistory1.MaximumSize = new Size(935, 414);
+			chatHistory1.MinimumSize = new Size(935, 414);
+			chatHistory1.Name = "chatHistory1";
+			chatHistory1.Size = new Size(935, 414);
+			chatHistory1.TabIndex = 0;
 			// 
 			// tabAutoMessages
 			// 
@@ -380,16 +390,6 @@
 			slapMessages.HeaderText = "Message";
 			slapMessages.Name = "slapMessages";
 			slapMessages.ReadOnly = true;
-			// 
-			// chatHistory1
-			// 
-			chatHistory1.Dock = DockStyle.Fill;
-			chatHistory1.Location = new Point(0, 0);
-			chatHistory1.MaximumSize = new Size(935, 414);
-			chatHistory1.MinimumSize = new Size(935, 414);
-			chatHistory1.Name = "chatHistory1";
-			chatHistory1.Size = new Size(935, 414);
-			chatHistory1.TabIndex = 0;
 			// 
 			// tabChat
 			// 

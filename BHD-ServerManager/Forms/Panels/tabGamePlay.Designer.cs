@@ -92,6 +92,8 @@ namespace BHD_ServerManager.Forms.Panels
 			label_dm = new Label();
 			groupBox_lobbyPasswords = new GroupBox();
 			tableLayoutPanel7 = new TableLayoutPanel();
+			tb_violetPassword = new TextBox();
+			tb_yellowPassword = new TextBox();
 			tb_redPassword = new TextBox();
 			tb_bluePassword = new TextBox();
 			groupBox4 = new GroupBox();
@@ -108,6 +110,7 @@ namespace BHD_ServerManager.Forms.Panels
 			btn_CustomSkins = new Button();
 			btn_AutoBalance = new Button();
 			tableLayoutPanel10 = new TableLayoutPanel();
+			btn_Enable4Teams = new Button();
 			btn_WarnOnFFKill = new Button();
 			btn_ShowFriendlyTags = new Button();
 			btn_FriendlyFireEnabled = new Button();
@@ -1066,45 +1069,72 @@ namespace BHD_ServerManager.Forms.Panels
 			groupBox_lobbyPasswords.Size = new Size(331, 44);
 			groupBox_lobbyPasswords.TabIndex = 5;
 			groupBox_lobbyPasswords.TabStop = false;
-			groupBox_lobbyPasswords.Text = "Lobby Passwords";
+			groupBox_lobbyPasswords.Text = "Team Passwords";
 			// 
 			// tableLayoutPanel7
 			// 
-			tableLayoutPanel7.ColumnCount = 2;
-			tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-			tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+			tableLayoutPanel7.ColumnCount = 4;
+			tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel7.Controls.Add(tb_violetPassword, 3, 0);
+			tableLayoutPanel7.Controls.Add(tb_yellowPassword, 2, 0);
 			tableLayoutPanel7.Controls.Add(tb_redPassword, 1, 0);
 			tableLayoutPanel7.Controls.Add(tb_bluePassword, 0, 0);
 			tableLayoutPanel7.Dock = DockStyle.Fill;
 			tableLayoutPanel7.Location = new Point(0, 16);
 			tableLayoutPanel7.Name = "tableLayoutPanel7";
 			tableLayoutPanel7.RowCount = 1;
-			tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-			tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+			tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 			tableLayoutPanel7.Size = new Size(331, 28);
 			tableLayoutPanel7.TabIndex = 0;
+			// 
+			// tb_violetPassword
+			// 
+			tb_violetPassword.Dock = DockStyle.Fill;
+			tb_violetPassword.Font = new Font("Segoe UI", 7F);
+			tb_violetPassword.Location = new Point(249, 3);
+			tb_violetPassword.MaxLength = 16;
+			tb_violetPassword.Name = "tb_violetPassword";
+			tb_violetPassword.PlaceholderText = "Violet";
+			tb_violetPassword.Size = new Size(79, 20);
+			tb_violetPassword.TabIndex = 7;
+			tb_violetPassword.TextAlign = HorizontalAlignment.Center;
+			// 
+			// tb_yellowPassword
+			// 
+			tb_yellowPassword.Dock = DockStyle.Fill;
+			tb_yellowPassword.Font = new Font("Segoe UI", 7F);
+			tb_yellowPassword.Location = new Point(167, 3);
+			tb_yellowPassword.MaxLength = 16;
+			tb_yellowPassword.Name = "tb_yellowPassword";
+			tb_yellowPassword.PlaceholderText = "Yellow";
+			tb_yellowPassword.Size = new Size(76, 20);
+			tb_yellowPassword.TabIndex = 6;
+			tb_yellowPassword.TextAlign = HorizontalAlignment.Center;
 			// 
 			// tb_redPassword
 			// 
 			tb_redPassword.Dock = DockStyle.Fill;
-			tb_redPassword.Font = new Font("Segoe UI", 8F);
-			tb_redPassword.Location = new Point(168, 3);
+			tb_redPassword.Font = new Font("Segoe UI", 7F);
+			tb_redPassword.Location = new Point(85, 3);
 			tb_redPassword.MaxLength = 16;
 			tb_redPassword.Name = "tb_redPassword";
-			tb_redPassword.PlaceholderText = "Red Team Password";
-			tb_redPassword.Size = new Size(160, 22);
+			tb_redPassword.PlaceholderText = "Red";
+			tb_redPassword.Size = new Size(76, 20);
 			tb_redPassword.TabIndex = 5;
 			tb_redPassword.TextAlign = HorizontalAlignment.Center;
 			// 
 			// tb_bluePassword
 			// 
 			tb_bluePassword.Dock = DockStyle.Fill;
-			tb_bluePassword.Font = new Font("Segoe UI", 8F);
+			tb_bluePassword.Font = new Font("Segoe UI", 7F);
 			tb_bluePassword.Location = new Point(3, 3);
 			tb_bluePassword.MaxLength = 16;
 			tb_bluePassword.Name = "tb_bluePassword";
-			tb_bluePassword.PlaceholderText = "Blue Team Password";
-			tb_bluePassword.Size = new Size(159, 22);
+			tb_bluePassword.PlaceholderText = "Blue";
+			tb_bluePassword.Size = new Size(76, 20);
 			tb_bluePassword.TabIndex = 4;
 			tb_bluePassword.TextAlign = HorizontalAlignment.Center;
 			// 
@@ -1314,6 +1344,7 @@ namespace BHD_ServerManager.Forms.Panels
 			tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 			tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 			tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel10.Controls.Add(btn_Enable4Teams, 0, 0);
 			tableLayoutPanel10.Controls.Add(btn_WarnOnFFKill, 3, 0);
 			tableLayoutPanel10.Controls.Add(btn_ShowFriendlyTags, 2, 0);
 			tableLayoutPanel10.Controls.Add(btn_FriendlyFireEnabled, 1, 0);
@@ -1325,6 +1356,20 @@ namespace BHD_ServerManager.Forms.Panels
 			tableLayoutPanel10.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 			tableLayoutPanel10.Size = new Size(331, 49);
 			tableLayoutPanel10.TabIndex = 1;
+			// 
+			// btn_Enable4Teams
+			// 
+			btn_Enable4Teams.BackColor = SystemColors.ControlLight;
+			btn_Enable4Teams.Dock = DockStyle.Fill;
+			btn_Enable4Teams.FlatStyle = FlatStyle.Flat;
+			btn_Enable4Teams.Font = new Font("Segoe UI", 7F);
+			btn_Enable4Teams.Location = new Point(3, 3);
+			btn_Enable4Teams.Name = "btn_Enable4Teams";
+			btn_Enable4Teams.Size = new Size(76, 43);
+			btn_Enable4Teams.TabIndex = 12;
+			btn_Enable4Teams.Text = "4 Team Matches";
+			toolTip_gamePlay.SetToolTip(btn_Enable4Teams, "Enable 4 Team Matches");
+			btn_Enable4Teams.UseVisualStyleBackColor = false;
 			// 
 			// btn_WarnOnFFKill
 			// 
@@ -1516,6 +1561,7 @@ namespace BHD_ServerManager.Forms.Panels
 			num_maxPlayers.Font = new Font("Segoe UI", 8F);
 			num_maxPlayers.Location = new Point(99, 115);
 			num_maxPlayers.Margin = new Padding(0);
+			num_maxPlayers.Maximum = new decimal(new int[] { 80, 0, 0, 0 });
 			num_maxPlayers.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
 			num_maxPlayers.Name = "num_maxPlayers";
 			num_maxPlayers.Size = new Size(67, 22);
@@ -1841,5 +1887,8 @@ namespace BHD_ServerManager.Forms.Panels
 		public NumericUpDown num_FullWeaponThreshold;
 		public Button btn_MatchStateToggle;
 		public Label label_maxFFkills;
+		private Button btn_Enable4Teams;
+		public TextBox tb_violetPassword;
+		public TextBox tb_yellowPassword;
 	}
 }

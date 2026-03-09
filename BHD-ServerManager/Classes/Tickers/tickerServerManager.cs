@@ -115,7 +115,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         }
                     }
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                    ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
+                    ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
 
 
 
@@ -123,12 +123,13 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 4. Online (game in progress)
                 else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
                 {
-                    theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
+                    theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag                  
+
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                    ServerMemory.GetNextMapType();                                      // Grab the Current Map Type and the Next Map Type
+                    ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
 
                     // Stats update
-                    statsInstanceManager.RunPlayerStatsUpdate();                               // Collect Player Stats
+                    statsInstanceManager.RunPlayerStatsUpdate();                        // Collect Player Stats
                 
                     // WebStats Updates and Reports
                     if (theInstance.WebStatsEnabled)

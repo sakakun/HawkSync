@@ -12,18 +12,19 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// </summary>
         public static GamePlaySettings BuildGamePlaySettingsFromInstance(theInstance instance)
         {
-            var options = new ServerOptions(
-                AutoBalance: instance.gameOptionAutoBalance,
-                ShowTracers: instance.gameOptionShowTracers,
-                ShowClays: instance.gameShowTeamClays,
-                AutoRange: instance.gameOptionAutoRange,
-                CustomSkins: instance.gameCustomSkins,
-                DestroyBuildings: instance.gameDestroyBuildings,
-                FatBullets: instance.gameFatBullets,
-                OneShotKills: instance.gameOneShotKills,
-                AllowLeftLeaning: instance.gameAllowLeftLeaning,
-                AllowRightLeaning: instance.gameAllowRightLeaning
-            );
+        var options = new ServerOptions(
+            AutoBalance: instance.gameOptionAutoBalance,
+            ShowTracers: instance.gameOptionShowTracers,
+            ShowClays: instance.gameShowTeamClays,
+            AutoRange: instance.gameOptionAutoRange,
+            CustomSkins: instance.gameCustomSkins,
+            DestroyBuildings: instance.gameDestroyBuildings,
+            FatBullets: instance.gameFatBullets,
+            OneShotKills: instance.gameOneShotKills,
+            AllowLeftLeaning: instance.gameAllowLeftLeaning,
+            AllowRightLeaning: instance.gameAllowRightLeaning,
+            Enable4Teams: instance.gameEnableFourTeams
+        );
 
             var friendlyFire = new FriendlyFireSettings(
                 Enabled: instance.gameOptionFF,
@@ -69,6 +70,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             return new GamePlaySettings(
                 BluePassword: instance.gamePasswordBlue,
                 RedPassword: instance.gamePasswordRed,
+                YellowPassword: instance.gamePasswordYellow,
+                VioletPassword: instance.gamePasswordViolet,
                 ScoreKOTH: instance.gameScoreZoneTime,
                 ScoreDM: instance.gameScoreKills,
                 ScoreFB: instance.gameScoreFlags,

@@ -221,15 +221,22 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // ================================================================================
 
         /// <summary>
-        /// Switch a player to the opposite team for the next map
+        /// Switch a player to a specific team for the next map
         /// </summary>
-        public static OperationResult SwitchPlayerTeam(int playerSlot, string playerName, int currentTeam)
+        public static OperationResult SwitchPlayerTeam(int playerSlot, string playerName, int currentTeam, int targetTeam)
         {
             try
             {
                 var (isValid, errorMessage) = ValidatePlayerOperation(playerSlot, playerName);
                 if (!isValid)
                     return new OperationResult(false, errorMessage);
+
+                // Validate target team
+                if (targetTeam < 1 || targetTeam > 4)
+                    return new OperationResult(false, $"Invalid target team: {targetTeam}. Must be 1-4.");
+
+                if (currentTeam == targetTeam)
+                    return new OperationResult(false, $"Player {playerName} is already on that team.");
 
                 // Check if already queued for team switch
                 var existing = playerInstance.PlayerChangeTeamList.FirstOrDefault(p => p.slotNum == playerSlot);
@@ -242,27 +249,22 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new OperationResult(true, $"Team switch for {playerName} has been undone.");
                 }
 
-                // Determine new team
-                int newTeam = currentTeam switch
-                {
-                    1 => 2, // Blue to Red
-                    2 => 1, // Red to Blue
-                    _ => currentTeam
-                };
-
-                if (newTeam == currentTeam)
-                {
-                    return new OperationResult(false, $"Player {playerName} is not on a valid team for switching.");
-                }
-
                 // Queue team switch for next map
                 playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                 {
                     slotNum = playerSlot,
-                    Team = newTeam
+                    Team = targetTeam
                 });
 
-                string teamName = newTeam == 1 ? "Blue" : "Red";
+                string teamName = targetTeam switch
+                {
+                    1 => "Blue",
+                    2 => "Red",
+                    3 => "Yellow",
+                    4 => "Violet",
+                    _ => "Unknown"
+                };
+
                 AppDebug.Log("playerInstanceManager", $"Player {playerName} queued for team switch to {teamName}");
                 return new OperationResult(true, $"Player {playerName} will be switched to {teamName} team for the next map.");
             }

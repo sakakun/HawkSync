@@ -15,21 +15,28 @@ public partial class tabPlayers : UserControl
     // --- Class Variables ---
     private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
 
-    private PlayerCard[] playerCards = new PlayerCard[50];
+    private PlayerCard[] playerCards = new PlayerCard[80];
 
     // --- Generate Init. Cards ---
     private void functionEvent_GeneratePlayerCards()
     {
+        TableLayoutPanel PlayerCards1 = playerTable1; // 40 cards (1-40)
+        TableLayoutPanel PlayerCards2 = playerTable2; // 40 cards (41-80)
+        
+        PlayerCards1.Controls.Clear();
+        PlayerCards2.Controls.Clear();
 
-        TableLayoutPanel PlayerCards = playerLayout;
-        PlayerCards.Controls.Clear();
+        // Configure PlayerCards1: 4 columns x 10 rows = 40 cards
+        PlayerCards1.ColumnCount = 4;
+        PlayerCards1.RowCount = 10;
+        PlayerCards1.Padding = new Padding(0, 0, 0, 0);
 
-        // Ensure the TableLayoutPanel has 5 columns and 10 rows
-        PlayerCards.ColumnCount = 5;
-        PlayerCards.RowCount = 10;
-        PlayerCards.Padding = new Padding(0,3,0,0);
+        // Configure PlayerCards2: 4 columns x 10 rows = 40 cards
+        PlayerCards2.ColumnCount = 4;
+        PlayerCards2.RowCount = 10;
+        PlayerCards2.Padding = new Padding(0, 0, 0, 0);
 
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 80; i++)
         {
             int slotNum = i + 1;
             PlayerCard card = new PlayerCard(slotNum);
@@ -40,10 +47,19 @@ public partial class tabPlayers : UserControl
             card.ToggleSlot((i) < theInstance!.gameMaxSlots ? true : false);
             playerCards[i] = card;
 
-            // Column by column: column = i / 10, row = i % 10
-            PlayerCards.Controls.Add(card, i / 10, i % 10);
+            // Distribute cards: 0-39 to PlayerCards1, 40-79 to PlayerCards2
+            if (i < 40)
+            {
+                // Cards 1-40: column = i / 10, row = i % 10
+                PlayerCards1.Controls.Add(card, i / 10, i % 10);
+            }
+            else
+            {
+                // Cards 41-80: adjust index and add to second table
+                int adjustedIndex = i - 40;
+                PlayerCards2.Controls.Add(card, adjustedIndex / 10, adjustedIndex % 10);
+            }
         }
-
     }
 
     public tabPlayers()
@@ -68,7 +84,8 @@ public partial class tabPlayers : UserControl
 
     public void tickerPlayerHook()
     {
-        playerLayout.SuspendLayout();
+        playerTable1.SuspendLayout();
+        playerTable2.SuspendLayout();
         try
         {
             if (!_firstLoadComplete)
@@ -79,7 +96,7 @@ public partial class tabPlayers : UserControl
 
             if (theInstance!.instanceStatus == InstanceStatus.OFFLINE)
             {
-                for (int i = 0; i < 50; i++)
+                for (int i = 0; i < 80; i++)
                 {
                     playerCards[i].UpdateCard(null, false);
                 }
@@ -88,6 +105,12 @@ public partial class tabPlayers : UserControl
             {
                 for (int i = 0; i < theInstance.gameMaxSlots; i++)
                 {
+                    // Block update for players over 80 (max capacity across both tables)
+                    if (i >= 80)
+                    {
+                        break;
+                    }
+
                     int slotNum = i + 1;
                     if (playerInstance.PlayerList.TryGetValue(slotNum, out var playerInfo))
                     {
@@ -102,7 +125,8 @@ public partial class tabPlayers : UserControl
         }
         finally
         {
-            playerLayout.ResumeLayout();
+            playerTable1.ResumeLayout();
+            playerTable2.ResumeLayout();
         }
     }
 }

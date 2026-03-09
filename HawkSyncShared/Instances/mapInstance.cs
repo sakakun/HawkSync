@@ -101,16 +101,31 @@ public class mapInstance
     public int TotalMapsInPlaylist => Playlists.ContainsKey(ActivePlaylist) 
         ? Playlists[ActivePlaylist].Count 
         : 0;
-    
+
+    /// <summary>
+    /// Is the current map a 4 Team Map?
+    /// </summary>
+    public bool IsCurrentMap4Team { get; set; } = false;
+
     // ================================================================================
     // NEXT MAP INFO
     // ================================================================================
     
     /// <summary>
+    /// Is the next map a 4 Team Map?
+    /// </summary>
+    public bool IsNextMap4Team { get; set; } = false;
+
+    /// <summary>
     /// Next map to be played
     /// </summary>
     public string NextMapName { get; set; } = string.Empty;
     
+    /// <summary>
+    /// Next map to be played
+    /// </summary>
+    public string NextMapFile { get; set; } = string.Empty;
+
     /// <summary>
     /// Next map's game type
     /// </summary>

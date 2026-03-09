@@ -67,7 +67,7 @@ public class PlayerController : ControllerBase
         if(!HasPermission("players")) return Forbid();
 
         string playerName = AppFunc.FB64(command.PlayerName);
-        var result = playerInstanceManager.SwitchPlayerTeam(command.PlayerSlot, playerName, command.TeamNum);
+        var result = playerInstanceManager.SwitchPlayerTeam(command.PlayerSlot, playerName, command.currentTeam, command.TeamNum);
         LogPlayerAction("SwitchTeamPlayer", playerName, result.Success, result.Message);
         return Ok(new CommandResult
         {

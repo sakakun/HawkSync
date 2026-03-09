@@ -60,7 +60,8 @@ public class GamePlayController : ControllerBase
             request.Options.ShowClays, request.Options.AutoRange,
             request.Options.CustomSkins, request.Options.DestroyBuildings,
             request.Options.FatBullets, request.Options.OneShotKills,
-            request.Options.AllowLeftLeaning, request.Options.AllowRightLeaning
+            request.Options.AllowLeftLeaning, request.Options.AllowRightLeaning,
+            request.Options.Enable4Teams
         );
         var friendlyFire = new FriendlyFireSettings(
             request.FriendlyFire.Enabled, request.FriendlyFire.MaxKills,
@@ -100,6 +101,7 @@ public class GamePlayController : ControllerBase
         );
         var settings = new GamePlaySettings(
             request.BluePassword, request.RedPassword,
+            request.YellowPassword, request.VioletPassword,
             request.ScoreKOTH, request.ScoreDM, request.ScoreFB,
             request.TimeLimit, request.LoopMaps, request.StartDelay,
             request.RespawnTime, request.ScoreBoardDelay, request.MaxSlots,
@@ -144,8 +146,8 @@ public class GamePlayController : ControllerBase
         if (request.TimeLimit < 0 || request.TimeLimit > 999)
             errors.Add("Time limit must be between 0 and 999 minutes.");
 
-        if (request.MaxSlots < 1 || request.MaxSlots > 50)
-            errors.Add("Max players must be between 1 and 50.");
+        if (request.MaxSlots < 1 || request.MaxSlots > 80)
+            errors.Add("Max players must be between 1 and 80.");
 
         if (request.RespawnTime < 0 || request.RespawnTime > 999)
             errors.Add("Respawn time must be between 0 and 999 seconds.");
@@ -191,7 +193,8 @@ public class GamePlayController : ControllerBase
             instance.gameFatBullets,
             instance.gameOneShotKills,
             instance.gameAllowLeftLeaning,
-            instance.gameAllowRightLeaning
+            instance.gameAllowRightLeaning,
+            instance.gameEnableFourTeams
         );
 
         var friendlyFire = new FriendlyFireSettingsDTO(
@@ -361,14 +364,15 @@ public class GamePlayController : ControllerBase
                 message = result.Message;
                 return Ok(new GamePlaySettingsExportResponse { Success = false, Message = message });
             }
-            var instance = CommonCore.theInstance!;
-            var options = new ServerOptions(
-                instance.gameOptionAutoBalance, instance.gameOptionShowTracers,
-                instance.gameShowTeamClays, instance.gameOptionAutoRange,
-                instance.gameCustomSkins, instance.gameDestroyBuildings,
-                instance.gameFatBullets, instance.gameOneShotKills,
-                instance.gameAllowLeftLeaning, instance.gameAllowRightLeaning
-            );
+        var instance = CommonCore.theInstance!;
+        var options = new ServerOptions(
+            instance.gameOptionAutoBalance, instance.gameOptionShowTracers,
+            instance.gameShowTeamClays, instance.gameOptionAutoRange,
+            instance.gameCustomSkins, instance.gameDestroyBuildings,
+            instance.gameFatBullets, instance.gameOneShotKills,
+            instance.gameAllowLeftLeaning, instance.gameAllowRightLeaning,
+            instance.gameEnableFourTeams
+        );
             var friendlyFire = new FriendlyFireSettings(
                 instance.gameOptionFF, instance.gameFriendlyFireKills,
                 instance.gameOptionFFWarn, instance.gameOptionFriendlyTags
@@ -407,6 +411,7 @@ public class GamePlayController : ControllerBase
             );
             var settings = new GamePlaySettings(
                 instance.gamePasswordBlue, instance.gamePasswordRed,
+                instance.gamePasswordYellow, instance.gamePasswordViolet,
                 instance.gameScoreZoneTime, instance.gameScoreKills, instance.gameScoreFlags,
                 instance.gameTimeLimit, instance.gameLoopMaps, instance.gameStartDelay,
                 instance.gameRespawnTime, instance.gameScoreBoardDelay, instance.gameMaxSlots,

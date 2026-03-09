@@ -69,6 +69,13 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             {
                 godModeItem.Text = IsGod ? "Disable God Mode" : "Enable God Mode";
             }
+
+            // Update team switch menu (rebuild to reflect current state)
+            if (ContextMenu.Items.Count > 12)
+            {
+                ContextMenu.Items.RemoveAt(12);
+                ContextMenu.Items.Insert(12, CreateSwitchTeamMenuItem());
+            }
         }
 
         private void BuildContextMenu()
@@ -341,19 +348,108 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
 
         private ToolStripMenuItem CreateSwitchTeamMenuItem()
         {
-            var command = new ToolStripMenuItem("Switch Team");
-            command.Click += async (sender, e) =>
+            var mapInstance = CommonCore.instanceMaps!;
+            var playerInstance = CommonCore.instancePlayers!;
+
+            // Check if already queued for team switch
+            var existingSwitch = playerInstance.PlayerChangeTeamList.FirstOrDefault(p => p.slotNum == Player.PlayerSlot);
+
+            // Check game type - disable for DM (0) and KOTH (4)
+            if (mapInstance.CurrentGameType == 0 || mapInstance.CurrentGameType == 4)
             {
-                var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(Player.PlayerSlot, Player.PlayerName, Player.PlayerTeam);
-                
-                MessageBox.Show(
-                    result.Message,
-                    result.Success ? "Player Action" : "Error",
-                    MessageBoxButtons.OK,
-                    result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
-                );
+                var command = new ToolStripMenuItem("Switch Team")
+                {
+                    Enabled = false,
+                    ToolTipText = "Team switching not available in Deathmatch or King of the Hill"
+                };
+                return command;
+            }
+
+            // If 4-team support disabled or next map is not a 4-team map, use simple toggle
+            if (!TheInstance.gameEnableFourTeams || !mapInstance.IsNextMap4Team)
+            {
+                var command = new ToolStripMenuItem(existingSwitch != null ? "Cancel Team Switch" : "Switch Team");
+                command.Click += async (sender, e) =>
+                {
+                    var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(
+                        Player.PlayerSlot, 
+                        Player.PlayerName, 
+                        Player.PlayerTeam, 
+                        Player.PlayerTeam == 1 ? 2 : 1 // Toggle between Team 1 and Team 2
+                    );
+
+                    MessageBox.Show(
+                        result.Message,
+                        result.Success ? "Player Action" : "Error",
+                        MessageBoxButtons.OK,
+                        result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
+                    );
+                };
+                return command;
+            }
+
+            // Next map is 4-team with 4-team support enabled - show submenu
+            var switchTeamMenu = new ToolStripMenuItem(existingSwitch != null ? "Cancel Team Switch" : "Switch Team");
+
+            // If already queued, clicking cancels the switch
+            if (existingSwitch != null)
+            {
+                switchTeamMenu.Click += async (sender, e) =>
+                {
+                    var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(
+                        Player.PlayerSlot, 
+                        Player.PlayerName, 
+                        Player.PlayerTeam, 
+                        existingSwitch.Team
+                    );
+
+                    MessageBox.Show(
+                        result.Message,
+                        result.Success ? "Player Action" : "Error",
+                        MessageBoxButtons.OK,
+                        result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
+                    );
+                };
+                return switchTeamMenu;
+            }
+
+            // Show options for all teams except current team
+            var teamOptions = new[]
+            {
+                (Team: 1, Name: "Blue", Color: Color.Blue),
+                (Team: 2, Name: "Red", Color: Color.Red),
+                (Team: 3, Name: "Yellow", Color: Color.Gold),
+                (Team: 4, Name: "Violet", Color: Color.Violet)
             };
-            return command;
+
+            foreach (var teamOption in teamOptions)
+            {
+                if (teamOption.Team == Player.PlayerTeam)
+                    continue; // Skip current team
+
+                var teamItem = new ToolStripMenuItem($"Switch to {teamOption.Name}")
+                {
+                    ForeColor = teamOption.Color
+                };
+
+                int targetTeam = teamOption.Team; // Capture for lambda
+
+                teamItem.Click += async (sender, e) =>
+                {
+                    var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(Player.PlayerSlot, Player.PlayerName, Player.PlayerTeam, targetTeam);
+
+                    MessageBox.Show(
+                        result.Message,
+                        result.Success ? "Player Action" : "Error",
+                        MessageBoxButtons.OK,
+                        result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
+                    );
+                };
+
+                switchTeamMenu.DropDownItems.Add(teamItem);
+            }
+
+            return switchTeamMenu;
         }
 
         // ================================================================================
@@ -370,7 +466,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             {
                 // Show warning icon for proxy/VPN/TOR
                 playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonCircleExclamation;
-                playerTeamIcon.IconColor = Color.Yellow;
+                playerTeamIcon.IconColor = Color.Orange;
             }
             else
             {
@@ -380,6 +476,8 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                 {
                     1 => Color.Blue,
                     2 => Color.Red,
+                    3 => Color.Yellow,
+                    4 => Color.Violet,
                     _ => Color.Black
                 };
             }

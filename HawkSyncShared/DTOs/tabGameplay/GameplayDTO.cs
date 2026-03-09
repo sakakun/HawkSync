@@ -13,7 +13,8 @@ public record ServerOptionsDTO(
     bool FatBullets,
     bool OneShotKills,
     bool AllowLeftLeaning,
-    bool AllowRightLeaning
+    bool AllowRightLeaning,
+    bool Enable4Teams
 );
 
 /// <summary>
@@ -80,6 +81,8 @@ public class GamePlaySettingsRequest
     // Lobby Passwords
     public string BluePassword { get; set; } = string.Empty;
     public string RedPassword { get; set; } = string.Empty;
+    public string YellowPassword { get; set; } = string.Empty;
+    public string VioletPassword { get; set; } = string.Empty;
 
     // Win Conditions
     public int ScoreKOTH { get; set; }
@@ -99,7 +102,7 @@ public class GamePlaySettingsRequest
     public int FullWeaponThreshold { get; set; }
 
     // Grouped Settings
-    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false, false);
+    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false);
     public FriendlyFireSettingsDTO FriendlyFire { get; set; } = new(false, 0, false, false);
     public RoleRestrictionsDTO Roles { get; set; } = new(false, false, false, false);
     public WeaponRestrictionsDTO Weapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
@@ -114,6 +117,8 @@ public class GamePlaySettingsData
     // Lobby Passwords
     public string BluePassword { get; set; } = string.Empty;
     public string RedPassword { get; set; } = string.Empty;
+    public string YellowPassword { get; set; } = string.Empty;
+    public string VioletPassword { get; set; } = string.Empty;
 
     // Win Conditions
     public int ScoreKOTH { get; set; }
@@ -133,7 +138,7 @@ public class GamePlaySettingsData
     public int FullWeaponThreshold { get; set; }
 
     // Grouped Settings
-    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false, false);
+    public ServerOptionsDTO Options { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false);
     public FriendlyFireSettingsDTO FriendlyFire { get; set; } = new(false, 0, false, false);
     public RoleRestrictionsDTO Roles { get; set; } = new(false, false, false, false);
     public WeaponRestrictionsDTO Weapons { get; set; } = new(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);

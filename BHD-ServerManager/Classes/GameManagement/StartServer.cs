@@ -27,6 +27,92 @@ namespace BHD_ServerManager.Classes.GameManagement
         private static mapInstance mapInstance => CommonCore.instanceMaps!;
         private static tabProfile  tabProfile  => Program.ServerManagerUI!.ProfileTab;
 
+        public static bool createdfv()
+        {
+            try
+            {
+                string dfvCFGPath = Path.Combine(theInstance.profileServerPath!, "dfv.cfg");
+
+                if (!File.Exists(dfvCFGPath))
+                {
+                    AppDebug.Log("createdfv", "dfv.cfg does not exist. File must exist to update values.");
+                    return false;
+                }
+
+                var lines = File.ReadAllLines(dfvCFGPath);
+                var updatedLines = new List<string>();
+
+                foreach (var line in lines)
+                {
+                    string updatedLine = line;
+
+                    if (line.Contains("=") && !line.TrimStart().StartsWith("//"))
+                    {
+                        var parts = line.Split(new[] { '=' }, 2);
+                        if (parts.Length == 2)
+                        {
+                            string key = parts[0].Trim();
+                            string currentValue = parts[1].Trim();
+                            string newValue = GetConfigValue(key, currentValue);
+
+                            if (newValue != currentValue)
+                            {
+                                int equalsIndex = line.IndexOf('=');
+                                string prefix = line.Substring(0, equalsIndex + 1);
+                                updatedLine = $"{prefix} {newValue}";
+                            }
+                        }
+                    }
+
+                    updatedLines.Add(updatedLine);
+                }
+
+                File.WriteAllLines(dfvCFGPath, updatedLines);
+
+                AppDebug.Log("createdfv", "dfv.cfg updated successfully.");
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppDebug.Log("createdfv", "Error updating dfv.cfg file: " + e);
+                return false;
+            }
+        }
+
+        private static string GetConfigValue(string key, string currentValue)
+        {
+            return key switch
+            {
+                "windowed" => Convert.ToInt32(theInstance.gameWindowedMode).ToString(),
+                "game_name" => $"\"{theInstance.gameServerName}\"",
+                "internet_address" => $"\"{theInstance.profileBindIP}\"",
+                "mp_gameport" => theInstance.profileBindPort.ToString(),
+                "maxplayers" => theInstance.gameMaxSlots.ToString(),
+                "dedicated" => Convert.ToInt32(theInstance.gameDedicated).ToString(),
+                "max_kills" => theInstance.gameScoreKills.ToString(),
+                "host_password" => $"\"{theInstance.gamePasswordLobby}\"",
+                "red_password" => $"\"{theInstance.gamePasswordRed}\"",
+                "blue_password" => $"\"{theInstance.gamePasswordBlue}\"",
+                "yellow_password" => $"\"{theInstance.gamePasswordYellow}\"",
+                "violet_password" => $"\"{theInstance.gamePasswordViolet}\"",
+                "time_limit" => theInstance.gameTimeLimit.ToString(),
+                "timeout" => theInstance.gameRespawnTime.ToString(),
+                "allowcustomskins" => Convert.ToInt32(theInstance.gameCustomSkins).ToString(),
+                "hostrequiresnovaworldlogin" => Convert.ToInt32(theInstance.gameRequireNova).ToString(),
+                "servermsg" => $"\"{theInstance.gameMOTD}\"",
+                "startdelay" => theInstance.gameStartDelay.ToString(),
+                "minping" => theInstance.gameMinPingValue.ToString(),
+                "dominpingcheck" => Convert.ToInt32(theInstance.gameMinPing).ToString(),
+                "maxping" => theInstance.gameMaxPingValue.ToString(),
+                "domaxpingcheck" => Convert.ToInt32(theInstance.gameMaxPing).ToString(),
+                "flagreturntime" => theInstance.gameFlagReturnTime.ToString(),
+                "koth_limit" => theInstance.gameScoreZoneTime.ToString(),
+                "destroybuild" => Convert.ToInt32(theInstance.gameDestroyBuildings).ToString(),
+                "country" => $"\"{theInstance.gameCountryCode}\"",
+                _ => currentValue
+            };
+        }
+
         public static bool createAutoRes()
         {
             try
@@ -97,39 +183,44 @@ namespace BHD_ServerManager.Classes.GameManagement
                 const int OFFSET_CURRENT_MAP = 0x187F;
                 const int OFFSET_MAP_TABLE = 0x1883;
 
-                // Server rules offsets inside unk_9F1F28
-                const int RULE_UNKNOWN_160B = 0x160B;
-                const int RULE_MAX_SLOTS = 0x160F;          // 0x000D97A0
-                const int RULE_DEDICATED = 0x1613;          
-                const int RULE_MAX_TEAM_LIVES = 0x161F;     // 0x000D8554
-                const int RULE_FLAG_SCORE = 0x1623;         // 0x5F21AC / 0x6034B8 
-                const int RULE_START_DELAY = 0x1627;        // 0x000D7F00
-                const int RULE_UNKNOWN_162F = 0x162F;       
-                const int RULE_FLAG_RETURN_TIME = 0x1633;   // 0x000DB6AC
-                const int RULE_UNKNOWN_1637 = 0x1637;
-                const int RULE_UNKNOWN_163B = 0x163B;
-                const int RULE_TIME_LIMIT = 0x163F;         // 0x000DD1DC
-                const int RULE_ZONE_TIMER = 0x1643;         // 0x5F21B8 / 0x6344B4
-                const int RULE_RESPAWN_TIME = 0x1647;       // 0x000DD4E8 
-                const int RULE_DESTROY_BUILDINGS = 0x164B;  // 0x000D99B8
-                const int RULE_UNKNOWN_1693 = 0x1693;
-                const int RULE_UNKNOWN_1697 = 0x1697;
-                const int RULE_UNKNOWN_169B = 0x169B;
-                const int RULE_UNKNOWN_16B7 = 0x16B7;
-                const int RULE_UNKNOWN_16BB = 0x16BB;
-                const int RULE_UNKNOWN_16C7 = 0x16C7;
-                const int RULE_UNKNOWN_16CB = 0x16CB;
-                const int RULE_GAME_PORT = 0x16CF;
-                const int RULE_ALLOW_CUSTOM_SKINS = 0x16D7; // 0x000AD760
-                const int RULE_REQUIRE_NOVA_LOGIN = 0x16DB; // 0x000D9960
-                const int RULE_LAN_MODE = 0x16EF;
-                const int RULE_MIN_PING_VALUE = 0x16F3;     // 0x000D7FB8
-                const int RULE_ENABLE_MIN_PING = 0x16F7;    // 0x000D9A60
-                const int RULE_MAX_PING_VALUE = 0x16FB;     // 0x000DB634
-                const int RULE_ENABLE_MAX_PING = 0x16FF;    // 0x000DB634
-                const int RULE_UNKNOWN_1703 = 0x1703;
-                const int RULE_UNKNOWN_1707 = 0x1707;
-                const int RULE_MOTD = 0x170B;               // 0x000D9AAC
+                // Strings / passwords offsets (A341B8 block)
+                const int RULE_MP_EULA_ACCEPTED = 0x151B;   // A3438C
+
+                // Server rules offsets (A341B8 block)
+                const int RULE_MP_GAMETYPE = 0x160B;        // A3447C
+                const int RULE_MAX_SLOTS = 0x160F;          // A34480 - must be 80 for memory allocation
+                const int RULE_DEDICATED = 0x1613;          // A34484
+                const int RULE_MAX_TEAM_LIVES = 0x161F;     // A34490
+                const int RULE_FLAG_SCORE = 0x1623;         // A34494
+                const int RULE_START_DELAY = 0x1627;        // A34498
+                const int RULE_DESTROY_BUILDINGS = 0x162B;  // A3449C = destroybuild
+                const int RULE_DEATHMES = 0x162F;           // A344A0
+                const int RULE_FLAG_RETURN_TIME = 0x1633;   // A344A4
+                const int RULE_TEAM_REQ = 0x1637;           // A344A8
+                const int RULE_REPLAY = 0x163B;             // A344AC
+                const int RULE_TIME_LIMIT = 0x163F;         // A344B0
+                const int RULE_ZONE_TIMER = 0x1643;         // A344B4
+                const int RULE_RESPAWN_TIME = 0x1647;       // A344B8
+                const int RULE_MP_SERVICE = 0x164B;         // A344BC = mp_service (NovaWorld = 1)
+                const int RULE_PING = 0x1693;               // A34504
+                const int RULE_SEND_PLAYER_LIST = 0x1697;   // A34508
+                const int RULE_TEAMCHANGE_TIME = 0x169B;    // A3450C
+                const int RULE_HUD_COLOR_INDEX = 0x16B7;    // A34528
+                const int RULE_HUD_DETAIL = 0x16BB;         // A3452C
+                const int RULE_MP_VERBOSE = 0x16C7;         // A34538
+                const int RULE_CROSSHAIRS_COLOR = 0x16CB;   // A3453C
+                const int RULE_GAME_PORT = 0x16CF;          // A34540
+                const int RULE_ALLOW_CUSTOM_SKINS = 0x16D7; // A34548
+                const int RULE_REQUIRE_NOVA_LOGIN = 0x16DB; // A3454C
+                const int RULE_FATBULLETS = 0x16E3;         // A34554
+                const int RULE_LAN_MODE = 0x16EF;           // A34560
+                const int RULE_MIN_PING_VALUE = 0x16F3;     // A34564
+                const int RULE_ENABLE_MIN_PING = 0x16F7;    // A34568
+                const int RULE_MAX_PING_VALUE = 0x16FB;     // A3456C
+                const int RULE_ENABLE_MAX_PING = 0x16FF;    // A34570
+                const int RULE_DIRTY_UPSTREAM = 0x1703;     // A34574
+                const int RULE_DIRTY_UPSTREAM_POST = 0x1707;// A34578
+                const int RULE_MOTD = 0x170B;               // A3457C = servermsg
 
                 // -----------------------------------------------------------------
                 // Original blobs - unchanged
@@ -160,8 +251,10 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] serverPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordLobby!);
                 byte[] redTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordRed!);
                 byte[] blueTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordBlue!);
+                byte[] yellowTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordYellow!);
+                byte[] violetTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordViolet!);
                 byte[] gamePlayOptionsBytes = BitConverter.GetBytes(gamePlayOptions);
-                byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps > 0 ? 1 : 0); // preserved for parity
+                byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps);
                 byte[] gameTypeBytes = BitConverter.GetBytes(firstMap.MapType);
                 byte[] timeLimitBytes = BitConverter.GetBytes(theInstance.gameTimeLimit);
                 byte[] respawnTimeBytes = BitConverter.GetBytes(theInstance.gameRespawnTime);
@@ -183,6 +276,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] customMapFlagBytes = BitConverter.GetBytes(Convert.ToInt32(firstMap.ModType == 9 ? 1 : 0));
                 byte[] allowDestroyingBuildings = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDestroyBuildings));
                 byte[] flagreturntime = BitConverter.GetBytes(theInstance.gameFlagReturnTime);
+                byte[] enablefatbullets = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameFatBullets));
 
 				// Keep original working behavior
 				byte[] mapListPrehandle = BitConverter.GetBytes(10621344);
@@ -231,47 +325,52 @@ namespace BHD_ServerManager.Classes.GameManagement
                 ms.Write(graphicsSetupMisc_Settings, 0, graphicsSetupMisc_Settings.Length);
 
                 // Strings / passwords / server identity
+                WriteAt(RULE_MP_EULA_ACCEPTED, BitConverter.GetBytes(1));
                 WriteAt(0x151F, gamePlayOptionsBytes);
                 WriteAt(0x152F, serverPasswordBytes);
                 WriteAt(0x1562, redTeamPasswordBytes);
                 WriteAt(0x1573, blueTeamPasswordBytes);
+                WriteAt(0x1584, yellowTeamPasswordBytes);
+                WriteAt(0x1595, violetTeamPasswordBytes);
                 WriteAt(0x15A6, serverNameBytes);
                 WriteAt(0x15C6, countryCodeBytes);
                 WriteAt(0x15EA, bindAddressBytes);
 
-                // Server rules block
-                WriteAt(RULE_UNKNOWN_160B, BitConverter.GetBytes(1));
-                WriteAt(RULE_MAX_SLOTS, BitConverter.GetBytes(80));             // Must be set 80 for the memory allocation to work correctly
+				// Server rules block
+				WriteAt(RULE_MP_GAMETYPE, BitConverter.GetBytes(1));            
+				WriteAt(RULE_MAX_SLOTS, BitConverter.GetBytes(80));             // Must be 80 for memory allocation on startup
 				WriteAt(RULE_DEDICATED, dedicatedBytes);
-                WriteAt(RULE_MAX_TEAM_LIVES, BitConverter.GetBytes(100));
-                WriteAt(RULE_FLAG_SCORE, flagBallScoreBytes);
-                WriteAt(RULE_START_DELAY, startDelayBytes);
-                WriteAt(RULE_UNKNOWN_162F, BitConverter.GetBytes(1));
-                WriteAt(RULE_FLAG_RETURN_TIME, flagreturntime);
-                WriteAt(RULE_UNKNOWN_1637, BitConverter.GetBytes(1));
-                WriteAt(RULE_UNKNOWN_163B, BitConverter.GetBytes(2));
-                WriteAt(RULE_TIME_LIMIT, timeLimitBytes);
-                WriteAt(RULE_ZONE_TIMER, zoneTimerBytes);
-                WriteAt(RULE_RESPAWN_TIME, respawnTimeBytes);
-                WriteAt(RULE_DESTROY_BUILDINGS, allowDestroyingBuildings);     // A3449C = destroybuild
-                WriteAt(RULE_UNKNOWN_1693, BitConverter.GetBytes(1));
-                WriteAt(RULE_UNKNOWN_1697, BitConverter.GetBytes(1));
-                WriteAt(RULE_UNKNOWN_169B, BitConverter.GetBytes(15));
-                WriteAt(RULE_UNKNOWN_16B7, BitConverter.GetBytes(2));
-                WriteAt(RULE_UNKNOWN_16BB, BitConverter.GetBytes(1));
-                WriteAt(RULE_UNKNOWN_16C7, BitConverter.GetBytes(1));
-                WriteAt(RULE_UNKNOWN_16CB, BitConverter.GetBytes(2));
-                WriteAt(RULE_GAME_PORT, gamePortBytes);
-                WriteAt(RULE_ALLOW_CUSTOM_SKINS, allowCustomSkinsBytes);
-                WriteAt(RULE_REQUIRE_NOVA_LOGIN, requireNovaLoginBytes);
-                WriteAt(RULE_LAN_MODE, BitConverter.GetBytes(4));               // A34560 = lanmode (1, 2, 4)
-                WriteAt(RULE_MIN_PING_VALUE, minPingValueBytes);
-                WriteAt(RULE_ENABLE_MIN_PING, enableMinPingBytes);
-                WriteAt(RULE_MAX_PING_VALUE, maxPingValueBytes);
-                WriteAt(RULE_ENABLE_MAX_PING, enableMaxPingBytes);
-                WriteAt(RULE_UNKNOWN_1703, BitConverter.GetBytes(1));
-                WriteAt(RULE_UNKNOWN_1707, BitConverter.GetBytes(1));
-                WriteAt(RULE_MOTD, motdBytes);
+				WriteAt(RULE_MAX_TEAM_LIVES, BitConverter.GetBytes(100));       // Required for legacy, not used by game
+				WriteAt(RULE_FLAG_SCORE, flagBallScoreBytes);
+				WriteAt(RULE_START_DELAY, startDelayBytes);
+				WriteAt(RULE_DESTROY_BUILDINGS, allowDestroyingBuildings);
+				WriteAt(RULE_DEATHMES, BitConverter.GetBytes(1));               // Turn death messages on/off? :)
+				WriteAt(RULE_FLAG_RETURN_TIME, flagreturntime);
+				WriteAt(RULE_TEAM_REQ, BitConverter.GetBytes(1));
+				WriteAt(RULE_REPLAY, loopMapsBytes);                            // Default was 2, but loop maps value is more intuitive to write here
+				WriteAt(RULE_TIME_LIMIT, timeLimitBytes);
+				WriteAt(RULE_ZONE_TIMER, zoneTimerBytes);
+				WriteAt(RULE_RESPAWN_TIME, respawnTimeBytes);
+				WriteAt(RULE_MP_SERVICE, BitConverter.GetBytes(1));
+				WriteAt(RULE_PING, BitConverter.GetBytes(1));
+				WriteAt(RULE_SEND_PLAYER_LIST, BitConverter.GetBytes(1));
+				WriteAt(RULE_TEAMCHANGE_TIME, BitConverter.GetBytes(15));
+				WriteAt(RULE_HUD_COLOR_INDEX, BitConverter.GetBytes(2));
+				WriteAt(RULE_HUD_DETAIL, BitConverter.GetBytes(1));
+				WriteAt(RULE_MP_VERBOSE, BitConverter.GetBytes(1));
+				WriteAt(RULE_CROSSHAIRS_COLOR, BitConverter.GetBytes(2));
+				WriteAt(RULE_GAME_PORT, gamePortBytes);
+				WriteAt(RULE_ALLOW_CUSTOM_SKINS, allowCustomSkinsBytes);
+				WriteAt(RULE_REQUIRE_NOVA_LOGIN, requireNovaLoginBytes);
+				WriteAt(RULE_FATBULLETS, enablefatbullets);
+				WriteAt(RULE_LAN_MODE, BitConverter.GetBytes(4));
+				WriteAt(RULE_MIN_PING_VALUE, minPingValueBytes);
+				WriteAt(RULE_ENABLE_MIN_PING, enableMinPingBytes);
+				WriteAt(RULE_MAX_PING_VALUE, maxPingValueBytes);
+				WriteAt(RULE_ENABLE_MAX_PING, enableMaxPingBytes);
+				WriteAt(RULE_DIRTY_UPSTREAM, BitConverter.GetBytes(1));
+				WriteAt(RULE_DIRTY_UPSTREAM_POST, BitConverter.GetBytes(1));
+				WriteAt(RULE_MOTD, motdBytes);
 
                 // Keep original working writes that may overlap intentionally
                 WriteAt(0x16F4, BitConverter.GetBytes(1));
@@ -344,6 +443,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 string autoResPath = Path.Combine(theInstance.profileServerPath!, "autores.bin");
                 string dumpPath = Path.Combine(theInstance.profileServerPath!, "autores_dump.txt");
 
+
                 if (!File.Exists(autoResPath))
                 {
                     AppDebug.Log("ReadAutoRes", "autores.bin file does not exist.");
@@ -384,9 +484,12 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                     // Strings / passwords / server identity
                     writer.WriteLine($"0x151F: {BitConverter.ToInt32(fileData, 0x151F)}");
+                    writer.WriteLine($"0x151B: {BitConverter.ToInt32(fileData, 0x151B)}");
                     writer.WriteLine($"0x152F: {ReadNullTerminatedString(fileData, 0x152F)}");
                     writer.WriteLine($"0x1562: {ReadNullTerminatedString(fileData, 0x1562)}");
                     writer.WriteLine($"0x1573: {ReadNullTerminatedString(fileData, 0x1573)}");
+                    writer.WriteLine($"0x1584: {ReadNullTerminatedString(fileData, 0x1584)}");
+                    writer.WriteLine($"0x1595: {ReadNullTerminatedString(fileData, 0x1595)}");
                     writer.WriteLine($"0x15A6: {ReadNullTerminatedString(fileData, 0x15A6)}");
                     writer.WriteLine($"0x15C6: {ReadNullTerminatedString(fileData, 0x15C6)}");
                     writer.WriteLine($"0x15EA: {ReadNullTerminatedString(fileData, 0x15EA)}");
@@ -398,6 +501,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     writer.WriteLine($"0x161F: {BitConverter.ToInt32(fileData, 0x161F)}");
                     writer.WriteLine($"0x1623: {BitConverter.ToInt32(fileData, 0x1623)}");
                     writer.WriteLine($"0x1627: {BitConverter.ToInt32(fileData, 0x1627)}");
+                    writer.WriteLine($"0x162B: {BitConverter.ToInt32(fileData, 0x162B)}");
                     writer.WriteLine($"0x162F: {BitConverter.ToInt32(fileData, 0x162F)}");
                     writer.WriteLine($"0x1633: {BitConverter.ToInt32(fileData, 0x1633)}");
                     writer.WriteLine($"0x1637: {BitConverter.ToInt32(fileData, 0x1637)}");
@@ -416,6 +520,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     writer.WriteLine($"0x16CF: {BitConverter.ToInt32(fileData, 0x16CF)}");
                     writer.WriteLine($"0x16D7: {BitConverter.ToInt32(fileData, 0x16D7)}");
                     writer.WriteLine($"0x16DB: {BitConverter.ToInt32(fileData, 0x16DB)}");
+                    writer.WriteLine($"0x16E3: {BitConverter.ToInt32(fileData, 0x16E3)}");
                     writer.WriteLine($"0x16EF: {BitConverter.ToInt32(fileData, 0x16EF)}");
                     writer.WriteLine($"0x16F3: {BitConverter.ToInt32(fileData, 0x16F3)}");
                     writer.WriteLine($"0x16F7: {BitConverter.ToInt32(fileData, 0x16F7)}");
@@ -578,6 +683,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                     AppDebug.Log("startGame", "Already patched, starting as-is.");
 
                 AppDebug.Log("startGame", "No existing game process found, starting a new instance...");
+
+                // Update the dfv.cfg
+                createdfv();
 
                 // Create the AutoRes File
                 createAutoRes();

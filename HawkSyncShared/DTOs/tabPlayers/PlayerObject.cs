@@ -129,12 +129,12 @@ namespace HawkSyncShared.DTOs.tabPlayers
     }
     public enum Teams
     {
-        TEAM_GREEN = 0,
-        TEAM_BLUE = 1,
-        TEAM_RED = 2,
-        TEAM_YELLOW = 3,
-        TEAM_PURPLE = 4,
-        TEAM_SPEC = 5 // this shouldn't be here because there is no spectator camera
+        TEAM_GREEN = 0,   // Deathmatch/FFA (non-team modes)
+        TEAM_BLUE = 1,    // 2-team & 4-team modes
+        TEAM_RED = 2,     // 2-team & 4-team modes
+        TEAM_YELLOW = 3,  // 4-team mode only
+        TEAM_PURPLE = 4,  // 4-team mode only
+        TEAM_SPEC = 5     // Not used
     }
     public enum CharacterClass
     {

@@ -61,7 +61,7 @@ namespace HawkSyncShared.Instances
 		// Game Settings
         public int              gameMatchID                 { get; set; } = 0;
 		public int              gameMatchWinner             { get; set; } = 0;
-        public int              gameNumTeams                { get; set; } = 0;
+        public bool             gameEnableFourTeams         { get; set; } = false;
 		public string           gameServerName              { get; set; } = "Untitled Server";
         public string           gameMOTD                    { get; set; } = "Welcome to the server!";
         public string           gameCountryCode             { get; set; } = "US";
@@ -71,6 +71,8 @@ namespace HawkSyncShared.Instances
         public string           gamePasswordLobby           { get; set; } = "";
         public string           gamePasswordBlue            { get; set; } = "";
         public string           gamePasswordRed             { get; set; } = "";
+        public string           gamePasswordYellow          { get; set; } = "";
+        public string           gamePasswordViolet          { get; set; } = "";
         public int              gameMaxSlots                { get; set; } = 50;  /* Max Players 50 */
         public int              gameLoopMaps                { get; set; } = 1;   /* 0 = Play One Map, 1 = Loop Maps, 2 = Cycle Maps */
         public bool             gameRequireNova             { get; set; } = false;

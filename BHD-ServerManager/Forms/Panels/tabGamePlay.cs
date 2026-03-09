@@ -136,6 +136,8 @@ namespace BHD_ServerManager.Forms.Panels
 		{
 			tb_bluePassword.Text = settings.BluePassword;
 			tb_redPassword.Text = settings.RedPassword;
+			tb_yellowPassword.Text = settings.YellowPassword;
+			tb_violetPassword.Text = settings.VioletPassword;
 			num_scoresKOTH.Value = settings.ScoreKOTH;
 			num_scoresDM.Value = settings.ScoreDM;
 			num_scoresFB.Value = settings.ScoreFB;
@@ -158,19 +160,20 @@ namespace BHD_ServerManager.Forms.Panels
 			SetWeaponButtons(settings.Weapons, settings.RestrictedWeapons);
 		}
 
-		private void SetOptionButtons(ServerOptions options)
-		{
-			btn_AutoBalance.BackColor = options.AutoBalance ? Color.LightGreen : Color.LightGray;
-			btn_CustomSkins.BackColor = options.CustomSkins ? Color.LightGreen : Color.LightGray;
-			btn_AllowLeftLeaning.BackColor = options.AllowLeftLeaning ? Color.LightGreen : Color.LightGray;
-			btn_AllowRightLeaning.BackColor = options.AllowRightLeaning ? Color.LightGreen : Color.LightGray;
-			btn_AutoRange.BackColor = options.AutoRange ? Color.LightGreen : Color.LightGray;
-			btn_DestroyBuildings.BackColor = options.DestroyBuildings ? Color.LightGreen : Color.LightGray;
-			btn_FatBullets.BackColor = options.FatBullets ? Color.LightGreen : Color.LightGray;
-			btn_OneShotKills.BackColor = options.OneShotKills ? Color.LightGreen : Color.LightGray;
-			btn_ShowTracers.BackColor = options.ShowTracers ? Color.LightGreen : Color.LightGray;
-			btn_ShowClays.BackColor = options.ShowClays ? Color.LightGreen : Color.LightGray;
-		}
+	private void SetOptionButtons(ServerOptions options)
+	{
+		btn_AutoBalance.BackColor = options.AutoBalance ? Color.LightGreen : Color.LightGray;
+		btn_CustomSkins.BackColor = options.CustomSkins ? Color.LightGreen : Color.LightGray;
+		btn_AllowLeftLeaning.BackColor = options.AllowLeftLeaning ? Color.LightGreen : Color.LightGray;
+		btn_AllowRightLeaning.BackColor = options.AllowRightLeaning ? Color.LightGreen : Color.LightGray;
+		btn_AutoRange.BackColor = options.AutoRange ? Color.LightGreen : Color.LightGray;
+		btn_DestroyBuildings.BackColor = options.DestroyBuildings ? Color.LightGreen : Color.LightGray;
+		btn_FatBullets.BackColor = options.FatBullets ? Color.LightGreen : Color.LightGray;
+		btn_OneShotKills.BackColor = options.OneShotKills ? Color.LightGreen : Color.LightGray;
+		btn_ShowTracers.BackColor = options.ShowTracers ? Color.LightGreen : Color.LightGray;
+		btn_ShowClays.BackColor = options.ShowClays ? Color.LightGreen : Color.LightGray;
+		btn_Enable4Teams.BackColor = theInstance?.gameEnableFourTeams == true ? Color.LightGreen : Color.LightGray;
+	}
 
 		private void SetFriendlyFireButtons(FriendlyFireSettings ff)
 		{
@@ -263,6 +266,7 @@ namespace BHD_ServerManager.Forms.Panels
 			btn_OneShotKills.Click += actionClick_OptionButtonChanged;
 			btn_ShowTracers.Click += actionClick_OptionButtonChanged;
 			btn_ShowClays.Click += actionClick_OptionButtonChanged;
+			btn_Enable4Teams.Click += actionClick_OptionButtonChanged;
 			// Friendly fire buttons
 			btn_FriendlyFireEnabled.Click += actionClick_FriendlyFireButtonChanged;
 			btn_ShowFriendlyTags.Click += actionClick_FriendlyFireButtonChanged;
@@ -466,7 +470,8 @@ namespace BHD_ServerManager.Forms.Panels
 				FatBullets: btn_FatBullets.BackColor == Color.LightGreen,
 				OneShotKills: btn_OneShotKills.BackColor == Color.LightGreen,
 				AllowLeftLeaning: btn_AllowLeftLeaning.BackColor == Color.LightGreen,
-				AllowRightLeaning: btn_AllowRightLeaning.BackColor == Color.LightGreen
+				AllowRightLeaning: btn_AllowRightLeaning.BackColor == Color.LightGreen,
+				Enable4Teams: btn_Enable4Teams.BackColor == Color.LightGreen
 			);
 
 			var friendlyFire = new FriendlyFireSettings(
@@ -540,6 +545,8 @@ namespace BHD_ServerManager.Forms.Panels
 			return new GamePlaySettings(
 				BluePassword: tb_bluePassword.Text,
 				RedPassword: tb_redPassword.Text,
+				YellowPassword: tb_yellowPassword.Text,
+				VioletPassword: tb_violetPassword.Text,
 				ScoreKOTH: (int)num_scoresKOTH.Value,
 				ScoreDM: (int)num_scoresDM.Value,
 				ScoreFB: (int)num_scoresFB.Value,

@@ -1,11 +1,14 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
+﻿using BHD_ServerManager.API;
 using BHD_ServerManager.Classes.GameManagement;
-using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.Tickers;
 using BHD_ServerManager.Forms;
-using BHD_ServerManager.API;
+using HawkSyncShared;
+using HawkSyncShared.DTOs.tabPlayers;
+using HawkSyncShared.DTOs.tabStats;
+using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -13,8 +16,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Storage;
-using HawkSyncShared.DTOs.tabStats;
-using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -71,7 +72,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         bool FatBullets,
         bool OneShotKills,
         bool AllowLeftLeaning,
-        bool AllowRightLeaning
+        bool AllowRightLeaning,
+        bool Enable4Teams
     );
 
     /// <summary>
@@ -137,6 +139,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // Lobby Passwords
         string BluePassword,
         string RedPassword,
+        string YellowPassword,
+        string VioletPassword,
         
         // Win Conditions
         int ScoreKOTH,
@@ -452,18 +456,19 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             try
             {
-                var options = new ServerOptions(
-                    AutoBalance: ServerSettings.Get("gameOptionAutoBalance", true),
-                    ShowTracers: ServerSettings.Get("gameOptionShowTracers", false),
-                    ShowClays: ServerSettings.Get("gameShowTeamClays", true),
-                    AutoRange: ServerSettings.Get("gameOptionAutoRange", false),
-                    CustomSkins: ServerSettings.Get("gameCustomSkins", true),
-                    DestroyBuildings: ServerSettings.Get("gameDestroyBuildings", true),
-                    FatBullets: ServerSettings.Get("gameFatBullets", false),
-                    OneShotKills: ServerSettings.Get("gameOneShotKills", false),
-                    AllowLeftLeaning: ServerSettings.Get("gameAllowLeftLeaning", true),
-                    AllowRightLeaning: ServerSettings.Get("gameAllowRightLeaning", true)
-                );
+            var options = new ServerOptions(
+                AutoBalance: ServerSettings.Get("gameOptionAutoBalance", true),
+                ShowTracers: ServerSettings.Get("gameOptionShowTracers", false),
+                ShowClays: ServerSettings.Get("gameShowTeamClays", true),
+                AutoRange: ServerSettings.Get("gameOptionAutoRange", false),
+                CustomSkins: ServerSettings.Get("gameCustomSkins", true),
+                DestroyBuildings: ServerSettings.Get("gameDestroyBuildings", true),
+                FatBullets: ServerSettings.Get("gameFatBullets", false),
+                OneShotKills: ServerSettings.Get("gameOneShotKills", false),
+                AllowLeftLeaning: ServerSettings.Get("gameAllowLeftLeaning", true),
+                AllowRightLeaning: ServerSettings.Get("gameAllowRightLeaning", true),
+                Enable4Teams: ServerSettings.Get("gameEnableFourTeams", false)
+            );
 
                 var friendlyFire = new FriendlyFireSettings(
                     Enabled: ServerSettings.Get("gameOptionFF", true),
@@ -536,6 +541,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var settings = new GamePlaySettings(
                     BluePassword: ServerSettings.Get("gamePasswordBlue", string.Empty),
                     RedPassword: ServerSettings.Get("gamePasswordRed", string.Empty),
+                    YellowPassword: ServerSettings.Get("gamePasswordYellow", string.Empty),
+                    VioletPassword: ServerSettings.Get("gamePasswordViolet", string.Empty),
                     ScoreKOTH: ServerSettings.Get("gameScoreZoneTime", 10),
                     ScoreDM: ServerSettings.Get("gameScoreKills", 200),
                     ScoreFB: ServerSettings.Get("gameScoreFlags", 10),
@@ -585,6 +592,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Save lobby passwords
                 ServerSettings.Set("gamePasswordBlue", settings.BluePassword);
                 ServerSettings.Set("gamePasswordRed", settings.RedPassword);
+                ServerSettings.Set("gamePasswordYellow", settings.YellowPassword);
+                ServerSettings.Set("gamePasswordViolet", settings.VioletPassword);
 
                 // Save win conditions
                 ServerSettings.Set("gameScoreZoneTime", settings.ScoreKOTH);
@@ -602,17 +611,18 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("gameFlagReturnTime", settings.FlagReturnTime);
                 ServerSettings.Set("gameFullWeaponThreshold", settings.FullWeaponThreshold);
 
-                // Save server options
-                ServerSettings.Set("gameOptionAutoBalance", settings.Options.AutoBalance);
-                ServerSettings.Set("gameOptionShowTracers", settings.Options.ShowTracers);
-                ServerSettings.Set("gameShowTeamClays", settings.Options.ShowClays);
-                ServerSettings.Set("gameOptionAutoRange", settings.Options.AutoRange);
-                ServerSettings.Set("gameCustomSkins", settings.Options.CustomSkins);
-                ServerSettings.Set("gameDestroyBuildings", settings.Options.DestroyBuildings);
-                ServerSettings.Set("gameFatBullets", settings.Options.FatBullets);
-                ServerSettings.Set("gameOneShotKills", settings.Options.OneShotKills);
-                ServerSettings.Set("gameAllowLeftLeaning", settings.Options.AllowLeftLeaning);
-                ServerSettings.Set("gameAllowRightLeaning", settings.Options.AllowRightLeaning);
+            // Save server options
+            ServerSettings.Set("gameOptionAutoBalance", settings.Options.AutoBalance);
+            ServerSettings.Set("gameOptionShowTracers", settings.Options.ShowTracers);
+            ServerSettings.Set("gameShowTeamClays", settings.Options.ShowClays);
+            ServerSettings.Set("gameOptionAutoRange", settings.Options.AutoRange);
+            ServerSettings.Set("gameCustomSkins", settings.Options.CustomSkins);
+            ServerSettings.Set("gameDestroyBuildings", settings.Options.DestroyBuildings);
+            ServerSettings.Set("gameFatBullets", settings.Options.FatBullets);
+            ServerSettings.Set("gameOneShotKills", settings.Options.OneShotKills);
+            ServerSettings.Set("gameAllowLeftLeaning", settings.Options.AllowLeftLeaning);
+            ServerSettings.Set("gameAllowRightLeaning", settings.Options.AllowRightLeaning);
+            ServerSettings.Set("gameEnableFourTeams", settings.Options.Enable4Teams);
 
                 // Save friendly fire
                 ServerSettings.Set("gameOptionFF", settings.FriendlyFire.Enabled);
@@ -703,6 +713,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 errors.Add("Blue team password cannot exceed 50 characters.");
             if (settings.RedPassword.Length > 50)
                 errors.Add("Red team password cannot exceed 50 characters.");
+            if (settings.YellowPassword.Length > 50)
+                errors.Add("Yellow team password cannot exceed 50 characters.");
+            if (settings.VioletPassword.Length > 50)
+                errors.Add("Violet team password cannot exceed 50 characters.");
 
             // Validate win conditions
             if (settings.ScoreKOTH < 1 || settings.ScoreKOTH > 999)
@@ -742,14 +756,15 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (!result.Success)
                     return result;
 
-                // Get current settings from instance
-                var options = new ServerOptions(
-                    theInstance.gameOptionAutoBalance, theInstance.gameOptionShowTracers,
-                    theInstance.gameShowTeamClays, theInstance.gameOptionAutoRange,
-                    theInstance.gameCustomSkins, theInstance.gameDestroyBuildings,
-                    theInstance.gameFatBullets, theInstance.gameOneShotKills,
-                    theInstance.gameAllowLeftLeaning, theInstance.gameAllowRightLeaning
-                );
+            // Get current settings from instance
+            var options = new ServerOptions(
+                theInstance.gameOptionAutoBalance, theInstance.gameOptionShowTracers,
+                theInstance.gameShowTeamClays, theInstance.gameOptionAutoRange,
+                theInstance.gameCustomSkins, theInstance.gameDestroyBuildings,
+                theInstance.gameFatBullets, theInstance.gameOneShotKills,
+                theInstance.gameAllowLeftLeaning, theInstance.gameAllowRightLeaning,
+                theInstance.gameEnableFourTeams
+            );
 
                 var friendlyFire = new FriendlyFireSettings(
                     theInstance.gameOptionFF, theInstance.gameFriendlyFireKills,
@@ -793,6 +808,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 var settings = new GamePlaySettings(
                     theInstance.gamePasswordBlue, theInstance.gamePasswordRed,
+                    theInstance.gamePasswordYellow, theInstance.gamePasswordViolet,
                     theInstance.gameScoreZoneTime, theInstance.gameScoreKills, theInstance.gameScoreFlags,
                     theInstance.gameTimeLimit, theInstance.gameLoopMaps, theInstance.gameStartDelay,
                     theInstance.gameRespawnTime, theInstance.gameScoreBoardDelay, theInstance.gameMaxSlots,
@@ -1066,6 +1082,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             theInstance.gamePasswordBlue = settings.BluePassword;
             theInstance.gamePasswordRed = settings.RedPassword;
+            theInstance.gamePasswordYellow = settings.YellowPassword;
+            theInstance.gamePasswordViolet = settings.VioletPassword;
             theInstance.gameScoreZoneTime = settings.ScoreKOTH;
             theInstance.gameScoreKills = settings.ScoreDM;
             theInstance.gameScoreFlags = settings.ScoreFB;
@@ -1079,17 +1097,18 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             theInstance.gameFlagReturnTime = settings.FlagReturnTime;
             theInstance.gameFullWeaponThreshold = settings.FullWeaponThreshold;
 
-            // Server options
-            theInstance.gameOptionAutoBalance = settings.Options.AutoBalance;
-            theInstance.gameOptionShowTracers = settings.Options.ShowTracers;
-            theInstance.gameShowTeamClays = settings.Options.ShowClays;
-            theInstance.gameOptionAutoRange = settings.Options.AutoRange;
-            theInstance.gameCustomSkins = settings.Options.CustomSkins;
-            theInstance.gameDestroyBuildings = settings.Options.DestroyBuildings;
-            theInstance.gameFatBullets = settings.Options.FatBullets;
-            theInstance.gameOneShotKills = settings.Options.OneShotKills;
-            theInstance.gameAllowLeftLeaning = settings.Options.AllowLeftLeaning;
-            theInstance.gameAllowRightLeaning = settings.Options.AllowRightLeaning;
+        // Server options
+        theInstance.gameOptionAutoBalance = settings.Options.AutoBalance;
+        theInstance.gameOptionShowTracers = settings.Options.ShowTracers;
+        theInstance.gameShowTeamClays = settings.Options.ShowClays;
+        theInstance.gameOptionAutoRange = settings.Options.AutoRange;
+        theInstance.gameCustomSkins = settings.Options.CustomSkins;
+        theInstance.gameDestroyBuildings = settings.Options.DestroyBuildings;
+        theInstance.gameFatBullets = settings.Options.FatBullets;
+        theInstance.gameOneShotKills = settings.Options.OneShotKills;
+        theInstance.gameAllowLeftLeaning = settings.Options.AllowLeftLeaning;
+        theInstance.gameAllowRightLeaning = settings.Options.AllowRightLeaning;
+        theInstance.gameEnableFourTeams = settings.Options.Enable4Teams;
 
             // Friendly fire
             theInstance.gameOptionFF = settings.FriendlyFire.Enabled;
@@ -1183,7 +1202,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
                 return;
-
+            
+            // Update the DFV to match the current settings. On map change these should "apply".
+            StartServer.createdfv();
+            
+            // Update Memory Locations
             ServerMemory.UpdateServerName();
             ServerMemory.UpdatePlayerHostName();
             ServerMemory.UpdateMOTD();
@@ -1195,10 +1218,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             ServerMemory.UpdateMaxSlots();
             ServerMemory.UpdateBluePassword();
             ServerMemory.UpdateRedPassword();
-            ServerMemory.UpdateGamePlayOptions();
+            ServerMemory.UpdateYellowPassword();
+            ServerMemory.UpdateVioletPassword();
+			ServerMemory.UpdateGamePlayOptions();
             ServerMemory.UpdatePSPTakeOverTime();
             ServerMemory.UpdateFlagReturnTime();
-            ServerMemory.UpdateMaxTeamLives();
             ServerMemory.UpdateFriendlyFireKills();
             ServerMemory.UpdateMinPing();
             ServerMemory.UpdateMaxPing();
@@ -1210,7 +1234,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             ServerMemory.UpdateOneShotKills();
             ServerMemory.UpdateWeaponRestrictions();
             ServerMemory.UpdateGameScores();
-        }
+
+		}
 
         public static void InitializeTickers()
         {
@@ -1221,11 +1246,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             CommonCore.Ticker?.Start("SessionCleanup", 60000, () => adminInstanceManager.CleanupStaleSessions(2));
         }
 
-        public static void changeTeamGameMode(int currentMapType, int nextMapType)
+        public static void changeTeamGameMode(int currentMapType, int nextMapType, bool isCurrentMap4Team, bool isNextMap4Team)
         {
             bool isCurrentMapTeamMap = Functions.IsMapTeamBased(currentMapType);
             bool isNextMapTeamMap = Functions.IsMapTeamBased(nextMapType);
 
+            AppDebug.Log("changeTeamGameMode", $"Transition: CurrentType={currentMapType} NextType={nextMapType} Current4Team={isCurrentMap4Team} Next4Team={isNextMap4Team}");
+
+            // SCENARIO 1: Team-based → Non-team (2-team or 4-team → FFA/DM)
             if (isNextMapTeamMap == false && isCurrentMapTeamMap == true)
             {
                 foreach (var playerRecord in playerInstance.PlayerList)
@@ -1237,18 +1265,22 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         Team = playerObj.PlayerTeam
                     });
 
+                    // Assign all players to team 0 (Deathmatch/FFA)
                     playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                     {
                         slotNum = playerObj.PlayerSlot,
-                        Team = playerObj.PlayerSlot + 5
+                        Team = (int)Teams.TEAM_GREEN // 0 = FFA
                     });
                 }
+                AppDebug.Log("changeTeamGameMode", "Assigned all players to FFA (Team 0)");
             }
+            // SCENARIO 2: Non-team → Team-based (FFA/DM → 2-team or 4-team)
             else if (isNextMapTeamMap == true && isCurrentMapTeamMap == false)
             {
+                // Restore players who were on teams before FFA
                 foreach (playerTeamObject playerObj in playerInstance.PlayerPreviousTeamList)
                 {
-                    if (playerInstance.PlayerList[playerObj.slotNum] != null)
+                    if (playerInstance.PlayerList.ContainsKey(playerObj.slotNum))
                     {
                         playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                         {
@@ -1257,96 +1289,145 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         });
                     }
                 }
+
+                // Balance new players who joined during FFA
                 foreach (var playerRecord in playerInstance.PlayerList)
                 {
                     PlayerObject player = playerRecord.Value;
-                    bool found = false;
-                    foreach (playerTeamObject previousPlayer in playerInstance.PlayerPreviousTeamList)
+                    bool found = playerInstance.PlayerPreviousTeamList.Any(p => p.slotNum == player.PlayerSlot);
+
+                    if (!found)
                     {
-                        if (player.PlayerSlot == previousPlayer.slotNum)
+                        int assignedTeam = BalanceNewPlayer(isNextMap4Team);
+                        
+                        playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
                         {
-                            found = true;
-                            break;
-                        }
-                    }
+                            slotNum = player.PlayerSlot,
+                            Team = assignedTeam
+                        });
+                        playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
+                        {
+                            slotNum = player.PlayerSlot,
+                            Team = assignedTeam
+                        });
 
-                    if (found == false)
-                    {
-                        int blueteam = 0;
-                        int redteam = 0;
-
-                        foreach (playerTeamObject playerTeam in playerInstance.PlayerPreviousTeamList)
-                        {
-                            if (playerTeam.Team == (int)Teams.TEAM_BLUE)
-                            {
-                                blueteam++;
-                            }
-                            else if (playerTeam.Team == (int)Teams.TEAM_RED)
-                            {
-                                redteam++;
-                            }
-                        }
-
-                        if (blueteam > redteam)
-                        {
-                            playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
-                            {
-                                slotNum = player.PlayerSlot,
-                                Team = (int)Teams.TEAM_RED
-                            });
-                            playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
-                            {
-                                slotNum = player.PlayerSlot,
-                                Team = (int)Teams.TEAM_RED
-                            });
-                        }
-                        else if (blueteam < redteam)
-                        {
-                            playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
-                            {
-                                slotNum = player.PlayerSlot,
-                                Team = (int)Teams.TEAM_BLUE
-                            });
-                            playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
-                            {
-                                slotNum = player.PlayerSlot,
-                                Team = (int)Teams.TEAM_BLUE
-                            });
-                        }
-                        else if (blueteam == redteam)
-                        {
-                            Random rand = new Random();
-                            int rnd = rand.Next(1, 3);
-                            if (rnd == 1)
-                            {
-                                playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
-                                {
-                                    slotNum = player.PlayerSlot,
-                                    Team = (int)Teams.TEAM_BLUE
-                                });
-                                playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
-                                {
-                                    slotNum = player.PlayerSlot,
-                                    Team = (int)Teams.TEAM_BLUE
-                                });
-                            }
-                            else if (rnd == 2)
-                            {
-                                playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
-                                {
-                                    slotNum = player.PlayerSlot,
-                                    Team = (int)Teams.TEAM_RED
-                                });
-                                playerInstance.PlayerPreviousTeamList.Add(new playerTeamObject
-                                {
-                                    slotNum = player.PlayerSlot,
-                                    Team = (int)Teams.TEAM_RED
-                                });
-                            }
-                        }
+                        AppDebug.Log("changeTeamGameMode", $"Balanced new player slot {player.PlayerSlot} to team {assignedTeam}");
                     }
                 }
                 playerInstance.PlayerPreviousTeamList.Clear();
+            }
+            // SCENARIO 3: 2-team → 4-team
+            else if (isCurrentMapTeamMap && isNextMapTeamMap && !isCurrentMap4Team && isNextMap4Team)
+            {
+                // Split existing 2 teams into 4 teams
+                var blueTeamPlayers = playerInstance.PlayerList.Values.Where(p => p.PlayerTeam == (int)Teams.TEAM_BLUE).ToList();
+                var redTeamPlayers = playerInstance.PlayerList.Values.Where(p => p.PlayerTeam == (int)Teams.TEAM_RED).ToList();
+
+                // Split Blue team → Blue (1) and Yellow (3)
+                for (int i = 0; i < blueTeamPlayers.Count; i++)
+                {
+                    int newTeam = (i % 2 == 0) ? (int)Teams.TEAM_BLUE : (int)Teams.TEAM_YELLOW;
+                    playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
+                    {
+                        slotNum = blueTeamPlayers[i].PlayerSlot,
+                        Team = newTeam
+                    });
+                }
+
+                // Split Red team → Red (2) and Purple (4)
+                for (int i = 0; i < redTeamPlayers.Count; i++)
+                {
+                    int newTeam = (i % 2 == 0) ? (int)Teams.TEAM_RED : (int)Teams.TEAM_PURPLE;
+                    playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
+                    {
+                        slotNum = redTeamPlayers[i].PlayerSlot,
+                        Team = newTeam
+                    });
+                }
+
+                AppDebug.Log("changeTeamGameMode", $"Split 2 teams into 4: {blueTeamPlayers.Count} blue→blue/yellow, {redTeamPlayers.Count} red→red/purple");
+            }
+            // SCENARIO 4: 4-team → 2-team
+            else if (isCurrentMapTeamMap && isNextMapTeamMap && isCurrentMap4Team && !isNextMap4Team)
+            {
+                // Merge 4 teams into 2 teams
+                foreach (var playerRecord in playerInstance.PlayerList)
+                {
+                    PlayerObject player = playerRecord.Value;
+                    int newTeam;
+
+                    // Blue (1) and Yellow (3) → Blue (1)
+                    // Red (2) and Purple (4) → Red (2)
+                    if (player.PlayerTeam == (int)Teams.TEAM_BLUE || player.PlayerTeam == (int)Teams.TEAM_YELLOW)
+                    {
+                        newTeam = (int)Teams.TEAM_BLUE;
+                    }
+                    else // Red or Purple
+                    {
+                        newTeam = (int)Teams.TEAM_RED;
+                    }
+
+                    playerInstance.PlayerChangeTeamList.Add(new playerTeamObject
+                    {
+                        slotNum = player.PlayerSlot,
+                        Team = newTeam
+                    });
+                }
+
+                AppDebug.Log("changeTeamGameMode", "Merged 4 teams into 2 (Blue/Yellow→Blue, Red/Purple→Red)");
+            }
+            // SCENARIO 5: Same team structure (2→2 or 4→4) - no changes needed
+            else if (isCurrentMapTeamMap && isNextMapTeamMap)
+            {
+                AppDebug.Log("changeTeamGameMode", $"Same team structure ({(isCurrentMap4Team ? "4" : "2")}→{(isNextMap4Team ? "4" : "2")}), no team changes");
+            }
+        }
+
+        /// <summary>
+        /// Balances a new player to the smallest team
+        /// </summary>
+        private static int BalanceNewPlayer(bool is4TeamMode)
+        {
+            if (is4TeamMode)
+            {
+                // Count players in each of the 4 teams (1, 2, 3, 4)
+                int blueCount = playerInstance.PlayerPreviousTeamList.Count(p => p.Team == (int)Teams.TEAM_BLUE);
+                int redCount = playerInstance.PlayerPreviousTeamList.Count(p => p.Team == (int)Teams.TEAM_RED);
+                int yellowCount = playerInstance.PlayerPreviousTeamList.Count(p => p.Team == (int)Teams.TEAM_YELLOW);
+                int purpleCount = playerInstance.PlayerPreviousTeamList.Count(p => p.Team == (int)Teams.TEAM_PURPLE);
+
+                // Find minimum count
+                int minCount = new[] { blueCount, redCount, yellowCount, purpleCount }.Min();
+
+                // Assign to smallest team (with random tiebreaker)
+                var smallestTeams = new List<int>();
+                if (blueCount == minCount) smallestTeams.Add((int)Teams.TEAM_BLUE);
+                if (redCount == minCount) smallestTeams.Add((int)Teams.TEAM_RED);
+                if (yellowCount == minCount) smallestTeams.Add((int)Teams.TEAM_YELLOW);
+                if (purpleCount == minCount) smallestTeams.Add((int)Teams.TEAM_PURPLE);
+
+                Random rand = new Random();
+                return smallestTeams[rand.Next(smallestTeams.Count)];
+            }
+            else
+            {
+                // 2-team balancing (Blue=1, Red=2)
+                int blueteam = playerInstance.PlayerPreviousTeamList.Count(p => p.Team == (int)Teams.TEAM_BLUE);
+                int redteam = playerInstance.PlayerPreviousTeamList.Count(p => p.Team == (int)Teams.TEAM_RED);
+
+                if (blueteam > redteam)
+                {
+                    return (int)Teams.TEAM_RED;
+                }
+                else if (blueteam < redteam)
+                {
+                    return (int)Teams.TEAM_BLUE;
+                }
+                else
+                {
+                    Random rand = new Random();
+                    return rand.Next(1, 3) == 1 ? (int)Teams.TEAM_BLUE : (int)Teams.TEAM_RED;
+                }
             }
         }
 

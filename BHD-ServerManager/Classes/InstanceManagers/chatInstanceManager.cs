@@ -348,7 +348,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 1 => 3,
                 2 => 4,
                 3 => 5,
-                0 => 1,
+				0 => 1,
                 _ => 1
             };
         }
@@ -427,6 +427,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     1 => "Blue",
                     2 => "Red",
+                    3 => "Yellow",
+                    4 => "Violet",
                     _ => "Unknown Team"
                 },
                 _ => "Unknown"

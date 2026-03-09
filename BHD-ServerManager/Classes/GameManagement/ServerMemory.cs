@@ -753,53 +753,62 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: UpdateBluePassword
         public static void UpdateBluePassword()
         {
-
-
-            byte[] Ptr1 = new byte[4];
-            int Ptr1Read = 0;
-            ReadProcessMemory((int)processHandle, baseAddr + 0x005F204A, Ptr1, Ptr1.Length, ref Ptr1Read);
-
-            int Ptr1Addr = BitConverter.ToInt32(Ptr1, 0);
-
-            // Always use 16 bytes for the password buffer
-            byte[] BluePasswordWrite = new byte[16];
+            // byte_9F204A: char[17] — direct buffer, no pointer indirection
+            byte[] BluePasswordWrite = new byte[17];
             if (!string.IsNullOrEmpty(thisInstance.gamePasswordBlue))
             {
                 byte[] pwBytes = Encoding.Default.GetBytes(thisInstance.gamePasswordBlue);
-                Array.Copy(pwBytes, BluePasswordWrite, Math.Min(pwBytes.Length, BluePasswordWrite.Length));
+                Array.Copy(pwBytes, BluePasswordWrite, Math.Min(pwBytes.Length, 16));
             }
-            // If password is null or empty, BluePasswordWrite remains all zeros
 
             int BluePasswordWritten = 0;
-            WriteProcessMemory((int)processHandle, Ptr1Addr, BluePasswordWrite, BluePasswordWrite.Length, ref BluePasswordWritten);
-
-
+            WriteProcessMemory((int)processHandle, baseAddr + 0x005F204A, BluePasswordWrite, BluePasswordWrite.Length, ref BluePasswordWritten);
         }
         // Function: UpdateRedPassword
         public static void UpdateRedPassword()
         {
-
-
-            byte[] Ptr1 = new byte[4];
-            int Ptr1Read = 0;
-            ReadProcessMemory((int)processHandle, baseAddr + 0x006343D3, Ptr1, Ptr1.Length, ref Ptr1Read);
-
-            int Ptr1Addr = BitConverter.ToInt32(Ptr1, 0);
-
-            // Always use 16 bytes for the password buffer
-            byte[] RedPasswordWrite = new byte[16];
+            // byte_9F2039: char[17] — direct buffer, no pointer indirection
+            byte[] RedPasswordWrite = new byte[17];
             if (!string.IsNullOrEmpty(thisInstance.gamePasswordRed))
             {
                 byte[] pwBytes = Encoding.Default.GetBytes(thisInstance.gamePasswordRed);
-                Array.Copy(pwBytes, RedPasswordWrite, Math.Min(pwBytes.Length, RedPasswordWrite.Length));
+                Array.Copy(pwBytes, RedPasswordWrite, Math.Min(pwBytes.Length, 16));
             }
-            // If password is null or empty, RedPasswordWrite remains all zeros
 
             int RedPasswordWritten = 0;
-            WriteProcessMemory((int)processHandle, Ptr1Addr + 0x33, RedPasswordWrite, RedPasswordWrite.Length, ref RedPasswordWritten);
-
-
+            WriteProcessMemory((int)processHandle, baseAddr + 0x005F2039, RedPasswordWrite, RedPasswordWrite.Length, ref RedPasswordWritten);
         }
+
+        // Function: UpdateYellowPassword
+        public static void UpdateYellowPassword()
+        {
+            // byte_9F205B: char[17] — direct buffer, no pointer indirection
+            byte[] YellowPasswordWrite = new byte[17];
+            if (!string.IsNullOrEmpty(thisInstance.gamePasswordYellow))
+            {
+                byte[] pwBytes = Encoding.Default.GetBytes(thisInstance.gamePasswordYellow);
+                Array.Copy(pwBytes, YellowPasswordWrite, Math.Min(pwBytes.Length, 16));
+            }
+
+            int YellowPasswordWritten = 0;
+            WriteProcessMemory((int)processHandle, baseAddr + 0x005F205B, YellowPasswordWrite, YellowPasswordWrite.Length, ref YellowPasswordWritten);
+        }
+
+        // Function: UpdateVioletPassword
+        public static void UpdateVioletPassword()
+        {
+            // byte_9F206C: char[17] — direct buffer, no pointer indirection
+            byte[] VioletPasswordWrite = new byte[17];
+            if (!string.IsNullOrEmpty(thisInstance.gamePasswordViolet))
+            {
+                byte[] pwBytes = Encoding.Default.GetBytes(thisInstance.gamePasswordViolet);
+                Array.Copy(pwBytes, VioletPasswordWrite, Math.Min(pwBytes.Length, 16));
+            }
+
+            int VioletPasswordWritten = 0;
+            WriteProcessMemory((int)processHandle, baseAddr + 0x005F206C, VioletPasswordWrite, VioletPasswordWrite.Length, ref VioletPasswordWritten);
+        }
+
         // Function: UpdateMapCycle1
         // Clears the current map cycle and fills it with empty maps
         public static void UpdateMapCycle1()
@@ -1053,29 +1062,33 @@ namespace BHD_ServerManager.Classes.GameManagement
         }
 
         // Function: Read NumTeam State
-        public static void ReadNumTeams()
+        public static bool ReadNumTeams()
         {
             byte[] NumTeamsBytes = new byte[4];
             int NumTeamsRead = 0;
 
-            int NumTeamsPtr = baseAddr + 0xA344C4;
+            int NumTeamsPtr = 0x00A344C4;
 
             ReadProcessMemory((int)processHandle, NumTeamsPtr, NumTeamsBytes, NumTeamsBytes.Length, ref NumTeamsRead);
 
             int NumTeamsCount = BitConverter.ToInt32(NumTeamsBytes, 0);
 
-            thisInstance.gameNumTeams = NumTeamsCount;
+            return (NumTeamsCount == 4);         
 
         }
 
         // Function: Update NumTeam State
-        public static void UpdateNumTeams(int value)
+        public static void UpdateNumTeams(bool isEnabled)
         {
-            var numTeams = baseAddr + 0xA344C4;
-            byte[] endTimerBytes = BitConverter.GetBytes(value);
+            AppDebug.Log("UpdateNumTeams", "Updating 4-Team Mode to: " + isEnabled);
+
+			var numTeams = 0x00A344C4;
+            byte[] endTimerBytes = BitConverter.GetBytes(isEnabled ? 4 : 0);
             int bytesWritten = 0;
             WriteProcessMemory((int)processHandle, numTeams, endTimerBytes, endTimerBytes.Length, ref bytesWritten);
-        }
+
+            AppDebug.Log("UpdateNumTeams", $"4-Team Mode update complete. ({ReadNumTeams().ToString()})");
+		}
 
 
         // Function: Update Start Delay Timer
@@ -1099,8 +1112,8 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 
         }
-        // Function: UpdateNextMapGameType
-        public static void GetNextMapType()
+		// Function: GetMapData, gets current and next map data from the server memory and updates the mapInstance accordingly
+		public static void GetMapData()
         {
 
             // This will grab the current map index.
@@ -1115,6 +1128,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int CurrentMapIndexBytesRead = 0;
             ReadProcessMemory((int)processHandle, Ptr2, CurrentMapIndexBytes, CurrentMapIndexBytes.Length, ref CurrentMapIndexBytesRead);
             int currentMapIndex = BitConverter.ToInt32(CurrentMapIndexBytes, 0);
+
             AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.Playlists[mapInstance.ActivePlaylist].Count + " Pre-Check Current Map Index: " + currentMapIndex);
 
             if (currentMapIndex + 1 >= mapInstance.Playlists[mapInstance.ActivePlaylist].Count || mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex + 1] == null)
@@ -1134,8 +1148,14 @@ namespace BHD_ServerManager.Classes.GameManagement
             AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName + " " + mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapType + " - " + nextMapType);
 
             mapInstance.NextMapGameType = nextMapType;
+            mapInstance.NextMapName = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName!;
+            mapInstance.NextMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapFile!;
+            mapInstance.IsNextMap4Team = mapInstanceManager.Is4TeamMap(mapInstance.NextMapFile);
 
-        }
+            mapInstance.CurrentMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][mapInstance.ActualPlayingMapIndex].MapFile;
+            mapInstance.IsCurrentMap4Team = mapInstanceManager.Is4TeamMap(mapInstance.CurrentMapFile);
+
+		}
         public static void SetNextMapType()
         {
             AppDebug.Log("SetNextMapType", "Updated the Map Type for the Next Map");
@@ -1148,9 +1168,36 @@ namespace BHD_ServerManager.Classes.GameManagement
                 int nextMaptypeBytesWrite = 0;
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
 
-                // Deal with the Players
-                theInstanceManager.changeTeamGameMode(CommonCore.instanceMaps!.CurrentGameType, mapInstance.NextMapGameType);
-                ServerMemory.UpdatePlayerTeam();                    // Move players to their teams if applicable
+                // Determine if we need to enable/disable 4-team mode
+                bool shouldEnable4Teams = thisInstance.gameEnableFourTeams && 
+                                         mapInstance.IsNextMap4Team &&
+                                         (mapInstance.NextMapGameType == 1 || mapInstance.NextMapGameType == 3); // TDM or TKOTH
+                
+                AppDebug.Log("SetNextMapType", $"Next Map: {mapInstance.NextMapName} | Next Map Type: {mapInstance.NextMapGameType} | Is 4-Team Map: {mapInstance.IsNextMap4Team} | Should Enable 4-Team Mode: {shouldEnable4Teams}");
+
+				// Update the 4-team state in game memory
+				UpdateNumTeams(shouldEnable4Teams);
+                
+                AppDebug.Log("SetNextMapType", $"4-Team Mode: {(shouldEnable4Teams ? "Enabled" : "Disabled")} for next map");
+
+                AppDebug.Log("SetNextMapType", $"4-Team Mode Enabled? {ServerMemory.ReadNumTeams().ToString()}");
+
+				// Deal with the Players
+				bool isCurrentMap4Team = thisInstance.gameEnableFourTeams && 
+                                        mapInstance.IsCurrentMap4Team &&
+                                        (CommonCore.instanceMaps!.CurrentGameType == 1 || CommonCore.instanceMaps!.CurrentGameType == 3);
+                
+                theInstanceManager.changeTeamGameMode(
+                    CommonCore.instanceMaps!.CurrentGameType, 
+                    mapInstance.NextMapGameType,
+                    isCurrentMap4Team,
+                    shouldEnable4Teams
+                );
+
+                // FILTER INVALID TEAM SWITCHES BEFORE APPLYING
+                ValidateAndNormalizeTeamSwitches(shouldEnable4Teams);
+
+                UpdatePlayerTeam();
 
             }
             catch (Exception ex)
@@ -1200,6 +1247,59 @@ namespace BHD_ServerManager.Classes.GameManagement
             AppDebug.Log("UpdateGameScores", "Game Score Updated: " + nextGameScore);
 
         }
+        /// <summary>
+        /// Validate and normalize team switches before applying them to game memory.
+        /// Filters out invalid team numbers and normalizes teams that don't exist on the next map.
+        /// </summary>
+        private static void ValidateAndNormalizeTeamSwitches(bool nextMapIs4Team)
+        {
+            if (playerInstance.PlayerChangeTeamList.Count == 0)
+                return;
+
+            var toRemove = new List<playerTeamObject>();
+
+            foreach (var teamSwitch in playerInstance.PlayerChangeTeamList)
+            {
+                // If next map is 2-team only, normalize team 3/4 to team 1/2
+                if (!nextMapIs4Team && (teamSwitch.Team < 1 || teamSwitch.Team > 2))
+                {
+                    if (teamSwitch.Team == 3 || teamSwitch.Team == 4)
+                    {
+                        int normalizedTeam = ((teamSwitch.Team - 1) % 2) + 1; // Team 3→1, Team 4→2
+                        AppDebug.Log("ValidateTeamSwitches", 
+                            $"Normalizing team switch: Slot {teamSwitch.slotNum} from Team {teamSwitch.Team} → Team {normalizedTeam}. " +
+                            $"Next map '{mapInstance.NextMapName}' only supports 2 teams.");
+                        teamSwitch.Team = normalizedTeam;
+                    }
+                    else
+                    {
+                        AppDebug.Log("ValidateTeamSwitches", 
+                            $"Invalid team number detected: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}. Removing from queue.");
+                        toRemove.Add(teamSwitch);
+                    }
+                }
+                // If next map is 4-team, validate team is 1-4
+                else if (teamSwitch.Team < 1 || teamSwitch.Team > 4)
+                {
+                    AppDebug.Log("ValidateTeamSwitches", 
+                        $"Invalid team number detected: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}. Removing from queue.");
+                    toRemove.Add(teamSwitch);
+                }
+            }
+
+            // Remove invalid switches
+            foreach (var item in toRemove)
+            {
+                playerInstance.PlayerChangeTeamList.Remove(item);
+            }
+
+            if (toRemove.Count > 0)
+            {
+                AppDebug.Log("ValidateTeamSwitches", 
+                    $"Filtered {toRemove.Count} invalid team switch(es). {playerInstance.PlayerChangeTeamList.Count} valid switch(es) remain.");
+            }
+        }
+
         // Function UpdatePlayerTeam
         public static void UpdatePlayerTeam()
         {
@@ -1207,35 +1307,60 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 return;
             }
-            else
+
+            // Determine if next map supports 4 teams (safety check)
+            bool nextMapIs4Team = thisInstance.gameEnableFourTeams && 
+                                 mapInstance.IsNextMap4Team &&
+                                 (mapInstance.NextMapGameType == 1 || mapInstance.NextMapGameType == 3);
+
+            int buffer = 0;
+            byte[] PointerAddr9 = new byte[4];
+            var Pointer = baseAddr + 0x005ED600;
+
+            // read the playerlist memory PlayerIPAddress from the game...
+            ReadProcessMemory((int)processHandle, Pointer, PointerAddr9, PointerAddr9.Length, ref buffer);
+            var playerlistStartingLocationPointer = BitConverter.ToInt32(PointerAddr9, 0) + 0x28;
+            byte[] playerListStartingLocationByteArray = new byte[4];
+            int playerListStartingLocationBuffer = 0;
+            ReadProcessMemory((int)processHandle, playerlistStartingLocationPointer, playerListStartingLocationByteArray, playerListStartingLocationByteArray.Length, ref playerListStartingLocationBuffer);
+
+            int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
+
+            // Iterate backwards to safely remove items during iteration
+            for (int ii = playerInstance.PlayerChangeTeamList.Count - 1; ii >= 0; ii--)
             {
-
-                int buffer = 0;
-                byte[] PointerAddr9 = new byte[4];
-                var Pointer = baseAddr + 0x005ED600;
-
-                // read the playerlist memory PlayerIPAddress from the game...
-                ReadProcessMemory((int)processHandle, Pointer, PointerAddr9, PointerAddr9.Length, ref buffer);
-                var playerlistStartingLocationPointer = BitConverter.ToInt32(PointerAddr9, 0) + 0x28;
-                byte[] playerListStartingLocationByteArray = new byte[4];
-                int playerListStartingLocationBuffer = 0;
-                ReadProcessMemory((int)processHandle, playerlistStartingLocationPointer, playerListStartingLocationByteArray, playerListStartingLocationByteArray.Length, ref playerListStartingLocationBuffer);
-
-                int playerlistStartingLocation = BitConverter.ToInt32(playerListStartingLocationByteArray, 0);
-
-                for (int ii = 0; ii < playerInstance.PlayerChangeTeamList.Count; ii++)
+                var teamSwitch = playerInstance.PlayerChangeTeamList[ii];
+                
+                // SAFETY NET: Final validation before writing to memory
+                if (!nextMapIs4Team && (teamSwitch.Team < 1 || teamSwitch.Team > 2))
                 {
-                    int playerLocationOffset = (playerInstance.PlayerChangeTeamList[ii].slotNum - 1) * 0xAF33C;
-
-                    int playerLocation = playerlistStartingLocation + playerLocationOffset;
-                    int playerTeamLocation = playerLocation + 0x90;
-                    byte[] teamBytes = BitConverter.GetBytes(playerInstance.PlayerChangeTeamList[ii].Team);
-                    int bytesWritten = 0;
-                    WriteProcessMemory((int)processHandle, playerTeamLocation, teamBytes, teamBytes.Length, ref bytesWritten);
+                    AppDebug.Log("UpdatePlayerTeam", 
+                        $"SAFETY: Skipping invalid team switch - Slot {teamSwitch.slotNum} → Team {teamSwitch.Team} " +
+                        $"(Next map '{mapInstance.NextMapName}' is 2-team only)");
                     playerInstance.PlayerChangeTeamList.RemoveAt(ii);
+                    continue;
                 }
 
+                if (teamSwitch.Team < 1 || teamSwitch.Team > 4)
+                {
+                    AppDebug.Log("UpdatePlayerTeam", 
+                        $"SAFETY: Skipping invalid team number - Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}");
+                    playerInstance.PlayerChangeTeamList.RemoveAt(ii);
+                    continue;
+                }
 
+                // Apply team switch to game memory
+                int playerLocationOffset = (teamSwitch.slotNum - 1) * 0xAF33C;
+                int playerLocation = playerlistStartingLocation + playerLocationOffset;
+                int playerTeamLocation = playerLocation + 0x90;
+                byte[] teamBytes = BitConverter.GetBytes(teamSwitch.Team);
+                int bytesWritten = 0;
+                WriteProcessMemory((int)processHandle, playerTeamLocation, teamBytes, teamBytes.Length, ref bytesWritten);
+                
+                AppDebug.Log("UpdatePlayerTeam", 
+                    $"Applied team switch: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}");
+                
+                playerInstance.PlayerChangeTeamList.RemoveAt(ii);
             }
         }
         // Function: UpdatePlayMapNext
@@ -1949,11 +2074,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                     .Where(pair => pair.value != 0)
                     .Select(pair => $"{beginaddr + pair.offset:X8}:{pair.offset:X8} => {pair.value}\n")
             );
-            AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsets2Log);
+            // AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsets2Log);
             
             // Score Offsets
             string offsetsLog = string.Join(", ", offsets.Select((offset, i) => $"{beginaddr + offset:X8}:{offset:X8} => {stats[i]}\n"));
-            AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsetsLog);
+            // AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsetsLog);
 
             // Read Player Flag Time
             byte[] read_playerActiveZoneTimeByte = new byte[4];

@@ -54,7 +54,7 @@
 			playerTeamIcon.IconColor = SystemColors.ControlText;
 			playerTeamIcon.IconFont = FontAwesome.Sharp.IconFont.Auto;
 			playerTeamIcon.IconSize = 35;
-			playerTeamIcon.Location = new Point(3, 4);
+			playerTeamIcon.Location = new Point(1, 2);
 			playerTeamIcon.Name = "playerTeamIcon";
 			playerTeamIcon.Size = new Size(37, 35);
 			playerTeamIcon.TabIndex = 0;
@@ -70,11 +70,10 @@
 			playerContextMenuIcon.IconChar = FontAwesome.Sharp.IconChar.EllipsisV;
 			playerContextMenuIcon.IconColor = SystemColors.ControlText;
 			playerContextMenuIcon.IconFont = FontAwesome.Sharp.IconFont.Auto;
-			playerContextMenuIcon.IconSize = 33;
-			playerContextMenuIcon.Location = new Point(161, 7);
+			playerContextMenuIcon.Location = new Point(163, 4);
 			playerContextMenuIcon.Margin = new Padding(0);
 			playerContextMenuIcon.Name = "playerContextMenuIcon";
-			playerContextMenuIcon.Size = new Size(33, 35);
+			playerContextMenuIcon.Size = new Size(33, 32);
 			playerContextMenuIcon.TabIndex = 1;
 			playerContextMenuIcon.TabStop = false;
 			// 
@@ -94,7 +93,7 @@
 			label_dataPlayerNameRole.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			label_dataPlayerNameRole.BackColor = Color.Transparent;
 			label_dataPlayerNameRole.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-			label_dataPlayerNameRole.Location = new Point(71, 4);
+			label_dataPlayerNameRole.Location = new Point(73, 4);
 			label_dataPlayerNameRole.Name = "label_dataPlayerNameRole";
 			label_dataPlayerNameRole.Size = new Size(95, 15);
 			label_dataPlayerNameRole.TabIndex = 2;
@@ -105,7 +104,7 @@
 			// 
 			label_dataIPinfo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			label_dataIPinfo.BackColor = Color.Transparent;
-			label_dataIPinfo.Location = new Point(48, 19);
+			label_dataIPinfo.Location = new Point(50, 19);
 			label_dataIPinfo.Name = "label_dataIPinfo";
 			label_dataIPinfo.Size = new Size(89, 15);
 			label_dataIPinfo.TabIndex = 3;
@@ -129,7 +128,6 @@
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			BorderStyle = BorderStyle.FixedSingle;
 			Controls.Add(label_dataPlayerNameRole);
 			Controls.Add(playerFlagIcon);
 			Controls.Add(playerContextMenuIcon);
@@ -137,7 +135,7 @@
 			Controls.Add(playerTeamIcon);
 			Controls.Add(label_dataIPinfo);
 			Name = "PlayerCard";
-			Size = new Size(193, 42);
+			Size = new Size(195, 39);
 			((System.ComponentModel.ISupportInitialize)playerTeamIcon).EndInit();
 			((System.ComponentModel.ISupportInitialize)playerContextMenuIcon).EndInit();
 			((System.ComponentModel.ISupportInitialize)playerFlagIcon).EndInit();

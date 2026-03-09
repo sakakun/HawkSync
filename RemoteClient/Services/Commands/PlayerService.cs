@@ -68,10 +68,10 @@ public class PlayerService
         var command = new GodModePlayerCommand(playerSlot, PlayerName);
         return await _apiClient.SendCommandAsync("/api/player/togglegodmode", command);
     }
-    public async Task<CommandResult> SwitchTeamPlayerAsync(int playerSlot, string playerName, int teamNum)
+    public async Task<CommandResult> SwitchTeamPlayerAsync(int playerSlot, string playerName, int currentTeam, int teamNum)
     {
         var PlayerName = AppFunc.TB64(playerName);
-        var command = new SwitchTeamPlayerCommand(playerSlot, PlayerName, teamNum);
+        var command = new SwitchTeamPlayerCommand(playerSlot, PlayerName, currentTeam, teamNum);
         return await _apiClient.SendCommandAsync("/api/player/switchteam", command);
     }
 

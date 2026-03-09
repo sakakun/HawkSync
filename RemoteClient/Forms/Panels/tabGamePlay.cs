@@ -78,7 +78,7 @@ public partial class tabGamePlay : UserControl
         optionButtons = new()
         {
             btn_AutoBalance, btn_CustomSkins, btn_AllowLeftLeaning, btn_AllowRightLeaning, btn_AutoRange, 
-            btn_DestroyBuildings, btn_FatBullets, btn_OneShotKills, btn_ShowTracers, btn_ShowClays
+            btn_DestroyBuildings, btn_FatBullets, btn_OneShotKills, btn_ShowTracers, btn_ShowClays, btn_Enable4Teams
         };
 
         friendlyFireButtons = new()
@@ -134,6 +134,14 @@ public partial class tabGamePlay : UserControl
         // Wire up textboxes
         tb_bluePassword.TextChanged += Control_ValueChanged;
         tb_redPassword.TextChanged += Control_ValueChanged;
+        tb_yellowPassword.TextChanged += Control_ValueChanged;
+        tb_violetPassword.TextChanged += Control_ValueChanged;
+
+        // Enter focus events so editing is flagged before the first keystroke
+        tb_bluePassword.Enter += Control_ValueChanged;
+        tb_redPassword.Enter += Control_ValueChanged;
+        tb_yellowPassword.Enter += Control_ValueChanged;
+        tb_violetPassword.Enter += Control_ValueChanged;
 
         // Wire up numeric controls
         num_scoresKOTH.ValueChanged += Control_ValueChanged;
@@ -146,7 +154,6 @@ public partial class tabGamePlay : UserControl
         num_maxPlayers.ValueChanged += Control_ValueChanged;
         num_pspTakeoverTimer.ValueChanged += Control_ValueChanged;
         num_flagReturnTime.ValueChanged += Control_ValueChanged;
-        num_maxTeamLives.ValueChanged += Control_ValueChanged;
         num_maxFFKills.ValueChanged += Control_ValueChanged;
         num_FullWeaponThreshold.ValueChanged += Control_ValueChanged;
 
@@ -554,7 +561,8 @@ public partial class tabGamePlay : UserControl
             FatBullets: btn_FatBullets.BackColor == Color.LightGreen,
             OneShotKills: btn_OneShotKills.BackColor == Color.LightGreen,
             AllowLeftLeaning: btn_AllowLeftLeaning.BackColor == Color.LightGreen,
-            AllowRightLeaning: btn_AllowRightLeaning.BackColor == Color.LightGreen
+            AllowRightLeaning: btn_AllowRightLeaning.BackColor == Color.LightGreen,
+            Enable4Teams: btn_Enable4Teams.BackColor == Color.LightGreen
         );
 
         var friendlyFire = new FriendlyFireSettingsDTO(
@@ -629,6 +637,8 @@ public partial class tabGamePlay : UserControl
         {
             BluePassword = tb_bluePassword.Text,
             RedPassword = tb_redPassword.Text,
+            YellowPassword = tb_yellowPassword.Text,
+            VioletPassword = tb_violetPassword.Text,
             ScoreKOTH = (int)num_scoresKOTH.Value,
             ScoreDM = (int)num_scoresDM.Value,
             ScoreFB = (int)num_scoresFB.Value,
@@ -640,7 +650,6 @@ public partial class tabGamePlay : UserControl
             MaxSlots = (int)num_maxPlayers.Value,
             PSPTakeoverTimer = (int)num_pspTakeoverTimer.Value,
             FlagReturnTime = (int)num_flagReturnTime.Value,
-            MaxTeamLives = (int)num_maxTeamLives.Value,
             FullWeaponThreshold = (int)num_FullWeaponThreshold.Value,
             Options = options,
             FriendlyFire = friendlyFire,
@@ -661,6 +670,8 @@ public partial class tabGamePlay : UserControl
             // Lobby Passwords
             tb_bluePassword.Text = theInstance.gamePasswordBlue;
             tb_redPassword.Text = theInstance.gamePasswordRed;
+            tb_yellowPassword.Text = theInstance.gamePasswordYellow;
+            tb_violetPassword.Text = theInstance.gamePasswordViolet;
 
             // Match Win Conditions
             num_scoresKOTH.Value = theInstance.gameScoreZoneTime;
@@ -689,6 +700,7 @@ public partial class tabGamePlay : UserControl
             btn_OneShotKills.BackColor = theInstance.gameOneShotKills ? Color.LightGreen : Color.LightGray;
             btn_ShowTracers.BackColor = theInstance.gameOptionShowTracers ? Color.LightGreen : Color.LightGray;
             btn_ShowClays.BackColor = theInstance.gameShowTeamClays ? Color.LightGreen : Color.LightGray;
+            btn_Enable4Teams.BackColor = theInstance.gameEnableFourTeams ? Color.LightGreen : Color.LightGray;
 
             // Friendly Fire (Buttons)
             btn_FriendlyFireEnabled.BackColor = theInstance.gameOptionFF ? Color.LightGreen : Color.LightGray;
