@@ -21,7 +21,7 @@ env:
   NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
   HAWKSYNCSHARED_PROJECT_PATH: HawkSyncShared/HawkSyncShared.csproj
   OUTPUT_NAME: HawkSync-ServerManager
-  DOTNET_VERSION: '10.0.4'
+  DOTNET_VERSION: '10.0.3'
 
 jobs:
   validate:
