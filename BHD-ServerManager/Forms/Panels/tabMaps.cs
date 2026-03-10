@@ -222,7 +222,7 @@ namespace BHD_ServerManager.Forms.Panels
             foreach (var map in maps)
             {
                 int rowIndex = dataGridView_currentMaps.Rows.Add(
-                    map.MapID,
+                    dataGridView_currentMaps.Rows.Count + 1,
                     map.MapName,
                     map.MapFile,
                     map.ModType,
@@ -704,10 +704,11 @@ namespace BHD_ServerManager.Forms.Panels
 
             dataGridView_currentMaps.Rows.Clear();
 
+            int order = 1;
             foreach (var map in playlist)
             {
                 int rowIndex = dataGridView_currentMaps.Rows.Add(
-                    map.MapID,
+                    order++,
                     map.MapName,
                     map.MapFile,
                     map.ModType,

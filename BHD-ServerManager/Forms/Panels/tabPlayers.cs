@@ -18,23 +18,16 @@ namespace BHD_ServerManager.Forms.Panels
         // --- Generate Init. Cards ---
         private void functionEvent_GeneratePlayerCards()
         {
-            TableLayoutPanel PlayerCards1 = playerTable1; // 40 cards (1-40)
-            TableLayoutPanel PlayerCards2 = playerTable2; // 40 cards (41-80)
+            TableLayoutPanel PlayerCards1 = playerTable1; // 50 cards (1-50)
             
             PlayerCards1.Controls.Clear();
-            PlayerCards2.Controls.Clear();
 
             // Configure PlayerCards1: 5 columns x 8 rows = 40 cards
-            PlayerCards1.ColumnCount = 4;
+            PlayerCards1.ColumnCount = 5;
             PlayerCards1.RowCount = 10;
             PlayerCards1.Padding = new Padding(0, 0, 0, 0);
 
-            // Configure PlayerCards2: 5 columns x 8 rows = 40 cards
-            PlayerCards2.ColumnCount = 4;
-            PlayerCards2.RowCount = 10;
-            PlayerCards2.Padding = new Padding(0, 0, 0, 0);
-
-            for (int i = 0; i < 80; i++)
+            for (int i = 0; i < 50; i++)
             {
                 int slotNum = i + 1;
                 PlayerCard card = new PlayerCard(slotNum);
@@ -45,18 +38,8 @@ namespace BHD_ServerManager.Forms.Panels
                 card.ToggleSlot((i) < theInstance!.gameMaxSlots ? true : false);
                 playerCards[i] = card;
 
-                // Distribute cards: 0-39 to PlayerCards1, 40-79 to PlayerCards2
-                if (i < 40)
-                {
-                    // Cards 1-40: column = i / 8, row = i % 8
-                    PlayerCards1.Controls.Add(card, i / 10, i % 10);
-                }
-                else
-                {
-                    // Cards 41-80: adjust index and add to second table
-                    int adjustedIndex = i - 40;
-                    PlayerCards2.Controls.Add(card, adjustedIndex / 10, adjustedIndex % 10);
-                }
+                // Cards 1-40: column = i / 8, row = i % 8
+                PlayerCards1.Controls.Add(card, i / 10, i % 10);
             }
         }
 
@@ -77,7 +60,6 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             playerTable1.SuspendLayout();
-            playerTable2.SuspendLayout();
 
             try
             {
@@ -89,7 +71,7 @@ namespace BHD_ServerManager.Forms.Panels
 
                 if (theInstance!.instanceStatus == InstanceStatus.OFFLINE)
                 {
-                    for (int i = 0; i < 80; i++)
+                    for (int i = 0; i < 50; i++)
                     {
                         playerCards[i].UpdateCard(null, false);
                     }
@@ -123,7 +105,6 @@ namespace BHD_ServerManager.Forms.Panels
             finally
             {
                 playerTable1.ResumeLayout();
-                playerTable2.ResumeLayout();
             }
         }
     }
