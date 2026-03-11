@@ -2,7 +2,17 @@
 using System.IO;
 
 /// <summary>
-/// Patches dfbhd.exe to raise the maxplayers cap from 50/51 to 80/81.
+/// Patches dfbhd.exe in two independent areas:
+///
+///   1. Max-players cap: raises the server player limit from 50/51 to 80/81.
+///
+///   2. 4-team PSP announcements: in the original binary sub_4AFD70 and sub_4AFE00
+///      both contain a hard-coded early-return for teams other than 1 (Red) and
+///      2 (Blue), which silently skips the network message that triggers the
+///      "enemy is taking over a spawn point" audio cue and status-text overlay.
+///      NOPing those two conditional jumps lets teams 3 (Yellow) and 4 (Violet)
+///      reach the same broadcast path as Red and Blue.
+///
 /// Call Patch() before starting the server process, Unpatch() after stopping it.
 /// Safe to call multiple times — IsPatched() guards against double-patching.
 /// </summary>
@@ -29,6 +39,7 @@ public static class DFBHDPatcher
 
     private static readonly PatchSite[] Sites =
     {
+        // ── Max-players cap (50/51 → 80/81) ─────────────────────────────────────
         new PatchSite(0x0D979E, 0x32, 0x50, "Config parser cmp 50->80"),
         new PatchSite(0x0D97B1, 0x32, 0x50, "Config parser mov 50->80"),
         new PatchSite(0x0A4A7A, 0x33, 0x51, "Map change cmp 51->81"),
@@ -40,7 +51,7 @@ public static class DFBHDPatcher
         new PatchSite(0x0B13EA, 0x33, 0x51, "Allocator guard cmp 51->81"),
     };
 
-    public enum PatchState
+	public enum PatchState
     {
         Unpatched,      // All sites have original bytes
         Patched,        // All sites have patched bytes

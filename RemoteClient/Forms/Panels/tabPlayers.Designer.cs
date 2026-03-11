@@ -40,10 +40,10 @@
 			playerTable1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
 			playerTable1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
 			playerTable1.Dock = DockStyle.Fill;
-			playerTable1.Location = new Point(0, 0);
+			playerTable1.Location = new Point(5, 5);
 			playerTable1.Margin = new Padding(0);
 			playerTable1.Name = "playerTable1";
-			playerTable1.Padding = new Padding(0, 5, 0, 0);
+			playerTable1.Padding = new Padding(5);
 			playerTable1.RowCount = 11;
 			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
 			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
@@ -56,7 +56,7 @@
 			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
 			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
 			playerTable1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-			playerTable1.Size = new Size(966, 422);
+			playerTable1.Size = new Size(956, 412);
 			playerTable1.TabIndex = 0;
 			// 
 			// tabPlayers
@@ -66,6 +66,7 @@
 			Controls.Add(playerTable1);
 			Margin = new Padding(0);
 			Name = "tabPlayers";
+			Padding = new Padding(5);
 			Size = new Size(966, 422);
 			ResumeLayout(false);
 		}

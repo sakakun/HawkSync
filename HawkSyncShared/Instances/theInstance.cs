@@ -209,6 +209,16 @@ namespace HawkSyncShared.Instances
         public bool             netLimiterEnableConLimit    { get; set; } = false;
         public decimal          netLimiterConThreshold      { get; set; } = 10; // Number of Connections
 
+        // PSP Polling Variables
+        [JsonIgnore]
+        public int     _lastPspTeam = 0;
+        [JsonIgnore]
+        public IntPtr  _lastPspPtr = IntPtr.Zero;
+        [JsonIgnore]
+        public bool    _attemptAnnounced = false;
+        [JsonIgnore]
+        public HashSet<string> _contesting = new HashSet<string>();
+
     }
 
     public enum InstanceStatus

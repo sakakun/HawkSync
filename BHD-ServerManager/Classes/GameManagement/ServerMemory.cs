@@ -2418,6 +2418,65 @@ namespace BHD_ServerManager.Classes.GameManagement
             return normalizedStatus;
         }
 
+        private static byte ReadByte(int address)
+        {
+            byte[] buf = new byte[1];
+            int bytesRead = 0;
+            ReadProcessMemory((int)processHandle, address, buf, 1, ref bytesRead);
+            return buf[0];
+        }
+
+        private static int ReadInt(int address)
+        {
+            byte[] buf = new byte[4];
+            int bytesRead = 0;
+            ReadProcessMemory((int)processHandle, address, buf, buf.Length, ref bytesRead);
+            return BitConverter.ToInt32(buf, 0);
+        }
+
+        // data_9ed600 is a pointer to a header: { int32 count; void* playerArrayBase }
+        private const int PLAYER_LIST_PTR = 0x009ED600;  // address of the pointer
+        private const int PLAYER_STRIDE   = 0xaf33c;      // bytes per player struct
+        private const int PLAYER_OFF_ACTIVE = 0x68c4;     // byte: non-zero = connected/active
+        private const int PLAYER_OFF_PSPPTR = 0x18;       // int32: non-null = currently contesting a PSP
+        private const int PLAYER_OFF_TEAM   = 0x78;       // int32: 1=Blue 2=Red 3=Yellow 4=Violet
+
+        public static void PollPspState()
+        {
+            int container = ReadInt(PLAYER_LIST_PTR);
+            if (container == 0) return;
+
+            int count    = ReadInt(container);
+            int baseAddr = ReadInt(container + 4);
+            if (baseAddr == 0 || count <= 0) return;
+
+            for (int i = 0; i < count; i++)
+            {
+                int player = baseAddr + i * PLAYER_STRIDE;
+
+                byte active = ReadByte(player + PLAYER_OFF_ACTIVE);
+                if (active == 0) continue;
+
+                int team = ReadInt(player + PLAYER_OFF_TEAM);
+                if (team != 3 && team != 4) continue;
+
+                int pspPtr = ReadInt(player + PLAYER_OFF_PSPPTR);
+                string key = $"p{i}";
+                string teamName = team == 3 ? "Yellow" : "Violet";
+
+                if (pspPtr != 0 && !thisInstance._contesting.Contains(key))
+                {
+                    thisInstance._contesting.Add(key);
+                    WriteMemorySendChatMessage(8, $"** {teamName} team is taking over a spawn point! **");
+                }
+                else if (pspPtr == 0 && thisInstance._contesting.Contains(key))
+                {
+                    thisInstance._contesting.Remove(key);
+                    WriteMemorySendChatMessage(8, $"** {teamName} team has captured a spawn point! **");
+                }
+            }
+        }
+
     }
 
 }

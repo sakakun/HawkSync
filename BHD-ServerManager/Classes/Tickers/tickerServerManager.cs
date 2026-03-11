@@ -24,15 +24,6 @@ namespace BHD_ServerManager.Classes.Tickers
         // Lock for thread safety (if needed for shared resources)
         private static int isTickerRunning = 0;
 
-        // Helper for UI thread safety
-        private static void SafeInvoke(Control control, Action action)
-        {
-            if (control.InvokeRequired)
-                control.Invoke(action);
-            else
-                action();
-        }
-
         public static void runTicker()
         {
             // Skip this tick if the previous one is still running
@@ -92,6 +83,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     // Score Reading
                     ServerMemory.ReadMemoryCurrentGameWinConditions();                  // Read Current Game Win Conditions
                     ServerMemory.ReadMemoryCurrentGameScores();                         // Read Current Game Scores
+                    // Polling Updates
+                    ServerMemory.PollPspState();
                 }
 
                 // 2. Loading Map
@@ -116,8 +109,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     }
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
                     ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
-
-
 
                 }
                 // 4. Online (game in progress)
