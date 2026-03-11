@@ -2434,46 +2434,86 @@ namespace BHD_ServerManager.Classes.GameManagement
             return BitConverter.ToInt32(buf, 0);
         }
 
-        // data_9ed600 is a pointer to a header: { int32 count; void* playerArrayBase }
-        private const int PLAYER_LIST_PTR = 0x009ED600;  // address of the pointer
-        private const int PLAYER_STRIDE   = 0xaf33c;      // bytes per player struct
-        private const int PLAYER_OFF_ACTIVE = 0x68c4;     // byte: non-zero = connected/active
-        private const int PLAYER_OFF_PSPPTR = 0x18;       // int32: non-null = currently contesting a PSP
-        private const int PLAYER_OFF_TEAM   = 0x78;       // int32: 1=Blue 2=Red 3=Yellow 4=Violet
+        private static string ReadString(int address, int maxLen = 32)
+        {
+            byte[] buf = new byte[maxLen];
+            int bytesRead = 0;
+            ReadProcessMemory((int)processHandle, address, buf, maxLen, ref bytesRead);
+            int len = Array.IndexOf(buf, (byte)0);
+            return System.Text.Encoding.ASCII.GetString(buf, 0, len < 0 ? bytesRead : len);
+        }
 
-        public static void PollPspState()
+        private const int ENTITY_ARRAY_BASE    = 0x00715900;
+        private const int ENTITY_STRIDE        = 0x29c;
+
+        // data_9e4728 timer list (second list: ptr at +0x18, count at +0x1c)
+        private const int PSP_TIMER_LIST_PTR   = 0x009E4740; // value = heap ptr to array
+        private const int PSP_TIMER_COUNT_ADDR = 0x009E4744; // count of active entries
+        private const int PSP_ENTRY_STRIDE     = 0x14;
+        private const int PSP_ENTRY_TEAM       = 0x04;  // s[1] = capturing player's team (1–4)
+        private const int PSP_ENTRY_PLAYER     = 0x10;  // s[4] = player entity ptr in data_715900
+
+        // data_9ed600 session struct (for player name lookup)
+        private const int PLAYER_LIST_PTR      = 0x009ED600;
+        private const int PLAYER_STRIDE        = 0xaf33c;
+        private const int PLAYER_OFF_ENTITY    = 0x18;  // ptr to data_715900 entity
+        private const int PLAYER_OFF_NAME      = 0x1c;  // null-terminated name string
+
+        private static string GetPlayerName(int playerEntityPtr)
         {
             int container = ReadInt(PLAYER_LIST_PTR);
-            if (container == 0) return;
-
-            int count    = ReadInt(container);
-            int baseAddr = ReadInt(container + 4);
-            if (baseAddr == 0 || count <= 0) return;
+            if (container == 0) return "Unknown";
+            int count     = ReadInt(container);
+            int baseAddr  = ReadInt(container + 4);
+            if (baseAddr == 0 || count <= 0) return "Unknown";
 
             for (int i = 0; i < count; i++)
             {
-                int player = baseAddr + i * PLAYER_STRIDE;
+                int session = baseAddr + i * PLAYER_STRIDE;
+                if (ReadInt(session + PLAYER_OFF_ENTITY) == playerEntityPtr)
+                    return ReadString(session + PLAYER_OFF_NAME);
+            }
+            return "Unknown";
+        }
 
-                byte active = ReadByte(player + PLAYER_OFF_ACTIVE);
-                if (active == 0) continue;
+        public static void PollPspState()
+        {
+            int count   = ReadInt(PSP_TIMER_COUNT_ADDR);
+            int listPtr = ReadInt(PSP_TIMER_LIST_PTR);
 
-                int team = ReadInt(player + PLAYER_OFF_TEAM);
-                if (team != 3 && team != 4) continue;
+            var currentKeys = new HashSet<string>();
 
-                int pspPtr = ReadInt(player + PLAYER_OFF_PSPPTR);
-                string key = $"p{i}";
-                string teamName = team == 3 ? "Yellow" : "Violet";
-
-                if (pspPtr != 0 && !thisInstance._contesting.Contains(key))
+            if (count > 0 && listPtr != 0)
+            {
+                for (int i = 0; i < count; i++)
                 {
-                    thisInstance._contesting.Add(key);
-                    WriteMemorySendChatMessage(8, $"** {teamName} team is taking over a spawn point! **");
+                    int entryAddr     = listPtr + i * PSP_ENTRY_STRIDE;
+                    int team          = ReadInt(entryAddr + PSP_ENTRY_TEAM);   // s[1] = player's team
+                    int playerEntPtr  = ReadInt(entryAddr + PSP_ENTRY_PLAYER); // s[4] = player entity ptr
+
+                    if (team != 3 && team != 4) continue;
+                    if (playerEntPtr == 0) continue;
+
+                    string key      = $"e{playerEntPtr:X8}";
+                    string teamName = team == 3 ? "Yellow" : "Violet";
+
+                    currentKeys.Add(key);
+
+                    if (!thisInstance._contesting.ContainsKey(key))
+                    {
+                        string name = GetPlayerName(playerEntPtr);
+                        thisInstance._contesting[key] = name;
+                        WriteMemorySendChatMessage(8,
+                            $"** {name} of the {teamName} team is attempting to take a spawn point! **");
+                    }
                 }
-                else if (pspPtr == 0 && thisInstance._contesting.Contains(key))
-                {
-                    thisInstance._contesting.Remove(key);
-                    WriteMemorySendChatMessage(8, $"** {teamName} team has captured a spawn point! **");
-                }
+            }
+
+            foreach (var key in thisInstance._contesting.Keys.Where(k => !currentKeys.Contains(k)).ToList())
+            {
+                string name = thisInstance._contesting[key];
+                WriteMemorySendChatMessage(8, $"** {name} has captured a spawn point! **");
+                thisInstance._contesting.Remove(key);
             }
         }
 

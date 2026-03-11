@@ -217,9 +217,9 @@ namespace HawkSyncShared.Instances
         [JsonIgnore]
         public bool    _attemptAnnounced = false;
         [JsonIgnore]
-        public HashSet<string> _contesting = new HashSet<string>();
+        public Dictionary<string, string> _contesting = new Dictionary<string, string>();
 
-    }
+	}
 
     public enum InstanceStatus
     {
