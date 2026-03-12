@@ -119,8 +119,12 @@ namespace BHD_ServerManager.Classes.Tickers
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
                     ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
 
+                    // Score Tick
+                    ServerMemory.TickFlagScorer();
+                    
                     // Stats update
                     statsInstanceManager.RunPlayerStatsUpdate();                        // Collect Player Stats
+                    
                 
                     // WebStats Updates and Reports
                     if (theInstance.WebStatsEnabled)

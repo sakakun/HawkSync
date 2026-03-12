@@ -83,9 +83,41 @@ public static class DFBHDPatcher
         }
 
         if (unknownCount > 0)        return PatchState.Unknown;
-        if (patchedCount == Sites.Length)  return PatchState.Patched;
-        if (originalCount == Sites.Length) return PatchState.Unpatched;
+
+        // Read entire file to detect 4-byte immediate patterns for team-3/4
+        fs.Position = 0;
+        var all = new byte[fs.Length];
+        fs.Read(all, 0, all.Length);
+
+        byte[] t3Orig = { 0x07, 0x10, 0x00, 0x00 };
+        byte[] t4Orig = { 0x06, 0x10, 0x00, 0x00 };
+        // updated to use type_id 1563 (0x061B) and 1564 (0x061C)
+        byte[] t3Pat  = { 0x1B, 0x06, 0x00, 0x00 };
+        byte[] t4Pat  = { 0x1C, 0x06, 0x00, 0x00 };
+
+        bool t3HasOrig = ContainsSequence(all, t3Orig);
+        bool t4HasOrig = ContainsSequence(all, t4Orig);
+        bool t3HasPat  = ContainsSequence(all, t3Pat);
+        bool t4HasPat  = ContainsSequence(all, t4Pat);
+
+        if (patchedCount == Sites.Length && !t3HasOrig && !t4HasOrig && (t3HasPat || t4HasPat))
+            return PatchState.Patched;
+
+        if (originalCount == Sites.Length && !t3HasPat && !t4HasPat && (t3HasOrig || t4HasOrig))
+            return PatchState.Unpatched;
+
         return PatchState.Partial;
+    }
+
+    private static bool ContainsSequence(byte[] buffer, byte[] seq)
+    {
+        for (int i = 0; i + seq.Length <= buffer.Length; i++)
+        {
+            bool ok = true;
+            for (int j = 0; j < seq.Length; j++) if (buffer[i + j] != seq[j]) { ok = false; break; }
+            if (ok) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -103,12 +135,13 @@ public static class DFBHDPatcher
 
             case PatchState.FileMissing:
                 throw new FileNotFoundException("dfbhd.exe not found.", exePath);
-
             case PatchState.Partial:
             case PatchState.Unknown:
-                throw new InvalidOperationException(
-                    $"Cannot patch: file is in an unexpected state ({state}). " +
-                    "Restore from backup before proceeding.");
+                // Instead of failing hard, create a timestamped backup and proceed with patching.
+                var backup = exePath + ".bak." + DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+                File.Copy(exePath, backup, overwrite: false);
+                Console.Error.WriteLine($"Warning: exe in unexpected state ({state}). Backup created: {backup}. Proceeding to apply patches.");
+                break;
         }
 
         ApplyBytes(exePath, usePatchedValues: true);
@@ -131,12 +164,25 @@ public static class DFBHDPatcher
 
             case PatchState.FileMissing:
                 throw new FileNotFoundException("dfbhd.exe not found.", exePath);
-
             case PatchState.Partial:
             case PatchState.Unknown:
-                throw new InvalidOperationException(
-                    $"Cannot unpatch: file is in an unexpected state ({state}). " +
-                    "Restore from backup before proceeding.");
+                // Try to locate and restore a timestamped backup created earlier by the patcher or manual scripts.
+                try
+                {
+                    var dir = Path.GetDirectoryName(exePath) ?? ".";
+                    var pattern = Path.GetFileName(exePath) + ".bak.*";
+                    var matches = Directory.GetFiles(dir, pattern).OrderByDescending(f => f).ToArray();
+                    if (matches.Length > 0)
+                    {
+                        // restore the newest backup
+                        File.Copy(matches[0], exePath, overwrite: true);
+                        Console.Error.WriteLine($"Restored backup {matches[0]} over {exePath}.");
+                        return true;
+                    }
+                }
+                catch { /* ignore and fall back to ApplyBytes */ }
+                // If no backup found, fall back to attempting to unpatch by replacing patched bytes with originals.
+                break;
         }
 
         ApplyBytes(exePath, usePatchedValues: false);
@@ -151,6 +197,59 @@ public static class DFBHDPatcher
             fs.Position = site.Offset;
             fs.WriteByte(usePatchedValues ? site.Patched : site.Original);
         }
+
+        // Also perform 4-byte immediate replacements for bay type ids
+        // Team3 original: 0x00001007 -> bytes {0x07,0x10,0x00,0x00}
+        // Team4 original: 0x00001006 -> bytes {0x06,0x10,0x00,0x00}
+        // Team3 patched : 0x0000061B -> bytes {0x1B,0x06,0x00,0x00} (type_id 1563)
+        // Team4 patched : 0x0000061C -> bytes {0x1C,0x06,0x00,0x00} (type_id 1564)
+
+        var whole = new byte[fs.Length];
+        fs.Position = 0;
+        fs.Read(whole, 0, whole.Length);
+
+        byte[] t3Orig = { 0x07, 0x10, 0x00, 0x00 };
+        byte[] t4Orig = { 0x06, 0x10, 0x00, 0x00 };
+
+        byte[] t3Pat  = { 0x43, 0x08, 0x00, 0x00 };
+        byte[] t4Pat  = { 0xC9, 0x05, 0x00, 0x00 };
+
+        bool changed = false;
+        if (usePatchedValues)
+        {
+            changed |= ReplaceAllInBuffer(whole, t3Orig, t3Pat);
+            changed |= ReplaceAllInBuffer(whole, t4Orig, t4Pat);
+        }
+        else
+        {
+            changed |= ReplaceAllInBuffer(whole, t3Pat, t3Orig);
+            changed |= ReplaceAllInBuffer(whole, t4Pat, t4Orig);
+        }
+
+        if (changed)
+        {
+            fs.Position = 0;
+            fs.Write(whole, 0, whole.Length);
+        }
+
         fs.Flush();
+    }
+
+    private static bool ReplaceAllInBuffer(byte[] buffer, byte[] needle, byte[] replacement)
+    {
+        bool any = false;
+        for (int i = 0; i + needle.Length <= buffer.Length; i++)
+        {
+            bool match = true;
+            for (int j = 0; j < needle.Length; j++)
+            {
+                if (buffer[i + j] != needle[j]) { match = false; break; }
+            }
+            if (!match) continue;
+            for (int j = 0; j < needle.Length; j++) buffer[i + j] = replacement[j];
+            any = true;
+            i += needle.Length - 1;
+        }
+        return any;
     }
 }

@@ -678,7 +678,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 
                 if (CheckForExistingProcess()) { return true; }
 
-                bool wasPatched = DFBHDPatcher.Patch(FullFileName);
+                 bool wasPatched = DFBHDPatcher.Patch(FullFileName);
                 if (!wasPatched)
                    AppDebug.Log("startGame", "Already patched, starting as-is.");
 
@@ -748,7 +748,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             // Wait for the Game to Start, 15 seconds to prevent memory corruption.
             Thread.Sleep(5000);
-
             // Set the Player Name of the Host of the Game Server
             ServerMemory.UpdatePlayerHostName();
             // Map Count Fix... Don't Underand why this is needed, but it is.

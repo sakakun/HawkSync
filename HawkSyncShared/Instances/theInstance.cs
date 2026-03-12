@@ -209,15 +209,17 @@ namespace HawkSyncShared.Instances
         public bool             netLimiterEnableConLimit    { get; set; } = false;
         public decimal          netLimiterConThreshold      { get; set; } = 10; // Number of Connections
 
-        // PSP Polling Variables
-        [JsonIgnore]
-        public int     _lastPspTeam = 0;
-        [JsonIgnore]
-        public IntPtr  _lastPspPtr = IntPtr.Zero;
-        [JsonIgnore]
-        public bool    _attemptAnnounced = false;
-        [JsonIgnore]
-        public Dictionary<string, string> _contesting = new Dictionary<string, string>();
+		// PSP Polling Variables
+		[JsonIgnore]
+		public int     _lastPspTeam = 0;
+		[JsonIgnore]
+		public IntPtr  _lastPspPtr = IntPtr.Zero;
+		[JsonIgnore]
+		public bool    _attemptAnnounced = false;
+		[JsonIgnore]
+		public Dictionary<string, string> _contesting = new Dictionary<string, string>();
+		[JsonIgnore]
+		public Dictionary<string, string> _flagCarriers = new Dictionary<string, string>();
 
 	}
 
