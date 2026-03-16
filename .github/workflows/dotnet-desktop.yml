@@ -92,13 +92,14 @@ jobs:
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}"
           /p:FileVersion="${{ needs.validate.outputs.version }}"
 
-      - name: Restore and Build NetLimiterBridge
+      - name: Restore and build NetLimiterBridge
         shell: pwsh
         run: |
           msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
             /t:Restore,Build `
-            /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
+            /p:Configuration=Release `
             /p:Platform="Any CPU" `
+            /p:OutputPath=bin/Release/ `
             /p:PlatformTarget=x64 `
             /m
 
