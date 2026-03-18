@@ -1,4 +1,4 @@
-﻿name: Development Build and Publish
+name: Development Build and Publish
 on:
   push:
     branches: [ master, main ]
