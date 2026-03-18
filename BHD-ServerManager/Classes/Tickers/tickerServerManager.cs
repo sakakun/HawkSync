@@ -58,7 +58,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     // --- Server is online: run status-specific logic in order ---
                     // 1. Always update status and basic info
                     ServerMemory.ReadMemoryServerStatus();                                  // Server Status
-                    ServerMemory.ReadStartDelayTimer();                                     // Start Delay Timer Value
+                    ServerMemory.ReadStartDelayCounter();                                   // Start Delay Current Counter Value
 				}
 
                 if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
@@ -108,7 +108,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         }
                     }
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                    ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
+                    ServerMemory.UpdateMapCycleData();                                      // Grab the Current Map Type and the Next Map Type
 
                 }
                 // 4. Online (game in progress)
@@ -117,7 +117,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag                  
 
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                    ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
+                    ServerMemory.UpdateMapCycleData();                                  // Grab the Current Map Type and the Next Map Type
 
                     // Score Tick
                     ServerMemory.TickFlagScorer();
@@ -196,18 +196,20 @@ namespace BHD_ServerManager.Classes.Tickers
             {
                 theInstance.instanceScoringProcRun = false;
 
-                // Read Winning Team
-                ServerMemory.ReadMemoryWinningTeam();
 				// Final Stats Update
 				Task.Run(() => statsInstanceManager.SendImportData(thisServer!));
+                
                 // Set the Next Map Type
-                ServerMemory.SetNextMapType();
+                ServerMemory.SetupNextMap();
+                
                 // Update the Scores Required to Win the Next Game
                 ServerMemory.UpdateGameScores();
-				// Scoreboard Delay Ticker
+				
+                // Scoreboard Delay Ticker
 				int scoreboardDelay = theInstance.gameScoreBoardDelay * 1000;
 				CommonCore.Ticker?.StartOnce("ScoreboardTicker", scoreboardDelay, () => tickerEvent_Scoreboard());
-				// Log Completion
+				
+                // Log Completion
 				AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
             }
             

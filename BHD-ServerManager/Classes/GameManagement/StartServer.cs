@@ -158,7 +158,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                 int gamePlayOptions;
                 try
                 {
-                    gamePlayOptions = Functions.CalulateGameOptions(
+                    int MP_ATTRIB_DEFAULT = 0x3A06;
+                    gamePlayOptions = Functions.CalulateGameOptions(MP_ATTRIB_DEFAULT,
                         theInstance.gameOptionAutoBalance,
                         theInstance.gameOptionFF,
                         theInstance.gameOptionFriendlyTags,
@@ -338,7 +339,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 				// Server rules block
 				WriteAt(RULE_MP_GAMETYPE, BitConverter.GetBytes(1));            
-				WriteAt(RULE_MAX_SLOTS, BitConverter.GetBytes(80));             // Must be 80 for memory allocation on startup
+				WriteAt(RULE_MAX_SLOTS, BitConverter.GetBytes(50));             // Must be 80 for memory allocation on startup
 				WriteAt(RULE_DEDICATED, dedicatedBytes);
 				WriteAt(RULE_MAX_TEAM_LIVES, BitConverter.GetBytes(100));       // Required for legacy, not used by game
 				WriteAt(RULE_FLAG_SCORE, flagBallScoreBytes);

@@ -57,17 +57,39 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 return ofd.ShowDialog() == DialogResult.OK ? ofd.FileName : string.Empty;
             }
         }
-        public static int CalulateGameOptions(bool autoBalance, bool friendlyFire, bool friendlyTags, bool friendlyFireWarning, bool showTracers, bool showTeamClays, bool allowAutoRange)
+        public static int CalulateGameOptions(
+                int baseValue,
+                bool autoBalance,
+                bool friendlyFire,
+                bool friendlyTags,
+                bool friendlyFireWarning,
+                bool showTracers,
+                bool showTeamClays,
+                bool allowAutoRange)
         {
-            int value = 15887;
+            int value = baseValue;
 
-            if (autoBalance) value -= 4;
-            if (friendlyFire) value -= 512;
-            if (friendlyTags) value -= 1024;
-            if (friendlyFireWarning) value -= 8;
-            if (showTracers) value -= 1;
-            if (showTeamClays) value += 32768;
-            if (allowAutoRange) value += 65536;
+            // Masks validated from sub_4dd0d0 toggle code on data_a34390.
+            // Auto Balance: true means bit cleared.
+            value = autoBalance ? (value & ~0x200) : (value | 0x200);
+
+            // Friendly Fire: true means bit cleared.
+            value = friendlyFire ? (value & ~0x400) : (value | 0x400);
+
+            // Friendly Tags: true means bit set.
+            value = friendlyTags ? (value | 0x4) : (value & ~0x4);
+
+            // Friendly Fire Warning: true means bit cleared.
+            value = friendlyFireWarning ? (value & ~0x8) : (value | 0x8);
+
+            // Show Tracers: true means bit cleared.
+            value = showTracers ? (value & ~0x1) : (value | 0x1);
+
+            // Show Team Clays: true means bit set.
+            value = showTeamClays ? (value | 0x8000) : (value & ~0x8000);
+
+            // Allow Auto Range: true means bit set.
+            value = allowAutoRange ? (value | 0x10000) : (value & ~0x10000);
 
             return value;
         }
