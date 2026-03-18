@@ -43,6 +43,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 mapInstance.CurrentMapName = currentPlaylist[currentMapIndex].MapName;
                 mapInstance.CurrentMapFile = currentPlaylist[currentMapIndex].MapFile;
                 mapInstance.IsCurrentMap4Team = mapInstanceManager.Is4TeamMap(mapInstance.CurrentMapFile);
+                mapInstance.IsCurrentMapHideAndSeek = mapInstanceManager.IsHideSeekMap(mapInstance.CurrentMapFile);
 			}
 
             // Calculate the next map index (wraps to 0 at end of playlist)

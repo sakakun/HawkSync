@@ -96,14 +96,19 @@ public class mapInstance
     /// </summary>
     public bool IsCurrentMap4Team { get; set; } = false;
 
-    // ================================================================================
-    // NEXT MAP INFO
-    // ================================================================================
-    
-    /// <summary>
-    /// Is the next map a 4 Team Map?
-    /// </summary>
-    public bool IsNextMap4Team { get; set; } = false;
+	/// <summary>
+	/// Is the current map a Hide and Seek Map?
+	/// </summary>
+    public bool IsCurrentMapHideAndSeek { get; set; } = false;
+
+	// ================================================================================
+	// NEXT MAP INFO
+	// ================================================================================
+
+	/// <summary>
+	/// Is the next map a 4 Team Map?
+	/// </summary>
+	public bool IsNextMap4Team { get; set; } = false;
 
     /// <summary>
     /// Next map to be played

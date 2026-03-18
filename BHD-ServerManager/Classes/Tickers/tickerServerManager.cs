@@ -82,8 +82,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     // Score Reading
                     ServerMemory.ReadMemoryCurrentGameWinConditions();                  // Read Current Game Win Conditions
                     ServerMemory.ReadMemoryCurrentGameScores();                         // Read Current Game Scores
-                    // Polling Updates
-                    ServerMemory.PollPspState();
                 }
 
                 // 2. Loading Map
@@ -107,7 +105,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         }
                     }
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                    ServerMemory.UpdateMapCycleData();                                      // Grab the Current Map Type and the Next Map Type
+                    ServerMemory.UpdateMapCycleData();                                  // Grab the Current Map Type and the Next Map Type
 
                 }
                 // 4. Online (game in progress)
@@ -119,10 +117,12 @@ namespace BHD_ServerManager.Classes.Tickers
                     ServerMemory.UpdateMapCycleData();                                  // Grab the Current Map Type and the Next Map Type
 
                     // Score Tick
-                    ServerMemory.TickFlagScorer();
-                    
-                    // Stats update
-                    statsInstanceManager.RunPlayerStatsUpdate();                        // Collect Player Stats
+                    ServerMemory.TickFlagScorer();                                      // 4 Team Flag Scoring
+                    ServerMemory.PollPspState();                                        // 4 Team PSP Polling
+					ServerMemory.TickFlagTimerGuard();                                  // Hide and Seek Flag Timer Guard
+
+					// Stats update
+					statsInstanceManager.RunPlayerStatsUpdate();                        // Collect Player Stats
                     
                 
                     // WebStats Updates and Reports

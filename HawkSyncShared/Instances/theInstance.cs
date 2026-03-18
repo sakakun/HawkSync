@@ -62,6 +62,7 @@ namespace HawkSyncShared.Instances
         public int              gameMatchID                 { get; set; } = 0;
 		public int              gameMatchWinner             { get; set; } = 0;
         public bool             gameEnableFourTeams         { get; set; } = false;
+        public bool             gameEnableHideandSeek       { get; set; } = true;
 		public string           gameServerName              { get; set; } = "Untitled Server";
         public string           gameMOTD                    { get; set; } = "Welcome to the server!";
         public string           gameCountryCode             { get; set; } = "US";
