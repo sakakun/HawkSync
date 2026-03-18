@@ -186,7 +186,6 @@ namespace HawkSyncShared.Instances
         public bool             gameInfoIsBlueDefending     { get; set; }       /* Current Game Defending Team, used for the Info Panel */
         public int              gameInfoBlueScore           { get; set; } = 0;  /* Current Blue Score, used for the Info Panel */
         public int              gameInfoRedScore            { get; set; } = 0;  /* Current Red Score, used for the Info Panel */
-        public int              gameInfoMapCycleIndex       { get; set; } = 0;  /* Map Cycle Index, used for the Info Panel */
         public int              gameInfoStartDelayTimer     { get; set; } = 0;  /* Current Start Delay Timer value from memory */
 
         // Proxy Checking Settings

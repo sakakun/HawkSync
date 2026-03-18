@@ -18,9 +18,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
     public static partial class ServerMemory {
 
-		// Function: ReadMapCycleCounter, Reads the Map Cycle Counter from Memory and stores it in the gameInfoMapCycleIndex variable.
-		public static void ReadMapCycleCounter() => theInstance.gameInfoMapCycleIndex = ReadInt(baseAddr + 0x5ED644);
-
 		// Function: UpdateMapCycleData, gets current and next map data from the server memory and updates the mapInstance accordingly
 		public static void UpdateMapCycleData()
         {
@@ -30,7 +27,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             if (currentPlaylist.Count == 0) return;
 
             // Read Game Server Map Cycle Index
-            int currentMapIndex = ReadInt(GetMapCycleServerAddress() + 0xC);
+            int currentMapIndex = ReadInt(0x00A348D0);
 
             // Clamp to valid range — stale memory can return an out-of-bounds index
             if (currentMapIndex < 0 || currentMapIndex >= currentPlaylist.Count)
@@ -65,13 +62,24 @@ namespace BHD_ServerManager.Classes.GameManagement
 		public static void UpdateMapListCount()
         {
 
-            int MapListMoveGarbageAddress = baseAddr + 0x5EA7B8;
-            WriteInt(MapListMoveGarbageAddress, ReadInt(MapListMoveGarbageAddress) + 0x350);
+            if (mapInstance.Playlists[mapInstance.ActivePlaylist].Count > 128)
+            {
+                throw new Exception("Someway, somehow, someone bypassed the maplist checks. You are NOT allowed to have more than 128 maps. #87");
+            }
 
-            int mapListNumberOfMaps = GetMapCycleServerAddress() + 0x4;
+            const int mapCycleCountAddress = 0x00A3483C;
+            const int mapCycleCountMirrorAddress = 0x00A03394;
+            const int mapCycleSelectedIndexAddress = 0x00A348D0;
+
             int count = mapInstance.Playlists[mapInstance.ActivePlaylist].Count;
-            WriteInt(mapListNumberOfMaps, count);
-            WriteInt(mapListNumberOfMaps + 0x4, count);
+            int selectedIndex = ReadInt(mapCycleSelectedIndexAddress);
+
+            if (selectedIndex < 0 || selectedIndex >= count)
+                selectedIndex = 0;
+
+            WriteInt(mapCycleCountAddress, count);
+            WriteInt(mapCycleCountMirrorAddress, count);
+            WriteInt(mapCycleSelectedIndexAddress, selectedIndex);
 
         }
 
@@ -84,23 +92,25 @@ namespace BHD_ServerManager.Classes.GameManagement
                 throw new Exception("Someway, somehow, someone bypassed the maplist checks. You are NOT allowed to have more than 128 maps. #88");
             }
 
-            int mapCycleServerAddress = GetMapCycleServerAddress();
+            const int mapCycleTableAddress = 0x00A3F688;
+            const int mapCycleTableSize = 0x39800;
+            const int mapCycleCountAddress = 0x00A3483C;
+            const int mapCycleCountMirrorAddress = 0x00A03394;
+            const int mapCycleSelectedIndexAddress = 0x00A348D0;
+
             int count = mapInstance.Playlists[mapInstance.ActivePlaylist].Count;
-            WriteInt(mapCycleServerAddress + 0x4, count);
-            WriteInt(mapCycleServerAddress + 0xC, count);
-            int mapCycleList = ReadInt(mapCycleServerAddress);
+            int selectedIndex = ReadInt(mapCycleSelectedIndexAddress);
+            byte[] emptyTable = new byte[mapCycleTableSize];
+            int emptyTableBytesWritten = 0;
 
-            foreach (MapObject entry in mapInstance.Playlists[mapInstance.ActivePlaylist])
-            {
-                int mapFileIndexLocation = mapCycleList;
+            WriteProcessMemory((int)processHandle, mapCycleTableAddress, emptyTable, emptyTable.Length, ref emptyTableBytesWritten);
 
-                byte[] mapFileBytes = new byte[0x20]; // 32 bytes, all initialized to 0
-                int mapFileBytesWritten = 0;
-                WriteProcessMemory((int)processHandle, mapFileIndexLocation, mapFileBytes, mapFileBytes.Length, ref mapFileBytesWritten);
+            if (selectedIndex < 0 || selectedIndex >= count)
+                selectedIndex = 0;
 
-                WriteInt(mapFileIndexLocation, 0);
-                mapCycleList += 0x24;
-            }
+            WriteInt(mapCycleCountAddress, count);
+            WriteInt(mapCycleCountMirrorAddress, count);
+            WriteInt(mapCycleSelectedIndexAddress, selectedIndex);
 
         }
         // Function: UpdateMapCycle2
@@ -112,89 +122,85 @@ namespace BHD_ServerManager.Classes.GameManagement
                 throw new Exception("Someway, somehow, someone bypassed the maplist checks. You are NOT allowed to have more than 128 maps. #89");
             }
 
-            int mapCycleClientAddress = ReadInt(baseAddr + 0x000DC6D8);
+            const int mapCycleTableAddress = 0x00A3F688;
+            const int mapCycleEntryStride = 0x730;
+            const int mapCycleFileOffset = 0x000;
+            const int mapCycleFileSize = 0x104;
+            const int mapCycleNameOffset = 0x20F;
+            const int mapCycleNameSize = 0x0FF;
+            const int mapCycleModTypeOffset = 0x710;
+            const int mapCycleCustomFlagOffset = 0x714;
 
-            using var ms = new MemoryStream();
-            using var bw = new BinaryWriter(ms, Encoding.Default);
+            byte[] emptyEntry = new byte[mapCycleEntryStride];
+            int count = mapInstance.Playlists[mapInstance.ActivePlaylist].Count;
 
-            // Helper to write a fixed-length string with null padding
-            void WriteFixedString(string value, int length)
+            for (int i = 0; i < count; i++)
             {
-                var bytes = Encoding.Default.GetBytes(value);
-                bw.Write(bytes, 0, Math.Min(bytes.Length, length));
-                for (int i = bytes.Length; i < length; i++)
-                    bw.Write((byte)0x00);
+                MapObject map = mapInstance.Playlists[mapInstance.ActivePlaylist][i];
+                int entryBase = mapCycleTableAddress + (i * mapCycleEntryStride);
+                int emptyEntryBytesWritten = 0;
+
+                WriteProcessMemory((int)processHandle, entryBase, emptyEntry, emptyEntry.Length, ref emptyEntryBytesWritten);
+
+                int customFlag = map.ModType == 9 ? 1 : 0;
+                WriteFixedString(entryBase + mapCycleFileOffset, map.MapFile, mapCycleFileSize);
+                WriteFixedString(entryBase + mapCycleNameOffset, map.MapName, mapCycleNameSize);
+                WriteInt(entryBase + mapCycleModTypeOffset, customFlag);
+                WriteInt(entryBase + mapCycleCustomFlagOffset, customFlag);
             }
-
-            // Write the first map
-            var firstMap = mapInstance.Playlists[mapInstance.ActivePlaylist][0];
-            WriteFixedString(firstMap.MapFile!, 28);
-            bw.Write(new byte[256]); // adjust this padding as needed
-
-            string mapName = firstMap.MapName!;
-            if (mapName.Length > 31)
-                mapName = mapName.Substring(0, 31);
-            WriteFixedString(mapName, 28);
-            bw.Write(new byte[256]); // adjust this padding as needed
-
-            bw.Write(BitConverter.GetBytes(theInstance.gameScoreKills));
-            bw.Write(new byte[256]); // adjust this padding as needed
-
-            bw.Write(BitConverter.GetBytes(firstMap.ModType==9 ? 1 : 0)); // Custom map flag
-			bw.Write(new byte[24]); // adjust this padding as needed
-
-            // Write additional maps
-            for (int i = 1; i < mapInstance.Playlists[mapInstance.ActivePlaylist].Count; i++)
-            {
-                var map = mapInstance.Playlists[mapInstance.ActivePlaylist][i];
-                WriteFixedString(map.MapFile!, 28);
-                bw.Write(new byte[256]); // adjust this padding as needed
-
-                string name = map.MapName!;
-                if (name.Length > 31)
-                    name = name.Substring(0, 31);
-                WriteFixedString(name, 28);
-                bw.Write(new byte[256]); // adjust this padding as needed
-
-                bw.Write(BitConverter.GetBytes(theInstance.gameScoreKills));
-                bw.Write(new byte[256]); // adjust this padding as needed
-
-                bw.Write(BitConverter.GetBytes(map.ModType==9 ? 1 : 0));  // Custom map flag
-                bw.Write(new byte[28]); // adjust this padding as needed
-            }
-
-            // Write to memory
-            byte[] mapCycleClientBytes = ms.ToArray();
-            int mapCycleClientWritten = 0;
-            WriteProcessMemory((int)processHandle, mapCycleClientAddress, mapCycleClientBytes, mapCycleClientBytes.Length, ref mapCycleClientWritten);
 
             UpdateSecondaryMapList();
         }
 
         // Function: UpdateSecondaryMapList
-        // Updates the secondary map list in the server memory
+        // Refreshes the derived 0x24 secondary list cache used by some live paths.
         public static void UpdateSecondaryMapList()
         {
+            const int secondaryEntryStride = 0x24;
+            const int secondaryEntryNameSize = 0x20;
+            const int secondaryEntryFlagOffset = 0x20;
+            const int secondaryListCountOffset = 0x04;
+            const int secondaryListCapacityOffset = 0x08;
+            const int secondaryListSelectedIndexOffset = 0x0C;
+            const int mapCycleSelectedIndexAddress = 0x00A348D0;
 
             int mapCycleServerAddress = GetMapCycleServerAddress();
-            int count = mapInstance.Playlists[mapInstance.ActivePlaylist].Count;
-            WriteInt(mapCycleServerAddress + 0x4, count);
-            WriteInt(mapCycleServerAddress + 0xC, count);
+            if (mapCycleServerAddress == 0)
+                return;
+
             int mapCycleList = ReadInt(mapCycleServerAddress);
+            int capacity = ReadInt(mapCycleServerAddress + secondaryListCapacityOffset);
+            int count = mapInstance.Playlists[mapInstance.ActivePlaylist].Count;
 
+            if (mapCycleList == 0 || capacity <= 0)
+                return;
 
-            for (int i = 0; i < mapInstance.Playlists[mapInstance.ActivePlaylist].Count; i++)
+            if (count > capacity)
             {
-                int mapFileIndexLocation = mapCycleList;
-                byte[] mapFileBytes = new byte[0x20]; // 32 bytes
-                byte[] nameBytes = Encoding.ASCII.GetBytes(mapInstance.Playlists[mapInstance.ActivePlaylist][i].MapFile!);
-                Array.Copy(nameBytes, mapFileBytes, Math.Min(nameBytes.Length, mapFileBytes.Length));
-                int mapFileBytesWritten = 0;
-                WriteProcessMemory((int)processHandle, mapFileIndexLocation, mapFileBytes, mapFileBytes.Length, ref mapFileBytesWritten);
-                mapFileIndexLocation += 0x20;
+                throw new Exception($"Secondary map list capacity ({capacity}) is smaller than the active playlist count ({count}). #90");
+            }
 
-                WriteInt(mapFileIndexLocation, mapInstance.Playlists[mapInstance.ActivePlaylist][i].ModType == 9 ? 1 : 0);
-                mapCycleList += 0x24;
+            int selectedIndex = ReadInt(mapCycleSelectedIndexAddress);
+            if (count <= 0)
+                selectedIndex = -1;
+            else if (selectedIndex < 0 || selectedIndex >= count)
+                selectedIndex = 0;
+
+            byte[] emptyList = new byte[capacity * secondaryEntryStride];
+            int emptyListBytesWritten = 0;
+            WriteProcessMemory((int)processHandle, mapCycleList, emptyList, emptyList.Length, ref emptyListBytesWritten);
+
+            WriteInt(mapCycleServerAddress + secondaryListCountOffset, count);
+            WriteInt(mapCycleServerAddress + secondaryListSelectedIndexOffset, selectedIndex);
+
+            for (int i = 0; i < count; i++)
+            {
+                MapObject map = mapInstance.Playlists[mapInstance.ActivePlaylist][i];
+                int entryBase = mapCycleList + (i * secondaryEntryStride);
+                int customFlag = map.ModType == 9 ? 1 : 0;
+
+                WriteFixedString(entryBase, map.MapFile, secondaryEntryNameSize);
+                WriteInt(entryBase + secondaryEntryFlagOffset, customFlag);
             }
 
         }
@@ -231,13 +237,21 @@ namespace BHD_ServerManager.Classes.GameManagement
 		public static void UpdateNextMap(int NextMapIndex)
         {
             var playlist = mapInstance.Playlists[mapInstance.ActivePlaylist];
+            if (playlist.Count == 0)
+                return;
 
-            if (NextMapIndex == 0)
-                NextMapIndex = playlist.Count;
-            else if (playlist[NextMapIndex - 1] != null)
-                NextMapIndex--;
+            const int mapCycleSelectedIndexAddress = 0x00A348D0;
+            int selectedIndex;
 
-            WriteInt(GetMapCycleServerAddress() + 0xC, NextMapIndex);
+            if (NextMapIndex <= 0)
+                selectedIndex = 0;
+            else
+                selectedIndex = NextMapIndex - 1;
+
+            if (selectedIndex >= playlist.Count)
+                selectedIndex = playlist.Count - 1;
+
+            WriteInt(mapCycleSelectedIndexAddress, selectedIndex);
         }
 
         // Function: WriteMemoryScoreMap

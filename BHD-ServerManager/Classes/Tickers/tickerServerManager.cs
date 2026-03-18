@@ -78,7 +78,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     ServerMemory.ReadMemoryCurrentMissionName();                        // Get Current Mission Name
                     ServerMemory.ReadMemoryCurrentGameType();                           // Get Current Game Type
                     ServerMemory.ReadMemoryCurrentNumPlayers();                         // Get Current Number of Players
-                    ServerMemory.ReadMapCycleCounter();                                 // Map Cycle Counter (How Maps Have Been Played)
                     ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
                     // Score Reading
                     ServerMemory.ReadMemoryCurrentGameWinConditions();                  // Read Current Game Win Conditions
