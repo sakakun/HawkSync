@@ -636,47 +636,17 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             try
             {
                 string gamePath = theInstance.profileServerPath;
-
+                
                 if (string.IsNullOrEmpty(gamePath))
                     return false;
 
                 string filePath = Path.Combine(gamePath, mapFileName);
-
+                
                 if (!File.Exists(filePath))
                     return false;
 
                 string fileContents = File.ReadAllText(filePath, Encoding.GetEncoding(1252));
                 return fileContents.Contains("4T3AM", StringComparison.OrdinalIgnoreCase);
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("mapInstanceManager", $"Error checking if map is 4-team: {ex.Message}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Check if a map file is a 4-team map (contains "4T3AM" in file contents)
-        /// </summary>
-        public static bool IsHideSeekMap(string mapFileName)
-        {
-            if (string.IsNullOrEmpty(mapFileName))
-                return false;
-
-            try
-            {
-                string gamePath = theInstance.profileServerPath;
-                
-                if (string.IsNullOrEmpty(gamePath))
-                    return false;
-
-                string filePath = Path.Combine(gamePath, mapFileName);
-                
-                if (!File.Exists(filePath))
-                    return false;
-
-                string fileContents = File.ReadAllText(filePath, Encoding.GetEncoding(1252));
-                return fileContents.Contains("H1D3S33K", StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception ex)
             {

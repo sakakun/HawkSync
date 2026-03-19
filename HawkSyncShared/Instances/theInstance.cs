@@ -62,7 +62,6 @@ namespace HawkSyncShared.Instances
         public int              gameMatchID                 { get; set; } = 0;
 		public int              gameMatchWinner             { get; set; } = 0;
         public bool             gameEnableFourTeams         { get; set; } = false;
-        public bool             gameEnableHideandSeek       { get; set; } = true;
 		public string           gameServerName              { get; set; } = "Untitled Server";
         public string           gameMOTD                    { get; set; } = "Welcome to the server!";
         public string           gameCountryCode             { get; set; } = "US";
@@ -187,6 +186,7 @@ namespace HawkSyncShared.Instances
         public bool             gameInfoIsBlueDefending     { get; set; }       /* Current Game Defending Team, used for the Info Panel */
         public int              gameInfoBlueScore           { get; set; } = 0;  /* Current Blue Score, used for the Info Panel */
         public int              gameInfoRedScore            { get; set; } = 0;  /* Current Red Score, used for the Info Panel */
+        public int              gameInfoMapCycleIndex       { get; set; } = 0;  /* Map Cycle Index, used for the Info Panel */
         public int              gameInfoStartDelayTimer     { get; set; } = 0;  /* Current Start Delay Timer value from memory */
 
         // Proxy Checking Settings

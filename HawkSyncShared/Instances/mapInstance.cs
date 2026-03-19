@@ -23,6 +23,12 @@ public class mapInstance
     /// </summary>
     public List<MapObject> CustomMaps { get; set; } = new();
     
+    /// <summary>
+    /// Combined list of all available maps (for quick access)
+    /// </summary>
+    public List<MapObject> AllAvailableMaps => 
+        DefaultMaps.Concat(CustomMaps).OrderBy(m => m.MapName).ToList();
+    
     // ================================================================================
     // PLAYLISTS (5 Playlists)
     // ================================================================================
@@ -82,33 +88,33 @@ public class mapInstance
     /// <summary>
     /// Current index in the active playlist (0-based)
     /// </summary>
-    public int ActualPlayingMapIndex { get; set; } = 0;  
-    // The map that's actually playing right now (for UI)
+    public int ActualPlayingMapIndex { get; set; } = 0;  // The map that's actually playing right now (for UI)
 
     /// <summary>
     /// Current index in the active playlist (0-based)
-    /// This is used for determining the next map to be played based on the server's map cycle counter.
     /// </summary>
     public int CurrentMapIndex { get; set; } = 0;
     
+    /// <summary>
+    /// Total maps in the active playlist
+    /// </summary>
+    public int TotalMapsInPlaylist => Playlists.ContainsKey(ActivePlaylist) 
+        ? Playlists[ActivePlaylist].Count 
+        : 0;
+
     /// <summary>
     /// Is the current map a 4 Team Map?
     /// </summary>
     public bool IsCurrentMap4Team { get; set; } = false;
 
-	/// <summary>
-	/// Is the current map a Hide and Seek Map?
-	/// </summary>
-    public bool IsCurrentMapHideAndSeek { get; set; } = false;
-
-	// ================================================================================
-	// NEXT MAP INFO
-	// ================================================================================
-
-	/// <summary>
-	/// Is the next map a 4 Team Map?
-	/// </summary>
-	public bool IsNextMap4Team { get; set; } = false;
+    // ================================================================================
+    // NEXT MAP INFO
+    // ================================================================================
+    
+    /// <summary>
+    /// Is the next map a 4 Team Map?
+    /// </summary>
+    public bool IsNextMap4Team { get; set; } = false;
 
     /// <summary>
     /// Next map to be played
@@ -125,4 +131,34 @@ public class mapInstance
     /// </summary>
     public int NextMapGameType { get; set; } = 0;
     
+    /// <summary>
+    /// Get the next map object from the active playlist
+    /// </summary>
+    public MapObject? GetNextMap()
+    {
+        if (!Playlists.ContainsKey(ActivePlaylist)) 
+            return null;
+        
+        var playlist = Playlists[ActivePlaylist];
+        if (playlist.Count == 0) 
+            return null;
+        
+        int nextIndex = (CurrentMapIndex + 1) % playlist.Count;
+        return playlist[nextIndex];
+    }
+    
+    /// <summary>
+    /// Get the current map object from the active playlist
+    /// </summary>
+    public MapObject? GetCurrentMap()
+    {
+        if (!Playlists.ContainsKey(ActivePlaylist)) 
+            return null;
+        
+        var playlist = Playlists[ActivePlaylist];
+        if (playlist.Count == 0 || CurrentMapIndex >= playlist.Count) 
+            return null;
+        
+        return playlist[CurrentMapIndex];
+    }
 }

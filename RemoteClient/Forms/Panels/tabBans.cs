@@ -18,7 +18,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Windows.Storage;
 
 namespace RemoteClient.Forms.Panels
 {
@@ -281,7 +280,7 @@ namespace RemoteClient.Forms.Panels
             catch (Exception ex)
             {
                 // Log the error if you have a logging mechanism
-                AppDebug.Log("UpdateNetLimiterConnectionLogUI","Error updating NetLimiter Connection Log UI: " + ex.Message);
+                // For now, silently fail to avoid disrupting the UI
             }
         }
 
