@@ -95,7 +95,13 @@ jobs:
       run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
 
     - name: Build HawkSyncShared
-      run: dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} --configuration Release
+      run: |
+        dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} `
+          --configuration Release `
+          --no-restore `
+          /p:Platform=AnyCPU `
+          /p:OutputPath=bin/Release/ `
+          /p:AppendTargetFrameworkToOutputPath=false
 
     # Restore and build ServerManager
     - name: Restore ServerManager dependencies
