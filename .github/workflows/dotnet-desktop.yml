@@ -133,6 +133,7 @@ jobs:
           --no-restore `
           /p:BuildProjectReferences=false `
           /p:UseCommonOutputDirectory=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
           /p:Platform=AnyCPU `
@@ -163,6 +164,7 @@ jobs:
           --self-contained false `
           --output ./publish/framework-dependent/ServerManager `
           /p:BuildProjectReferences=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:UseCommonOutputDirectory=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
@@ -356,4 +358,3 @@ jobs:
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            
