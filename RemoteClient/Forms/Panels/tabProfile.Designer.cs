@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             tableLayoutPanel1 = new TableLayoutPanel();
             profileFileManagers = new TabControl();
             tabProfilePage1 = new TabPage();
@@ -41,6 +41,7 @@
             num_minPing = new NumericUpDown();
             groupBox7 = new GroupBox();
             tableLayoutPanel6 = new TableLayoutPanel();
+            cb_localPlay = new CheckBox();
             num_remotePort = new NumericUpDown();
             checkBox_enableRemote = new CheckBox();
             cb_serverDedicated = new CheckBox();
@@ -113,7 +114,6 @@
             btn_saveProfile = new Button();
             folderProfileBrowserDialog = new FolderBrowserDialog();
             openFileDialog1 = new OpenFileDialog();
-            cb_localPlay = new CheckBox();
             tableLayoutPanel1.SuspendLayout();
             profileFileManagers.SuspendLayout();
             tabProfilePage1.SuspendLayout();
@@ -302,6 +302,22 @@
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 16.666666F));
             tableLayoutPanel6.Size = new Size(422, 173);
             tableLayoutPanel6.TabIndex = 0;
+            // 
+            // cb_localPlay
+            // 
+            cb_localPlay.AutoSize = true;
+            cb_localPlay.CheckAlign = ContentAlignment.MiddleRight;
+            tableLayoutPanel6.SetColumnSpan(cb_localPlay, 2);
+            cb_localPlay.Dock = DockStyle.Fill;
+            cb_localPlay.Location = new Point(186, 59);
+            cb_localPlay.Margin = new Padding(3, 3, 10, 3);
+            cb_localPlay.Name = "cb_localPlay";
+            cb_localPlay.Size = new Size(226, 22);
+            cb_localPlay.TabIndex = 16;
+            cb_localPlay.Text = "Local Area Network Only";
+            cb_localPlay.TextAlign = ContentAlignment.MiddleRight;
+            cb_localPlay.UseVisualStyleBackColor = true;
+            cb_localPlay.CheckedChanged += cb_localPlay_CheckedChanged;
             // 
             // num_remotePort
             // 
@@ -1067,17 +1083,17 @@
             dgvAuditLogs.AllowUserToAddRows = false;
             dgvAuditLogs.AllowUserToDeleteRows = false;
             dgvAuditLogs.AllowUserToResizeRows = false;
-            dataGridViewCellStyle11.BackColor = Color.FromArgb(240, 240, 240);
-            dgvAuditLogs.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(240, 240, 240);
+            dgvAuditLogs.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvAuditLogs.BorderStyle = BorderStyle.Fixed3D;
-            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle12.BackColor = Color.FromArgb(230, 230, 230);
-            dataGridViewCellStyle12.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            dataGridViewCellStyle12.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle12.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle12.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle12.WrapMode = DataGridViewTriState.True;
-            dgvAuditLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(230, 230, 230);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvAuditLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvAuditLogs.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvAuditLogs.Columns.AddRange(new DataGridViewColumn[] { Time, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3, dataGridViewTextBoxColumn4, Description, Status });
             dgvAuditLogs.Dock = DockStyle.Fill;
@@ -1200,21 +1216,6 @@
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openModFileDialog";
-            // 
-            // cb_localPlay
-            // 
-            cb_localPlay.AutoSize = true;
-            cb_localPlay.CheckAlign = ContentAlignment.MiddleRight;
-            tableLayoutPanel6.SetColumnSpan(cb_localPlay, 2);
-            cb_localPlay.Dock = DockStyle.Fill;
-            cb_localPlay.Location = new Point(186, 59);
-            cb_localPlay.Margin = new Padding(3, 3, 10, 3);
-            cb_localPlay.Name = "cb_localPlay";
-            cb_localPlay.Size = new Size(226, 22);
-            cb_localPlay.TabIndex = 16;
-            cb_localPlay.Text = "Local Area Network Only";
-            cb_localPlay.TextAlign = ContentAlignment.MiddleRight;
-            cb_localPlay.UseVisualStyleBackColor = true;
             // 
             // tabProfile
             // 

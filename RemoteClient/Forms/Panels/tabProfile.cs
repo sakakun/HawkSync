@@ -454,12 +454,19 @@ public partial class tabProfile : UserControl
         }
     }
 
-	#region Audit Logs
+    private void cb_localPlay_CheckedChanged(object sender, EventArgs e)
+    {
+        bool isLAN = cb_localPlay.Checked;
+        cb_requireNova.Enabled = !isLAN;
+        if (isLAN) cb_requireNova.Checked = false;
+    }
 
-	/// <summary>
-	/// Initialize audit log UI components
-	/// </summary>
-	private void InitializeAuditLogUI()
+    #region Audit Logs
+
+    /// <summary>
+    /// Initialize audit log UI components
+    /// </summary>
+    private void InitializeAuditLogUI()
 	{
 		Console.WriteLine("[tabProfile] Initializing audit log UI...");
 		

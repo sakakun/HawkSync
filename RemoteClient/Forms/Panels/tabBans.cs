@@ -281,6 +281,7 @@ namespace RemoteClient.Forms.Panels
             {
                 // Log the error if you have a logging mechanism
                 // For now, silently fail to avoid disrupting the UI
+                AppDebug.Log("tabBans", $"Error updating NetLimiter Connection Log UI: {ex.Message}");
             }
         }
 

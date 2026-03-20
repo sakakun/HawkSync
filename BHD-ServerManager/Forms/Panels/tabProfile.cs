@@ -35,7 +35,6 @@ namespace BHD_ServerManager.Forms.Panels
 		{
 			// Initialize the form components
 			InitializeComponent();
-		cb_localPlay.CheckedChanged += cb_localPlay_CheckedChanged;
 			InitializeAuditLogUI();
 
 			// Initialize the profile tab with current settings
