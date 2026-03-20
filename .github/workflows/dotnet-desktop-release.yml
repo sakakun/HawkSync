@@ -95,7 +95,7 @@ jobs:
       run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
 
     - name: Build HawkSyncShared
-      run: dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} --configuration Release
+      run: dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} --configuration Release --no-restore --output ./HawkSyncShared/publish
 
     # Restore and build ServerManager
     - name: Restore ServerManager dependencies
@@ -218,11 +218,11 @@ jobs:
       shell: pwsh
       run: |
         # ServerManager
-        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+        Copy-Item -Path ./HawkSyncShared/publish/* `
           -Destination ./publish/framework-dependent/ServerManager/ `
           -Recurse -Force
         # RemoteClient
-        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+        Copy-Item -Path ./HawkSyncShared/publish/* `
           -Destination ./publish/framework-dependent/RemoteClient/ `
           -Recurse -Force
 
@@ -230,11 +230,11 @@ jobs:
       shell: pwsh
       run: |
         # ServerManager
-        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+        Copy-Item -Path ./HawkSyncShared/publish/* `
           -Destination ./publish/self-contained/ServerManager/ `
           -Recurse -Force
         # RemoteClient
-        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+        Copy-Item -Path ./HawkSyncShared/publish/* `
           -Destination ./publish/self-contained/RemoteClient/ `
           -Recurse -Force
 
@@ -412,7 +412,7 @@ jobs:
           
           ### 📋 Changes
           
-          See the [full changelog](https://github.com/${{ github.repository }}/compare/v${{ needs.validate.outputs.version }}...HEAD)
+          See the [full changelog](https://github.com/${{ github.repository }}/releases/tag/v${{ needs.validate.outputs.version }})
         draft: false
         prerelease: false
         make_latest: true
