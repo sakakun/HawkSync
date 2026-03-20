@@ -1,4 +1,4 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
+﻿using BHD_ServerManager.Classes.GameManagement.Memory;
 using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;

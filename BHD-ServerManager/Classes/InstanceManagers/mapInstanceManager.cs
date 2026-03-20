@@ -1,4 +1,4 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
+﻿using BHD_ServerManager.Classes.GameManagement.Memory;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
 using HawkSyncShared;
@@ -724,7 +724,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
                     return new OperationResult(false, "Server is offline.");
 
-                ServerMemory.ScoreMap();
+                ServerMemory.WriteMemoryScoreMap();
 
                 AppDebug.Log("mapInstanceManager", "Scored current map");
 
