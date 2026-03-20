@@ -75,7 +75,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
@@ -129,7 +129,7 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
-          /p:Platform="Any CPU" `
+          /p:Platform=AnyCPU `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
           /p:FileVersion="${{ needs.validate.outputs.version }}"
@@ -143,7 +143,7 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
-          /p:Platform="Any CPU" `
+          /p:Platform=AnyCPU `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
           /p:FileVersion="${{ needs.validate.outputs.version }}"
@@ -293,7 +293,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
@@ -352,3 +352,4 @@ jobs:
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            
