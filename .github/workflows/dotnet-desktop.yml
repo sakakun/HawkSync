@@ -13,6 +13,7 @@ permissions:
   packages: write
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SERVERMANAGER_PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
   REMOTECLIENT_PROJECT_PATH: RemoteClient/RemoteClient.csproj
   NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
@@ -30,7 +31,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
