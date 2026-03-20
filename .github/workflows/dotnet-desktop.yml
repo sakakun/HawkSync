@@ -190,12 +190,10 @@ jobs:
     - name: Copy HawkSyncShared to Framework-Dependent output
       shell: pwsh
       run: |
-        # ServerManager
-        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+        Copy-Item -Path ./HawkSyncShared/bin/Release/net10.0/* `
           -Destination ./publish/framework-dependent/ServerManager/ `
           -Recurse -Force
-        # RemoteClient
-        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
+        Copy-Item -Path ./HawkSyncShared/bin/Release/net10.0/* `
           -Destination ./publish/framework-dependent/RemoteClient/ `
           -Recurse -Force
 
