@@ -107,7 +107,7 @@ jobs:
 
     # Restore NetLimiterBridge packages (legacy .NET Framework project)
     - name: Restore NetLimiterBridge dependencies
-      run: nuget restore ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} -PackagesDirectory ./packages -NonInteractive
+      run: nuget restore ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} -PackagesDirectory ./NetLimiterBridge/packages -NonInteractive
 
     # Build NetLimiterBridge (.NET Framework 4.8.1)
     - name: Build NetLimiterBridge (.NET Framework 4.8.1)
@@ -117,8 +117,7 @@ jobs:
           /p:Configuration=Release `
           /p:Platform="Any CPU" `
           /p:PlatformTarget=x64 `
-          /p:OutputPath=bin\Release\ `
-          /p:RestorePackages=false
+          /p:OutputPath=bin\Release\
 
     # Build ServerManager (.NET 10.0)
     - name: Build ServerManager (.NET 10.0)
@@ -126,6 +125,7 @@ jobs:
         dotnet build ${{ env.SERVERMANAGER_PROJECT_PATH }} `
           --configuration Release `
           --no-restore `
+          /p:BuildProjectReferences=false `
           /p:UseCommonOutputDirectory=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
@@ -156,9 +156,17 @@ jobs:
           --runtime win-x64 `
           --self-contained false `
           --output ./publish/framework-dependent/ServerManager `
+          /p:BuildProjectReferences=false `
           /p:UseCommonOutputDirectory=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
+
+    - name: Copy NetLimiterBridge to ServerManager output
+      shell: pwsh
+      run: |
+        Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
+          -Destination ./publish/framework-dependent/ServerManager/ `
+          -Recurse -Force
 
     # Publish RemoteClient
     - name: Publish RemoteClient (Framework-Dependent)
