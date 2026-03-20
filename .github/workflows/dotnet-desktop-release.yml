@@ -95,7 +95,12 @@ jobs:
       run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
 
     - name: Build HawkSyncShared
-      run: dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} --configuration Release --no-restore --output ./HawkSyncShared/publish
+      run: |
+        dotnet build ${{ env.HAWKSYNCSHARED_PROJECT_PATH }} `
+          --configuration Release `
+          --no-restore `
+          /p:AppendTargetFrameworkToOutputPath=false `
+          /p:ProduceReferenceAssembly=true
 
     # Restore and build ServerManager
     - name: Restore ServerManager dependencies
@@ -125,7 +130,7 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
-          /p:Platform="Any CPU" `
+          /p:Platform=AnyCPU `
           /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
@@ -140,7 +145,7 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
-          /p:Platform="Any CPU" `
+          /p:Platform=AnyCPU `
           /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
@@ -223,24 +228,20 @@ jobs:
     - name: Copy HawkSyncShared to Framework-Dependent output
       shell: pwsh
       run: |
-        # ServerManager
-        Copy-Item -Path ./HawkSyncShared/publish/* `
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
           -Destination ./publish/framework-dependent/ServerManager/ `
           -Recurse -Force
-        # RemoteClient
-        Copy-Item -Path ./HawkSyncShared/publish/* `
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
           -Destination ./publish/framework-dependent/RemoteClient/ `
           -Recurse -Force
 
     - name: Copy HawkSyncShared to Self-Contained output
       shell: pwsh
       run: |
-        # ServerManager
-        Copy-Item -Path ./HawkSyncShared/publish/* `
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
           -Destination ./publish/self-contained/ServerManager/ `
           -Recurse -Force
-        # RemoteClient
-        Copy-Item -Path ./HawkSyncShared/publish/* `
+        Copy-Item -Path ./HawkSyncShared/bin/Release/* `
           -Destination ./publish/self-contained/RemoteClient/ `
           -Recurse -Force
 
