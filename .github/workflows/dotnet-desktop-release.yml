@@ -126,6 +126,7 @@ jobs:
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
           /p:Platform="Any CPU" `
+          /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
           /p:FileVersion="${{ needs.validate.outputs.version }}"
@@ -140,6 +141,7 @@ jobs:
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
           /p:Platform="Any CPU" `
+          /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
           /p:FileVersion="${{ needs.validate.outputs.version }}"
@@ -153,6 +155,7 @@ jobs:
           --self-contained false `
           --output ./publish/framework-dependent/ServerManager `
           /p:UseCommonOutputDirectory=false `
+          /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
@@ -167,6 +170,7 @@ jobs:
           /p:IncludeNativeLibrariesForSelfExtract=true `
           /p:EnableCompressionInSingleFile=true `
           /p:UseCommonOutputDirectory=false `
+          /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
@@ -179,6 +183,7 @@ jobs:
           --self-contained false `
           --output ./publish/framework-dependent/RemoteClient `
           /p:UseCommonOutputDirectory=false `
+          /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
@@ -193,6 +198,7 @@ jobs:
           /p:IncludeNativeLibrariesForSelfExtract=true `
           /p:EnableCompressionInSingleFile=true `
           /p:UseCommonOutputDirectory=false `
+          /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
