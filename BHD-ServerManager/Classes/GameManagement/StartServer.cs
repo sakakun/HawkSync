@@ -351,7 +351,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 				WriteAt(RULE_TIME_LIMIT, timeLimitBytes);
 				WriteAt(RULE_ZONE_TIMER, zoneTimerBytes);
 				WriteAt(RULE_RESPAWN_TIME, respawnTimeBytes);
-				WriteAt(RULE_MP_SERVICE, BitConverter.GetBytes(1));
+				WriteAt(RULE_MP_SERVICE, BitConverter.GetBytes(theInstance.gameLocalPlay ? 2 : 1));
 				WriteAt(RULE_PING, BitConverter.GetBytes(1));
 				WriteAt(RULE_SEND_PLAYER_LIST, BitConverter.GetBytes(1));
 				WriteAt(RULE_TEAMCHANGE_TIME, BitConverter.GetBytes(15));

@@ -66,6 +66,7 @@ namespace HawkSyncShared.Instances
         public string           gameMOTD                    { get; set; } = "Welcome to the server!";
         public string           gameCountryCode             { get; set; } = "US";
         public string           gameHostName                { get; set; } = "HostName";
+        public bool             gameLocalPlay               { get; set; } = false;
         public bool             gameDedicated               { get; set; } = true;
         public bool             gameWindowedMode            { get; set; } = true;
         public string           gamePasswordLobby           { get; set; } = "";

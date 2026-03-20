@@ -2,8 +2,7 @@
   "profiles": {
     "ServerManager": {
       "commandName": "Project",
-      "workingDirectory": "\\\\VM-DEV\\ServerData\\Development\\HawkSync\\Server-Manager",
-      "remoteDebugEnabled": true,
+      "remoteDebugEnabled": false,
       "remoteDebugMachine": "VM-DEV",
       "authenticationMode": "Windows",
       "nativeDebugging": true

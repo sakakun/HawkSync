@@ -15,6 +15,7 @@ public record ProfileSettingsRequest
     public string LobbyPassword { get; init; } = string.Empty;
     public bool Dedicated { get; init; }
     public bool RequireNova { get; init; }
+    public bool LocalPlay { get; init; }
     public string CountryCode { get; init; } = string.Empty;
     public bool MinPingEnabled { get; init; }
     public bool MaxPingEnabled { get; init; }
@@ -47,6 +48,7 @@ public record ProfileSettingsData
     public string LobbyPassword { get; init; } = string.Empty;
     public bool Dedicated { get; init; }
     public bool RequireNova { get; init; }
+    public bool LocalPlay { get; init; }
     public string CountryCode { get; init; } = string.Empty;
     public bool MinPingEnabled { get; init; }
     public bool MaxPingEnabled { get; init; }

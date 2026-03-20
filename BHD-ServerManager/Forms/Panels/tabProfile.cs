@@ -35,8 +35,7 @@ namespace BHD_ServerManager.Forms.Panels
 		{
 			// Initialize the form components
 			InitializeComponent();
-
-			// Initialize audit log UI
+		cb_localPlay.CheckedChanged += cb_localPlay_CheckedChanged;
 			InitializeAuditLogUI();
 
 			// Initialize the profile tab with current settings
@@ -138,6 +137,7 @@ namespace BHD_ServerManager.Forms.Panels
 			tb_serverMessage.Text = theInstance.gameMOTD;
 
 			// Server Details
+			PopulateServerIPComboBox();
 			if (!string.IsNullOrEmpty(theInstance.profileBindIP) && cb_serverIP.Items.Contains(theInstance.profileBindIP))
 			{
 				cb_serverIP.SelectedItem = theInstance.profileBindIP;
@@ -150,7 +150,9 @@ namespace BHD_ServerManager.Forms.Panels
 			num_serverPort.Value = theInstance.profileBindPort;
 			tb_serverPassword.Text = theInstance.gamePasswordLobby;
 			cb_serverDedicated.Checked = theInstance.gameDedicated;
-			cb_requireNova.Checked = theInstance.gameRequireNova;
+			cb_localPlay.Checked = theInstance.gameLocalPlay;
+			cb_requireNova.Checked = theInstance.gameLocalPlay ? false : theInstance.gameRequireNova;
+			cb_requireNova.Enabled = !theInstance.gameLocalPlay;
 			serverCountryCode.Text = theInstance.gameCountryCode;
 
 			// Remote Connection Settings
@@ -227,6 +229,7 @@ namespace BHD_ServerManager.Forms.Panels
 				BindPort: (int)num_serverPort.Value,
 				LobbyPassword: tb_serverPassword.Text,
 				Dedicated: cb_serverDedicated.Checked,
+				LocalPlay: cb_localPlay.Checked,
 				RequireNova: cb_requireNova.Checked,
 				CountryCode: serverCountryCode.Text,
 				MinPingEnabled: cb_enableMinCheck.Checked,
@@ -302,6 +305,35 @@ namespace BHD_ServerManager.Forms.Panels
 				AppDebug.Log(Name, $"Failed to open profile file dialog: {ex.Message}");
 				MessageBox.Show("Failed to open profile file dialog. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
+		}
+
+		private void PopulateServerIPComboBox()
+		{
+			var currentSelection = cb_serverIP.SelectedItem?.ToString();
+			cb_serverIP.Items.Clear();
+			cb_serverIP.Items.Add("0.0.0.0");
+
+			foreach (var ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+			{
+				if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
+				foreach (var addr in ni.GetIPProperties().UnicastAddresses)
+				{
+					if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+						cb_serverIP.Items.Add(addr.Address.ToString());
+				}
+			}
+
+			if (currentSelection != null && cb_serverIP.Items.Contains(currentSelection))
+				cb_serverIP.SelectedItem = currentSelection;
+			else
+				cb_serverIP.SelectedIndex = 0;
+		}
+
+		private void cb_localPlay_CheckedChanged(object sender, EventArgs e)
+		{
+			bool isLAN = cb_localPlay.Checked;
+			cb_requireNova.Enabled = !isLAN;
+			if (isLAN) cb_requireNova.Checked = false;
 		}
 
 		#region Audit Logs

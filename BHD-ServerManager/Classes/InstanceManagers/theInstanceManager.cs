@@ -49,6 +49,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         string LobbyPassword,
         bool Dedicated,
         bool RequireNova,
+        bool LocalPlay,
         string CountryCode,
         bool MinPingEnabled,
         bool MaxPingEnabled,
@@ -222,6 +223,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     LobbyPassword: ServerSettings.Get("gamePasswordLobby", string.Empty),
                     Dedicated: ServerSettings.Get("gameDedicated", true),
                     RequireNova: ServerSettings.Get("gameRequireNova", false),
+                    LocalPlay: ServerSettings.Get("gameLocalPlay", false),
                     CountryCode: ServerSettings.Get("gameCountryCode", "US"),
                     MinPingEnabled: ServerSettings.Get("gameMinPing", false),
                     MaxPingEnabled: ServerSettings.Get("gameMaxPing", false),
@@ -270,6 +272,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("gamePasswordLobby", settings.LobbyPassword);
                 ServerSettings.Set("gameDedicated", settings.Dedicated);
                 ServerSettings.Set("gameRequireNova", settings.RequireNova);
+                ServerSettings.Set("gameLocalPlay", settings.LocalPlay);
                 ServerSettings.Set("gameCountryCode", settings.CountryCode);
                 ServerSettings.Set("gameMinPing", settings.MinPingEnabled);
                 ServerSettings.Set("gameMaxPing", settings.MaxPingEnabled);
@@ -399,7 +402,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.gameHostName, theInstance.gameServerName, theInstance.gameMOTD,
                     theInstance.profileBindIP, theInstance.profileBindPort,
                     theInstance.gamePasswordLobby, theInstance.gameDedicated, theInstance.gameRequireNova,
-                    theInstance.gameCountryCode, theInstance.gameMinPing, theInstance.gameMaxPing,
+                    theInstance.gameLocalPlay, theInstance.gameCountryCode, theInstance.gameMinPing, theInstance.gameMaxPing,
                     theInstance.gameMinPingValue, theInstance.gameMaxPingValue,
                     theInstance.profileEnableRemote, theInstance.profileRemotePort,
                     flags
@@ -1046,7 +1049,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             theInstance.profileBindPort = settings.BindPort;
             theInstance.gamePasswordLobby = settings.LobbyPassword;
             theInstance.gameDedicated = settings.Dedicated;
-            theInstance.gameRequireNova = settings.RequireNova;
+            theInstance.gameLocalPlay = settings.LocalPlay;
+            theInstance.gameRequireNova = settings.LocalPlay ? false : settings.RequireNova;
             theInstance.gameCountryCode = settings.CountryCode;
             theInstance.gameMinPing = settings.MinPingEnabled;
             theInstance.gameMaxPing = settings.MaxPingEnabled;
