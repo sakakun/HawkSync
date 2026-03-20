@@ -20,7 +20,8 @@
     <PackageOutputPath>\bin\$(AssemblyName)</PackageOutputPath>
     <Platforms>AnyCPU</Platforms>
     <Configurations>Debug;Release</Configurations>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile> <!-- This line is crucial -->
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+	<NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -77,6 +78,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HawkSyncShared\HawkSyncShared.csproj" />
+    <ProjectReference Include="..\NetLimiterBridge\NetLimiterBridge.csproj" />
   </ItemGroup>
 
   <ItemGroup>
