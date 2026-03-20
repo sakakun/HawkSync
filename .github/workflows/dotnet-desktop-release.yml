@@ -16,6 +16,7 @@ permissions:
   packages: write
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SERVERMANAGER_PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
   REMOTECLIENT_PROJECT_PATH: RemoteClient/RemoteClient.csproj
   NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
@@ -128,6 +129,7 @@ jobs:
           --configuration Release `
           --no-restore `
           /p:UseCommonOutputDirectory=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
           /p:Platform=AnyCPU `
@@ -143,6 +145,7 @@ jobs:
           --configuration Release `
           --no-restore `
           /p:UseCommonOutputDirectory=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:OutputPath=bin/Release/ `
           /p:BaseOutputPath=bin/ `
           /p:Platform=AnyCPU `
@@ -151,7 +154,7 @@ jobs:
           /p:AssemblyVersion="${{ needs.validate.outputs.version }}" `
           /p:FileVersion="${{ needs.validate.outputs.version }}"
 
-    # Publish ServerManager
+    # Publish ServerManager (Framework-Dependent)
     - name: Publish ServerManager (Framework-Dependent)
       run: |
         dotnet publish ${{ env.SERVERMANAGER_PROJECT_PATH }} `
@@ -160,6 +163,7 @@ jobs:
           --self-contained false `
           --output ./publish/framework-dependent/ServerManager `
           /p:UseCommonOutputDirectory=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
@@ -175,11 +179,12 @@ jobs:
           /p:IncludeNativeLibrariesForSelfExtract=true `
           /p:EnableCompressionInSingleFile=true `
           /p:UseCommonOutputDirectory=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
 
-    # Publish RemoteClient
+    # Publish RemoteClient (Framework-Dependent)
     - name: Publish RemoteClient (Framework-Dependent)
       run: |
         dotnet publish ${{ env.REMOTECLIENT_PROJECT_PATH }} `
@@ -188,6 +193,7 @@ jobs:
           --self-contained false `
           --output ./publish/framework-dependent/RemoteClient `
           /p:UseCommonOutputDirectory=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
@@ -203,6 +209,7 @@ jobs:
           /p:IncludeNativeLibrariesForSelfExtract=true `
           /p:EnableCompressionInSingleFile=true `
           /p:UseCommonOutputDirectory=false `
+          /p:AppendTargetFrameworkToOutputPath=false `
           /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
