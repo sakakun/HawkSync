@@ -96,7 +96,13 @@ public class MapPlaylistController : ControllerBase
         }).ToList();
 
         var result = mapInstanceManager.SavePlaylist(playlist.PlaylistID, maps);
+
+        if (playlist.PlaylistID == CommonCore.instanceMaps!.ActivePlaylist) {
+            var updateResult = mapInstanceManager.UpdateServerMapCycle();
+        }
+
         TriggerServerUIReload();
+
         LogMapPlaylistAction(
             "SavePlaylist",
             $"Saved playlist {playlist.PlaylistID}",
