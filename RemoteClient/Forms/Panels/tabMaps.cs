@@ -533,61 +533,51 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         public void UpdateCurrentMapHighlighting()
         {
-
-            // No Maps In Current Playlist (Race Condition Issues)
-            if (dataGridView_currentMaps.Rows.Count == 0)
-                return;
-
-            // Clear all row backgrounds first
-            foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
+            // Reset all row colors to White
+			foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
             {
                 if (row.IsNewRow) continue;
                 row.DefaultCellStyle.BackColor = Color.White;
             }
 
-            // Only highlight if viewing the active playlist and server is online
             if (mapInstance.ActivePlaylist != _selectedPlaylist)
-            {
-                AppDebug.Log("UpdateCurrentMapHighlighting", $"ActivePlaylist {mapInstance.ActivePlaylist} SelectedPlaylist {_selectedPlaylist}");
-                return;
-            }                
-
-            if (theInstance?.instanceStatus == InstanceStatus.OFFLINE)
                 return;
 
-            // Use the stable "actually playing" index for UI display
-            int actualCurrentMapIndex = mapInstance.ActualPlayingMapIndex;
+            int currentMap = mapInstance.ActualPlayingMapIndex;
+            int nextMap = mapInstance.CurrentMapIndex + 1;
 
-            int currentMapIndex = mapInstance.CurrentMapIndex;
 
-            // Calculate next map naturally from the actual current map
-            int nextMapIndex = mapInstance.CurrentMapIndex + 1;
-            
-            if (nextMapIndex >= dataGridView_currentMaps.Rows.Count)
-            {
-                nextMapIndex = 0; // Loop to beginning
+            if(theInstance!.gameLoopMaps != 2) {
+
+                dataGridView_currentMaps.Rows[currentMap].DefaultCellStyle.BackColor = Color.LightYellow;
+				return;
             }
-            
-            AppDebug.Log("UpdateCurrentMapHighlighting", $"Map Index: Actual: {actualCurrentMapIndex} Current: {currentMapIndex} Next: {nextMapIndex} Row Count: {dataGridView_currentMaps.Rows.Count}");                
 
-            // Check if current and next are the same (looping same map)
-            if (actualCurrentMapIndex == nextMapIndex)
-            {
-                // Yellow for looping the same map
-                dataGridView_currentMaps.Rows[actualCurrentMapIndex].DefaultCellStyle.BackColor = Color.Yellow;
-            }
-            else
-            {
+            if (theInstance?.instanceStatus is InstanceStatus.ONLINE or InstanceStatus.STARTDELAY ) {
 
-                if(theInstance!.instanceStatus != InstanceStatus.LOADINGMAP || theInstance!.instanceStatus != InstanceStatus.SCORING)
+				// If the current map and next map are the same, highlight in light yellow to indicate loading/playing
+                if (currentMap == nextMap)
                 {
-                    dataGridView_currentMaps.Rows[actualCurrentMapIndex].DefaultCellStyle.BackColor = Color.LightGreen;
-                }               
+                    dataGridView_currentMaps.Rows[currentMap].DefaultCellStyle.BackColor = Color.LightYellow;
+                }
+                else
+                {
+					// Highlight the current map in light green
+                    dataGridView_currentMaps.Rows[currentMap].DefaultCellStyle.BackColor = Color.LightGreen;
+					// highlight the next map in light blue
+                    if (nextMap >= dataGridView_currentMaps.Rows.Count)
+                    {
+						// If the next map index is out of range, it means the playlist is looping back to the beginning, so we highlight the first map as the next map.
+						dataGridView_currentMaps.Rows[0].DefaultCellStyle.BackColor = Color.LightBlue;
+					} else {
+						// Highlight the next map in light blue
+						dataGridView_currentMaps.Rows[nextMap].DefaultCellStyle.BackColor = Color.LightBlue;
+                    }
+				}
 
-                // Next map is blue
-                dataGridView_currentMaps.Rows[nextMapIndex].DefaultCellStyle.BackColor = Color.LightBlue;
-            }
-        }
+			}
+
+		}
 
     }
 }
