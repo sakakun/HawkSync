@@ -39,6 +39,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="API\Controllers\Admin\**" />
+    <EmbeddedResource Remove="API\Controllers\Admin\**" />
+    <None Remove="API\Controllers\Admin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Databases\database.sqlite" />
     <None Remove="Databases\database.sqlite.sql" />
     <None Remove="Databases\DATABASE_MIGRATION_GUIDE.md" />
@@ -109,10 +115,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="API\Controllers\Admin\" />
   </ItemGroup>
 
 

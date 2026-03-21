@@ -246,7 +246,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] countryCodeBytes = Encoding.Default.GetBytes(theInstance.gameCountryCode);
                 byte[] bindAddressBytes = Encoding.Default.GetBytes(theInstance.profileBindIP!);
                 byte[] firstMapFileBytes = Encoding.Default.GetBytes(firstMap.MapFile!);
-                byte[] maxSlotsBytes = BitConverter.GetBytes(theInstance.gameMaxSlots);
+                byte[] maxSlotsBytes = BitConverter.GetBytes(80);
                 byte[] dedicatedBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDedicated));
                 byte[] gameScoreBytes = BitConverter.GetBytes(theInstance.gameScoreKills);
                 byte[] serverPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordLobby!);
@@ -339,7 +339,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
 				// Server rules block
 				WriteAt(RULE_MP_GAMETYPE, BitConverter.GetBytes(1));            
-				WriteAt(RULE_MAX_SLOTS, BitConverter.GetBytes(80));             // Must be 80 for memory allocation on startup
+				WriteAt(RULE_MAX_SLOTS, maxSlotsBytes);                         // Must be 80 for memory allocation on startup
 				WriteAt(RULE_DEDICATED, dedicatedBytes);
 				WriteAt(RULE_MAX_TEAM_LIVES, BitConverter.GetBytes(100));       // Required for legacy, not used by game
 				WriteAt(RULE_FLAG_SCORE, flagBallScoreBytes);
@@ -749,14 +749,20 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             // Wait for the Game to Start, 15 seconds to prevent memory corruption.
             Thread.Sleep(5000);
+            // Get Server Memory Update
+            ServerMemory.ReadMemoryServerStatus();
             // Set the Player Name of the Host of the Game Server
             ServerMemory.UpdatePlayerHostName();
             // Map Count Fix... Don't Underand why this is needed, but it is.
             ServerMemory.UpdateMapListCount();
             // Additional Game Settings to Set
             theInstanceManager.UpdateGameServer();
+            // Set Next Game Map
+            ServerMemory.UpdateNextMap(0);
+            // Skip Map
+            ServerMemory.WriteMemorySendConsoleCommand("resetgames");
 
-            return true;
+			return true;
         }
         // Function: stopGame
         public static bool stopGame()

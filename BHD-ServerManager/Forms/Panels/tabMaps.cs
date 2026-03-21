@@ -728,7 +728,8 @@ namespace BHD_ServerManager.Forms.Panels
 
         public void UpdateCurrentMapHighlighting()
         {
-            foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
+            // Reset all row colors to White
+			foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
             {
                 if (row.IsNewRow) continue;
                 row.DefaultCellStyle.BackColor = Color.White;
@@ -737,32 +738,40 @@ namespace BHD_ServerManager.Forms.Panels
             if (mapInstance.ActivePlaylist != mapInstance.SelectedPlaylist)
                 return;
 
-            if (theInstance?.instanceStatus == InstanceStatus.OFFLINE)
-                return;
+            int currentMap = mapInstance.ActualPlayingMapIndex;
+            int nextMap = mapInstance.CurrentMapIndex + 1;
 
-            int actualCurrentMapIndex = mapInstance.ActualPlayingMapIndex;
-            int currentMapIndex = mapInstance.CurrentMapIndex;
-            int nextMapIndex = mapInstance.CurrentMapIndex + 1;
 
-            if (nextMapIndex >= dataGridView_currentMaps.Rows.Count)
-            {
-                nextMapIndex = 0;
+            if(theInstance!.gameLoopMaps != 2) {
+
+                dataGridView_currentMaps.Rows[currentMap].DefaultCellStyle.BackColor = Color.LightYellow;
+				return;
             }
 
-            AppDebug.Log("UpdateCurrentMapHighlighting", $"Map Index: Actual: {actualCurrentMapIndex} Current: {currentMapIndex} Next: {nextMapIndex} Row Count: {dataGridView_currentMaps.Rows.Count}");
+            if (theInstance?.instanceStatus is InstanceStatus.ONLINE or InstanceStatus.STARTDELAY ) {
 
-            if (actualCurrentMapIndex == nextMapIndex)
-            {
-                dataGridView_currentMaps.Rows[actualCurrentMapIndex].DefaultCellStyle.BackColor = Color.Yellow;
-            }
-            else
-            {
-                if (theInstance?.instanceStatus != InstanceStatus.LOADINGMAP && theInstance?.instanceStatus != InstanceStatus.SCORING)
+				// If the current map and next map are the same, highlight in light yellow to indicate loading/playing
+                if (currentMap == nextMap)
                 {
-                    dataGridView_currentMaps.Rows[actualCurrentMapIndex].DefaultCellStyle.BackColor = Color.LightGreen;
+                    dataGridView_currentMaps.Rows[currentMap].DefaultCellStyle.BackColor = Color.LightYellow;
                 }
-                dataGridView_currentMaps.Rows[nextMapIndex].DefaultCellStyle.BackColor = Color.LightBlue;
-            }
-        }
+                else
+                {
+					// Highlight the current map in light green
+                    dataGridView_currentMaps.Rows[currentMap].DefaultCellStyle.BackColor = Color.LightGreen;
+					// highlight the next map in light blue
+                    if (nextMap >= dataGridView_currentMaps.Rows.Count)
+                    {
+						// If the next map index is out of range, it means the playlist is looping back to the beginning, so we highlight the first map as the next map.
+						dataGridView_currentMaps.Rows[0].DefaultCellStyle.BackColor = Color.LightBlue;
+					} else {
+						// Highlight the next map in light blue
+						dataGridView_currentMaps.Rows[nextMap].DefaultCellStyle.BackColor = Color.LightBlue;
+                    }
+				}
+
+			}
+
+		}
     }
 }

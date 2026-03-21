@@ -73,7 +73,6 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
             int TotalnumberofMapsWritten = 0;
             WriteProcessMemory((int)processHandle, mapListNumberOfMaps, TotalnumberOfMaps, TotalnumberOfMaps.Length, ref TotalnumberofMapsWritten);
         }
-	
         // Function: UpdateMapCycle1
         // Clears the current map cycle and fills it with empty maps
         public static void UpdateMapCycle1()

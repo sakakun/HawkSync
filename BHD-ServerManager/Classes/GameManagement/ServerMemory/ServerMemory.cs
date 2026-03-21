@@ -25,13 +25,13 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
 
         // Import of Dynamic Link Libraries
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern nint OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+        public static extern nint       OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
         [DllImport("kernel32.dll")]
-        public static extern bool ReadProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
+        public static extern bool       ReadProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
         [DllImport("user32.dll")]
-        static extern bool PostMessage(nint hWnd, uint Msg, int wParam, int lParam);
+        static extern bool              PostMessage(nint hWnd, uint Msg, int wParam, int lParam);
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool WriteProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesWritten);
+        static extern bool              WriteProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesWritten);
 
         // Process Memory CONST
         const int PROCESS_WM_READ = 0x0010;

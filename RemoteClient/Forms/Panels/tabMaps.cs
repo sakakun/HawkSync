@@ -327,10 +327,25 @@ namespace RemoteClient.Forms.Panels
                 MessageBox.Show("Cannot save an empty playlist.", "Empty Playlist", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
+            if(mapInstance.ActivePlaylist == _selectedPlaylist && theInstance!.instanceStatus != InstanceStatus.OFFLINE)
+            {
+                DialogResult result2 = MessageBox.Show(
+                    "This is the active playlist. Updating will update the game-server too, continue?",
+                    "Update Active Playlist",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result2 == DialogResult.No)
+                    return;
+
+            } 
+
             var dto = new PlaylistDTO { PlaylistID = _selectedPlaylist, Maps = _currentPlaylist };
             var result = await ApiCore.ApiClient!.Maps.SavePlaylistAsync(dto);
             MessageBox.Show(result.Message, result.Success ? "Success" : "Error",
                 MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+            
         }
 
         private async Task SetActivePlaylist()
