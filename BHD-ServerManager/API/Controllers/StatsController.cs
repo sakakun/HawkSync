@@ -3,13 +3,9 @@ using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
-using HawkSyncShared.DTOs.tabBans;
-using HawkSyncShared.DTOs.tabBans.Service;
-using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.DTOs.tabStats;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static BHD_ServerManager.API.Controllers.ProfileController;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -24,39 +20,110 @@ public class StatsController : ControllerBase
         return permissions.Contains(permission);
     }
 
-    [HttpPost("save")]
-    public ActionResult<CommandResult> SaveWebStatsSettings([FromBody] WebStatsSettings settings)
-    {
-        if(!HasPermission("stats")) return Forbid();
+    [HttpPost("servers/save")]
+    public async Task<ActionResult<CommandResult>> SaveBabstatsServer([FromBody] SaveBabstatsServerRequest req) {
 
-        if (settings == null)
-            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
+        if (!HasPermission("stats")) return Forbid();
 
-        var result = theInstanceManager.SaveWebStatsSettings(settings);
-
-        LogStatsAction(
-            "SaveWebStatsSettings",
-            "Web stats settings updated",
-            result.Success,
-            result.Message
-        );
+        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerPath))
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
+    
+        bool success = DatabaseManager.UpdateBabstatsServer(req.Server);
 
         CommonCore.instanceStats!.ForceUIUpdate = true;
-        return Ok(new CommandResult
+
+		return Ok(new CommandResult
         {
-            Success = result.Success,
-            Message = result.Message
-        });
+            Success = success,
+            Message = "Babstats server settings saved successfully."
+		});
+
     }
-    [HttpPost("validate")]
+
+    [HttpPost("servers/add")]
+    public async Task<ActionResult<CommandResult>> AddBabstatsServer([FromBody] SaveBabstatsServerRequest req) {
+
+        if (!HasPermission("stats")) return Forbid();
+
+        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerPath))
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
+    
+        string message = "Server Added Successfully.";
+        bool success = true;
+
+		try {
+            DatabaseManager.AddBabstatsServer(req.Server);
+        } catch (Exception ex) {
+            success = false;
+            message = ex.Message;
+        }
+
+		CommonCore.instanceStats!.ForceUIUpdate = true;
+
+		return Ok(new CommandResult
+        {
+            Success = success,
+            Message = message
+		});
+
+    }
+
+    [HttpPost("servers/remove")]
+    public async Task<ActionResult<CommandResult>> RemoveBabstatsServer([FromBody] int serverID) {
+
+        if (!HasPermission("stats")) return Forbid();
+
+        string message = "Server Removed Successfully.";
+        bool success = true;
+
+		try {
+            success = DatabaseManager.RemoveBabstatsServer(serverID);
+		} catch (Exception ex) {
+            success = false;
+            message = ex.Message;
+        }
+
+		CommonCore.instanceStats!.ForceUIUpdate = true;
+
+		return Ok(new CommandResult
+        {
+            Success = success,
+            Message = message
+		});
+
+    }
+
+    [HttpPost("servers/clearAnnoucements")]
+    public async Task<ActionResult<CommandResult>> ClearBabstatsAnnoucements([FromBody] bool req) {
+
+        if (!HasPermission("stats")) return Forbid();
+
+        DatabaseManager.DisableAllBabstatsAnnouncements();
+
+		return Ok(new CommandResult
+        {
+            Success = true,
+            Message = "Babstats server settings saved successfully."
+		});
+
+    }
+
+	[HttpPost("validate")]
     public async Task<ActionResult<CommandResult>> ValidateWebStatsConnection([FromBody] WebStatsValidateRequest req)
     {
-        if(!HasPermission("stats")) return Forbid();
+        if (!HasPermission("stats")) return Forbid();
 
         if (req == null || string.IsNullOrWhiteSpace(req.ServerPath))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
         var result = await theInstanceManager.TestWebStatsConnectionAsync(req.ServerPath);
+
+        LogStatsAction(
+            "ValidateWebStatsConnection",
+            "Validated Web Stats Connection",
+            result.Success,
+            result.Message
+        );
 
         return Ok(new CommandResult
         {

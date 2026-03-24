@@ -177,6 +177,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static theInstance theInstance => CommonCore.theInstance!;
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
+        private static statInstance instanceStats => CommonCore.instanceStats!;
 
         // ================================================================================
         // PROFILE SETTINGS MANAGEMENT
@@ -557,7 +558,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     ScoreBoardDelay: ServerSettings.Get("gameScoreBoardDelay", 20),
                     MaxSlots: ServerSettings.Get("gameMaxSlots", 50),
                     PSPTakeoverTimer: ServerSettings.Get("gamePSPTOTimer", 20),
-                    FlagReturnTime: ServerSettings.Get("gameFlagReturnTime", 210),
+                    FlagReturnTime: ServerSettings.Get("gameFlagReturnTime", 210 ),
                     FullWeaponThreshold: ServerSettings.Get("gameFullWeaponThreshold", 10),
                     Options: options,
                     FriendlyFire: friendlyFire,
@@ -1470,100 +1471,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // ================================================================================
 
         /// <summary>
-        /// Load web stats settings
-        /// </summary>
-        public static OperationResult LoadWebStatsSettings()
-        {
-            try
-            {
-                var settings = new WebStatsSettings(
-                    ProfileID: ServerSettings.Get("WebStatsProfileID", string.Empty),
-                    Enabled: ServerSettings.Get("WebStatsEnabled", false),
-                    ServerPath: ServerSettings.Get("WebStatsServerPath", string.Empty),
-                    Announcements: ServerSettings.Get("WebStatsAnnouncements", false),
-                    ReportInterval: ServerSettings.Get("WebStatsReportInterval", 300),
-                    UpdateInterval: ServerSettings.Get("WebStatsUpdateInterval", 60)
-                );
-
-                ApplyWebStatsSettingsToInstance(settings);
-        
-                AppDebug.Log("theInstanceManager", "Web stats settings loaded");
-                return new OperationResult(true, "Settings loaded successfully.");
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("theInstanceManager", $"Error loading web stats settings: {ex.Message}");
-                return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
-            }
-        }
-
-        /// <summary>
-        /// Save web stats settings with validation
-        /// </summary>
-        public static OperationResult SaveWebStatsSettings(WebStatsSettings settings)
-        {
-            try
-            {
-                var (isValid, errors) = ValidateWebStatsSettings(settings);
-                if (!isValid)
-                    return new OperationResult(false, $"Validation failed:\n\n{string.Join("\n", errors)}");
-
-                ServerSettings.Set("WebStatsProfileID", settings.ProfileID);
-                ServerSettings.Set("WebStatsEnabled", settings.Enabled);
-                ServerSettings.Set("WebStatsServerPath", settings.ServerPath);
-                ServerSettings.Set("WebStatsAnnouncements", settings.Announcements);
-                ServerSettings.Set("WebStatsReportInterval", settings.ReportInterval);
-                ServerSettings.Set("WebStatsUpdateInterval", settings.UpdateInterval);
-
-                ApplyWebStatsSettingsToInstance(settings);
-        
-                AppDebug.Log("theInstanceManager", "Web stats settings saved");
-                return new OperationResult(true, "Settings saved successfully.");
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log("theInstanceManager", $"Error saving web stats settings: {ex.Message}");
-                return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
-            }
-        }
-
-        /// <summary>
-        /// Validate web stats settings
-        /// </summary>
-        public static (bool isValid, List<string> errors) ValidateWebStatsSettings(WebStatsSettings settings)
-        {
-            var errors = new List<string>();
-
-            if (settings.Enabled)
-            {
-                if (string.IsNullOrWhiteSpace(settings.ProfileID))
-                    errors.Add("Profile ID is required when web stats is enabled.");
-
-                if (string.IsNullOrWhiteSpace(settings.ServerPath))
-                    errors.Add("Server path is required when web stats is enabled.");
-                else
-                {
-                    if (!settings.ServerPath.EndsWith("/"))
-                        errors.Add("Server path must end with a forward slash (/).");
-            
-                    if (!Uri.TryCreate(settings.ServerPath, UriKind.Absolute, out Uri? uri) || 
-                        (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
-                    {
-                        errors.Add("Server path must be a valid HTTP or HTTPS URL.");
-                    }
-                }
-
-                if (settings.Announcements && (settings.ReportInterval < 60 || settings.ReportInterval > 3600))
-                    errors.Add("Report interval must be between 60 and 3600 seconds.");
-
-                if (settings.UpdateInterval < 30 || settings.UpdateInterval > 600)
-                    errors.Add("Update interval must be between 30 and 600 seconds.");
-            }
-
-            return (errors.Count == 0, errors);
-        }
-
-        /// <summary>
         /// Test connection to Babstats server
         /// </summary>
         public static async Task<OperationResult> TestWebStatsConnectionAsync(string serverPath)
@@ -1574,8 +1481,8 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new OperationResult(false, "Server path cannot be empty.");
 
                 bool result = await statsInstanceManager.TestBabstatsConnectionAsync(serverPath);
-        
-                return result 
+
+                return result
                     ? new OperationResult(true, "Connection successful.")
                     : new OperationResult(false, "Connection failed. Please verify the server path.");
             }
@@ -1585,18 +1492,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
-
-        private static void ApplyWebStatsSettingsToInstance(WebStatsSettings settings)
-        {
-            theInstance.WebStatsProfileID = settings.ProfileID;
-            theInstance.WebStatsEnabled = settings.Enabled;
-            theInstance.WebStatsServerPath = settings.ServerPath;
-            theInstance.WebStatsAnnouncements = settings.Announcements;
-            theInstance.WebStatsReportInterval = settings.ReportInterval;
-            theInstance.WebStatsUpdateInterval = settings.UpdateInterval;
-        }
-
-        // Add this to the end of the theInstanceManager class, before the closing brace
 
         // ================================================================================
         // REMOTE API MANAGEMENT

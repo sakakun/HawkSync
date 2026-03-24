@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HawkSyncShared.DTOs.tabStats
 {
     /// <summary>
-    /// Web stats configuration settings
+    /// Legacy single-server web stats configuration settings.
+    /// Kept for backward compatibility.
     /// </summary>
     public record WebStatsSettings(
         string ProfileID,
@@ -16,6 +14,29 @@ namespace HawkSyncShared.DTOs.tabStats
         bool Announcements,
         int ReportInterval,
         int UpdateInterval
+    );
+
+    /// <summary>
+    /// Multi-server Babstats settings row.
+    /// </summary>
+    public record BabstatsServerSettings(
+        int BabstatsServerID,
+        string DisplayName,
+        string ServerPath,
+        string ProfileID,
+        bool IsEnabled,
+        bool EnableAnnouncements,
+        int ReportIntervalSeconds,
+        int UpdateIntervalSeconds,
+        int SortOrder
+    );
+
+    public record WebStatsServersResponse(
+        List<BabstatsServerSettings> Servers
+    );
+
+    public record SaveBabstatsServerRequest(
+        BabstatsServerSettings Server
     );
 
     /// <summary>

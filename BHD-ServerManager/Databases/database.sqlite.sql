@@ -147,6 +147,23 @@ CREATE TABLE IF NOT EXISTS tb_users (
     LastLogin TEXT,
     Notes TEXT DEFAULT ''
 );
+CREATE TABLE IF NOT EXISTS "tb_babstatsServers" (
+    "BabstatsServerID"       INTEGER PRIMARY KEY AUTOINCREMENT,
+    "DisplayName"            TEXT NOT NULL DEFAULT '',
+    "ServerPath"             TEXT NOT NULL,
+    "ProfileID"              TEXT NOT NULL,
+    "IsEnabled"              INTEGER NOT NULL DEFAULT 1,   -- 0/1
+    "EnableAnnouncements"    INTEGER NOT NULL DEFAULT 0,   -- 0/1
+    "ReportIntervalSeconds"  INTEGER NOT NULL DEFAULT 60,
+    "UpdateIntervalSeconds"  INTEGER NOT NULL DEFAULT 60,
+    "SortOrder"              INTEGER NOT NULL DEFAULT 0,
+    "CreatedUtc"             TEXT NOT NULL DEFAULT (datetime('now')),
+    "UpdatedUtc"             TEXT NOT NULL DEFAULT (datetime('now')),
+    CHECK ("IsEnabled" IN (0, 1)),
+    CHECK ("EnableAnnouncements" IN (0, 1)),
+    CHECK ("ReportIntervalSeconds" >= 15 AND "ReportIntervalSeconds" <= 3600),
+    CHECK ("UpdateIntervalSeconds" >= 15 AND "UpdateIntervalSeconds" <= 3600)
+);
 INSERT INTO "tb_defaultMaps" ("mapID","mapName","mapFile","modType","mapType") VALUES (1,'Road Rage','DMK_01A.BMS',0,0),
  (2,'City Madness','DMM_01A.BMS',0,0),
  (3,'Cracked','DMM_01E.BMS',0,0),
@@ -284,6 +301,11 @@ CREATE INDEX IF NOT EXISTS "idx_auditLog_user" ON "tb_auditLogs" (
 	"UserID",
 	"Username"
 );
+CREATE UNIQUE INDEX IF NOT EXISTS "IX_tb_babstatsServers_ServerPath_ProfileID"
+ON "tb_babstatsServers" ("ServerPath", "ProfileID");
+
+CREATE INDEX IF NOT EXISTS "IX_tb_babstatsServers_IsEnabled"
+ON "tb_babstatsServers" ("IsEnabled", "SortOrder");
 CREATE INDEX IF NOT EXISTS idx_chatLogs_timestamp ON tb_chatLogs(messageTimeStamp);
 CREATE INDEX IF NOT EXISTS idx_permissions_permission ON tb_userPermissions(Permission);
 CREATE INDEX IF NOT EXISTS idx_permissions_userid ON tb_userPermissions(UserID);

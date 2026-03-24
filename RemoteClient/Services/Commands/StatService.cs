@@ -18,11 +18,118 @@ public class StatService
     }
 
     /// <summary>
-    /// Save web stats settings to the server.
+    /// Save all Babstats servers to the server.
     /// </summary>
-    public async Task<CommandResult> SaveWebStatsSettingsAsync(WebStatsSettings settings)
+    public async Task<CommandResult> SaveBabstatsServersAsync(BabstatsServerSettings server)
     {
-        return await _apiClient.SendCommandAsync("/api/stats/save", settings);
+        var request = new SaveBabstatsServerRequest(server);
+
+        try
+        {
+            var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/servers/save", request);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new CommandResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<CommandResult>();
+            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    /// <summary>
+    /// Save all Babstats servers to the server.
+    /// </summary>
+    public async Task<CommandResult> AddBabstatsServersAsync(BabstatsServerSettings server)
+    {
+        var request = new SaveBabstatsServerRequest(server);
+
+        try
+        {
+            var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/servers/add", request);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new CommandResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<CommandResult>();
+            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+    /// <summary>
+    /// Save all Babstats servers to the server.
+    /// </summary>
+    public async Task<CommandResult> RemoveBabstatsServersAsync(int serverID)
+    {
+
+        try
+        {
+            var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/servers/remove", serverID);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new CommandResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<CommandResult>();
+            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
+    }
+
+
+    /// <summary>
+    /// Save all Babstats servers to the server.
+    /// </summary>
+    public async Task<CommandResult> ClearBabstatsAnnoucementsAsync()
+    {
+        try
+        {
+            var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/servers/clearAnnoucements", true);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return new CommandResult
+                {
+                    Success = false,
+                    Message = $"HTTP {response.StatusCode}: {error}"
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<CommandResult>();
+            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+        }
     }
 
     /// <summary>

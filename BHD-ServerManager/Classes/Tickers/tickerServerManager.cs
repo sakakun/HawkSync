@@ -1,11 +1,12 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.GameManagement.Memory;
+using BHD_ServerManager.Classes.InstanceManagers;
+using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
 using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.InstanceManagers;
+using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
+using HawkSyncShared.SupportClasses;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -84,8 +85,7 @@ namespace BHD_ServerManager.Classes.Tickers
                     // Score Reading
                     ServerMemory.ReadMemoryCurrentGameWinConditions();                  // Read Current Game Win Conditions
                     ServerMemory.ReadMemoryCurrentGameScores();                         // Read Current Game Scores
-                    // Polling Updates
-                    ServerMemory.PollPspState();
+
                 }
 
                 // 2. Loading Map
@@ -109,7 +109,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         }
                     }
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                    ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
+                    ServerMemory.GetMapData();                                          // Grab the Current Map Type and the Next Map Type
 
                 }
                 // 4. Online (game in progress)
@@ -118,35 +118,15 @@ namespace BHD_ServerManager.Classes.Tickers
                     theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag                  
 
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
-                    ServerMemory.GetMapData();                                      // Grab the Current Map Type and the Next Map Type
+                    ServerMemory.GetMapData();                                          // Grab the Current Map Type and the Next Map Type
 
-                    // Score Tick
-                    ServerMemory.TickFlagScorer();
+                    ServerMemory.PollPspState();                                        // 4 Team PSP Polling State
+                    ServerMemory.TickFlagScorer();                                      // 4 Team Scoring Checks
                     
                     // Stats update
                     statsInstanceManager.RunPlayerStatsUpdate();                        // Collect Player Stats
-                    
-                
-                    // WebStats Updates and Reports
-                    if (theInstance.WebStatsEnabled)
-                    {
-                        if (DateTime.Now > statsInstance.lastPlayerStatsUpdate.AddSeconds(theInstance.WebStatsUpdateInterval))
-                        {
-                            statsInstance.lastPlayerStatsUpdate = DateTime.Now;
-                            Task.Run(() => statsInstanceManager.SendUpdateData(thisServer));
-                        
-                        }
-                        if (DateTime.Now > statsInstance.lastPlayerStatsReport.AddSeconds(theInstance.WebStatsReportInterval) && theInstance.WebStatsAnnouncements)
-                        {
-                            Task.Run(async () =>
-                            {
-                                statsInstance.lastPlayerStatsReport = DateTime.Now;
-                                string ReportResults = await statsInstanceManager.SendReportData(thisServer);
-                                // handle ReportResults if needed
-                            });
-                        
-                        }
-                    }
+
+                    RunBabstatsOnlineHooks();                                           // Babstats Updates and Reports
                 }
                 // 5. Scoring
                 else if (theInstance.instanceStatus == InstanceStatus.SCORING)
@@ -200,7 +180,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 // Read Winning Team
                 ServerMemory.ReadMemoryWinningTeam();
 				// Final Stats Update
-				Task.Run(() => statsInstanceManager.SendImportData(thisServer!));
+				SendScoringImportToEnabledBabstats();
                 // Set the Next Map Type
                 ServerMemory.SetNextMapType();
                 // Update the Scores Required to Win the Next Game
@@ -221,6 +201,63 @@ namespace BHD_ServerManager.Classes.Tickers
             ServerMemory.UpdateScoreBoardTimer();                                   // Set the scoreboard timer to 1 second.
             AppDebug.Log("tickerServerManagement", "Scoreboard Timer Complete");    // Log the completion of the scoreboard timer
             return;                                                                 // Should return to the main ticker loop
+        }
+
+        private static void RunBabstatsOnlineHooks()
+        {
+            var enabledServers = statsInstance.GetEnabledBabstatsServers().ToList();
+            if (enabledServers.Count == 0)
+            {
+                return;
+            }
+
+            BabstatsServerSettings? designatedAnnouncer = statsInstance.GetDesignatedAnnouncementServer();
+            DateTime now = DateTime.Now;
+
+            foreach (BabstatsServerSettings server in enabledServers)
+            {
+                BabstatsServerRuntimeState runtime = statsInstance.GetOrCreateServerState(server.BabstatsServerID);
+
+                if (now > runtime.LastPlayerStatsUpdate.AddSeconds(server.UpdateIntervalSeconds))
+                {
+                    runtime.LastPlayerStatsUpdate = now;
+                    BabstatsServerSettings serverCopy = server;
+                    Task.Run(() => statsInstanceManager.SendUpdateData(serverCopy));
+                }
+
+                if (!server.EnableAnnouncements)
+                {
+                    continue;
+                }
+
+                if (now > runtime.LastPlayerStatsReport.AddSeconds(server.ReportIntervalSeconds))
+                {
+                    runtime.LastPlayerStatsReport = now;
+
+                    bool emitAnnouncements = designatedAnnouncer != null &&
+                                             designatedAnnouncer.BabstatsServerID == server.BabstatsServerID;
+
+                    BabstatsServerSettings serverCopy = server;
+                    if (emitAnnouncements) {
+                        Task.Run(() => statsInstanceManager.SendReportData(serverCopy));
+                    }
+                }
+            }
+        }
+
+        private static void SendScoringImportToEnabledBabstats()
+        {
+            var enabledServers = statsInstance.GetEnabledBabstatsServers().ToList();
+            if (enabledServers.Count == 0)
+            {
+                return;
+            }
+
+            foreach (BabstatsServerSettings server in enabledServers)
+            {
+                BabstatsServerSettings serverCopy = server;
+                Task.Run(() => statsInstanceManager.SendImportData(serverCopy));
+            }
         }
 
     }

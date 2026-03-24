@@ -533,6 +533,9 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         public void UpdateCurrentMapHighlighting()
         {
+            if(theInstance!.instanceStatus == InstanceStatus.OFFLINE)
+                return;
+
             // Reset all row colors to White
 			foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
             {

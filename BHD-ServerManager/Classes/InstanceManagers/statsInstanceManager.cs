@@ -1,13 +1,14 @@
 ﻿﻿using BHD_ServerManager.Classes.GameManagement.Memory;
+using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
 using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
+using HawkSyncShared.DTOs.tabPlayers;
+using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
+using HawkSyncShared.SupportClasses;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using HawkSyncShared.DTOs.tabPlayers;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -288,6 +289,21 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             return importData;
         }
 
+        public static string GenerateImportData(BabstatsServerSettings server)
+        {
+            ArgumentNullException.ThrowIfNull(server);
+
+            string importData = string.Empty;
+            importData += "ServerID " + server.ProfileID + "\n";
+            importData += GenerateGameLine() + "\n";
+            foreach (var playerStat in instanceStats.playerStatsList.Values)
+            {
+                importData += GeneratePlayerLines(playerStat);
+            }
+            importData += "\n\n\n\n";
+            return importData;
+        }
+
         public static string GenerateGameLine()
         {
             if (theInstance.instanceStatus == InstanceStatus.SCORING)
@@ -392,6 +408,24 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             return updateData;
         }
 
+        public static string GenerateUpdateData(BabstatsServerSettings server)
+        {
+            ArgumentNullException.ThrowIfNull(server);
+
+            string updateData = string.Empty;
+            updateData += "ServerID " + server.ProfileID + "\n";
+            updateData += GenerateGameLine() + "\n";
+            foreach (var playerStat in instanceStats.playerStatsList.Values)
+            {
+                PlayerObject player = playerStat.PlayerStatsCurrent;
+                updateData += "  Player " + player.PlayerName + "\n";
+                updateData += "   PlayerStats " + player.PlayerTimePlayed + " " + player.PlayerTeam + " " + player.SelectedWeaponID + "\n";
+                updateData += "\n";
+            }
+            updateData += "End\n\n\n\n";
+            return updateData;
+        }
+
         public static string GenerateReportData()
         {
             string reportData = string.Empty;
@@ -416,71 +450,72 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
 // --- ASYNC NETWORK METHODS WITH UI INVOKE FIXES ---
 
-        public static async Task SendImportData(ServerManagerUI thisServer)
-
+        public static async Task SendImportData(BabstatsServerSettings server)
         {
-            if (!theInstance.WebStatsEnabled || string.IsNullOrEmpty(theInstance.WebStatsProfileID) || string.IsNullOrEmpty(theInstance.WebStatsServerPath))
+            ArgumentNullException.ThrowIfNull(server);
+
+            if (!server.IsEnabled || string.IsNullOrWhiteSpace(server.ProfileID) || string.IsNullOrWhiteSpace(server.ServerPath))
             {
-                AppDebug.Log("StatsManager", "WebStats is not enabled or profile ID/server path is not set.");
+                AppDebug.Log("StatsManager", $"Skipping import for server '{server.DisplayName}' due to missing configuration.");
                 return;
             }
 
-            string POST_URL = theInstance.WebStatsServerPath + "stats_import.php";
-            Dictionary<string, string> DATA = new Dictionary<string, string>
+            string postUrl = server.ServerPath + "stats_import.php";
+            Dictionary<string, string> data = new()
             {
-                ["serverid"] = theInstance.WebStatsProfileID,
-                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateImportData())),
+                ["serverid"] = server.ProfileID,
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateImportData(server))),
                 ["BMT"] = "1"
             };
 
-            try
+            string response = await SendBabstatsData(postUrl, data);
+            if (!string.IsNullOrWhiteSpace(response))
             {
-                var response = await SendBabstatsData(POST_URL, DATA);
-                if (!string.IsNullOrEmpty(response))
-                {
-                    string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
-                    AppDebug.Log("StatsManager", $"Babstats Import Response: {responseData}");
-                    AddStatsLogRowSafe(thisServer, DateTime.Now, responseData);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error sending import data: {ex.Message}");
+                string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
+                AppDebug.Log("StatsManager", $"Babstats Import Response ({server.ProfileID}): {responseData}");
+                AddStatsLogRowSafe(thisServer, DateTime.Now, responseData, server);
             }
         }
 
-        public static async Task SendUpdateData(ServerManagerUI thisServer)
+        public static async Task SendUpdateData(BabstatsServerSettings server)
         {
-            string POST_URL = theInstance.WebStatsServerPath + "status_update.php";
-            Dictionary<string, string> DATA = new Dictionary<string, string>
+            ArgumentNullException.ThrowIfNull(server);
+
+            if (!server.IsEnabled || string.IsNullOrWhiteSpace(server.ProfileID) || string.IsNullOrWhiteSpace(server.ServerPath))
             {
-                ["serverid"] = theInstance.WebStatsProfileID,
-                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateUpdateData())),
+                AppDebug.Log("StatsManager", $"Skipping update for server '{server.DisplayName}' due to missing configuration.");
+                return;
+            }
+
+            string postUrl = server.ServerPath + "status_update.php";
+            Dictionary<string, string> data = new()
+            {
+                ["serverid"] = server.ProfileID,
+                ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateUpdateData(server))),
                 ["BMT"] = "1"
             };
 
-            try
+            string response = await SendBabstatsData(postUrl, data);
+            if (!string.IsNullOrWhiteSpace(response))
             {
-                var response = await SendBabstatsData(POST_URL, DATA);
-                if (!string.IsNullOrEmpty(response))
-                {
-                    string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
-                    AppDebug.Log("StatsManager", $"Babstats Update Response: {responseData}");
-                    AddStatsLogRowSafe(thisServer, DateTime.Now, responseData);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error sending update data: {ex.Message}");
+                string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
+                AppDebug.Log("StatsManager", $"Babstats Update Response ({server.ProfileID}): {responseData}");
+                AddStatsLogRowSafe(thisServer, DateTime.Now, responseData, server);
             }
         }
 
-        public static async Task<string> SendReportData(ServerManagerUI thisServer)
+        public static async Task<string> SendReportData(BabstatsServerSettings server)
         {
-            string POST_URL = theInstance.WebStatsServerPath + "status_report.php";
+            if (!server.IsEnabled || string.IsNullOrWhiteSpace(server.ProfileID) || string.IsNullOrWhiteSpace(server.ServerPath))
+            {
+                AppDebug.Log("StatsManager", $"Skipping update for server '{server.DisplayName}' due to missing configuration.");
+                return "";
+            }
+
+            string POST_URL = server.ServerPath + "status_report.php";
             Dictionary<string, string> DATA = new Dictionary<string, string>
             {
-                ["serverid"] = theInstance.WebStatsProfileID,
+                ["serverid"] = server.ProfileID,
                 ["data"] = Convert.ToBase64String(Encoding.GetEncoding("Windows-1252").GetBytes(GenerateReportData())),
                 ["BMT"] = "1"
             };
@@ -602,6 +637,46 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             else
             {
                 thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message);
+                ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
+            }
+        }
+
+        private static void AddStatsLogRowSafe(ServerManagerUI thisServer, DateTime dateTime, string message, BabstatsServerSettings server)
+        {
+            ArgumentNullException.ThrowIfNull(server);
+
+            string serverLabel = string.IsNullOrWhiteSpace(server.DisplayName)
+                ? server.ProfileID
+                : server.DisplayName;
+
+            string scopedMessage = string.IsNullOrWhiteSpace(serverLabel)
+                ? message
+                : $"[{serverLabel}] {message}";
+
+            var logRecord = new StatReportObject
+            {
+                ReportDate = dateTime,
+                ReportContent = scopedMessage,
+                BabstatsServerID = server.BabstatsServerID,
+                BabstatsServerName = serverLabel
+            };
+
+            string dateTimeString = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+            CommonCore.instanceStats!.WebStatsLog.Add(logRecord);
+            CommonCore.instanceStats.TrimWebStatsLog();
+
+            if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
+            {
+                thisServer.StatsTab.dg_statsLog.Invoke(new Action(() =>
+                {
+                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, scopedMessage);
+                    ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
+                }));
+            }
+            else
+            {
+                thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, scopedMessage);
                 ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
             }
         }

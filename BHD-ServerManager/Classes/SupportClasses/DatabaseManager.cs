@@ -2,6 +2,7 @@
 using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.tabMaps;
+using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using Microsoft.Data.Sqlite;
@@ -33,7 +34,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         private static string _schemaFilePath = Path.Combine(databaseDirectory, "database.sqlite.sql");
         
         // Current schema version - increment this when you update database.sqlite.sql
-        private const int CURRENT_SCHEMA_VERSION = 1;
+        private const int CURRENT_SCHEMA_VERSION = 2;
 
         public static bool IsInitialized => _connection != null;
 
@@ -507,10 +508,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                         AppDebug.Log("DatabaseManager", "Version 1: No custom migrations needed");
                         break;
 
-                    // Example for future versions:
-                    // case 2:
-                    //     MigrateCustomVersion2(conn, tx);
-                    //     break;
+                    case 2:
+                        AppDebug.Log("DatabaseManager", "Version 2: No custom migrations needed");
+                        break;
+
+                    case 3:
+                        MigrateBabstatsServersFromSettings(conn, tx);
+                        break;
 
                     default:
                         // No custom migrations for this version
@@ -519,24 +523,62 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
         }
 
-        // Example of a custom migration method for complex changes
-        // Uncomment and modify when needed:
-        /*
-        private static void MigrateCustomVersion2(SqliteConnection conn, SqliteTransaction tx)
+        private static void MigrateBabstatsServersFromSettings(SqliteConnection conn, SqliteTransaction tx)
         {
-            using var cmd = conn.CreateCommand();
-            cmd.Transaction = tx;
+            using var existsCmd = conn.CreateCommand();
+            existsCmd.Transaction = tx;
+            existsCmd.CommandText = "SELECT COUNT(1) FROM tb_babstatsServers;";
 
-            // Example: Rename a column (SQLite doesn't support direct RENAME)
-            // 1. Create new table with correct structure
-            // 2. Copy data
-            // 3. Drop old table
-            // 4. Rename new table
-            // 5. Recreate indexes
+            long existingCount = Convert.ToInt64(existsCmd.ExecuteScalar() ?? 0L);
+            if (existingCount > 0)
+            {
+                AppDebug.Log("DatabaseManager", "Version 3 migration skipped: tb_babstatsServers already contains data");
+                return;
+            }
 
-            AppDebug.Log("DatabaseManager", "Applied custom migrations for version 2");
+            static string GetLegacySetting(SqliteConnection c, SqliteTransaction t, string key, string defaultValue)
+            {
+                using var cmd = c.CreateCommand();
+                cmd.Transaction = t;
+                cmd.CommandText = "SELECT value FROM tb_settings WHERE key = $key LIMIT 1;";
+                cmd.Parameters.AddWithValue("$key", key);
+
+                object? result = cmd.ExecuteScalar();
+                return result?.ToString() ?? defaultValue;
+            }
+
+            string profileId = GetLegacySetting(conn, tx, "WebStatsProfileID", string.Empty).Trim();
+            string serverPath = GetLegacySetting(conn, tx, "WebStatsServerPath", string.Empty).Trim();
+            bool isEnabled = bool.TryParse(GetLegacySetting(conn, tx, "WebStatsEnabled", "false"), out bool parsedEnabled) && parsedEnabled;
+            bool announcements = bool.TryParse(GetLegacySetting(conn, tx, "WebStatsAnnouncements", "false"), out bool parsedAnnouncements) && parsedAnnouncements;
+            int reportInterval = int.TryParse(GetLegacySetting(conn, tx, "WebStatsReportInterval", "300"), out int parsedReport) ? parsedReport : 300;
+            int updateInterval = int.TryParse(GetLegacySetting(conn, tx, "WebStatsUpdateInterval", "60"), out int parsedUpdate) ? parsedUpdate : 60;
+
+            if (string.IsNullOrWhiteSpace(serverPath) && string.IsNullOrWhiteSpace(profileId) && !isEnabled)
+            {
+                AppDebug.Log("DatabaseManager", "Version 3 migration: No legacy WebStats values to seed");
+                return;
+            }
+
+            using var insertCmd = conn.CreateCommand();
+            insertCmd.Transaction = tx;
+            insertCmd.CommandText = @"
+                INSERT INTO tb_babstatsServers
+                (DisplayName, ServerPath, ProfileID, IsEnabled, EnableAnnouncements, ReportIntervalSeconds, UpdateIntervalSeconds, SortOrder, CreatedUtc, UpdatedUtc)
+                VALUES
+                ($displayName, $serverPath, $profileId, $isEnabled, $announcements, $reportInterval, $updateInterval, 0, datetime('now'), datetime('now'));
+            ";
+            insertCmd.Parameters.AddWithValue("$displayName", "Primary");
+            insertCmd.Parameters.AddWithValue("$serverPath", serverPath);
+            insertCmd.Parameters.AddWithValue("$profileId", profileId.ToUpperInvariant());
+            insertCmd.Parameters.AddWithValue("$isEnabled", isEnabled ? 1 : 0);
+            insertCmd.Parameters.AddWithValue("$announcements", announcements ? 1 : 0);
+            insertCmd.Parameters.AddWithValue("$reportInterval", Math.Clamp(reportInterval, 15, 3600));
+            insertCmd.Parameters.AddWithValue("$updateInterval", Math.Clamp(updateInterval, 15, 3600));
+            insertCmd.ExecuteNonQuery();
+
+            AppDebug.Log("DatabaseManager", "Version 3 migration: Seeded tb_babstatsServers from legacy WebStats settings");
         }
-        */
 
         /// <summary>
         /// Get the current schema version from the database
@@ -3105,5 +3147,208 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 _connection = null;
             }
         }
+
+        /// <summary>
+        /// Get all Babstats servers from the database.
+        /// </summary>
+        public static List<BabstatsServerSettings> GetBabstatsServers()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var servers = new List<BabstatsServerSettings>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT BabstatsServerID, DisplayName, ServerPath, ProfileID,
+                       IsEnabled, EnableAnnouncements, ReportIntervalSeconds,
+                       UpdateIntervalSeconds, SortOrder
+                FROM tb_babstatsServers
+                ORDER BY SortOrder, BabstatsServerID;
+            ";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                servers.Add(new BabstatsServerSettings(
+                    BabstatsServerID: reader.GetInt32(0),
+                    DisplayName: reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                    ServerPath: reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                    ProfileID: reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                    IsEnabled: reader.GetInt32(4) == 1,
+                    EnableAnnouncements: reader.GetInt32(5) == 1,
+                    ReportIntervalSeconds: reader.GetInt32(6),
+                    UpdateIntervalSeconds: reader.GetInt32(7),
+                    SortOrder: reader.GetInt32(8)
+                ));
+            }
+
+            return servers;
+        }
+
+        /// <summary>
+        /// Add a new Babstats server to the database.
+        /// </summary>
+        public static int AddBabstatsServer(BabstatsServerSettings server)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_babstatsServers
+                    (DisplayName, ServerPath, ProfileID, IsEnabled, EnableAnnouncements, ReportIntervalSeconds, UpdateIntervalSeconds, SortOrder, CreatedUtc, UpdatedUtc)
+                    VALUES
+                    ($displayName, $serverPath, $profileId, $isEnabled, $announcements, $reportInterval, $updateInterval, $sortOrder, datetime('now'), datetime('now'));
+                    SELECT last_insert_rowid();
+                ";
+                cmd.Parameters.AddWithValue("$displayName", server.DisplayName ?? string.Empty);
+                cmd.Parameters.AddWithValue("$serverPath", server.ServerPath ?? string.Empty);
+                cmd.Parameters.AddWithValue("$profileId", server.ProfileID ?? string.Empty);
+                cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
+                cmd.Parameters.AddWithValue("$announcements", server.EnableAnnouncements ? 1 : 0);
+                cmd.Parameters.AddWithValue("$reportInterval", server.ReportIntervalSeconds);
+                cmd.Parameters.AddWithValue("$updateInterval", server.UpdateIntervalSeconds);
+                cmd.Parameters.AddWithValue("$sortOrder", server.SortOrder);
+
+                var newId = (long)cmd.ExecuteScalar()!;
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", $"Added Babstats server: {server.DisplayName} (ID: {newId})");
+                return (int)newId;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update an existing Babstats server in the database.
+        /// </summary>
+        public static bool UpdateBabstatsServer(BabstatsServerSettings server)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_babstatsServers
+                    SET DisplayName = $displayName,
+                        ServerPath = $serverPath,
+                        ProfileID = $profileId,
+                        IsEnabled = $isEnabled,
+                        EnableAnnouncements = $announcements,
+                        ReportIntervalSeconds = $reportInterval,
+                        UpdateIntervalSeconds = $updateInterval,
+                        SortOrder = $sortOrder,
+                        UpdatedUtc = datetime('now')
+                    WHERE BabstatsServerID = $id;
+                ";
+                cmd.Parameters.AddWithValue("$id", server.BabstatsServerID);
+                cmd.Parameters.AddWithValue("$displayName", server.DisplayName ?? string.Empty);
+                cmd.Parameters.AddWithValue("$serverPath", server.ServerPath ?? string.Empty);
+                cmd.Parameters.AddWithValue("$profileId", server.ProfileID ?? string.Empty);
+                cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
+                cmd.Parameters.AddWithValue("$announcements", server.EnableAnnouncements ? 1 : 0);
+                cmd.Parameters.AddWithValue("$reportInterval", server.ReportIntervalSeconds);
+                cmd.Parameters.AddWithValue("$updateInterval", server.UpdateIntervalSeconds);
+                cmd.Parameters.AddWithValue("$sortOrder", server.SortOrder);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", $"Updated Babstats server ID: {server.BabstatsServerID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove a Babstats server from the database by ID.
+        /// </summary>
+        public static bool RemoveBabstatsServer(int babstatsServerId)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_babstatsServers
+                    WHERE BabstatsServerID = $id;
+                ";
+                cmd.Parameters.AddWithValue("$id", babstatsServerId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", $"Removed Babstats server ID: {babstatsServerId}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Set EnableAnnouncements to false for all Babstats servers.
+        /// </summary>
+        public static void DisableAllBabstatsAnnouncements()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_babstatsServers
+                    SET EnableAnnouncements = 0,
+                        UpdatedUtc = datetime('now');
+                ";
+                cmd.ExecuteNonQuery();
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", "Set EnableAnnouncements = 0 for all Babstats servers");
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
+        }
+
     }
 }

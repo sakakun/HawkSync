@@ -31,10 +31,13 @@
 			tabControl1 = new TabControl();
 			tabBabstats = new TabPage();
 			tableLayoutPanel1 = new TableLayoutPanel();
-			dg_statsLog = new DataGridView();
 			panel1 = new Panel();
 			groupBox4 = new GroupBox();
+			tableLayoutPanel3 = new TableLayoutPanel();
+			btn_NewServer = new Button();
+			btn_RemoveServer = new Button();
 			btn_SaveSettings = new Button();
+			btn_AddServer = new Button();
 			groupBox3 = new GroupBox();
 			labelUpatedInterval = new Label();
 			num_WebStatsUpdates = new NumericUpDown();
@@ -47,6 +50,14 @@
 			tb_serverID = new TextBox();
 			btn_validate = new Button();
 			tb_webStatsServerPath = new TextBox();
+			babstats_table = new DataGridView();
+			babstats_id = new DataGridViewTextBoxColumn();
+			babstats_code = new DataGridViewTextBoxColumn();
+			babstats_siteurl = new DataGridViewTextBoxColumn();
+			babstats_enabled = new DataGridViewCheckBoxColumn();
+			babstats_updateinterval = new DataGridViewTextBoxColumn();
+			babstats_annoucements = new DataGridViewCheckBoxColumn();
+			babstats_reportinterval = new DataGridViewTextBoxColumn();
 			tabPlayerStats = new TabPage();
 			tableLayoutPanel2 = new TableLayoutPanel();
 			dataGridViewPlayerStats = new DataGridView();
@@ -82,31 +93,39 @@
 			Timer = new DataGridViewTextBoxColumn();
 			Weapon_Kills = new DataGridViewTextBoxColumn();
 			Weapon_Shots = new DataGridViewTextBoxColumn();
+			tabLogs = new TabPage();
+			dg_statsLog = new DataGridView();
 			statsLog_DateTime = new DataGridViewTextBoxColumn();
 			statLog_Message = new DataGridViewTextBoxColumn();
+			tabLobby = new TabPage();
 			tabControl1.SuspendLayout();
 			tabBabstats.SuspendLayout();
 			tableLayoutPanel1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)dg_statsLog).BeginInit();
 			panel1.SuspendLayout();
 			groupBox4.SuspendLayout();
+			tableLayoutPanel3.SuspendLayout();
 			groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).BeginInit();
 			((System.ComponentModel.ISupportInitialize)num_WebStatsReport).BeginInit();
 			groupBox2.SuspendLayout();
 			groupBox1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)babstats_table).BeginInit();
 			tabPlayerStats.SuspendLayout();
 			tableLayoutPanel2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).BeginInit();
 			tabWeaponStats.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).BeginInit();
+			tabLogs.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)dg_statsLog).BeginInit();
 			SuspendLayout();
 			// 
 			// tabControl1
 			// 
 			tabControl1.Controls.Add(tabBabstats);
+			tabControl1.Controls.Add(tabLobby);
 			tabControl1.Controls.Add(tabPlayerStats);
 			tabControl1.Controls.Add(tabWeaponStats);
+			tabControl1.Controls.Add(tabLogs);
 			tabControl1.Dock = DockStyle.Fill;
 			tabControl1.Location = new Point(0, 0);
 			tabControl1.Margin = new Padding(0);
@@ -130,33 +149,18 @@
 			// tableLayoutPanel1
 			// 
 			tableLayoutPanel1.ColumnCount = 2;
-			tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32.5450439F));
-			tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67.4549561F));
-			tableLayoutPanel1.Controls.Add(dg_statsLog, 1, 0);
+			tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+			tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
 			tableLayoutPanel1.Controls.Add(panel1, 0, 0);
+			tableLayoutPanel1.Controls.Add(babstats_table, 1, 0);
 			tableLayoutPanel1.Dock = DockStyle.Fill;
 			tableLayoutPanel1.Location = new Point(3, 3);
 			tableLayoutPanel1.Margin = new Padding(0);
 			tableLayoutPanel1.Name = "tableLayoutPanel1";
 			tableLayoutPanel1.RowCount = 1;
-			tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-			tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+			tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 			tableLayoutPanel1.Size = new Size(952, 388);
 			tableLayoutPanel1.TabIndex = 0;
-			// 
-			// dg_statsLog
-			// 
-			dg_statsLog.AllowUserToAddRows = false;
-			dg_statsLog.AllowUserToDeleteRows = false;
-			dg_statsLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-			dg_statsLog.Columns.AddRange(new DataGridViewColumn[] { statsLog_DateTime, statLog_Message });
-			dg_statsLog.Dock = DockStyle.Fill;
-			dg_statsLog.Location = new Point(312, 3);
-			dg_statsLog.Name = "dg_statsLog";
-			dg_statsLog.ReadOnly = true;
-			dg_statsLog.RowHeadersVisible = false;
-			dg_statsLog.Size = new Size(637, 382);
-			dg_statsLog.TabIndex = 1;
 			// 
 			// panel1
 			// 
@@ -168,30 +172,82 @@
 			panel1.Location = new Point(0, 0);
 			panel1.Margin = new Padding(0);
 			panel1.Name = "panel1";
-			panel1.Size = new Size(309, 388);
+			panel1.Size = new Size(314, 388);
 			panel1.TabIndex = 2;
 			// 
 			// groupBox4
 			// 
-			groupBox4.Controls.Add(btn_SaveSettings);
+			groupBox4.Controls.Add(tableLayoutPanel3);
 			groupBox4.Dock = DockStyle.Bottom;
-			groupBox4.Location = new Point(0, 331);
-			groupBox4.Margin = new Padding(0, 3, 3, 3);
+			groupBox4.Location = new Point(0, 337);
 			groupBox4.Name = "groupBox4";
-			groupBox4.Size = new Size(309, 57);
+			groupBox4.Size = new Size(314, 51);
 			groupBox4.TabIndex = 3;
 			groupBox4.TabStop = false;
-			groupBox4.Text = "Controls";
+			groupBox4.Text = "Server List";
+			// 
+			// tableLayoutPanel3
+			// 
+			tableLayoutPanel3.ColumnCount = 4;
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.Controls.Add(btn_NewServer, 3, 0);
+			tableLayoutPanel3.Controls.Add(btn_RemoveServer, 2, 0);
+			tableLayoutPanel3.Controls.Add(btn_SaveSettings, 0, 0);
+			tableLayoutPanel3.Controls.Add(btn_AddServer, 1, 0);
+			tableLayoutPanel3.Dock = DockStyle.Fill;
+			tableLayoutPanel3.Location = new Point(3, 19);
+			tableLayoutPanel3.Name = "tableLayoutPanel3";
+			tableLayoutPanel3.RowCount = 1;
+			tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+			tableLayoutPanel3.Size = new Size(308, 29);
+			tableLayoutPanel3.TabIndex = 0;
+			// 
+			// btn_NewServer
+			// 
+			btn_NewServer.Dock = DockStyle.Fill;
+			btn_NewServer.Location = new Point(234, 3);
+			btn_NewServer.Name = "btn_NewServer";
+			btn_NewServer.Size = new Size(71, 23);
+			btn_NewServer.TabIndex = 13;
+			btn_NewServer.Text = "New";
+			btn_NewServer.UseVisualStyleBackColor = true;
+			btn_NewServer.Click += babstatsClick_newServer;
+			// 
+			// btn_RemoveServer
+			// 
+			btn_RemoveServer.Dock = DockStyle.Fill;
+			btn_RemoveServer.Location = new Point(157, 3);
+			btn_RemoveServer.Name = "btn_RemoveServer";
+			btn_RemoveServer.Size = new Size(71, 23);
+			btn_RemoveServer.TabIndex = 12;
+			btn_RemoveServer.Text = "Remove";
+			btn_RemoveServer.UseVisualStyleBackColor = true;
+			btn_RemoveServer.Click += babstatsClick_RemoveRecord;
 			// 
 			// btn_SaveSettings
 			// 
-			btn_SaveSettings.Location = new Point(6, 22);
+			btn_SaveSettings.Dock = DockStyle.Fill;
+			btn_SaveSettings.Location = new Point(3, 3);
 			btn_SaveSettings.Name = "btn_SaveSettings";
-			btn_SaveSettings.Size = new Size(75, 23);
+			btn_SaveSettings.Size = new Size(71, 23);
 			btn_SaveSettings.TabIndex = 10;
 			btn_SaveSettings.Text = "Save";
 			btn_SaveSettings.UseVisualStyleBackColor = true;
-			btn_SaveSettings.Click += OnSaveStatSettingsClick;
+			btn_SaveSettings.Click += babstatsClick_saveServer;
+			// 
+			// btn_AddServer
+			// 
+			btn_AddServer.Dock = DockStyle.Fill;
+			btn_AddServer.Location = new Point(80, 3);
+			btn_AddServer.Name = "btn_AddServer";
+			btn_AddServer.Size = new Size(71, 23);
+			btn_AddServer.TabIndex = 11;
+			btn_AddServer.Text = "Add";
+			btn_AddServer.UseVisualStyleBackColor = true;
+			btn_AddServer.Click += babstatsClick_addServer;
 			// 
 			// groupBox3
 			// 
@@ -203,15 +259,15 @@
 			groupBox3.Location = new Point(0, 137);
 			groupBox3.Margin = new Padding(0, 3, 3, 3);
 			groupBox3.Name = "groupBox3";
-			groupBox3.Size = new Size(309, 85);
+			groupBox3.Size = new Size(314, 90);
 			groupBox3.TabIndex = 2;
 			groupBox3.TabStop = false;
-			groupBox3.Text = "Reporting Intervals (Seconds)";
+			groupBox3.Text = "Selected Server Intervals (Seconds)";
 			// 
 			// labelUpatedInterval
 			// 
 			labelUpatedInterval.AutoSize = true;
-			labelUpatedInterval.Location = new Point(89, 55);
+			labelUpatedInterval.Location = new Point(85, 58);
 			labelUpatedInterval.Name = "labelUpatedInterval";
 			labelUpatedInterval.Size = new Size(133, 15);
 			labelUpatedInterval.TabIndex = 11;
@@ -220,7 +276,7 @@
 			// 
 			// num_WebStatsUpdates
 			// 
-			num_WebStatsUpdates.Location = new Point(228, 51);
+			num_WebStatsUpdates.Location = new Point(234, 54);
 			num_WebStatsUpdates.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
 			num_WebStatsUpdates.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
 			num_WebStatsUpdates.Name = "num_WebStatsUpdates";
@@ -232,7 +288,7 @@
 			// labelReportInterval
 			// 
 			labelReportInterval.AutoSize = true;
-			labelReportInterval.Location = new Point(77, 26);
+			labelReportInterval.Location = new Point(73, 28);
 			labelReportInterval.Name = "labelReportInterval";
 			labelReportInterval.Size = new Size(145, 15);
 			labelReportInterval.TabIndex = 9;
@@ -241,7 +297,7 @@
 			// 
 			// num_WebStatsReport
 			// 
-			num_WebStatsReport.Location = new Point(228, 22);
+			num_WebStatsReport.Location = new Point(234, 24);
 			num_WebStatsReport.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
 			num_WebStatsReport.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
 			num_WebStatsReport.Name = "num_WebStatsReport";
@@ -258,22 +314,21 @@
 			groupBox2.Location = new Point(0, 84);
 			groupBox2.Margin = new Padding(0, 3, 3, 3);
 			groupBox2.Name = "groupBox2";
-			groupBox2.Size = new Size(309, 53);
+			groupBox2.Size = new Size(314, 53);
 			groupBox2.TabIndex = 1;
 			groupBox2.TabStop = false;
-			groupBox2.Text = "Options";
+			groupBox2.Text = "Selected Server Options";
 			// 
 			// cb_enableAnnouncements
 			// 
 			cb_enableAnnouncements.AutoSize = true;
 			cb_enableAnnouncements.CheckAlign = ContentAlignment.MiddleRight;
-			cb_enableAnnouncements.Location = new Point(131, 22);
+			cb_enableAnnouncements.Location = new Point(133, 22);
 			cb_enableAnnouncements.Name = "cb_enableAnnouncements";
 			cb_enableAnnouncements.Size = new Size(152, 19);
 			cb_enableAnnouncements.TabIndex = 5;
 			cb_enableAnnouncements.Text = "Enable Announcements";
 			cb_enableAnnouncements.UseVisualStyleBackColor = true;
-			cb_enableAnnouncements.CheckedChanged += OnEnableAnnouncementsChanged;
 			// 
 			// cb_enableWebStats
 			// 
@@ -285,7 +340,6 @@
 			cb_enableWebStats.TabIndex = 0;
 			cb_enableWebStats.Text = "Enable Babstats";
 			cb_enableWebStats.UseVisualStyleBackColor = true;
-			cb_enableWebStats.CheckedChanged += OnEnableWebStatsChanged;
 			// 
 			// groupBox1
 			// 
@@ -296,10 +350,10 @@
 			groupBox1.Location = new Point(0, 0);
 			groupBox1.Margin = new Padding(0, 3, 3, 3);
 			groupBox1.Name = "groupBox1";
-			groupBox1.Size = new Size(309, 84);
+			groupBox1.Size = new Size(314, 84);
 			groupBox1.TabIndex = 0;
 			groupBox1.TabStop = false;
-			groupBox1.Text = "Stats Web Address (HTTP/HTTPS)";
+			groupBox1.Text = "Selected Babstats Server";
 			// 
 			// tb_serverID
 			// 
@@ -313,7 +367,7 @@
 			// 
 			// btn_validate
 			// 
-			btn_validate.Location = new Point(208, 51);
+			btn_validate.Location = new Point(233, 51);
 			btn_validate.Name = "btn_validate";
 			btn_validate.Size = new Size(75, 23);
 			btn_validate.TabIndex = 4;
@@ -326,9 +380,79 @@
 			tb_webStatsServerPath.Location = new Point(6, 22);
 			tb_webStatsServerPath.Name = "tb_webStatsServerPath";
 			tb_webStatsServerPath.PlaceholderText = "http(s)://youdomain.com/babstats_root/";
-			tb_webStatsServerPath.Size = new Size(277, 23);
+			tb_webStatsServerPath.Size = new Size(302, 23);
 			tb_webStatsServerPath.TabIndex = 1;
 			tb_webStatsServerPath.TextAlign = HorizontalAlignment.Center;
+			// 
+			// babstats_table
+			// 
+			babstats_table.AllowUserToAddRows = false;
+			babstats_table.AllowUserToDeleteRows = false;
+			babstats_table.AllowUserToResizeColumns = false;
+			babstats_table.AllowUserToResizeRows = false;
+			babstats_table.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			babstats_table.Columns.AddRange(new DataGridViewColumn[] { babstats_id, babstats_code, babstats_siteurl, babstats_enabled, babstats_updateinterval, babstats_annoucements, babstats_reportinterval });
+			babstats_table.Dock = DockStyle.Fill;
+			babstats_table.Location = new Point(317, 3);
+			babstats_table.MultiSelect = false;
+			babstats_table.Name = "babstats_table";
+			babstats_table.ReadOnly = true;
+			babstats_table.RowHeadersVisible = false;
+			babstats_table.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+			babstats_table.ShowEditingIcon = false;
+			babstats_table.Size = new Size(632, 382);
+			babstats_table.TabIndex = 3;
+			babstats_table.DoubleClick += babstatsClick_openRecord;
+			// 
+			// babstats_id
+			// 
+			babstats_id.HeaderText = "ID";
+			babstats_id.Name = "babstats_id";
+			babstats_id.ReadOnly = true;
+			babstats_id.Visible = false;
+			// 
+			// babstats_code
+			// 
+			babstats_code.HeaderText = "Profile ID";
+			babstats_code.Name = "babstats_code";
+			babstats_code.ReadOnly = true;
+			babstats_code.Width = 90;
+			// 
+			// babstats_siteurl
+			// 
+			babstats_siteurl.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			babstats_siteurl.HeaderText = "Babstats URL";
+			babstats_siteurl.MinimumWidth = 220;
+			babstats_siteurl.Name = "babstats_siteurl";
+			babstats_siteurl.ReadOnly = true;
+			// 
+			// babstats_enabled
+			// 
+			babstats_enabled.HeaderText = "Enabled";
+			babstats_enabled.Name = "babstats_enabled";
+			babstats_enabled.ReadOnly = true;
+			babstats_enabled.Width = 65;
+			// 
+			// babstats_updateinterval
+			// 
+			babstats_updateinterval.HeaderText = "Update (s)";
+			babstats_updateinterval.Name = "babstats_updateinterval";
+			babstats_updateinterval.ReadOnly = true;
+			babstats_updateinterval.Width = 80;
+			// 
+			// babstats_annoucements
+			// 
+			babstats_annoucements.HeaderText = "Announce";
+			babstats_annoucements.Name = "babstats_annoucements";
+			babstats_annoucements.ReadOnly = true;
+			babstats_annoucements.Width = 75;
+			// 
+			// babstats_reportinterval
+			// 
+			babstats_reportinterval.HeaderText = "Report (s)";
+			babstats_reportinterval.Name = "babstats_reportinterval";
+			babstats_reportinterval.ReadOnly = true;
+			babstats_reportinterval.Width = 80;
 			// 
 			// tabPlayerStats
 			// 
@@ -635,6 +759,31 @@
 			Weapon_Shots.Name = "Weapon_Shots";
 			Weapon_Shots.ReadOnly = true;
 			// 
+			// tabLogs
+			// 
+			tabLogs.Controls.Add(dg_statsLog);
+			tabLogs.Location = new Point(4, 24);
+			tabLogs.Name = "tabLogs";
+			tabLogs.Padding = new Padding(3);
+			tabLogs.Size = new Size(958, 394);
+			tabLogs.TabIndex = 3;
+			tabLogs.Text = "Logs";
+			tabLogs.UseVisualStyleBackColor = true;
+			// 
+			// dg_statsLog
+			// 
+			dg_statsLog.AllowUserToAddRows = false;
+			dg_statsLog.AllowUserToDeleteRows = false;
+			dg_statsLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			dg_statsLog.Columns.AddRange(new DataGridViewColumn[] { statsLog_DateTime, statLog_Message });
+			dg_statsLog.Dock = DockStyle.Fill;
+			dg_statsLog.Location = new Point(3, 3);
+			dg_statsLog.Name = "dg_statsLog";
+			dg_statsLog.ReadOnly = true;
+			dg_statsLog.RowHeadersVisible = false;
+			dg_statsLog.Size = new Size(952, 388);
+			dg_statsLog.TabIndex = 2;
+			// 
 			// statsLog_DateTime
 			// 
 			statsLog_DateTime.HeaderText = "Time Stamp";
@@ -649,6 +798,15 @@
 			statLog_Message.Name = "statLog_Message";
 			statLog_Message.ReadOnly = true;
 			// 
+			// tabLobby
+			// 
+			tabLobby.Location = new Point(4, 24);
+			tabLobby.Name = "tabLobby";
+			tabLobby.Size = new Size(958, 394);
+			tabLobby.TabIndex = 4;
+			tabLobby.Text = "Lobby";
+			tabLobby.UseVisualStyleBackColor = true;
+			// 
 			// tabStats
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
@@ -659,9 +817,9 @@
 			tabControl1.ResumeLayout(false);
 			tabBabstats.ResumeLayout(false);
 			tableLayoutPanel1.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)dg_statsLog).EndInit();
 			panel1.ResumeLayout(false);
 			groupBox4.ResumeLayout(false);
+			tableLayoutPanel3.ResumeLayout(false);
 			groupBox3.ResumeLayout(false);
 			groupBox3.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).EndInit();
@@ -670,11 +828,14 @@
 			groupBox2.PerformLayout();
 			groupBox1.ResumeLayout(false);
 			groupBox1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)babstats_table).EndInit();
 			tabPlayerStats.ResumeLayout(false);
 			tableLayoutPanel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).EndInit();
 			tabWeaponStats.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).EndInit();
+			tabLogs.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)dg_statsLog).EndInit();
 			ResumeLayout(false);
 		}
 
@@ -685,7 +846,6 @@
         private TabPage tabPlayerStats;
         private TabPage tabWeaponStats;
         private TableLayoutPanel tableLayoutPanel1;
-        public DataGridView dg_statsLog;
         private Panel panel1;
         private GroupBox groupBox1;
         private TextBox tb_webStatsServerPath;
@@ -697,6 +857,8 @@
         public NumericUpDown num_WebStatsReport;
         private Label labelReportInterval;
         private GroupBox groupBox4;
+        private Button btn_RemoveServer;
+        private Button btn_AddServer;
         private Label labelUpatedInterval;
         public NumericUpDown num_WebStatsUpdates;
         private Button btn_SaveSettings;
@@ -734,7 +896,20 @@
         private DataGridViewTextBoxColumn PlayerActive;
         private DataGridViewTextBoxColumn TimePlayed;
         public TextBox tb_serverID;
+		private TabPage tabLogs;
+		public DataGridView dg_statsLog;
 		private DataGridViewTextBoxColumn statsLog_DateTime;
 		private DataGridViewTextBoxColumn statLog_Message;
+		private DataGridView babstats_table;
+		private DataGridViewTextBoxColumn babstats_id;
+		private DataGridViewTextBoxColumn babstats_code;
+		private DataGridViewTextBoxColumn babstats_siteurl;
+		private DataGridViewCheckBoxColumn babstats_enabled;
+		private DataGridViewTextBoxColumn babstats_updateinterval;
+		private DataGridViewCheckBoxColumn babstats_annoucements;
+		private DataGridViewTextBoxColumn babstats_reportinterval;
+		private Button btn_NewServer;
+		private TableLayoutPanel tableLayoutPanel3;
+		private TabPage tabLobby;
 	}
 }

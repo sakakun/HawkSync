@@ -246,7 +246,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 byte[] countryCodeBytes = Encoding.Default.GetBytes(theInstance.gameCountryCode);
                 byte[] bindAddressBytes = Encoding.Default.GetBytes(theInstance.profileBindIP!);
                 byte[] firstMapFileBytes = Encoding.Default.GetBytes(firstMap.MapFile!);
-                byte[] maxSlotsBytes = BitConverter.GetBytes(80);
+                byte[] maxSlotsBytes = BitConverter.GetBytes(theInstance.gameMaxSlots);
                 byte[] dedicatedBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDedicated));
                 byte[] gameScoreBytes = BitConverter.GetBytes(theInstance.gameScoreKills);
                 byte[] serverPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordLobby!);
@@ -679,9 +679,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 
                 if (CheckForExistingProcess()) { return true; }
 
-                 bool wasPatched = DFBHDPatcher.Patch(FullFileName);
-                if (!wasPatched)
-                   AppDebug.Log("startGame", "Already patched, starting as-is.");
+                // bool wasPatched = DFBHDPatcher.Patch(FullFileName);
+                // if (!wasPatched)
+                //   AppDebug.Log("startGame", "Already patched, starting as-is.");
 
                 AppDebug.Log("startGame", "No existing game process found, starting a new instance...");
 

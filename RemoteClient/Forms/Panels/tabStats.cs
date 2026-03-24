@@ -7,380 +7,482 @@ using RemoteClient.Core;
 
 namespace RemoteClient.Forms.Panels
 {
-    public partial class tabStats : UserControl
-    {
+	public partial class tabStats : UserControl
+	{
+		private theInstance theInstance => CommonCore.theInstance!;
+		private statInstance statInstance => CommonCore.instanceStats!;
+		private playerInstance playerInstance => CommonCore.instancePlayers!;
 
-        private theInstance theInstance => CommonCore.theInstance!;
-        private statInstance statInstance => CommonCore.instanceStats!;
-        private playerInstance playerInstance => CommonCore.instancePlayers!;
+		private static DateTime _lastPlayerStatsUpdate = DateTime.MinValue;
+		private static DateTime _lastWeaponStatsUpdate = DateTime.MinValue;
+		private List<BabstatsServerSettings> _BabstatServers = new List<BabstatsServerSettings>();
+		private int _BabstatsSelectedID;
 
-        // Throttle updates to once every 15 seconds
-        private static DateTime _lastPlayerStatsUpdate = DateTime.MinValue;
-        // Throttle updates to once every 15 seconds
-        private static DateTime _lastWeaponStatsUpdate = DateTime.MinValue;
+		public tabStats()
+		{
+			InitializeComponent();
 
-        private bool _isEditingStats = false;
-        private bool _suppressStatsChangeTracking = false;
-        private DateTime _lastStatsEditTime = DateTime.MinValue;
-        private System.Windows.Forms.Timer? _statsInactivityTimer;
-        private const int STATS_INACTIVITY_TIMEOUT_SECONDS = 120;
+			LoadWebStatsSettings();
+			babstatsFormReset();
+			babstatsButtonsReset();
 
-        public tabStats()
-        {
-            InitializeComponent();
+			ApiCore.OnSnapshotReceived += OnSnapshotReceived;
 
-            // First Load
-            methodFunction_loadSettings();
+		}
 
-            // Subscribe to server updates
-            ApiCore.OnSnapshotReceived += OnSnapshotReceived;
+		private bool AreBabstatsServerListsEqual(List<BabstatsServerSettings> listA, List<BabstatsServerSettings> listB)
+		{
+			if (ReferenceEquals(listA, listB))
+				return true;
+			if (listA == null || listB == null)
+				return false;
+			if (listA.Count != listB.Count)
+				return false;
 
-            SetupStatsInactivityTimer();
-            WireUpStatsChangeTracking();
+			// Compare each item (order-insensitive)
+			var setA = new HashSet<BabstatsServerSettings>(listA);
+			var setB = new HashSet<BabstatsServerSettings>(listB);
+			return setA.SetEquals(setB);
+		}
 
-        }
+		private void LoadWebStatsSettings()
+		{
 
-        private void OnSnapshotReceived(ServerSnapshot snapshot)
-        {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(() => OnSnapshotReceived(snapshot)));
-                return;
-            }
-            
-            // Load Settings
-            methodFunction_loadSettings();
-            // Update the stats log when a new snapshot is received
-            UpdateWebStatsLog();
-            // Update player stats grid
-            PopulatePlayerStatsGrid();
-            // Update weapon stats grid
-            PopulateWeaponStatsGrid();
-        }
+			if (!AreBabstatsServerListsEqual(statInstance.BabstatsServers, _BabstatServers))
+			{
+				_BabstatServers = statInstance.BabstatsServers;
+			}
+			else
+			{
+				return;
+			}
 
-        private void SetupStatsInactivityTimer()
-        {
-            _statsInactivityTimer = new System.Windows.Forms.Timer
-            {
-                Interval = 1000
-            };
-            _statsInactivityTimer.Tick += StatsInactivityTimer_Tick;
-            _statsInactivityTimer.Start();
-        }
+			// Clear existing items
+			babstats_table.Rows.Clear();
+			// Add each server to the table
+			foreach (var server in _BabstatServers)
+			{
+				int rowIndex = babstats_table.Rows.Add(
+					server.BabstatsServerID,                // babstats_id (hidden)
+					server.ProfileID,                       // babstats_code ("Profile ID")
+					server.ServerPath,                      // babstats_siteurl ("Babstats URL")
+					server.IsEnabled,                       // babstats_enabled (bool)
+					server.UpdateIntervalSeconds,           // babstats_updateinterval ("Update (s)")
+					server.EnableAnnouncements,             // babstats_annoucements (bool)
+					server.ReportIntervalSeconds            // babstats_reportinterval ("Report (s)")
+				);
+				DataGridViewRow row = babstats_table.Rows[rowIndex];
+				row.Tag = server; // Store the server settings in the row's Tag for later reference
+			}
+		}
 
-        private void StatsInactivityTimer_Tick(object? sender, EventArgs e)
-        {
-            if (!_isEditingStats)
-                return;
+		private async void OnSnapshotReceived(ServerSnapshot snapshot)
+		{
+			if (InvokeRequired)
+			{
+				Invoke(new Action(() => OnSnapshotReceived(snapshot)));
+				return;
+			}
 
-            if ((DateTime.Now - _lastStatsEditTime).TotalSeconds >= STATS_INACTIVITY_TIMEOUT_SECONDS)
-            {
-                _isEditingStats = false;
-                methodFunction_loadSettings();
-                UpdateStatsEditModeIndicator();
-                MessageBox.Show(
-                    "Stats settings refreshed due to inactivity.\nAny unsaved changes were discarded.",
-                    "Auto-Refresh",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-            }
-        }
+			LoadWebStatsSettings();
+			UpdateWebStatsLog();
 
-        private void WireUpStatsChangeTracking()
-        {
-            tb_serverID.TextChanged += Stats_ControlValueChanged;
-            cb_enableWebStats.CheckedChanged += Stats_ControlValueChanged;
-            tb_webStatsServerPath.TextChanged += Stats_ControlValueChanged;
-            cb_enableAnnouncements.CheckedChanged += Stats_ControlValueChanged;
-            num_WebStatsReport.ValueChanged += Stats_ControlValueChanged;
-            num_WebStatsUpdates.ValueChanged += Stats_ControlValueChanged;
-        }
+			PopulatePlayerStatsGrid();
+			PopulateWeaponStatsGrid();
+		}
 
-        private void Stats_ControlValueChanged(object? sender, EventArgs e)
-        {
-            if (_suppressStatsChangeTracking)
-                return;
+		public void UpdateWebStatsLog()
+		{
+			List<StatReportObject> logEntries = statInstance.WebStatsLog ?? new List<StatReportObject>();
 
-            if (!_isEditingStats)
-            {
-                _isEditingStats = true;
-                UpdateStatsEditModeIndicator();
-            }
-            _lastStatsEditTime = DateTime.Now;
-        }
+			var currentRows = new HashSet<string>();
+			foreach (DataGridViewRow row in dg_statsLog.Rows)
+			{
+				if (row.IsNewRow)
+				{
+					continue;
+				}
+
+				string dateStr = row.Cells[0].Value as string ?? string.Empty;
+				string content = row.Cells[1].Value as string ?? string.Empty;
+				currentRows.Add($"{dateStr}|{content}");
+			}
+
+			for (int i = dg_statsLog.Rows.Count - 1; i >= 0; i--)
+			{
+				DataGridViewRow row = dg_statsLog.Rows[i];
+				if (row.IsNewRow)
+				{
+					continue;
+				}
+
+				string dateStr = row.Cells[0].Value as string ?? string.Empty;
+				string content = row.Cells[1].Value as string ?? string.Empty;
+				bool exists = logEntries.Any(e =>
+					e.ReportDate.ToString("yyyy-MM-dd HH:mm:ss") == dateStr &&
+					e.ReportContent == content);
+
+				if (!exists)
+				{
+					dg_statsLog.Rows.RemoveAt(i);
+				}
+			}
+
+			bool rowsAdded = false;
+			foreach (StatReportObject entry in logEntries)
+			{
+				string dateStr = entry.ReportDate.ToString("yyyy-MM-dd HH:mm:ss");
+				string key = $"{dateStr}|{entry.ReportContent}";
+
+				if (!currentRows.Contains(key))
+				{
+					dg_statsLog.Rows.Add(dateStr, entry.ReportContent);
+					rowsAdded = true;
+				}
+			}
+
+			if (rowsAdded || dg_statsLog.SortedColumn == null)
+			{
+				ApplySortToStatsLog(dg_statsLog);
+			}
+		}
+
+		private void ApplySortToStatsLog(DataGridView grid)
+		{
+			if (grid.Rows.Count == 0)
+			{
+				return;
+			}
+
+			DataGridViewColumn? sortColumn = grid.SortedColumn;
+			SortOrder sortOrder = grid.SortOrder;
+
+			if (sortColumn == null || sortOrder == SortOrder.None)
+			{
+				if (grid.Columns.Count > 0)
+				{
+					grid.Sort(grid.Columns[0], System.ComponentModel.ListSortDirection.Descending);
+				}
+			}
+			else
+			{
+				var direction = sortOrder == SortOrder.Ascending
+					? System.ComponentModel.ListSortDirection.Ascending
+					: System.ComponentModel.ListSortDirection.Descending;
+				grid.Sort(sortColumn, direction);
+			}
+		}
+
+		private async void OnTestBabstatConnectionClick(object? sender, EventArgs e)
+		{
+			Button? button = sender as Button;
+			if (button != null)
+			{
+				button.Enabled = false;
+			}
+
+			try
+			{
+				CommandResult result = await ApiCore.ApiClient!.Stats.ValidateWebStatsConnectionAsync(tb_webStatsServerPath.Text);
+				MessageBox.Show(
+					result.Message,
+					result.Success ? "Connection Test" : "Connection Test Failed",
+					MessageBoxButtons.OK,
+					result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
+				);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(
+					$"An error occurred while testing the connection:\n\n{ex.Message}",
+					"Connection Test Error",
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error
+				);
+			}
+			finally
+			{
+				if (button != null)
+				{
+					button.Enabled = true;
+				}
+			}
+		}
+
+		public void PopulatePlayerStatsGrid()
+		{
+			if ((DateTime.UtcNow - _lastPlayerStatsUpdate).TotalSeconds < 15)
+			{
+				return;
+			}
+
+			_lastPlayerStatsUpdate = DateTime.UtcNow;
+			dataGridViewPlayerStats.Rows.Clear();
+
+			foreach (PlayerStatObject statObj in statInstance.playerStatsList.Values)
+			{
+				PlayerObject player = statObj.PlayerStatsCurrent;
+				string shotsPerKill = player.stat_Kills > 0 ? (player.stat_TotalShotsFired / player.stat_Kills).ToString() : "0";
+				bool playerActive = playerInstance.PlayerList.Values.Any(p => p.PlayerName == player.PlayerName);
+
+				dataGridViewPlayerStats.Rows.Add(
+					player.PlayerName,
+					player.stat_Suicides,
+					player.stat_Murders,
+					player.stat_Kills,
+					player.stat_Deaths,
+					player.stat_ZoneTime,
+					player.stat_FBCaptures,
+					player.stat_FlagSaves,
+					player.stat_SDADTargetsDestroyed,
+					player.stat_RevivesReceived,
+					player.stat_RevivesGiven,
+					player.stat_PSPAttempts,
+					player.stat_PSPTakeovers,
+					player.stat_FBCarrierKills,
+					player.stat_DoubleKills,
+					player.stat_Headshots,
+					player.stat_KnifeKills,
+					player.stat_SniperKills,
+					player.stat_TKOTHDefenseKills,
+					player.stat_TKOTHAttackKills,
+					shotsPerKill,
+					player.stat_ExperiencePoints,
+					player.PlayerTeam,
+					playerActive ? "1" : "0",
+					player.PlayerTimePlayed
+				);
+			}
+		}
+
+		public void PopulateWeaponStatsGrid()
+		{
+			if ((DateTime.UtcNow - _lastWeaponStatsUpdate).TotalSeconds < 15)
+			{
+				return;
+			}
+
+			_lastWeaponStatsUpdate = DateTime.UtcNow;
+			dataGridViewWeaponStats.Rows.Clear();
+
+			foreach (PlayerStatObject statObj in statInstance.playerStatsList.Values)
+			{
+				PlayerObject player = statObj.PlayerStatsCurrent;
+				foreach (WeaponStatObject weaponStat in statObj.PlayerWeaponStats)
+				{
+					dataGridViewWeaponStats.Rows.Add(
+						player.PlayerName,
+						((WeaponStack)weaponStat.WeaponID).ToString(),
+						weaponStat.TimeUsed,
+						weaponStat.Kills,
+						weaponStat.Shots
+					);
+				}
+			}
+		}
+
+		private void babstatsButtonsReset()
+		{
+			btn_SaveSettings.Enabled = false;
+			btn_RemoveServer.Enabled = false;
+			btn_AddServer.Enabled = true;
+			btn_NewServer.Enabled = true;
+			btn_NewServer.Text = "New";
+		}
+		private void babstatsFormReset()
+		{
+			_BabstatsSelectedID = 0;
+			tb_webStatsServerPath.Text = string.Empty;
+			tb_serverID.Text = string.Empty;
+			cb_enableWebStats.Checked = false;
+			cb_enableAnnouncements.Checked = false;
+			num_WebStatsReport.Value = 60;
+			num_WebStatsUpdates.Value = 60;
+		}
+
+		private void babstatsClick_openRecord(object sender, EventArgs e)
+		{
+			// Ensure a row is selected
+			if (babstats_table.SelectedRows.Count == 0)
+				return;
+
+			// Get the selected row and its associated BabstatsServerSettings
+			DataGridViewRow selectedRow = babstats_table.SelectedRows[0];
+			if (selectedRow.Tag is not BabstatsServerSettings server)
+				return;
+
+			// Populate form fields
+			_BabstatsSelectedID = server.BabstatsServerID;
+			tb_webStatsServerPath.Text = server.ServerPath;
+			tb_serverID.Text = server.ProfileID;
+			cb_enableWebStats.Checked = server.IsEnabled;
+			cb_enableAnnouncements.Checked = server.EnableAnnouncements;
+			num_WebStatsReport.Value = Math.Max(num_WebStatsReport.Minimum, Math.Min(num_WebStatsReport.Maximum, server.ReportIntervalSeconds));
+			num_WebStatsUpdates.Value = Math.Max(num_WebStatsUpdates.Minimum, Math.Min(num_WebStatsUpdates.Maximum, server.UpdateIntervalSeconds));
 
 
-        private void UpdateStatsEditModeIndicator()
-        {
-            if (_isEditingStats)
-            {
-                int secondsRemaining = STATS_INACTIVITY_TIMEOUT_SECONDS -
-                    (int)(DateTime.Now - _lastStatsEditTime).TotalSeconds;
-                btn_SaveSettings.BackColor = Color.Orange;
-                btn_SaveSettings.Text = $"Save";
-            }
-            else
-            {
-                btn_SaveSettings.BackColor = SystemColors.Control;
-                btn_SaveSettings.Text = "Save";
-            }
-        }
+			// Buttons enabled: Save, Remove
+			btn_SaveSettings.Enabled = true;
+			btn_RemoveServer.Enabled = true;
+			btn_AddServer.Enabled = false;
+			btn_NewServer.Enabled = true;
+			btn_NewServer.Text = "Cancel";
+		}
 
-        public void UpdateWebStatsLog()
-        {
-            var logEntries = statInstance.WebStatsLog ?? new List<StatReportObject>();
+		private async void babstatsClick_addServer(object sender, EventArgs e)
+		{
+			// New Record - Clear selected ID and form for new entry, this should already be done because of the form reset when clicking "New", but we'll do it again here to be safe.
+			_BabstatsSelectedID = 0;
 
-            // Build a set of current (date, content) pairs in the grid for quick lookup
-            var currentRows = new HashSet<string>();
-            foreach (DataGridViewRow row in dg_statsLog.Rows)
-            {
-                if (row.IsNewRow) continue;
-                var dateStr = row.Cells[0].Value as string ?? "";
-                var content = row.Cells[1].Value as string ?? "";
-                currentRows.Add($"{dateStr}|{content}");
-            }
+			// Collect Form Details for new server to be added, then add to database and refresh list
+			BabstatsServerSettings newServer = new BabstatsServerSettings(
+				0, // BabstatsServerID, will be set by the database
+				string.Empty, // DisplayName
+				tb_webStatsServerPath.Text.Trim(), // ServerPath
+				tb_serverID.Text.Trim(), // ProfileID
+				cb_enableWebStats.Checked, // IsEnabled
+				cb_enableAnnouncements.Checked, // EnableAnnouncements
+				(int)num_WebStatsReport.Value, // ReportIntervalSeconds
+				(int)num_WebStatsUpdates.Value, // UpdateIntervalSeconds
+				0 // SortOrder
+			);
 
-            // Remove rows that are no longer in the log
-            for (int i = dg_statsLog.Rows.Count - 1; i >= 0; i--)
-            {
-                var row = dg_statsLog.Rows[i];
-                if (row.IsNewRow) continue;
-                var dateStr = row.Cells[0].Value as string ?? "";
-                var content = row.Cells[1].Value as string ?? "";
-                bool exists = logEntries.Any(e =>
-                    e.ReportDate.ToString("yyyy-MM-dd HH:mm:ss") == dateStr &&
-                    e.ReportContent == content);
-                if (!exists)
-                    dg_statsLog.Rows.RemoveAt(i);
-            }
+			if (cb_enableAnnouncements.Checked)
+			{
+				DialogResult dialogResult = MessageBox.Show(
+					"You have enabled Announcements for this Babstats server. This will set Announcements to false for all other Babstats servers. Do you want to continue?",
+					"Enable Announcements",
+					MessageBoxButtons.YesNo,
+					MessageBoxIcon.Warning
+				);
+				if (dialogResult == DialogResult.No)
+				{
+					return;
+				}
+				else
+				{
+					// Set Announcements to false for all other servers
+					_ = await ApiCore.ApiClient!.Stats.ClearBabstatsAnnoucementsAsync();
+				}
+			}
 
-            // Track if we added any new rows
-            bool rowsAdded = false;
+			// Add the new server via API
+			CommandResult result = await ApiCore.ApiClient!.Stats.AddBabstatsServersAsync(newServer);
 
-            // Add new log entries that are not already present
-            foreach (var entry in logEntries)
-            {
-                var dateStr = entry.ReportDate.ToString("yyyy-MM-dd HH:mm:ss");
-                var key = $"{dateStr}|{entry.ReportContent}";
-                if (!currentRows.Contains(key))
-                {
-                    dg_statsLog.Rows.Add(dateStr, entry.ReportContent);
-                    rowsAdded = true;
-                }
-            }
+			MessageBox.Show(
+				result.Message,
+				result.Success ? "Babstats Server Updated" : "Failed to update Babstats Server",
+				MessageBoxButtons.OK,
+				result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
+			);
 
-            // Apply sort to maintain order (or set default to most recent first)
-            if (rowsAdded || dg_statsLog.SortedColumn == null)
-            {
-                ApplySortToStatsLog(dg_statsLog);
-            }
-        }
+			// Refresh the server list
+			LoadWebStatsSettings();
+			// Reset Form
+			babstatsFormReset();
+			// Reset Buttons
+			babstatsButtonsReset();
 
-        private void ApplySortToStatsLog(DataGridView grid)
-        {
-            if (grid.Rows.Count == 0)
-                return;
+		}
 
-            var sortColumn = grid.SortedColumn;
-            var sortOrder = grid.SortOrder;
+		private async void babstatsClick_saveServer(object sender, EventArgs e)
+		{
+			// Collect Form Details for new server to be added, then add to database and refresh list
+			BabstatsServerSettings updatedServer = new BabstatsServerSettings(
+				_BabstatsSelectedID, // BabstatsServerID, will be set by the database
+				string.Empty, // DisplayName
+				tb_webStatsServerPath.Text.Trim(), // ServerPath
+				tb_serverID.Text.Trim(), // ProfileID
+				cb_enableWebStats.Checked, // IsEnabled
+				cb_enableAnnouncements.Checked, // EnableAnnouncements
+				(int)num_WebStatsReport.Value, // ReportIntervalSeconds
+				(int)num_WebStatsUpdates.Value, // UpdateIntervalSeconds
+				0 // SortOrder
+			);
 
-            if (sortColumn == null || sortOrder == SortOrder.None)
-            {
-                // Default to showing most recent entries at the top
-                if (grid.Columns.Count > 0)
-                {
-                    grid.Sort(grid.Columns[0], System.ComponentModel.ListSortDirection.Descending);
-                }
-            }
-            else
-            {
-                // Maintain current sort order
-                var direction = sortOrder == SortOrder.Ascending 
-                    ? System.ComponentModel.ListSortDirection.Ascending 
-                    : System.ComponentModel.ListSortDirection.Descending;
-                grid.Sort(sortColumn, direction);
-            }
-        }
+			if (cb_enableAnnouncements.Checked)
+			{
+				DialogResult dialogResult = MessageBox.Show(
+					"You have enabled Announcements for this Babstats server. This will set Announcements to false for all other Babstats servers. Do you want to continue?",
+					"Enable Announcements",
+					MessageBoxButtons.YesNo,
+					MessageBoxIcon.Warning
+				);
+				if (dialogResult == DialogResult.No)
+				{
+					return;
+				}
+				else
+				{
+					// Set Announcements to false for all other servers
+					_ = await ApiCore.ApiClient!.Stats.ClearBabstatsAnnoucementsAsync();
+				}
+			}
+			// Update the server in the database
+			CommandResult result = await ApiCore.ApiClient!.Stats.SaveBabstatsServersAsync(updatedServer);
 
-        public void methodFunction_loadSettings()
-        {
-            _suppressStatsChangeTracking = true;
-            try
-            {
-                tb_serverID.Text = theInstance!.WebStatsProfileID;
-                cb_enableWebStats.Checked = theInstance.WebStatsEnabled;
-                tb_webStatsServerPath.Text = theInstance.WebStatsServerPath;
-                cb_enableAnnouncements.Checked = theInstance.WebStatsAnnouncements;
-                num_WebStatsReport.Value = theInstance.WebStatsReportInterval;
-                num_WebStatsUpdates.Value = theInstance.WebStatsUpdateInterval;
+			MessageBox.Show(
+				result.Message,
+				result.Success ? "Babstats Server Updated" : "Failed to update Babstats Server",
+				MessageBoxButtons.OK,
+				result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
+			);
 
-                UpdateControlStates();
-            }
-            finally
-            {
-                _suppressStatsChangeTracking = false;
-            }
-        }
+			// Refresh the server list
+			LoadWebStatsSettings();
+			// Reset Form
+			babstatsFormReset();
+			// Reset Buttons
+			babstatsButtonsReset();
+		}
 
-        /// <summary>
-        /// Update control enabled states based on settings
-        /// </summary>
-        private void UpdateControlStates()
-        {
-            bool statsEnabled = cb_enableWebStats.Checked;
-            bool announcementsEnabled = statsEnabled && cb_enableAnnouncements.Checked;
+		private async void babstatsClick_RemoveRecord(object sender, EventArgs e)
+		{
+			// Remove the selected server from the database, then refresh list and reset form/buttons
+			// Dialog to confirm deletion
+			DialogResult dialogResult = MessageBox.Show(
+				"Are you sure you want to remove this Babstats server? This action cannot be undone.",
+				"Confirm Removal",
+				MessageBoxButtons.YesNo,
+				MessageBoxIcon.Warning
+			);
 
-            tb_webStatsServerPath.Enabled = statsEnabled;
-            cb_enableAnnouncements.Enabled = statsEnabled;
-            num_WebStatsUpdates.Enabled = statsEnabled;
-            num_WebStatsReport.Enabled = announcementsEnabled;
-        }
+			if (dialogResult == DialogResult.No)
+			{
+				return;
+			}
 
-        /// <summary>
-        /// Enable/disable announcements
-        /// </summary>
-        private void ActionEvent_EnableAnnouncements(object sender, EventArgs e)
-        {
-            UpdateControlStates();
-        }
+			if (dialogResult == DialogResult.Yes)
+			{
+				// Update the server in the database
+				CommandResult result = await ApiCore.ApiClient!.Stats.RemoveBabstatsServersAsync(_BabstatsSelectedID);
+				// 
+				if (result.Success)
+				{
+					MessageBox.Show("Babstats server removed successfully.", "Removal Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-        /// <summary>
-        /// Enable/disable web stats
-        /// </summary>
-        private void ActionEvent_EnableBabStats(object sender, EventArgs e)
-        {
-            UpdateControlStates();
-        }
-        private async void btnSaveWebStats_Click(object sender, EventArgs e)
-        {
-            var settings = new WebStatsSettings(
-                ProfileID: tb_serverID.Text,
-                Enabled: cb_enableWebStats.Checked,
-                ServerPath: tb_webStatsServerPath.Text,
-                Announcements: cb_enableAnnouncements.Checked,
-                ReportInterval: (int)num_WebStatsReport.Value,
-                UpdateInterval: (int)num_WebStatsUpdates.Value
-            );
+				}
+				else
+				{
+					MessageBox.Show("Failed to remove Babstats server. Please try again.", "Removal Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return;
+				}
+			}
 
-            try
-            {
-                var result = await ApiCore.ApiClient!.Stats.SaveWebStatsSettingsAsync(settings);
+			// Refresh the server list
+			LoadWebStatsSettings();
+			// Reset Form
+			babstatsFormReset();
+			// Reset Buttons
+			babstatsButtonsReset();
+		}
 
-                if (result.Success)
-                {
-                    MessageBox.Show("Web stats settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show($"Failed to save web stats settings:\n\n{result.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error saving web stats settings:\n\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        private async void btn_validate_Click(object sender, EventArgs e)
-        {
-            var button = sender as Button;
-            if (button != null)
-                button.Enabled = false;
-
-            try
-            {
-                var result = await ApiCore.ApiClient!.Stats.ValidateWebStatsConnectionAsync(tb_webStatsServerPath.Text);
-
-                MessageBox.Show(
-                    result.Message,
-                    result.Success ? "Connection Test" : "Connection Test Failed",
-                    MessageBoxButtons.OK,
-                    result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error
-                );
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"An error occurred while testing the connection:\n\n{ex.Message}",
-                    "Connection Test Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }
-            finally
-            {
-                if (button != null)
-                    button.Enabled = true;
-            }
-        }
-
-        public void PopulatePlayerStatsGrid()
-        {
-            if ((DateTime.UtcNow - _lastPlayerStatsUpdate).TotalSeconds < 15)
-                return;
-            _lastPlayerStatsUpdate = DateTime.UtcNow;
-
-            dataGridViewPlayerStats.Rows.Clear();
-
-            foreach (var statObj in statInstance.playerStatsList.Values)
-            {
-                var player = statObj.PlayerStatsCurrent;
-                var shotsPerKill = player.stat_Kills > 0 ? (player.stat_TotalShotsFired / player.stat_Kills).ToString() : "0";
-                bool playerActive = playerInstance.PlayerList.Values.Any(p => p.PlayerName == player.PlayerName);
-
-                dataGridViewPlayerStats.Rows.Add(
-                    player.PlayerName,
-                    player.stat_Suicides,
-                    player.stat_Murders,
-                    player.stat_Kills,
-                    player.stat_Deaths,
-                    player.stat_ZoneTime,
-                    player.stat_FBCaptures,
-                    player.stat_FlagSaves,
-                    player.stat_SDADTargetsDestroyed,
-                    player.stat_RevivesReceived,
-                    player.stat_RevivesGiven,
-                    player.stat_PSPAttempts,
-                    player.stat_PSPTakeovers,
-                    player.stat_FBCarrierKills,
-                    player.stat_DoubleKills,
-                    player.stat_Headshots,
-                    player.stat_KnifeKills,
-                    player.stat_SniperKills,
-                    player.stat_TKOTHDefenseKills,
-                    player.stat_TKOTHAttackKills,
-                    shotsPerKill,
-                    player.stat_ExperiencePoints,
-                    player.PlayerTeam,
-                    playerActive ? "1" : "0",
-                    player.PlayerTimePlayed
-                );
-            }
-
-        }
-
-        public void PopulateWeaponStatsGrid()
-        {
-            if ((DateTime.UtcNow - _lastWeaponStatsUpdate).TotalSeconds < 15)
-                return;
-            _lastWeaponStatsUpdate = DateTime.UtcNow;
-
-            dataGridViewWeaponStats.Rows.Clear();
-
-            foreach (var statObj in statInstance.playerStatsList.Values)
-            {
-                var player = statObj.PlayerStatsCurrent;
-                foreach (var weaponStat in statObj.PlayerWeaponStats)
-                {
-                    dataGridViewWeaponStats.Rows.Add(
-                        player.PlayerName,
-                        ((WeaponStack)weaponStat.WeaponID).ToString(),
-                        weaponStat.TimeUsed,
-                        weaponStat.Kills,
-                        weaponStat.Shots
-                    );
-                }
-            }
-        }
-
-    }
+		private void babstatsClick_newServer(object sender, EventArgs e)
+		{
+			// Reset Form
+			babstatsFormReset();
+			// Reset Buttons
+			babstatsButtonsReset();
+		}
+	}
 }
