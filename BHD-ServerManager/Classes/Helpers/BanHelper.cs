@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-namespace BHD_ServerManager.Classes.HelperClasses
+namespace BHD_ServerManager.Classes.Helpers
 {
     public static class BanHelper
     {

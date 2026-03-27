@@ -46,4 +46,16 @@ namespace HawkSyncShared.DTOs.tabStats
     {
         public string ServerPath { get; set; } = string.Empty;
     }
+
+    // Add alongside BabstatsServerSettings for lobby reporting servers
+    public record LobbyServerSettings(
+        int LobbyServerID,
+        string SiteName,
+        string ServerUri,
+        int GamePort,
+        string SecretKey,
+        bool IsEnabled,
+        int SortOrder
+    );
+
 }

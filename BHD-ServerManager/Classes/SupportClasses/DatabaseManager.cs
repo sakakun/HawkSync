@@ -34,7 +34,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
         private static string _schemaFilePath = Path.Combine(databaseDirectory, "database.sqlite.sql");
         
         // Current schema version - increment this when you update database.sqlite.sql
-        private const int CURRENT_SCHEMA_VERSION = 2;
+        private const int CURRENT_SCHEMA_VERSION = 3;
 
         public static bool IsInitialized => _connection != null;
 

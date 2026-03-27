@@ -1,5 +1,5 @@
 ﻿using BHD_ServerManager.Classes.GameManagement.Memory;
-using BHD_ServerManager.Classes.HelperClasses;
+using BHD_ServerManager.Classes.Helpers;
 using BHD_ServerManager.Classes.Services.NetLimiter;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Classes.SupportClasses.Networking;

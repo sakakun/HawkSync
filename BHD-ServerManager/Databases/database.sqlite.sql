@@ -41,6 +41,23 @@ CREATE TABLE IF NOT EXISTS "tb_auditLogs" (
 	PRIMARY KEY("LogID" AUTOINCREMENT),
 	FOREIGN KEY("UserID") REFERENCES "tb_users"("UserID") ON DELETE SET NULL
 );
+CREATE TABLE IF NOT EXISTS "tb_babstatsServers" (
+    "BabstatsServerID"       INTEGER PRIMARY KEY AUTOINCREMENT,
+    "DisplayName"            TEXT NOT NULL DEFAULT '',
+    "ServerPath"             TEXT NOT NULL,
+    "ProfileID"              TEXT NOT NULL,
+    "IsEnabled"              INTEGER NOT NULL DEFAULT 1,   -- 0/1
+    "EnableAnnouncements"    INTEGER NOT NULL DEFAULT 0,   -- 0/1
+    "ReportIntervalSeconds"  INTEGER NOT NULL DEFAULT 60,
+    "UpdateIntervalSeconds"  INTEGER NOT NULL DEFAULT 60,
+    "SortOrder"              INTEGER NOT NULL DEFAULT 0,
+    "CreatedUtc"             TEXT NOT NULL DEFAULT (datetime('now')),
+    "UpdatedUtc"             TEXT NOT NULL DEFAULT (datetime('now')),
+    CHECK ("IsEnabled" IN (0, 1)),
+    CHECK ("EnableAnnouncements" IN (0, 1)),
+    CHECK ("ReportIntervalSeconds" >= 15 AND "ReportIntervalSeconds" <= 3600),
+    CHECK ("UpdateIntervalSeconds" >= 15 AND "UpdateIntervalSeconds" <= 3600)
+);
 CREATE TABLE IF NOT EXISTS tb_chatAutoMessages (
     autoMessageId INTEGER PRIMARY KEY AUTOINCREMENT,
     autoMessageText TEXT NOT NULL,
@@ -65,6 +82,17 @@ CREATE TABLE IF NOT EXISTS "tb_defaultMaps" (
 	"modType"	INTEGER,
 	"mapType"	INTEGER,
 	PRIMARY KEY("mapID")
+);
+CREATE TABLE IF NOT EXISTS tb_lobbyServers (
+    LobbyServerID INTEGER PRIMARY KEY AUTOINCREMENT,
+    SiteName TEXT NOT NULL DEFAULT '',
+    ServerUri TEXT NOT NULL DEFAULT '',
+    GamePort INTEGER NOT NULL DEFAULT 0,            -- NAT / reported game port
+    SecretKey TEXT NOT NULL DEFAULT '',             -- SKey / shared secret
+    IsEnabled INTEGER NOT NULL DEFAULT 1,           -- 0 = false, 1 = true
+    SortOrder INTEGER NOT NULL DEFAULT 0,
+    CreatedUtc TEXT NOT NULL DEFAULT (datetime('now')),
+    UpdatedUtc TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE TABLE IF NOT EXISTS "tb_mapPlaylists" (
 	"playlistID"	INTEGER NOT NULL,
@@ -146,23 +174,6 @@ CREATE TABLE IF NOT EXISTS tb_users (
     Created TEXT DEFAULT (datetime('now')),
     LastLogin TEXT,
     Notes TEXT DEFAULT ''
-);
-CREATE TABLE IF NOT EXISTS "tb_babstatsServers" (
-    "BabstatsServerID"       INTEGER PRIMARY KEY AUTOINCREMENT,
-    "DisplayName"            TEXT NOT NULL DEFAULT '',
-    "ServerPath"             TEXT NOT NULL,
-    "ProfileID"              TEXT NOT NULL,
-    "IsEnabled"              INTEGER NOT NULL DEFAULT 1,   -- 0/1
-    "EnableAnnouncements"    INTEGER NOT NULL DEFAULT 0,   -- 0/1
-    "ReportIntervalSeconds"  INTEGER NOT NULL DEFAULT 60,
-    "UpdateIntervalSeconds"  INTEGER NOT NULL DEFAULT 60,
-    "SortOrder"              INTEGER NOT NULL DEFAULT 0,
-    "CreatedUtc"             TEXT NOT NULL DEFAULT (datetime('now')),
-    "UpdatedUtc"             TEXT NOT NULL DEFAULT (datetime('now')),
-    CHECK ("IsEnabled" IN (0, 1)),
-    CHECK ("EnableAnnouncements" IN (0, 1)),
-    CHECK ("ReportIntervalSeconds" >= 15 AND "ReportIntervalSeconds" <= 3600),
-    CHECK ("UpdateIntervalSeconds" >= 15 AND "UpdateIntervalSeconds" <= 3600)
 );
 INSERT INTO "tb_defaultMaps" ("mapID","mapName","mapFile","modType","mapType") VALUES (1,'Road Rage','DMK_01A.BMS',0,0),
  (2,'City Madness','DMM_01A.BMS',0,0),
@@ -286,41 +297,42 @@ INSERT INTO "tb_defaultMaps" ("mapID","mapName","mapFile","modType","mapType") V
  (120,'Dust Devil A','KHM_01G.BMS',0,4),
  (121,'Desert Insertion A','KHM_02A.BMS',0,4),
  (122,'Desert Fox A','KHM_03A.BMS',0,4);
-CREATE INDEX IF NOT EXISTS "idx_auditLog_category" ON "tb_auditLogs" (
+CREATE INDEX "IX_tb_babstatsServers_IsEnabled"
+ON "tb_babstatsServers" ("IsEnabled", "SortOrder");
+CREATE UNIQUE INDEX "IX_tb_babstatsServers_ServerPath_ProfileID"
+ON "tb_babstatsServers" ("ServerPath", "ProfileID");
+CREATE INDEX "idx_auditLog_category" ON "tb_auditLogs" (
 	"ActionCategory",
 	"ActionType"
 );
-CREATE INDEX IF NOT EXISTS "idx_auditLog_target" ON "tb_auditLogs" (
+CREATE INDEX "idx_auditLog_target" ON "tb_auditLogs" (
 	"TargetType",
 	"TargetID"
 );
-CREATE INDEX IF NOT EXISTS "idx_auditLog_timestamp" ON "tb_auditLogs" (
+CREATE INDEX "idx_auditLog_timestamp" ON "tb_auditLogs" (
 	"Timestamp" DESC
 );
-CREATE INDEX IF NOT EXISTS "idx_auditLog_user" ON "tb_auditLogs" (
+CREATE INDEX "idx_auditLog_user" ON "tb_auditLogs" (
 	"UserID",
 	"Username"
 );
-CREATE UNIQUE INDEX IF NOT EXISTS "IX_tb_babstatsServers_ServerPath_ProfileID"
-ON "tb_babstatsServers" ("ServerPath", "ProfileID");
-
-CREATE INDEX IF NOT EXISTS "IX_tb_babstatsServers_IsEnabled"
-ON "tb_babstatsServers" ("IsEnabled", "SortOrder");
-CREATE INDEX IF NOT EXISTS idx_chatLogs_timestamp ON tb_chatLogs(messageTimeStamp);
-CREATE INDEX IF NOT EXISTS idx_permissions_permission ON tb_userPermissions(Permission);
-CREATE INDEX IF NOT EXISTS idx_permissions_userid ON tb_userPermissions(UserID);
-CREATE INDEX IF NOT EXISTS idx_playerip_category ON "tb_playerIPRecords"(RecordCategory, RecordType);
-CREATE INDEX IF NOT EXISTS idx_playerip_expiry ON "tb_playerIPRecords"(ExpireDate);
-CREATE INDEX IF NOT EXISTS idx_playerip_ip ON "tb_playerIPRecords"(PlayerIP);
-CREATE INDEX IF NOT EXISTS idx_playerip_matchid ON "tb_playerIPRecords"(MatchID);
-CREATE INDEX IF NOT EXISTS idx_playername_category ON "tb_playerNameRecords"(RecordCategory, RecordType);
-CREATE INDEX IF NOT EXISTS idx_playername_expiry ON "tb_playerNameRecords"(ExpireDate);
-CREATE INDEX IF NOT EXISTS idx_playername_matchid ON "tb_playerNameRecords"(MatchID);
-CREATE INDEX IF NOT EXISTS idx_playername_name ON "tb_playerNameRecords"(PlayerName);
-CREATE INDEX IF NOT EXISTS idx_proxy_country_code ON "tb_proxyBlockedCountries"(CountryCode);
-CREATE INDEX IF NOT EXISTS idx_proxy_expiry ON "tb_proxyRecords"(CacheExpiry);
-CREATE INDEX IF NOT EXISTS idx_proxy_ip ON "tb_proxyRecords"(IPAddress);
-CREATE INDEX IF NOT EXISTS idx_proxy_vpn ON "tb_proxyRecords"(IsVpn, IsProxy, IsTor);
-CREATE INDEX IF NOT EXISTS idx_users_active ON tb_users(IsActive);
-CREATE INDEX IF NOT EXISTS idx_users_username ON tb_users(Username);
+CREATE INDEX idx_chatLogs_timestamp ON tb_chatLogs(messageTimeStamp);
+CREATE UNIQUE INDEX idx_lobbyServers_ServerUri ON tb_lobbyServers (ServerUri);
+CREATE INDEX idx_lobbyServers_SortOrder ON tb_lobbyServers (SortOrder);
+CREATE INDEX idx_permissions_permission ON tb_userPermissions(Permission);
+CREATE INDEX idx_permissions_userid ON tb_userPermissions(UserID);
+CREATE INDEX idx_playerip_category ON "tb_playerIPRecords"(RecordCategory, RecordType);
+CREATE INDEX idx_playerip_expiry ON "tb_playerIPRecords"(ExpireDate);
+CREATE INDEX idx_playerip_ip ON "tb_playerIPRecords"(PlayerIP);
+CREATE INDEX idx_playerip_matchid ON "tb_playerIPRecords"(MatchID);
+CREATE INDEX idx_playername_category ON "tb_playerNameRecords"(RecordCategory, RecordType);
+CREATE INDEX idx_playername_expiry ON "tb_playerNameRecords"(ExpireDate);
+CREATE INDEX idx_playername_matchid ON "tb_playerNameRecords"(MatchID);
+CREATE INDEX idx_playername_name ON "tb_playerNameRecords"(PlayerName);
+CREATE INDEX idx_proxy_country_code ON "tb_proxyBlockedCountries"(CountryCode);
+CREATE INDEX idx_proxy_expiry ON "tb_proxyRecords"(CacheExpiry);
+CREATE INDEX idx_proxy_ip ON "tb_proxyRecords"(IPAddress);
+CREATE INDEX idx_proxy_vpn ON "tb_proxyRecords"(IsVpn, IsProxy, IsTor);
+CREATE INDEX idx_users_active ON tb_users(IsActive);
+CREATE INDEX idx_users_username ON tb_users(Username);
 COMMIT;
