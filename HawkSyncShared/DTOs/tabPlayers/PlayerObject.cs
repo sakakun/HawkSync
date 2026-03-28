@@ -29,6 +29,14 @@ namespace HawkSyncShared.DTOs.tabPlayers
 
         // In-Game Values
         public int ActiveZoneTime { get; set; }
+        public int PlayerHealth { get; set; } = 0;
+
+        // In-Game Position and Facing Information
+        public float PosX { get; set; }
+        public float PosY { get; set; }
+        public float PosZ { get; set; }
+        public float FacingYaw { get; set; }
+        public float FacingPitch { get; set; }
 
         // Player Statistics
         public int stat_Kills { get; set; }

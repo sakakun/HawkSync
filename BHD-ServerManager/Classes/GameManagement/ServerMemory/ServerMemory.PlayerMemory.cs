@@ -43,6 +43,71 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
             }
             return "Unknown";
         }
+
+        /// <summary>
+        /// Convert engine-encoded angle value into two integer components and degree approximations.
+        /// Ports the logic from the engine helper (sub_55e6e0) using the engine tables.
+        /// Returns (rawA, rawB, degA, degB). Degree conversion is a heuristic (raw * 360/65536).
+        /// </summary>
+        public static (int rawA, int rawB, float degA, float degB) ConvertEngineAngleSingle(int encoded)
+        {
+            // Table addresses discovered in HLIL
+            const int TABLE1_ADDR = 0x00E920E8; // data_e920e8
+            const int TABLE2_ADDR = 0x00E920EC; // data_e920ec
+            const int DATA_654CF4_PTR = 0x00654CF4; // contains pointer to table used for second output
+
+            int bytesread = 0;
+
+            int masked = encoded & 0x3FFFFF;
+            uint idx = (uint)encoded >> 0x16;
+
+            byte[] buf = new byte[4];
+
+            // read baseA
+            ReadProcessMemory((int)processHandle, TABLE1_ADDR + (int)(idx * 4), buf, buf.Length, ref bytesread);
+            uint baseA = BitConverter.ToUInt32(buf, 0);
+
+            // read deltaA
+            ReadProcessMemory((int)processHandle, TABLE2_ADDR + (int)(idx * 4), buf, buf.Length, ref bytesread);
+            uint deltaA = BitConverter.ToUInt32(buf, 0);
+
+            long prod = (long)masked * (long)((int)deltaA - (int)baseA);
+            uint low = (uint)prod;
+            uint high = (uint)((ulong)prod >> 32);
+            uint valA = ((low >> 0x16) | (high << 0x0a)) + baseA;
+
+            // read pointer to table3 from data_654cf4 variable
+            ReadProcessMemory((int)processHandle, DATA_654CF4_PTR, buf, buf.Length, ref bytesread);
+            uint table3base = BitConverter.ToUInt32(buf, 0);
+
+            // read baseB and deltaB from table3
+            ReadProcessMemory((int)processHandle, (int)table3base + (int)(idx * 4), buf, buf.Length, ref bytesread);
+            uint baseB = BitConverter.ToUInt32(buf, 0);
+            ReadProcessMemory((int)processHandle, (int)table3base + (int)(idx * 4) + 4, buf, buf.Length, ref bytesread);
+            uint deltaB = BitConverter.ToUInt32(buf, 0);
+
+            long prod2 = (long)masked * (long)((int)deltaB - (int)baseB);
+            uint low2 = (uint)prod2;
+            uint high2 = (uint)((ulong)prod2 >> 32);
+            uint valB = ((low2 >> 0x16) | (high2 << 0x0a)) + baseB;
+
+            // Heuristic conversion to degrees (engine appears to use fixed-point scaling)
+            const float DEG_SCALE = 360.0f / 65536.0f;
+            float degA = (int)valA * DEG_SCALE;
+            float degB = (int)valB * DEG_SCALE;
+
+            return ((int)valA, (int)valB, degA, degB);
+        }
+
+        // Overload used by ReadMemoryPlayerStats which provides two encoded ints (yaw, pitch)
+        public static (float yaw, float pitch) ConvertEngineAngles(int angA, int angB)
+        {
+            var a = ConvertEngineAngleSingle(angA);
+            var b = ConvertEngineAngleSingle(angB);
+
+            // Use the first degree component from each conversion as the primary angle
+            return (a.degA, b.degA);
+        }
         private static int GetPlayerAddress(int slot)
         {
             if (slot <= 0) return 0;
@@ -623,6 +688,27 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
             ReadProcessMemory((int)processHandle, beginaddr + 0x5E7C, read_playerObjectLocation, read_playerObjectLocation.Length, ref bytesread);
             int read_playerObject = BitConverter.ToInt32(read_playerObjectLocation, 0);
 
+            // Position X, Y, Z
+            byte[] posBytes = new byte[12];
+            ReadProcessMemory((int)processHandle, read_playerObject + 0x08, posBytes, posBytes.Length, ref bytesread);
+            float posX = BitConverter.ToSingle(posBytes, 0);
+            float posY = BitConverter.ToSingle(posBytes, 4);
+            float posZ = BitConverter.ToSingle(posBytes, 8);
+
+            // Facing Yaw and Facing Pitch
+            byte[] angBytes = new byte[8];
+            ReadProcessMemory((int)processHandle, read_playerObject + 0x14, angBytes, angBytes.Length, ref bytesread);
+            int angA = BitConverter.ToInt32(angBytes, 0);
+            int angB = BitConverter.ToInt32(angBytes, 4);
+
+            // Convert engine-encoded ints to usable angles if needed (implement conversion).
+            (float yaw, float pitch) = ConvertEngineAngles(angA, angB);
+
+            // Player Health (read from player object; writer uses +0xE2)
+            byte[] read_health = new byte[4];
+            ReadProcessMemory((int)processHandle, read_playerObject + 0xE2, read_health, read_health.Length, ref bytesread);
+            int PlayerHealth = BitConverter.ToInt32(read_health, 0);
+
             // Selected Weapon & Character Class
             byte[] read_selectedWeapon = new byte[4];
             ReadProcessMemory((int)processHandle, read_playerObject + 0x178, read_selectedWeapon, read_selectedWeapon.Length, ref bytesread);
@@ -667,6 +753,12 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
                 SelectedWeaponID = SelectedWeapon,
                 PlayerWeapons = WeaponList,
                 ActiveZoneTime = read_playerActiveZoneTimeInt,
+                PlayerHealth = PlayerHealth,
+                PosX = posX,
+                PosY = posY,
+                PosZ = posZ,
+                FacingYaw = yaw,
+                FacingPitch = pitch,
                 stat_TotalShotsFired = stats[0],
                 stat_Kills = stats[1],
                 stat_Deaths = stats[2],
