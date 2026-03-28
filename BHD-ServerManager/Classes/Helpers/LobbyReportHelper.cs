@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.SupportClasses;
+using BHD_ServerManager.Classes.GameManagement.Memory;
 
 namespace BHD_ServerManager.Classes.Helpers
 {
@@ -117,7 +118,7 @@ namespace BHD_ServerManager.Classes.Helpers
                 var mapFile = maps.CurrentMapFile ?? string.Empty;
                 var modText = IsTeamSaber() + (modString ?? string.Empty);
 
-                var isPassworded = "1";
+                var isPassworded = "HiddenPassword";
                 if (string.IsNullOrEmpty(theInstance.gamePasswordLobby) &&
                     string.IsNullOrEmpty(theInstance.gamePasswordRed) &&
                     string.IsNullOrEmpty(theInstance.gamePasswordBlue) &&
@@ -130,7 +131,7 @@ namespace BHD_ServerManager.Classes.Helpers
                 var fields = new Dictionary<string, string>
                 {
                     ["Encoding"] = "Windows-1252",
-                    ["PKey"] = "eYkJaPPR-3WNbgPN93,(ZwxBCnEW)", // consider moving secrets out of source
+                    ["PKey"] = "eYkJaPPR-3WNbgPN93,(ZwxBCnEW", // consider moving secrets out of source
                     ["PVer"] = "1.0.9",
                     ["SKey"] = SKey,
                     ["DataType"] = "0x100",
@@ -145,7 +146,7 @@ namespace BHD_ServerManager.Classes.Helpers
                     ["MaxPlayers"] = maxPlayers,
                     ["MissionName"] = mapName,
                     ["MissionFile"] = mapFile,
-                    ["TimeRemaining"] = "8520",
+                    ["TimeRemaining"] = (theInstance.gameInfoTimeRemaining.TotalSeconds*60).ToString(),
                     ["Password"] = isPassworded,
                     ["Message"] = serverMessage,
                     ["Mod"] = modText,
@@ -242,13 +243,13 @@ namespace BHD_ServerManager.Classes.Helpers
                 ["0"] = new
                 {
                     Name = CommonCore.theInstance!.gameHostName,
-                    NameBase64Encoded = AppFunc.TB64(CommonCore.theInstance!.gameHostName),
+                    NameBase64Encoded = Convert.ToBase64String(Encoding.GetEncoding(1252).GetBytes(CommonCore.theInstance!.gameHostName)),
                     Kills = "0",
                     Deaths = "0",
                     WeaponId = "5",
                     WeaponText = "CAR-15",
-                    TeamId = "1",
-                    TeamText = "None"
+                    TeamId = "5",
+                    TeamText = "Unknown"
                 }
             };
 
@@ -277,7 +278,8 @@ namespace BHD_ServerManager.Classes.Helpers
                 });
             }
 
-            return AppFunc.TB64(System.Text.Json.JsonSerializer.Serialize(playerList));
+            return Convert.ToBase64String(Encoding.GetEncoding(1252).GetBytes(System.Text.Json.JsonSerializer.Serialize(playerList)));
+            
         }
 
     }

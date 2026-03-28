@@ -347,8 +347,8 @@ namespace BHD_ServerManager.Forms.Panels
         private void lobbyAction_RandomizeKey(object sender, EventArgs e)
         {
             // Generate a 16-character cryptographically-secure alphanumeric key
-            const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,=-><!@#$%^&*()";
-            const int length = 16;
+            const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            const int length = 20;
 
             Span<char> chars = stackalloc char[length];
             Span<byte> randomBytes = stackalloc byte[length];

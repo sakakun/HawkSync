@@ -26,6 +26,9 @@ namespace BHD_ServerManager.Classes.Tickers
         // Lock for thread safety (if needed for shared resources)
         private static int isTickerRunning = 0;
 
+        // Runtime state for lobby server heartbeats
+        private static readonly Dictionary<int, DateTime> lobbyServerHeartbeatTimes = new();
+
         public static void runTicker()
         {
             // Skip this tick if the previous one is still running
@@ -267,11 +270,26 @@ namespace BHD_ServerManager.Classes.Tickers
             if (enabledServers.Count == 0)
             {
                 return;
-			}
+            }
 
+            DateTime now = DateTime.Now;
 
-
-		}
+            foreach (LobbyServerSettings server in enabledServers)
+            {
+                // Check last heartbeat time for this server
+                lobbyServerHeartbeatTimes.TryGetValue(server.LobbyServerID, out DateTime lastHeartbeat);
+                if (now > lastHeartbeat.AddSeconds(30))
+                {
+                    lobbyServerHeartbeatTimes[server.LobbyServerID] = now;
+                    LobbyServerSettings serverCopy = server;
+                    Task.Run(() => BHD_ServerManager.Classes.Helpers.LobbyReportHelper.SendHeartbeat(
+                        uriString: serverCopy.ServerUri,
+                        SKey: serverCopy.SecretKey,
+                        reportPort: serverCopy.GamePort.ToString()
+                    ));
+                }
+            }
+        }
 
 
     }
