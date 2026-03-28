@@ -174,7 +174,9 @@ namespace BHD_ServerManager.Classes.Helpers
 
                 var client = GetOrCreateHttpClientForLocalIp(localIp);
                 using var resp = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
-
+                
+                AppDebug.Log("SendHeartbeat", $"Heartbeat Successful! ({uriString})");
+                
                 return new HeartBeatResponse
                 {
                     StatusCode = (int)resp.StatusCode,
@@ -183,15 +185,17 @@ namespace BHD_ServerManager.Classes.Helpers
             }
             catch (OperationCanceledException)
             {
+                AppDebug.Log("SendHeartbeat", $"Failed to send heartbeat to {uriString}");
                 // Distinguish cancellation/timeout from other failures.
                 return new HeartBeatResponse
                 {
                     StatusCode = -2,
                     ReasonPhrase = "Request canceled or timed out (10s)"
-                };
+				};
             }
             catch (Exception ex)
             {
+                AppDebug.Log("SendHeartbeat", $"Failed to send heartbeat to {uriString}");
                 return new HeartBeatResponse
                 {
                     StatusCode = -1,
