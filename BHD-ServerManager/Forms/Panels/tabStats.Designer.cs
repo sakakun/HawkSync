@@ -20,1132 +20,1138 @@
             base.Dispose(disposing);
         }
 
-        #region Component Designer generated code
+		#region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            tabControl1 = new TabControl();
-            tabBabstats = new TabPage();
-            tableLayoutPanel1 = new TableLayoutPanel();
-            panel1 = new Panel();
-            groupBox4 = new GroupBox();
-            tableLayoutPanel3 = new TableLayoutPanel();
-            btn_NewServer = new Button();
-            btn_RemoveServer = new Button();
-            btn_SaveSettings = new Button();
-            btn_AddServer = new Button();
-            groupBox3 = new GroupBox();
-            labelUpatedInterval = new Label();
-            num_WebStatsUpdates = new NumericUpDown();
-            labelReportInterval = new Label();
-            num_WebStatsReport = new NumericUpDown();
-            groupBox2 = new GroupBox();
-            cb_enableAnnouncements = new CheckBox();
-            cb_enableWebStats = new CheckBox();
-            groupBox1 = new GroupBox();
-            tb_serverID = new TextBox();
-            btn_validate = new Button();
-            tb_webStatsServerPath = new TextBox();
-            babstats_table = new DataGridView();
-            babstats_id = new DataGridViewTextBoxColumn();
-            babstats_code = new DataGridViewTextBoxColumn();
-            babstats_siteurl = new DataGridViewTextBoxColumn();
-            babstats_enabled = new DataGridViewCheckBoxColumn();
-            babstats_updateinterval = new DataGridViewTextBoxColumn();
-            babstats_annoucements = new DataGridViewCheckBoxColumn();
-            babstats_reportinterval = new DataGridViewTextBoxColumn();
-            tabLobby = new TabPage();
-            lobby_layout = new TableLayoutPanel();
-            lobby_table = new DataGridView();
-            lobby_id = new DataGridViewTextBoxColumn();
-            lobby_sitename = new DataGridViewTextBoxColumn();
-            lobby_uri = new DataGridViewTextBoxColumn();
-            lobby_port = new DataGridViewTextBoxColumn();
-            lobby_secret = new DataGridViewTextBoxColumn();
-            lobby_enabled = new DataGridViewTextBoxColumn();
-            panel2 = new Panel();
-            groupBox6 = new GroupBox();
-            tableLayoutPanel5 = new TableLayoutPanel();
-            btn_lobbyRandKey = new Button();
-            tb_lobbySecretKey = new TextBox();
-            tb_lobbySiteName = new TextBox();
-            tb_lobbySiteUri = new TextBox();
-            label_lobbyInfo = new Label();
-            num_lobbyGamePort = new NumericUpDown();
-            groupBox5 = new GroupBox();
-            tableLayoutPanel4 = new TableLayoutPanel();
-            btn_lobbyNew = new Button();
-            btn_lobbyRemove = new Button();
-            btn_lobbySave = new Button();
-            btn_lobbyAdd = new Button();
-            tabPlayerStats = new TabPage();
-            tableLayoutPanel2 = new TableLayoutPanel();
-            dataGridViewPlayerStats = new DataGridView();
-            PlayerName = new DataGridViewTextBoxColumn();
-            Suicides = new DataGridViewTextBoxColumn();
-            Murders = new DataGridViewTextBoxColumn();
-            Kills = new DataGridViewTextBoxColumn();
-            Deaths = new DataGridViewTextBoxColumn();
-            ZoneTime = new DataGridViewTextBoxColumn();
-            FBCaptures = new DataGridViewTextBoxColumn();
-            FlagSaves = new DataGridViewTextBoxColumn();
-            ADTargetsDestroyed = new DataGridViewTextBoxColumn();
-            RevivesReceived = new DataGridViewTextBoxColumn();
-            RevivesGiven = new DataGridViewTextBoxColumn();
-            PSPAttempts = new DataGridViewTextBoxColumn();
-            PSPTakeovers = new DataGridViewTextBoxColumn();
-            FBCarrierKills = new DataGridViewTextBoxColumn();
-            DoubleKills = new DataGridViewTextBoxColumn();
-            Headshots = new DataGridViewTextBoxColumn();
-            KnifeKills = new DataGridViewTextBoxColumn();
-            SniperKills = new DataGridViewTextBoxColumn();
-            TKOTHDefenseKills = new DataGridViewTextBoxColumn();
-            TKOTHAttackKills = new DataGridViewTextBoxColumn();
-            ShotsPerKill = new DataGridViewTextBoxColumn();
-            ExperiencePoints = new DataGridViewTextBoxColumn();
-            PlayerTeam = new DataGridViewTextBoxColumn();
-            PlayerActive = new DataGridViewTextBoxColumn();
-            TimePlayed = new DataGridViewTextBoxColumn();
-            tabWeaponStats = new TabPage();
-            dataGridViewWeaponStats = new DataGridView();
-            Weapon_PlayerName = new DataGridViewTextBoxColumn();
-            WeaponName = new DataGridViewTextBoxColumn();
-            Timer = new DataGridViewTextBoxColumn();
-            Weapon_Kills = new DataGridViewTextBoxColumn();
-            Weapon_Shots = new DataGridViewTextBoxColumn();
-            tabLogs = new TabPage();
-            dg_statsLog = new DataGridView();
-            statsLog_DateTime = new DataGridViewTextBoxColumn();
-            statLog_Message = new DataGridViewTextBoxColumn();
-            tabControl1.SuspendLayout();
-            tabBabstats.SuspendLayout();
-            tableLayoutPanel1.SuspendLayout();
-            panel1.SuspendLayout();
-            groupBox4.SuspendLayout();
-            tableLayoutPanel3.SuspendLayout();
-            groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsReport).BeginInit();
-            groupBox2.SuspendLayout();
-            groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)babstats_table).BeginInit();
-            tabLobby.SuspendLayout();
-            lobby_layout.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)lobby_table).BeginInit();
-            panel2.SuspendLayout();
-            groupBox6.SuspendLayout();
-            tableLayoutPanel5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)num_lobbyGamePort).BeginInit();
-            groupBox5.SuspendLayout();
-            tableLayoutPanel4.SuspendLayout();
-            tabPlayerStats.SuspendLayout();
-            tableLayoutPanel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).BeginInit();
-            tabWeaponStats.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).BeginInit();
-            tabLogs.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dg_statsLog).BeginInit();
-            SuspendLayout();
-            // 
-            // tabControl1
-            // 
-            tabControl1.Controls.Add(tabBabstats);
-            tabControl1.Controls.Add(tabLobby);
-            tabControl1.Controls.Add(tabPlayerStats);
-            tabControl1.Controls.Add(tabWeaponStats);
-            tabControl1.Controls.Add(tabLogs);
-            tabControl1.Dock = DockStyle.Fill;
-            tabControl1.Location = new Point(0, 0);
-            tabControl1.Margin = new Padding(0);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(966, 422);
-            tabControl1.TabIndex = 0;
-            // 
-            // tabBabstats
-            // 
-            tabBabstats.Controls.Add(tableLayoutPanel1);
-            tabBabstats.Location = new Point(4, 24);
-            tabBabstats.Margin = new Padding(0);
-            tabBabstats.Name = "tabBabstats";
-            tabBabstats.Padding = new Padding(3);
-            tabBabstats.Size = new Size(958, 394);
-            tabBabstats.TabIndex = 0;
-            tabBabstats.Text = "Babstats";
-            tabBabstats.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel1
-            // 
-            tableLayoutPanel1.ColumnCount = 2;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
-            tableLayoutPanel1.Controls.Add(panel1, 0, 0);
-            tableLayoutPanel1.Controls.Add(babstats_table, 1, 0);
-            tableLayoutPanel1.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Location = new Point(3, 3);
-            tableLayoutPanel1.Margin = new Padding(0);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(952, 388);
-            tableLayoutPanel1.TabIndex = 0;
-            // 
-            // panel1
-            // 
-            panel1.Controls.Add(groupBox4);
-            panel1.Controls.Add(groupBox3);
-            panel1.Controls.Add(groupBox2);
-            panel1.Controls.Add(groupBox1);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(0, 0);
-            panel1.Margin = new Padding(0);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(314, 388);
-            panel1.TabIndex = 2;
-            // 
-            // groupBox4
-            // 
-            groupBox4.Controls.Add(tableLayoutPanel3);
-            groupBox4.Dock = DockStyle.Bottom;
-            groupBox4.Location = new Point(0, 337);
-            groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(314, 51);
-            groupBox4.TabIndex = 3;
-            groupBox4.TabStop = false;
-            groupBox4.Text = "Server List";
-            // 
-            // tableLayoutPanel3
-            // 
-            tableLayoutPanel3.ColumnCount = 4;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel3.Controls.Add(btn_NewServer, 3, 0);
-            tableLayoutPanel3.Controls.Add(btn_RemoveServer, 2, 0);
-            tableLayoutPanel3.Controls.Add(btn_SaveSettings, 0, 0);
-            tableLayoutPanel3.Controls.Add(btn_AddServer, 1, 0);
-            tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(3, 19);
-            tableLayoutPanel3.Name = "tableLayoutPanel3";
-            tableLayoutPanel3.RowCount = 1;
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Size = new Size(308, 29);
-            tableLayoutPanel3.TabIndex = 0;
-            // 
-            // btn_NewServer
-            // 
-            btn_NewServer.Dock = DockStyle.Fill;
-            btn_NewServer.Location = new Point(234, 3);
-            btn_NewServer.Name = "btn_NewServer";
-            btn_NewServer.Size = new Size(71, 23);
-            btn_NewServer.TabIndex = 13;
-            btn_NewServer.Text = "New";
-            btn_NewServer.UseVisualStyleBackColor = true;
-            btn_NewServer.Click += babstatsClick_newServer;
-            // 
-            // btn_RemoveServer
-            // 
-            btn_RemoveServer.Dock = DockStyle.Fill;
-            btn_RemoveServer.Location = new Point(157, 3);
-            btn_RemoveServer.Name = "btn_RemoveServer";
-            btn_RemoveServer.Size = new Size(71, 23);
-            btn_RemoveServer.TabIndex = 12;
-            btn_RemoveServer.Text = "Remove";
-            btn_RemoveServer.UseVisualStyleBackColor = true;
-            btn_RemoveServer.Click += babstatsClick_RemoveRecord;
-            // 
-            // btn_SaveSettings
-            // 
-            btn_SaveSettings.Dock = DockStyle.Fill;
-            btn_SaveSettings.Location = new Point(3, 3);
-            btn_SaveSettings.Name = "btn_SaveSettings";
-            btn_SaveSettings.Size = new Size(71, 23);
-            btn_SaveSettings.TabIndex = 10;
-            btn_SaveSettings.Text = "Save";
-            btn_SaveSettings.UseVisualStyleBackColor = true;
-            btn_SaveSettings.Click += babstatsClick_saveServer;
-            // 
-            // btn_AddServer
-            // 
-            btn_AddServer.Dock = DockStyle.Fill;
-            btn_AddServer.Location = new Point(80, 3);
-            btn_AddServer.Name = "btn_AddServer";
-            btn_AddServer.Size = new Size(71, 23);
-            btn_AddServer.TabIndex = 11;
-            btn_AddServer.Text = "Add";
-            btn_AddServer.UseVisualStyleBackColor = true;
-            btn_AddServer.Click += babstatsClick_addServer;
-            // 
-            // groupBox3
-            // 
-            groupBox3.Controls.Add(labelUpatedInterval);
-            groupBox3.Controls.Add(num_WebStatsUpdates);
-            groupBox3.Controls.Add(labelReportInterval);
-            groupBox3.Controls.Add(num_WebStatsReport);
-            groupBox3.Dock = DockStyle.Top;
-            groupBox3.Location = new Point(0, 137);
-            groupBox3.Margin = new Padding(0, 3, 3, 3);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(314, 90);
-            groupBox3.TabIndex = 2;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "Selected Server Intervals (Seconds)";
-            // 
-            // labelUpatedInterval
-            // 
-            labelUpatedInterval.AutoSize = true;
-            labelUpatedInterval.Location = new Point(85, 58);
-            labelUpatedInterval.Name = "labelUpatedInterval";
-            labelUpatedInterval.Size = new Size(133, 15);
-            labelUpatedInterval.TabIndex = 11;
-            labelUpatedInterval.Text = "In-game Player Updates";
-            labelUpatedInterval.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // num_WebStatsUpdates
-            // 
-            num_WebStatsUpdates.Location = new Point(234, 54);
-            num_WebStatsUpdates.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
-            num_WebStatsUpdates.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
-            num_WebStatsUpdates.Name = "num_WebStatsUpdates";
-            num_WebStatsUpdates.Size = new Size(55, 23);
-            num_WebStatsUpdates.TabIndex = 10;
-            num_WebStatsUpdates.TextAlign = HorizontalAlignment.Center;
-            num_WebStatsUpdates.Value = new decimal(new int[] { 60, 0, 0, 0 });
-            // 
-            // labelReportInterval
-            // 
-            labelReportInterval.AutoSize = true;
-            labelReportInterval.Location = new Point(73, 28);
-            labelReportInterval.Name = "labelReportInterval";
-            labelReportInterval.Size = new Size(145, 15);
-            labelReportInterval.TabIndex = 9;
-            labelReportInterval.Text = "Announcements / Awards";
-            labelReportInterval.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // num_WebStatsReport
-            // 
-            num_WebStatsReport.Location = new Point(234, 24);
-            num_WebStatsReport.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
-            num_WebStatsReport.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
-            num_WebStatsReport.Name = "num_WebStatsReport";
-            num_WebStatsReport.Size = new Size(55, 23);
-            num_WebStatsReport.TabIndex = 7;
-            num_WebStatsReport.TextAlign = HorizontalAlignment.Center;
-            num_WebStatsReport.Value = new decimal(new int[] { 60, 0, 0, 0 });
-            // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(cb_enableAnnouncements);
-            groupBox2.Controls.Add(cb_enableWebStats);
-            groupBox2.Dock = DockStyle.Top;
-            groupBox2.Location = new Point(0, 84);
-            groupBox2.Margin = new Padding(0, 3, 3, 3);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(314, 53);
-            groupBox2.TabIndex = 1;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Selected Server Options";
-            // 
-            // cb_enableAnnouncements
-            // 
-            cb_enableAnnouncements.AutoSize = true;
-            cb_enableAnnouncements.CheckAlign = ContentAlignment.MiddleRight;
-            cb_enableAnnouncements.Location = new Point(133, 22);
-            cb_enableAnnouncements.Name = "cb_enableAnnouncements";
-            cb_enableAnnouncements.Size = new Size(152, 19);
-            cb_enableAnnouncements.TabIndex = 5;
-            cb_enableAnnouncements.Text = "Enable Announcements";
-            cb_enableAnnouncements.UseVisualStyleBackColor = true;
-            // 
-            // cb_enableWebStats
-            // 
-            cb_enableWebStats.AutoSize = true;
-            cb_enableWebStats.CheckAlign = ContentAlignment.MiddleRight;
-            cb_enableWebStats.Location = new Point(6, 22);
-            cb_enableWebStats.Name = "cb_enableWebStats";
-            cb_enableWebStats.Size = new Size(108, 19);
-            cb_enableWebStats.TabIndex = 0;
-            cb_enableWebStats.Text = "Enable Babstats";
-            cb_enableWebStats.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(tb_serverID);
-            groupBox1.Controls.Add(btn_validate);
-            groupBox1.Controls.Add(tb_webStatsServerPath);
-            groupBox1.Dock = DockStyle.Top;
-            groupBox1.Location = new Point(0, 0);
-            groupBox1.Margin = new Padding(0, 3, 3, 3);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(314, 84);
-            groupBox1.TabIndex = 0;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Babstats Servers";
-            // 
-            // tb_serverID
-            // 
-            tb_serverID.Location = new Point(6, 51);
-            tb_serverID.MaxLength = 5;
-            tb_serverID.Name = "tb_serverID";
-            tb_serverID.PlaceholderText = "AA###";
-            tb_serverID.Size = new Size(58, 23);
-            tb_serverID.TabIndex = 5;
-            tb_serverID.TextAlign = HorizontalAlignment.Center;
-            // 
-            // btn_validate
-            // 
-            btn_validate.Location = new Point(233, 51);
-            btn_validate.Name = "btn_validate";
-            btn_validate.Size = new Size(75, 23);
-            btn_validate.TabIndex = 4;
-            btn_validate.Text = "Validate";
-            btn_validate.UseVisualStyleBackColor = true;
-            btn_validate.Click += OnTestBabstatConnectionClick;
-            // 
-            // tb_webStatsServerPath
-            // 
-            tb_webStatsServerPath.Location = new Point(6, 22);
-            tb_webStatsServerPath.Name = "tb_webStatsServerPath";
-            tb_webStatsServerPath.PlaceholderText = "http(s)://youdomain.com/babstats_root/";
-            tb_webStatsServerPath.Size = new Size(302, 23);
-            tb_webStatsServerPath.TabIndex = 1;
-            tb_webStatsServerPath.TextAlign = HorizontalAlignment.Center;
-            // 
-            // babstats_table
-            // 
-            babstats_table.AllowUserToAddRows = false;
-            babstats_table.AllowUserToDeleteRows = false;
-            babstats_table.AllowUserToResizeColumns = false;
-            babstats_table.AllowUserToResizeRows = false;
-            babstats_table.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            babstats_table.Columns.AddRange(new DataGridViewColumn[] { babstats_id, babstats_code, babstats_siteurl, babstats_enabled, babstats_updateinterval, babstats_annoucements, babstats_reportinterval });
-            babstats_table.Dock = DockStyle.Fill;
-            babstats_table.Location = new Point(317, 3);
-            babstats_table.MultiSelect = false;
-            babstats_table.Name = "babstats_table";
-            babstats_table.ReadOnly = true;
-            babstats_table.RowHeadersVisible = false;
-            babstats_table.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            babstats_table.ShowEditingIcon = false;
-            babstats_table.Size = new Size(632, 382);
-            babstats_table.TabIndex = 3;
-            babstats_table.DoubleClick += babstatsClick_openRecord;
-            // 
-            // babstats_id
-            // 
-            babstats_id.HeaderText = "ID";
-            babstats_id.Name = "babstats_id";
-            babstats_id.ReadOnly = true;
-            babstats_id.Visible = false;
-            // 
-            // babstats_code
-            // 
-            babstats_code.HeaderText = "Profile ID";
-            babstats_code.Name = "babstats_code";
-            babstats_code.ReadOnly = true;
-            babstats_code.Width = 90;
-            // 
-            // babstats_siteurl
-            // 
-            babstats_siteurl.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            babstats_siteurl.HeaderText = "Babstats URL";
-            babstats_siteurl.MinimumWidth = 220;
-            babstats_siteurl.Name = "babstats_siteurl";
-            babstats_siteurl.ReadOnly = true;
-            // 
-            // babstats_enabled
-            // 
-            babstats_enabled.HeaderText = "Enabled";
-            babstats_enabled.Name = "babstats_enabled";
-            babstats_enabled.ReadOnly = true;
-            babstats_enabled.Width = 65;
-            // 
-            // babstats_updateinterval
-            // 
-            babstats_updateinterval.HeaderText = "Update (s)";
-            babstats_updateinterval.Name = "babstats_updateinterval";
-            babstats_updateinterval.ReadOnly = true;
-            // 
-            // babstats_annoucements
-            // 
-            babstats_annoucements.HeaderText = "Announce";
-            babstats_annoucements.Name = "babstats_annoucements";
-            babstats_annoucements.ReadOnly = true;
-            babstats_annoucements.Width = 75;
-            // 
-            // babstats_reportinterval
-            // 
-            babstats_reportinterval.HeaderText = "Report (s)";
-            babstats_reportinterval.Name = "babstats_reportinterval";
-            babstats_reportinterval.ReadOnly = true;
-            // 
-            // tabLobby
-            // 
-            tabLobby.Controls.Add(lobby_layout);
-            tabLobby.Location = new Point(4, 24);
-            tabLobby.Name = "tabLobby";
-            tabLobby.Size = new Size(958, 394);
-            tabLobby.TabIndex = 4;
-            tabLobby.Text = "Lobby";
-            tabLobby.UseVisualStyleBackColor = true;
-            // 
-            // lobby_layout
-            // 
-            lobby_layout.ColumnCount = 2;
-            lobby_layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
-            lobby_layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
-            lobby_layout.Controls.Add(lobby_table, 1, 0);
-            lobby_layout.Controls.Add(panel2, 0, 0);
-            lobby_layout.Dock = DockStyle.Fill;
-            lobby_layout.Location = new Point(0, 0);
-            lobby_layout.Name = "lobby_layout";
-            lobby_layout.RowCount = 1;
-            lobby_layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            lobby_layout.Size = new Size(958, 394);
-            lobby_layout.TabIndex = 0;
-            // 
-            // lobby_table
-            // 
-            lobby_table.AllowUserToAddRows = false;
-            lobby_table.AllowUserToDeleteRows = false;
-            lobby_table.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            lobby_table.Columns.AddRange(new DataGridViewColumn[] { lobby_id, lobby_sitename, lobby_uri, lobby_port, lobby_secret, lobby_enabled });
-            lobby_table.Dock = DockStyle.Fill;
-            lobby_table.Location = new Point(319, 3);
-            lobby_table.Name = "lobby_table";
-            lobby_table.ReadOnly = true;
-            lobby_table.RowHeadersVisible = false;
-            lobby_table.Size = new Size(636, 388);
-            lobby_table.TabIndex = 0;
-            lobby_table.DoubleClick += lobbyAction_selectRecord;
-            // 
-            // lobby_id
-            // 
-            lobby_id.HeaderText = "ID";
-            lobby_id.Name = "lobby_id";
-            lobby_id.ReadOnly = true;
-            lobby_id.Visible = false;
-            // 
-            // lobby_sitename
-            // 
-            lobby_sitename.HeaderText = "Site";
-            lobby_sitename.Name = "lobby_sitename";
-            lobby_sitename.ReadOnly = true;
-            // 
-            // lobby_uri
-            // 
-            lobby_uri.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            lobby_uri.HeaderText = "URL";
-            lobby_uri.Name = "lobby_uri";
-            lobby_uri.ReadOnly = true;
-            // 
-            // lobby_port
-            // 
-            lobby_port.HeaderText = "Port";
-            lobby_port.Name = "lobby_port";
-            lobby_port.ReadOnly = true;
-            // 
-            // lobby_secret
-            // 
-            lobby_secret.HeaderText = "Secret";
-            lobby_secret.Name = "lobby_secret";
-            lobby_secret.ReadOnly = true;
-            lobby_secret.Width = 150;
-            // 
-            // lobby_enabled
-            // 
-            lobby_enabled.HeaderText = "Enabled";
-            lobby_enabled.Name = "lobby_enabled";
-            lobby_enabled.ReadOnly = true;
-            lobby_enabled.Width = 60;
-            // 
-            // panel2
-            // 
-            panel2.Controls.Add(groupBox6);
-            panel2.Controls.Add(groupBox5);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(0, 0);
-            panel2.Margin = new Padding(0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(316, 394);
-            panel2.TabIndex = 1;
-            // 
-            // groupBox6
-            // 
-            groupBox6.Controls.Add(tableLayoutPanel5);
-            groupBox6.Dock = DockStyle.Top;
-            groupBox6.Location = new Point(0, 0);
-            groupBox6.Margin = new Padding(0, 3, 3, 3);
-            groupBox6.Name = "groupBox6";
-            groupBox6.Size = new Size(316, 153);
-            groupBox6.TabIndex = 5;
-            groupBox6.TabStop = false;
-            groupBox6.Text = "Lobby Reporting Servers";
-            // 
-            // tableLayoutPanel5
-            // 
-            tableLayoutPanel5.ColumnCount = 4;
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.Controls.Add(btn_lobbyRandKey, 3, 2);
-            tableLayoutPanel5.Controls.Add(tb_lobbySecretKey, 0, 2);
-            tableLayoutPanel5.Controls.Add(tb_lobbySiteName, 0, 1);
-            tableLayoutPanel5.Controls.Add(tb_lobbySiteUri, 0, 0);
-            tableLayoutPanel5.Controls.Add(label_lobbyInfo, 0, 3);
-            tableLayoutPanel5.Controls.Add(num_lobbyGamePort, 3, 1);
-            tableLayoutPanel5.Dock = DockStyle.Fill;
-            tableLayoutPanel5.Location = new Point(3, 19);
-            tableLayoutPanel5.Name = "tableLayoutPanel5";
-            tableLayoutPanel5.RowCount = 4;
-            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel5.Size = new Size(310, 131);
-            tableLayoutPanel5.TabIndex = 0;
-            // 
-            // btn_lobbyRandKey
-            // 
-            btn_lobbyRandKey.Dock = DockStyle.Fill;
-            btn_lobbyRandKey.FlatStyle = FlatStyle.Flat;
-            btn_lobbyRandKey.Font = new Font("Segoe UI", 8F);
-            btn_lobbyRandKey.Location = new Point(234, 66);
-            btn_lobbyRandKey.Margin = new Padding(3, 2, 5, 3);
-            btn_lobbyRandKey.Name = "btn_lobbyRandKey";
-            btn_lobbyRandKey.Size = new Size(71, 27);
-            btn_lobbyRandKey.TabIndex = 14;
-            btn_lobbyRandKey.Text = "Rand";
-            btn_lobbyRandKey.UseVisualStyleBackColor = true;
-            btn_lobbyRandKey.Click += lobbyAction_RandomizeKey;
-            // 
-            // tb_lobbySecretKey
-            // 
-            tableLayoutPanel5.SetColumnSpan(tb_lobbySecretKey, 3);
-            tb_lobbySecretKey.Dock = DockStyle.Fill;
-            tb_lobbySecretKey.Location = new Point(3, 67);
-            tb_lobbySecretKey.MaxLength = 16;
-            tb_lobbySecretKey.Name = "tb_lobbySecretKey";
-            tb_lobbySecretKey.PlaceholderText = "Secret Key";
-            tb_lobbySecretKey.Size = new Size(225, 23);
-            tb_lobbySecretKey.TabIndex = 6;
-            tb_lobbySecretKey.TextAlign = HorizontalAlignment.Center;
-            // 
-            // tb_lobbySiteName
-            // 
-            tableLayoutPanel5.SetColumnSpan(tb_lobbySiteName, 3);
-            tb_lobbySiteName.Dock = DockStyle.Fill;
-            tb_lobbySiteName.Location = new Point(3, 35);
-            tb_lobbySiteName.MaxLength = 16;
-            tb_lobbySiteName.Name = "tb_lobbySiteName";
-            tb_lobbySiteName.PlaceholderText = "Site Name";
-            tb_lobbySiteName.Size = new Size(225, 23);
-            tb_lobbySiteName.TabIndex = 3;
-            tb_lobbySiteName.TextAlign = HorizontalAlignment.Center;
-            // 
-            // tb_lobbySiteUri
-            // 
-            tableLayoutPanel5.SetColumnSpan(tb_lobbySiteUri, 4);
-            tb_lobbySiteUri.Location = new Point(3, 3);
-            tb_lobbySiteUri.Name = "tb_lobbySiteUri";
-            tb_lobbySiteUri.PlaceholderText = "http(s)://yourdomain.com/import.php";
-            tb_lobbySiteUri.Size = new Size(302, 23);
-            tb_lobbySiteUri.TabIndex = 2;
-            tb_lobbySiteUri.TextAlign = HorizontalAlignment.Center;
-            // 
-            // label_lobbyInfo
-            // 
-            label_lobbyInfo.AutoSize = true;
-            tableLayoutPanel5.SetColumnSpan(label_lobbyInfo, 4);
-            label_lobbyInfo.Dock = DockStyle.Fill;
-            label_lobbyInfo.Location = new Point(3, 96);
-            label_lobbyInfo.Name = "label_lobbyInfo";
-            label_lobbyInfo.Size = new Size(304, 35);
-            label_lobbyInfo.TabIndex = 5;
-            label_lobbyInfo.Text = "Game Port (NAT Port Reporting)";
-            label_lobbyInfo.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // num_lobbyGamePort
-            // 
-            num_lobbyGamePort.Location = new Point(234, 35);
-            num_lobbyGamePort.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
-            num_lobbyGamePort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            num_lobbyGamePort.Name = "num_lobbyGamePort";
-            num_lobbyGamePort.Size = new Size(73, 23);
-            num_lobbyGamePort.TabIndex = 15;
-            num_lobbyGamePort.TextAlign = HorizontalAlignment.Center;
-            num_lobbyGamePort.Value = new decimal(new int[] { 17479, 0, 0, 0 });
-            // 
-            // groupBox5
-            // 
-            groupBox5.Controls.Add(tableLayoutPanel4);
-            groupBox5.Dock = DockStyle.Bottom;
-            groupBox5.Location = new Point(0, 343);
-            groupBox5.Name = "groupBox5";
-            groupBox5.Size = new Size(316, 51);
-            groupBox5.TabIndex = 4;
-            groupBox5.TabStop = false;
-            groupBox5.Text = "Server List";
-            // 
-            // tableLayoutPanel4
-            // 
-            tableLayoutPanel4.ColumnCount = 4;
-            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel4.Controls.Add(btn_lobbyNew, 3, 0);
-            tableLayoutPanel4.Controls.Add(btn_lobbyRemove, 2, 0);
-            tableLayoutPanel4.Controls.Add(btn_lobbySave, 0, 0);
-            tableLayoutPanel4.Controls.Add(btn_lobbyAdd, 1, 0);
-            tableLayoutPanel4.Dock = DockStyle.Fill;
-            tableLayoutPanel4.Location = new Point(3, 19);
-            tableLayoutPanel4.Name = "tableLayoutPanel4";
-            tableLayoutPanel4.RowCount = 1;
-            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel4.Size = new Size(310, 29);
-            tableLayoutPanel4.TabIndex = 0;
-            // 
-            // btn_lobbyNew
-            // 
-            btn_lobbyNew.Dock = DockStyle.Fill;
-            btn_lobbyNew.Location = new Point(234, 3);
-            btn_lobbyNew.Name = "btn_lobbyNew";
-            btn_lobbyNew.Size = new Size(73, 23);
-            btn_lobbyNew.TabIndex = 13;
-            btn_lobbyNew.Text = "New";
-            btn_lobbyNew.UseVisualStyleBackColor = true;
-            btn_lobbyNew.Click += lobbyAction_newRecord;
-            // 
-            // btn_lobbyRemove
-            // 
-            btn_lobbyRemove.Dock = DockStyle.Fill;
-            btn_lobbyRemove.Location = new Point(157, 3);
-            btn_lobbyRemove.Name = "btn_lobbyRemove";
-            btn_lobbyRemove.Size = new Size(71, 23);
-            btn_lobbyRemove.TabIndex = 12;
-            btn_lobbyRemove.Text = "Remove";
-            btn_lobbyRemove.UseVisualStyleBackColor = true;
-            btn_lobbyRemove.Click += lobbyAction_removeRecord;
-            // 
-            // btn_lobbySave
-            // 
-            btn_lobbySave.Dock = DockStyle.Fill;
-            btn_lobbySave.Location = new Point(3, 3);
-            btn_lobbySave.Name = "btn_lobbySave";
-            btn_lobbySave.Size = new Size(71, 23);
-            btn_lobbySave.TabIndex = 10;
-            btn_lobbySave.Text = "Save";
-            btn_lobbySave.UseVisualStyleBackColor = true;
-            btn_lobbySave.Click += lobbyAction_saveRecord;
-            // 
-            // btn_lobbyAdd
-            // 
-            btn_lobbyAdd.Dock = DockStyle.Fill;
-            btn_lobbyAdd.Location = new Point(80, 3);
-            btn_lobbyAdd.Name = "btn_lobbyAdd";
-            btn_lobbyAdd.Size = new Size(71, 23);
-            btn_lobbyAdd.TabIndex = 11;
-            btn_lobbyAdd.Text = "Add";
-            btn_lobbyAdd.UseVisualStyleBackColor = true;
-            btn_lobbyAdd.Click += lobbyAction_addRecord;
-            // 
-            // tabPlayerStats
-            // 
-            tabPlayerStats.Controls.Add(tableLayoutPanel2);
-            tabPlayerStats.Location = new Point(4, 24);
-            tabPlayerStats.Name = "tabPlayerStats";
-            tabPlayerStats.Padding = new Padding(3);
-            tabPlayerStats.Size = new Size(958, 394);
-            tabPlayerStats.TabIndex = 1;
-            tabPlayerStats.Text = "Player Stats";
-            tabPlayerStats.UseVisualStyleBackColor = true;
-            // 
-            // tableLayoutPanel2
-            // 
-            tableLayoutPanel2.ColumnCount = 1;
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel2.Controls.Add(dataGridViewPlayerStats, 0, 0);
-            tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(3, 3);
-            tableLayoutPanel2.Margin = new Padding(0);
-            tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 1;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel2.Size = new Size(952, 388);
-            tableLayoutPanel2.TabIndex = 0;
-            // 
-            // dataGridViewPlayerStats
-            // 
-            dataGridViewPlayerStats.AllowUserToAddRows = false;
-            dataGridViewPlayerStats.AllowUserToDeleteRows = false;
-            dataGridViewPlayerStats.AllowUserToResizeColumns = false;
-            dataGridViewPlayerStats.AllowUserToResizeRows = false;
-            dataGridViewPlayerStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewPlayerStats.Columns.AddRange(new DataGridViewColumn[] { PlayerName, Suicides, Murders, Kills, Deaths, ZoneTime, FBCaptures, FlagSaves, ADTargetsDestroyed, RevivesReceived, RevivesGiven, PSPAttempts, PSPTakeovers, FBCarrierKills, DoubleKills, Headshots, KnifeKills, SniperKills, TKOTHDefenseKills, TKOTHAttackKills, ShotsPerKill, ExperiencePoints, PlayerTeam, PlayerActive, TimePlayed });
-            dataGridViewPlayerStats.Dock = DockStyle.Fill;
-            dataGridViewPlayerStats.Location = new Point(0, 0);
-            dataGridViewPlayerStats.Margin = new Padding(0);
-            dataGridViewPlayerStats.Name = "dataGridViewPlayerStats";
-            dataGridViewPlayerStats.ReadOnly = true;
-            dataGridViewPlayerStats.RowHeadersVisible = false;
-            dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
-            dataGridViewPlayerStats.Size = new Size(952, 388);
-            dataGridViewPlayerStats.TabIndex = 1;
-            // 
-            // PlayerName
-            // 
-            PlayerName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            PlayerName.HeaderText = "Player Name";
-            PlayerName.MinimumWidth = 200;
-            PlayerName.Name = "PlayerName";
-            PlayerName.ReadOnly = true;
-            PlayerName.Width = 200;
-            // 
-            // Suicides
-            // 
-            Suicides.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Suicides.HeaderText = "";
-            Suicides.Name = "Suicides";
-            Suicides.ReadOnly = true;
-            Suicides.ToolTipText = "Suicides";
-            // 
-            // Murders
-            // 
-            Murders.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Murders.HeaderText = "";
-            Murders.Name = "Murders";
-            Murders.ReadOnly = true;
-            Murders.ToolTipText = "Murders";
-            // 
-            // Kills
-            // 
-            Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Kills.HeaderText = "";
-            Kills.Name = "Kills";
-            Kills.ReadOnly = true;
-            Kills.ToolTipText = "Kills";
-            // 
-            // Deaths
-            // 
-            Deaths.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Deaths.HeaderText = "";
-            Deaths.Name = "Deaths";
-            Deaths.ReadOnly = true;
-            Deaths.ToolTipText = "Deaths";
-            // 
-            // ZoneTime
-            // 
-            ZoneTime.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ZoneTime.HeaderText = "";
-            ZoneTime.Name = "ZoneTime";
-            ZoneTime.ReadOnly = true;
-            ZoneTime.ToolTipText = "Zone Time";
-            // 
-            // FBCaptures
-            // 
-            FBCaptures.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            FBCaptures.HeaderText = "";
-            FBCaptures.Name = "FBCaptures";
-            FBCaptures.ReadOnly = true;
-            FBCaptures.ToolTipText = "FlagBall Captures";
-            // 
-            // FlagSaves
-            // 
-            FlagSaves.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            FlagSaves.HeaderText = "";
-            FlagSaves.Name = "FlagSaves";
-            FlagSaves.ReadOnly = true;
-            FlagSaves.ToolTipText = "Flag Saves";
-            // 
-            // ADTargetsDestroyed
-            // 
-            ADTargetsDestroyed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ADTargetsDestroyed.HeaderText = "";
-            ADTargetsDestroyed.Name = "ADTargetsDestroyed";
-            ADTargetsDestroyed.ReadOnly = true;
-            ADTargetsDestroyed.ToolTipText = "ADTargetsDestroyed";
-            // 
-            // RevivesReceived
-            // 
-            RevivesReceived.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            RevivesReceived.HeaderText = "";
-            RevivesReceived.Name = "RevivesReceived";
-            RevivesReceived.ReadOnly = true;
-            RevivesReceived.ToolTipText = "Revives Received";
-            // 
-            // RevivesGiven
-            // 
-            RevivesGiven.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            RevivesGiven.HeaderText = "";
-            RevivesGiven.Name = "RevivesGiven";
-            RevivesGiven.ReadOnly = true;
-            RevivesGiven.ToolTipText = "Revives Given";
-            // 
-            // PSPAttempts
-            // 
-            PSPAttempts.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PSPAttempts.HeaderText = "";
-            PSPAttempts.Name = "PSPAttempts";
-            PSPAttempts.ReadOnly = true;
-            PSPAttempts.ToolTipText = "PSP Attempts";
-            // 
-            // PSPTakeovers
-            // 
-            PSPTakeovers.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PSPTakeovers.HeaderText = "";
-            PSPTakeovers.Name = "PSPTakeovers";
-            PSPTakeovers.ReadOnly = true;
-            PSPTakeovers.ToolTipText = "PSP Takeovers";
-            // 
-            // FBCarrierKills
-            // 
-            FBCarrierKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            FBCarrierKills.HeaderText = "";
-            FBCarrierKills.Name = "FBCarrierKills";
-            FBCarrierKills.ReadOnly = true;
-            FBCarrierKills.ToolTipText = "FB Carrier Kills";
-            // 
-            // DoubleKills
-            // 
-            DoubleKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            DoubleKills.HeaderText = "";
-            DoubleKills.Name = "DoubleKills";
-            DoubleKills.ReadOnly = true;
-            DoubleKills.ToolTipText = "Double Kills";
-            // 
-            // Headshots
-            // 
-            Headshots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Headshots.HeaderText = "";
-            Headshots.Name = "Headshots";
-            Headshots.ReadOnly = true;
-            Headshots.ToolTipText = "Headshots";
-            // 
-            // KnifeKills
-            // 
-            KnifeKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            KnifeKills.HeaderText = "";
-            KnifeKills.Name = "KnifeKills";
-            KnifeKills.ReadOnly = true;
-            KnifeKills.ToolTipText = "Knife Kills";
-            // 
-            // SniperKills
-            // 
-            SniperKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            SniperKills.HeaderText = "";
-            SniperKills.Name = "SniperKills";
-            SniperKills.ReadOnly = true;
-            SniperKills.ToolTipText = "Sniper Kills";
-            // 
-            // TKOTHDefenseKills
-            // 
-            TKOTHDefenseKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            TKOTHDefenseKills.HeaderText = "";
-            TKOTHDefenseKills.Name = "TKOTHDefenseKills";
-            TKOTHDefenseKills.ReadOnly = true;
-            TKOTHDefenseKills.ToolTipText = "TKOTH Defense Kills";
-            // 
-            // TKOTHAttackKills
-            // 
-            TKOTHAttackKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            TKOTHAttackKills.HeaderText = "";
-            TKOTHAttackKills.Name = "TKOTHAttackKills";
-            TKOTHAttackKills.ReadOnly = true;
-            TKOTHAttackKills.ToolTipText = "TKOTH Attack Kills";
-            // 
-            // ShotsPerKill
-            // 
-            ShotsPerKill.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ShotsPerKill.HeaderText = "";
-            ShotsPerKill.Name = "ShotsPerKill";
-            ShotsPerKill.ReadOnly = true;
-            ShotsPerKill.ToolTipText = "Shots Per Kill";
-            // 
-            // ExperiencePoints
-            // 
-            ExperiencePoints.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            ExperiencePoints.HeaderText = "";
-            ExperiencePoints.Name = "ExperiencePoints";
-            ExperiencePoints.ReadOnly = true;
-            ExperiencePoints.ToolTipText = "Experience Points";
-            // 
-            // PlayerTeam
-            // 
-            PlayerTeam.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PlayerTeam.HeaderText = "";
-            PlayerTeam.Name = "PlayerTeam";
-            PlayerTeam.ReadOnly = true;
-            PlayerTeam.ToolTipText = "Player Team";
-            // 
-            // PlayerActive
-            // 
-            PlayerActive.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            PlayerActive.HeaderText = "";
-            PlayerActive.Name = "PlayerActive";
-            PlayerActive.ReadOnly = true;
-            PlayerActive.ToolTipText = "Active";
-            // 
-            // TimePlayed
-            // 
-            TimePlayed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            TimePlayed.HeaderText = "";
-            TimePlayed.Name = "TimePlayed";
-            TimePlayed.ReadOnly = true;
-            TimePlayed.ToolTipText = "Time Played (s)";
-            // 
-            // tabWeaponStats
-            // 
-            tabWeaponStats.Controls.Add(dataGridViewWeaponStats);
-            tabWeaponStats.Location = new Point(4, 24);
-            tabWeaponStats.Name = "tabWeaponStats";
-            tabWeaponStats.Size = new Size(958, 394);
-            tabWeaponStats.TabIndex = 2;
-            tabWeaponStats.Text = "Weapon Stats";
-            tabWeaponStats.UseVisualStyleBackColor = true;
-            // 
-            // dataGridViewWeaponStats
-            // 
-            dataGridViewWeaponStats.AllowUserToAddRows = false;
-            dataGridViewWeaponStats.AllowUserToDeleteRows = false;
-            dataGridViewWeaponStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewWeaponStats.Columns.AddRange(new DataGridViewColumn[] { Weapon_PlayerName, WeaponName, Timer, Weapon_Kills, Weapon_Shots });
-            dataGridViewWeaponStats.Dock = DockStyle.Fill;
-            dataGridViewWeaponStats.Location = new Point(0, 0);
-            dataGridViewWeaponStats.Name = "dataGridViewWeaponStats";
-            dataGridViewWeaponStats.ReadOnly = true;
-            dataGridViewWeaponStats.RowHeadersVisible = false;
-            dataGridViewWeaponStats.Size = new Size(958, 394);
-            dataGridViewWeaponStats.TabIndex = 1;
-            // 
-            // Weapon_PlayerName
-            // 
-            Weapon_PlayerName.HeaderText = "Player Name";
-            Weapon_PlayerName.MinimumWidth = 200;
-            Weapon_PlayerName.Name = "Weapon_PlayerName";
-            Weapon_PlayerName.ReadOnly = true;
-            Weapon_PlayerName.Width = 200;
-            // 
-            // WeaponName
-            // 
-            WeaponName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            WeaponName.HeaderText = "Weapon Name";
-            WeaponName.Name = "WeaponName";
-            WeaponName.ReadOnly = true;
-            // 
-            // Timer
-            // 
-            Timer.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Timer.HeaderText = "Time Used (s)";
-            Timer.Name = "Timer";
-            Timer.ReadOnly = true;
-            // 
-            // Weapon_Kills
-            // 
-            Weapon_Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Weapon_Kills.HeaderText = "Kills";
-            Weapon_Kills.Name = "Weapon_Kills";
-            Weapon_Kills.ReadOnly = true;
-            // 
-            // Weapon_Shots
-            // 
-            Weapon_Shots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            Weapon_Shots.HeaderText = "Shots";
-            Weapon_Shots.Name = "Weapon_Shots";
-            Weapon_Shots.ReadOnly = true;
-            // 
-            // tabLogs
-            // 
-            tabLogs.Controls.Add(dg_statsLog);
-            tabLogs.Location = new Point(4, 24);
-            tabLogs.Name = "tabLogs";
-            tabLogs.Padding = new Padding(3);
-            tabLogs.Size = new Size(958, 394);
-            tabLogs.TabIndex = 3;
-            tabLogs.Text = "Logs";
-            tabLogs.UseVisualStyleBackColor = true;
-            // 
-            // dg_statsLog
-            // 
-            dg_statsLog.AllowUserToAddRows = false;
-            dg_statsLog.AllowUserToDeleteRows = false;
-            dg_statsLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dg_statsLog.Columns.AddRange(new DataGridViewColumn[] { statsLog_DateTime, statLog_Message });
-            dg_statsLog.Dock = DockStyle.Fill;
-            dg_statsLog.Location = new Point(3, 3);
-            dg_statsLog.Name = "dg_statsLog";
-            dg_statsLog.ReadOnly = true;
-            dg_statsLog.RowHeadersVisible = false;
-            dg_statsLog.Size = new Size(952, 388);
-            dg_statsLog.TabIndex = 2;
-            // 
-            // statsLog_DateTime
-            // 
-            statsLog_DateTime.HeaderText = "Time Stamp";
-            statsLog_DateTime.Name = "statsLog_DateTime";
-            statsLog_DateTime.ReadOnly = true;
-            statsLog_DateTime.Width = 150;
-            // 
-            // statLog_Message
-            // 
-            statLog_Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            statLog_Message.HeaderText = "Log Message";
-            statLog_Message.Name = "statLog_Message";
-            statLog_Message.ReadOnly = true;
-            // 
-            // tabStats
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(tabControl1);
-            Name = "tabStats";
-            Size = new Size(966, 422);
-            tabControl1.ResumeLayout(false);
-            tabBabstats.ResumeLayout(false);
-            tableLayoutPanel1.ResumeLayout(false);
-            panel1.ResumeLayout(false);
-            groupBox4.ResumeLayout(false);
-            tableLayoutPanel3.ResumeLayout(false);
-            groupBox3.ResumeLayout(false);
-            groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).EndInit();
-            ((System.ComponentModel.ISupportInitialize)num_WebStatsReport).EndInit();
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)babstats_table).EndInit();
-            tabLobby.ResumeLayout(false);
-            lobby_layout.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)lobby_table).EndInit();
-            panel2.ResumeLayout(false);
-            groupBox6.ResumeLayout(false);
-            tableLayoutPanel5.ResumeLayout(false);
-            tableLayoutPanel5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)num_lobbyGamePort).EndInit();
-            groupBox5.ResumeLayout(false);
-            tableLayoutPanel4.ResumeLayout(false);
-            tabPlayerStats.ResumeLayout(false);
-            tableLayoutPanel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).EndInit();
-            tabWeaponStats.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).EndInit();
-            tabLogs.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dg_statsLog).EndInit();
-            ResumeLayout(false);
-        }
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			tabControl1 = new TabControl();
+			tabBabstats = new TabPage();
+			tableLayoutPanel1 = new TableLayoutPanel();
+			panel1 = new Panel();
+			groupBox4 = new GroupBox();
+			tableLayoutPanel3 = new TableLayoutPanel();
+			btn_NewServer = new Button();
+			btn_RemoveServer = new Button();
+			btn_SaveSettings = new Button();
+			btn_AddServer = new Button();
+			groupBox3 = new GroupBox();
+			labelUpatedInterval = new Label();
+			num_WebStatsUpdates = new NumericUpDown();
+			labelReportInterval = new Label();
+			num_WebStatsReport = new NumericUpDown();
+			groupBox2 = new GroupBox();
+			cb_enableAnnouncements = new CheckBox();
+			cb_enableWebStats = new CheckBox();
+			groupBox1 = new GroupBox();
+			tb_serverID = new TextBox();
+			btn_validate = new Button();
+			tb_webStatsServerPath = new TextBox();
+			babstats_table = new DataGridView();
+			babstats_id = new DataGridViewTextBoxColumn();
+			babstats_code = new DataGridViewTextBoxColumn();
+			babstats_siteurl = new DataGridViewTextBoxColumn();
+			babstats_enabled = new DataGridViewCheckBoxColumn();
+			babstats_updateinterval = new DataGridViewTextBoxColumn();
+			babstats_annoucements = new DataGridViewCheckBoxColumn();
+			babstats_reportinterval = new DataGridViewTextBoxColumn();
+			tabLobby = new TabPage();
+			lobby_layout = new TableLayoutPanel();
+			lobby_table = new DataGridView();
+			lobby_id = new DataGridViewTextBoxColumn();
+			lobby_sitename = new DataGridViewTextBoxColumn();
+			lobby_uri = new DataGridViewTextBoxColumn();
+			lobby_port = new DataGridViewTextBoxColumn();
+			lobby_secret = new DataGridViewTextBoxColumn();
+			lobby_enabled = new DataGridViewCheckBoxColumn();
+			panel2 = new Panel();
+			groupBox6 = new GroupBox();
+			tableLayoutPanel5 = new TableLayoutPanel();
+			btn_lobbyRandKey = new Button();
+			tb_lobbySecretKey = new TextBox();
+			tb_lobbySiteName = new TextBox();
+			tb_lobbySiteUri = new TextBox();
+			num_lobbyGamePort = new NumericUpDown();
+			cb_lobbyEnabled = new CheckBox();
+			groupBox5 = new GroupBox();
+			tableLayoutPanel4 = new TableLayoutPanel();
+			btn_lobbyNew = new Button();
+			btn_lobbyRemove = new Button();
+			btn_lobbySave = new Button();
+			btn_lobbyAdd = new Button();
+			tabPlayerStats = new TabPage();
+			tableLayoutPanel2 = new TableLayoutPanel();
+			dataGridViewPlayerStats = new DataGridView();
+			PlayerName = new DataGridViewTextBoxColumn();
+			Suicides = new DataGridViewTextBoxColumn();
+			Murders = new DataGridViewTextBoxColumn();
+			Kills = new DataGridViewTextBoxColumn();
+			Deaths = new DataGridViewTextBoxColumn();
+			ZoneTime = new DataGridViewTextBoxColumn();
+			FBCaptures = new DataGridViewTextBoxColumn();
+			FlagSaves = new DataGridViewTextBoxColumn();
+			ADTargetsDestroyed = new DataGridViewTextBoxColumn();
+			RevivesReceived = new DataGridViewTextBoxColumn();
+			RevivesGiven = new DataGridViewTextBoxColumn();
+			PSPAttempts = new DataGridViewTextBoxColumn();
+			PSPTakeovers = new DataGridViewTextBoxColumn();
+			FBCarrierKills = new DataGridViewTextBoxColumn();
+			DoubleKills = new DataGridViewTextBoxColumn();
+			Headshots = new DataGridViewTextBoxColumn();
+			KnifeKills = new DataGridViewTextBoxColumn();
+			SniperKills = new DataGridViewTextBoxColumn();
+			TKOTHDefenseKills = new DataGridViewTextBoxColumn();
+			TKOTHAttackKills = new DataGridViewTextBoxColumn();
+			ShotsPerKill = new DataGridViewTextBoxColumn();
+			ExperiencePoints = new DataGridViewTextBoxColumn();
+			PlayerTeam = new DataGridViewTextBoxColumn();
+			PlayerActive = new DataGridViewTextBoxColumn();
+			TimePlayed = new DataGridViewTextBoxColumn();
+			tabWeaponStats = new TabPage();
+			dataGridViewWeaponStats = new DataGridView();
+			Weapon_PlayerName = new DataGridViewTextBoxColumn();
+			WeaponName = new DataGridViewTextBoxColumn();
+			Timer = new DataGridViewTextBoxColumn();
+			Weapon_Kills = new DataGridViewTextBoxColumn();
+			Weapon_Shots = new DataGridViewTextBoxColumn();
+			tabLogs = new TabPage();
+			dg_statsLog = new DataGridView();
+			statsLog_DateTime = new DataGridViewTextBoxColumn();
+			statLog_Message = new DataGridViewTextBoxColumn();
+			tabControl1.SuspendLayout();
+			tabBabstats.SuspendLayout();
+			tableLayoutPanel1.SuspendLayout();
+			panel1.SuspendLayout();
+			groupBox4.SuspendLayout();
+			tableLayoutPanel3.SuspendLayout();
+			groupBox3.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).BeginInit();
+			((System.ComponentModel.ISupportInitialize)num_WebStatsReport).BeginInit();
+			groupBox2.SuspendLayout();
+			groupBox1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)babstats_table).BeginInit();
+			tabLobby.SuspendLayout();
+			lobby_layout.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)lobby_table).BeginInit();
+			panel2.SuspendLayout();
+			groupBox6.SuspendLayout();
+			tableLayoutPanel5.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)num_lobbyGamePort).BeginInit();
+			groupBox5.SuspendLayout();
+			tableLayoutPanel4.SuspendLayout();
+			tabPlayerStats.SuspendLayout();
+			tableLayoutPanel2.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).BeginInit();
+			tabWeaponStats.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).BeginInit();
+			tabLogs.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)dg_statsLog).BeginInit();
+			SuspendLayout();
+			// 
+			// tabControl1
+			// 
+			tabControl1.Controls.Add(tabBabstats);
+			tabControl1.Controls.Add(tabLobby);
+			tabControl1.Controls.Add(tabPlayerStats);
+			tabControl1.Controls.Add(tabWeaponStats);
+			tabControl1.Controls.Add(tabLogs);
+			tabControl1.Dock = DockStyle.Fill;
+			tabControl1.Location = new Point(0, 0);
+			tabControl1.Margin = new Padding(0);
+			tabControl1.Name = "tabControl1";
+			tabControl1.SelectedIndex = 0;
+			tabControl1.Size = new Size(966, 422);
+			tabControl1.TabIndex = 0;
+			// 
+			// tabBabstats
+			// 
+			tabBabstats.Controls.Add(tableLayoutPanel1);
+			tabBabstats.Location = new Point(4, 24);
+			tabBabstats.Margin = new Padding(0);
+			tabBabstats.Name = "tabBabstats";
+			tabBabstats.Padding = new Padding(3);
+			tabBabstats.Size = new Size(958, 394);
+			tabBabstats.TabIndex = 0;
+			tabBabstats.Text = "Babstats";
+			tabBabstats.UseVisualStyleBackColor = true;
+			// 
+			// tableLayoutPanel1
+			// 
+			tableLayoutPanel1.ColumnCount = 2;
+			tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+			tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
+			tableLayoutPanel1.Controls.Add(panel1, 0, 0);
+			tableLayoutPanel1.Controls.Add(babstats_table, 1, 0);
+			tableLayoutPanel1.Dock = DockStyle.Fill;
+			tableLayoutPanel1.Location = new Point(3, 3);
+			tableLayoutPanel1.Margin = new Padding(0);
+			tableLayoutPanel1.Name = "tableLayoutPanel1";
+			tableLayoutPanel1.RowCount = 1;
+			tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+			tableLayoutPanel1.Size = new Size(952, 388);
+			tableLayoutPanel1.TabIndex = 0;
+			// 
+			// panel1
+			// 
+			panel1.Controls.Add(groupBox4);
+			panel1.Controls.Add(groupBox3);
+			panel1.Controls.Add(groupBox2);
+			panel1.Controls.Add(groupBox1);
+			panel1.Dock = DockStyle.Fill;
+			panel1.Location = new Point(0, 0);
+			panel1.Margin = new Padding(0);
+			panel1.Name = "panel1";
+			panel1.Size = new Size(314, 388);
+			panel1.TabIndex = 2;
+			// 
+			// groupBox4
+			// 
+			groupBox4.Controls.Add(tableLayoutPanel3);
+			groupBox4.Dock = DockStyle.Bottom;
+			groupBox4.Location = new Point(0, 337);
+			groupBox4.Name = "groupBox4";
+			groupBox4.Size = new Size(314, 51);
+			groupBox4.TabIndex = 3;
+			groupBox4.TabStop = false;
+			groupBox4.Text = "Server List";
+			// 
+			// tableLayoutPanel3
+			// 
+			tableLayoutPanel3.ColumnCount = 4;
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel3.Controls.Add(btn_NewServer, 3, 0);
+			tableLayoutPanel3.Controls.Add(btn_RemoveServer, 2, 0);
+			tableLayoutPanel3.Controls.Add(btn_SaveSettings, 0, 0);
+			tableLayoutPanel3.Controls.Add(btn_AddServer, 1, 0);
+			tableLayoutPanel3.Dock = DockStyle.Fill;
+			tableLayoutPanel3.Location = new Point(3, 19);
+			tableLayoutPanel3.Name = "tableLayoutPanel3";
+			tableLayoutPanel3.RowCount = 1;
+			tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+			tableLayoutPanel3.Size = new Size(308, 29);
+			tableLayoutPanel3.TabIndex = 0;
+			// 
+			// btn_NewServer
+			// 
+			btn_NewServer.Dock = DockStyle.Fill;
+			btn_NewServer.Location = new Point(234, 3);
+			btn_NewServer.Name = "btn_NewServer";
+			btn_NewServer.Size = new Size(71, 23);
+			btn_NewServer.TabIndex = 13;
+			btn_NewServer.Text = "New";
+			btn_NewServer.UseVisualStyleBackColor = true;
+			btn_NewServer.Click += babstatsClick_newServer;
+			// 
+			// btn_RemoveServer
+			// 
+			btn_RemoveServer.Dock = DockStyle.Fill;
+			btn_RemoveServer.Location = new Point(157, 3);
+			btn_RemoveServer.Name = "btn_RemoveServer";
+			btn_RemoveServer.Size = new Size(71, 23);
+			btn_RemoveServer.TabIndex = 12;
+			btn_RemoveServer.Text = "Remove";
+			btn_RemoveServer.UseVisualStyleBackColor = true;
+			btn_RemoveServer.Click += babstatsClick_RemoveRecord;
+			// 
+			// btn_SaveSettings
+			// 
+			btn_SaveSettings.Dock = DockStyle.Fill;
+			btn_SaveSettings.Location = new Point(3, 3);
+			btn_SaveSettings.Name = "btn_SaveSettings";
+			btn_SaveSettings.Size = new Size(71, 23);
+			btn_SaveSettings.TabIndex = 10;
+			btn_SaveSettings.Text = "Save";
+			btn_SaveSettings.UseVisualStyleBackColor = true;
+			btn_SaveSettings.Click += babstatsClick_saveServer;
+			// 
+			// btn_AddServer
+			// 
+			btn_AddServer.Dock = DockStyle.Fill;
+			btn_AddServer.Location = new Point(80, 3);
+			btn_AddServer.Name = "btn_AddServer";
+			btn_AddServer.Size = new Size(71, 23);
+			btn_AddServer.TabIndex = 11;
+			btn_AddServer.Text = "Add";
+			btn_AddServer.UseVisualStyleBackColor = true;
+			btn_AddServer.Click += babstatsClick_addServer;
+			// 
+			// groupBox3
+			// 
+			groupBox3.Controls.Add(labelUpatedInterval);
+			groupBox3.Controls.Add(num_WebStatsUpdates);
+			groupBox3.Controls.Add(labelReportInterval);
+			groupBox3.Controls.Add(num_WebStatsReport);
+			groupBox3.Dock = DockStyle.Top;
+			groupBox3.Location = new Point(0, 137);
+			groupBox3.Margin = new Padding(0, 3, 3, 3);
+			groupBox3.Name = "groupBox3";
+			groupBox3.Size = new Size(314, 90);
+			groupBox3.TabIndex = 2;
+			groupBox3.TabStop = false;
+			groupBox3.Text = "Selected Server Intervals (Seconds)";
+			// 
+			// labelUpatedInterval
+			// 
+			labelUpatedInterval.AutoSize = true;
+			labelUpatedInterval.Location = new Point(85, 58);
+			labelUpatedInterval.Name = "labelUpatedInterval";
+			labelUpatedInterval.Size = new Size(133, 15);
+			labelUpatedInterval.TabIndex = 11;
+			labelUpatedInterval.Text = "In-game Player Updates";
+			labelUpatedInterval.TextAlign = ContentAlignment.MiddleLeft;
+			// 
+			// num_WebStatsUpdates
+			// 
+			num_WebStatsUpdates.Location = new Point(234, 54);
+			num_WebStatsUpdates.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
+			num_WebStatsUpdates.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
+			num_WebStatsUpdates.Name = "num_WebStatsUpdates";
+			num_WebStatsUpdates.Size = new Size(55, 23);
+			num_WebStatsUpdates.TabIndex = 10;
+			num_WebStatsUpdates.TextAlign = HorizontalAlignment.Center;
+			num_WebStatsUpdates.Value = new decimal(new int[] { 60, 0, 0, 0 });
+			// 
+			// labelReportInterval
+			// 
+			labelReportInterval.AutoSize = true;
+			labelReportInterval.Location = new Point(73, 28);
+			labelReportInterval.Name = "labelReportInterval";
+			labelReportInterval.Size = new Size(145, 15);
+			labelReportInterval.TabIndex = 9;
+			labelReportInterval.Text = "Announcements / Awards";
+			labelReportInterval.TextAlign = ContentAlignment.MiddleLeft;
+			// 
+			// num_WebStatsReport
+			// 
+			num_WebStatsReport.Location = new Point(234, 24);
+			num_WebStatsReport.Maximum = new decimal(new int[] { 300, 0, 0, 0 });
+			num_WebStatsReport.Minimum = new decimal(new int[] { 15, 0, 0, 0 });
+			num_WebStatsReport.Name = "num_WebStatsReport";
+			num_WebStatsReport.Size = new Size(55, 23);
+			num_WebStatsReport.TabIndex = 7;
+			num_WebStatsReport.TextAlign = HorizontalAlignment.Center;
+			num_WebStatsReport.Value = new decimal(new int[] { 60, 0, 0, 0 });
+			// 
+			// groupBox2
+			// 
+			groupBox2.Controls.Add(cb_enableAnnouncements);
+			groupBox2.Controls.Add(cb_enableWebStats);
+			groupBox2.Dock = DockStyle.Top;
+			groupBox2.Location = new Point(0, 84);
+			groupBox2.Margin = new Padding(0, 3, 3, 3);
+			groupBox2.Name = "groupBox2";
+			groupBox2.Size = new Size(314, 53);
+			groupBox2.TabIndex = 1;
+			groupBox2.TabStop = false;
+			groupBox2.Text = "Selected Server Options";
+			// 
+			// cb_enableAnnouncements
+			// 
+			cb_enableAnnouncements.AutoSize = true;
+			cb_enableAnnouncements.CheckAlign = ContentAlignment.MiddleRight;
+			cb_enableAnnouncements.Location = new Point(133, 22);
+			cb_enableAnnouncements.Name = "cb_enableAnnouncements";
+			cb_enableAnnouncements.Size = new Size(152, 19);
+			cb_enableAnnouncements.TabIndex = 5;
+			cb_enableAnnouncements.Text = "Enable Announcements";
+			cb_enableAnnouncements.UseVisualStyleBackColor = true;
+			// 
+			// cb_enableWebStats
+			// 
+			cb_enableWebStats.AutoSize = true;
+			cb_enableWebStats.CheckAlign = ContentAlignment.MiddleRight;
+			cb_enableWebStats.Location = new Point(6, 22);
+			cb_enableWebStats.Name = "cb_enableWebStats";
+			cb_enableWebStats.Size = new Size(108, 19);
+			cb_enableWebStats.TabIndex = 0;
+			cb_enableWebStats.Text = "Enable Babstats";
+			cb_enableWebStats.UseVisualStyleBackColor = true;
+			// 
+			// groupBox1
+			// 
+			groupBox1.Controls.Add(tb_serverID);
+			groupBox1.Controls.Add(btn_validate);
+			groupBox1.Controls.Add(tb_webStatsServerPath);
+			groupBox1.Dock = DockStyle.Top;
+			groupBox1.Location = new Point(0, 0);
+			groupBox1.Margin = new Padding(0, 3, 3, 3);
+			groupBox1.Name = "groupBox1";
+			groupBox1.Size = new Size(314, 84);
+			groupBox1.TabIndex = 0;
+			groupBox1.TabStop = false;
+			groupBox1.Text = "Babstats Servers";
+			// 
+			// tb_serverID
+			// 
+			tb_serverID.Location = new Point(6, 51);
+			tb_serverID.MaxLength = 5;
+			tb_serverID.Name = "tb_serverID";
+			tb_serverID.PlaceholderText = "AA###";
+			tb_serverID.Size = new Size(58, 23);
+			tb_serverID.TabIndex = 5;
+			tb_serverID.TextAlign = HorizontalAlignment.Center;
+			// 
+			// btn_validate
+			// 
+			btn_validate.Location = new Point(233, 51);
+			btn_validate.Name = "btn_validate";
+			btn_validate.Size = new Size(75, 23);
+			btn_validate.TabIndex = 4;
+			btn_validate.Text = "Validate";
+			btn_validate.UseVisualStyleBackColor = true;
+			btn_validate.Click += OnTestBabstatConnectionClick;
+			// 
+			// tb_webStatsServerPath
+			// 
+			tb_webStatsServerPath.Location = new Point(6, 22);
+			tb_webStatsServerPath.Name = "tb_webStatsServerPath";
+			tb_webStatsServerPath.PlaceholderText = "http(s)://youdomain.com/babstats_root/";
+			tb_webStatsServerPath.Size = new Size(302, 23);
+			tb_webStatsServerPath.TabIndex = 1;
+			tb_webStatsServerPath.TextAlign = HorizontalAlignment.Center;
+			// 
+			// babstats_table
+			// 
+			babstats_table.AllowUserToAddRows = false;
+			babstats_table.AllowUserToDeleteRows = false;
+			babstats_table.AllowUserToResizeColumns = false;
+			babstats_table.AllowUserToResizeRows = false;
+			babstats_table.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			babstats_table.Columns.AddRange(new DataGridViewColumn[] { babstats_id, babstats_code, babstats_siteurl, babstats_enabled, babstats_updateinterval, babstats_annoucements, babstats_reportinterval });
+			babstats_table.Dock = DockStyle.Fill;
+			babstats_table.Location = new Point(317, 3);
+			babstats_table.MultiSelect = false;
+			babstats_table.Name = "babstats_table";
+			babstats_table.ReadOnly = true;
+			babstats_table.RowHeadersVisible = false;
+			babstats_table.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+			babstats_table.ShowEditingIcon = false;
+			babstats_table.Size = new Size(632, 382);
+			babstats_table.TabIndex = 3;
+			babstats_table.DoubleClick += babstatsClick_openRecord;
+			// 
+			// babstats_id
+			// 
+			babstats_id.HeaderText = "ID";
+			babstats_id.Name = "babstats_id";
+			babstats_id.ReadOnly = true;
+			babstats_id.Visible = false;
+			// 
+			// babstats_code
+			// 
+			babstats_code.HeaderText = "Profile ID";
+			babstats_code.Name = "babstats_code";
+			babstats_code.ReadOnly = true;
+			babstats_code.Width = 90;
+			// 
+			// babstats_siteurl
+			// 
+			babstats_siteurl.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			babstats_siteurl.HeaderText = "Babstats URL";
+			babstats_siteurl.MinimumWidth = 220;
+			babstats_siteurl.Name = "babstats_siteurl";
+			babstats_siteurl.ReadOnly = true;
+			// 
+			// babstats_enabled
+			// 
+			babstats_enabled.HeaderText = "Enabled";
+			babstats_enabled.Name = "babstats_enabled";
+			babstats_enabled.ReadOnly = true;
+			babstats_enabled.Width = 65;
+			// 
+			// babstats_updateinterval
+			// 
+			babstats_updateinterval.HeaderText = "Update (s)";
+			babstats_updateinterval.Name = "babstats_updateinterval";
+			babstats_updateinterval.ReadOnly = true;
+			// 
+			// babstats_annoucements
+			// 
+			babstats_annoucements.HeaderText = "Announce";
+			babstats_annoucements.Name = "babstats_annoucements";
+			babstats_annoucements.ReadOnly = true;
+			babstats_annoucements.Width = 75;
+			// 
+			// babstats_reportinterval
+			// 
+			babstats_reportinterval.HeaderText = "Report (s)";
+			babstats_reportinterval.Name = "babstats_reportinterval";
+			babstats_reportinterval.ReadOnly = true;
+			// 
+			// tabLobby
+			// 
+			tabLobby.Controls.Add(lobby_layout);
+			tabLobby.Location = new Point(4, 24);
+			tabLobby.Name = "tabLobby";
+			tabLobby.Size = new Size(958, 394);
+			tabLobby.TabIndex = 4;
+			tabLobby.Text = "Lobby";
+			tabLobby.UseVisualStyleBackColor = true;
+			// 
+			// lobby_layout
+			// 
+			lobby_layout.ColumnCount = 2;
+			lobby_layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+			lobby_layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
+			lobby_layout.Controls.Add(lobby_table, 1, 0);
+			lobby_layout.Controls.Add(panel2, 0, 0);
+			lobby_layout.Dock = DockStyle.Fill;
+			lobby_layout.Location = new Point(0, 0);
+			lobby_layout.Name = "lobby_layout";
+			lobby_layout.RowCount = 1;
+			lobby_layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+			lobby_layout.Size = new Size(958, 394);
+			lobby_layout.TabIndex = 0;
+			// 
+			// lobby_table
+			// 
+			lobby_table.AllowUserToAddRows = false;
+			lobby_table.AllowUserToDeleteRows = false;
+			lobby_table.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			lobby_table.Columns.AddRange(new DataGridViewColumn[] { lobby_id, lobby_sitename, lobby_uri, lobby_port, lobby_secret, lobby_enabled });
+			lobby_table.Dock = DockStyle.Fill;
+			lobby_table.Location = new Point(319, 3);
+			lobby_table.Name = "lobby_table";
+			lobby_table.ReadOnly = true;
+			lobby_table.RowHeadersVisible = false;
+			lobby_table.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+			lobby_table.Size = new Size(636, 388);
+			lobby_table.TabIndex = 0;
+			lobby_table.DoubleClick += lobbyAction_selectRecord;
+			// 
+			// lobby_id
+			// 
+			lobby_id.HeaderText = "ID";
+			lobby_id.Name = "lobby_id";
+			lobby_id.ReadOnly = true;
+			lobby_id.Visible = false;
+			// 
+			// lobby_sitename
+			// 
+			lobby_sitename.HeaderText = "Site";
+			lobby_sitename.Name = "lobby_sitename";
+			lobby_sitename.ReadOnly = true;
+			// 
+			// lobby_uri
+			// 
+			lobby_uri.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			lobby_uri.HeaderText = "URL";
+			lobby_uri.Name = "lobby_uri";
+			lobby_uri.ReadOnly = true;
+			// 
+			// lobby_port
+			// 
+			lobby_port.HeaderText = "Port";
+			lobby_port.Name = "lobby_port";
+			lobby_port.ReadOnly = true;
+			// 
+			// lobby_secret
+			// 
+			lobby_secret.HeaderText = "Secret";
+			lobby_secret.Name = "lobby_secret";
+			lobby_secret.ReadOnly = true;
+			lobby_secret.Width = 150;
+			// 
+			// lobby_enabled
+			// 
+			lobby_enabled.HeaderText = "Enabled";
+			lobby_enabled.Name = "lobby_enabled";
+			lobby_enabled.ReadOnly = true;
+			lobby_enabled.Resizable = DataGridViewTriState.True;
+			lobby_enabled.SortMode = DataGridViewColumnSortMode.Automatic;
+			lobby_enabled.Width = 60;
+			// 
+			// panel2
+			// 
+			panel2.Controls.Add(groupBox6);
+			panel2.Controls.Add(groupBox5);
+			panel2.Dock = DockStyle.Fill;
+			panel2.Location = new Point(0, 0);
+			panel2.Margin = new Padding(0);
+			panel2.Name = "panel2";
+			panel2.Size = new Size(316, 394);
+			panel2.TabIndex = 1;
+			// 
+			// groupBox6
+			// 
+			groupBox6.Controls.Add(tableLayoutPanel5);
+			groupBox6.Dock = DockStyle.Top;
+			groupBox6.Location = new Point(0, 0);
+			groupBox6.Margin = new Padding(0, 3, 3, 3);
+			groupBox6.Name = "groupBox6";
+			groupBox6.Size = new Size(316, 153);
+			groupBox6.TabIndex = 5;
+			groupBox6.TabStop = false;
+			groupBox6.Text = "Lobby Reporting Servers";
+			// 
+			// tableLayoutPanel5
+			// 
+			tableLayoutPanel5.ColumnCount = 4;
+			tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.Controls.Add(btn_lobbyRandKey, 3, 2);
+			tableLayoutPanel5.Controls.Add(tb_lobbySecretKey, 0, 2);
+			tableLayoutPanel5.Controls.Add(tb_lobbySiteName, 0, 1);
+			tableLayoutPanel5.Controls.Add(tb_lobbySiteUri, 0, 0);
+			tableLayoutPanel5.Controls.Add(num_lobbyGamePort, 3, 1);
+			tableLayoutPanel5.Controls.Add(cb_lobbyEnabled, 2, 3);
+			tableLayoutPanel5.Dock = DockStyle.Fill;
+			tableLayoutPanel5.Location = new Point(3, 19);
+			tableLayoutPanel5.Name = "tableLayoutPanel5";
+			tableLayoutPanel5.RowCount = 4;
+			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+			tableLayoutPanel5.Size = new Size(310, 131);
+			tableLayoutPanel5.TabIndex = 0;
+			// 
+			// btn_lobbyRandKey
+			// 
+			btn_lobbyRandKey.Dock = DockStyle.Fill;
+			btn_lobbyRandKey.FlatStyle = FlatStyle.Flat;
+			btn_lobbyRandKey.Font = new Font("Segoe UI", 8F);
+			btn_lobbyRandKey.Location = new Point(234, 66);
+			btn_lobbyRandKey.Margin = new Padding(3, 2, 5, 3);
+			btn_lobbyRandKey.Name = "btn_lobbyRandKey";
+			btn_lobbyRandKey.Size = new Size(71, 27);
+			btn_lobbyRandKey.TabIndex = 14;
+			btn_lobbyRandKey.Text = "Rand";
+			btn_lobbyRandKey.UseVisualStyleBackColor = true;
+			btn_lobbyRandKey.Click += lobbyAction_RandomizeKey;
+			// 
+			// tb_lobbySecretKey
+			// 
+			tableLayoutPanel5.SetColumnSpan(tb_lobbySecretKey, 3);
+			tb_lobbySecretKey.Dock = DockStyle.Fill;
+			tb_lobbySecretKey.Location = new Point(3, 67);
+			tb_lobbySecretKey.MaxLength = 16;
+			tb_lobbySecretKey.Name = "tb_lobbySecretKey";
+			tb_lobbySecretKey.PlaceholderText = "Secret Key";
+			tb_lobbySecretKey.Size = new Size(225, 23);
+			tb_lobbySecretKey.TabIndex = 6;
+			tb_lobbySecretKey.TextAlign = HorizontalAlignment.Center;
+			// 
+			// tb_lobbySiteName
+			// 
+			tableLayoutPanel5.SetColumnSpan(tb_lobbySiteName, 3);
+			tb_lobbySiteName.Dock = DockStyle.Fill;
+			tb_lobbySiteName.Location = new Point(3, 35);
+			tb_lobbySiteName.MaxLength = 16;
+			tb_lobbySiteName.Name = "tb_lobbySiteName";
+			tb_lobbySiteName.PlaceholderText = "Site Name";
+			tb_lobbySiteName.Size = new Size(225, 23);
+			tb_lobbySiteName.TabIndex = 3;
+			tb_lobbySiteName.TextAlign = HorizontalAlignment.Center;
+			// 
+			// tb_lobbySiteUri
+			// 
+			tableLayoutPanel5.SetColumnSpan(tb_lobbySiteUri, 4);
+			tb_lobbySiteUri.Location = new Point(3, 3);
+			tb_lobbySiteUri.Name = "tb_lobbySiteUri";
+			tb_lobbySiteUri.PlaceholderText = "http(s)://yourdomain.com/import.php";
+			tb_lobbySiteUri.Size = new Size(302, 23);
+			tb_lobbySiteUri.TabIndex = 2;
+			tb_lobbySiteUri.TextAlign = HorizontalAlignment.Center;
+			// 
+			// num_lobbyGamePort
+			// 
+			num_lobbyGamePort.Location = new Point(234, 35);
+			num_lobbyGamePort.Maximum = new decimal(new int[] { 65999, 0, 0, 0 });
+			num_lobbyGamePort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+			num_lobbyGamePort.Name = "num_lobbyGamePort";
+			num_lobbyGamePort.Size = new Size(73, 23);
+			num_lobbyGamePort.TabIndex = 15;
+			num_lobbyGamePort.TextAlign = HorizontalAlignment.Center;
+			num_lobbyGamePort.Value = new decimal(new int[] { 17479, 0, 0, 0 });
+			// 
+			// cb_lobbyEnabled
+			// 
+			cb_lobbyEnabled.AutoSize = true;
+			cb_lobbyEnabled.CheckAlign = ContentAlignment.MiddleRight;
+			tableLayoutPanel5.SetColumnSpan(cb_lobbyEnabled, 2);
+			cb_lobbyEnabled.Dock = DockStyle.Fill;
+			cb_lobbyEnabled.Location = new Point(157, 99);
+			cb_lobbyEnabled.Name = "cb_lobbyEnabled";
+			cb_lobbyEnabled.Padding = new Padding(0, 0, 6, 0);
+			cb_lobbyEnabled.Size = new Size(150, 29);
+			cb_lobbyEnabled.TabIndex = 16;
+			cb_lobbyEnabled.Text = "Enable Reporting";
+			cb_lobbyEnabled.TextAlign = ContentAlignment.MiddleRight;
+			cb_lobbyEnabled.UseVisualStyleBackColor = true;
+			// 
+			// groupBox5
+			// 
+			groupBox5.Controls.Add(tableLayoutPanel4);
+			groupBox5.Dock = DockStyle.Bottom;
+			groupBox5.Location = new Point(0, 343);
+			groupBox5.Name = "groupBox5";
+			groupBox5.Size = new Size(316, 51);
+			groupBox5.TabIndex = 4;
+			groupBox5.TabStop = false;
+			groupBox5.Text = "Server List";
+			// 
+			// tableLayoutPanel4
+			// 
+			tableLayoutPanel4.ColumnCount = 4;
+			tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			tableLayoutPanel4.Controls.Add(btn_lobbyNew, 3, 0);
+			tableLayoutPanel4.Controls.Add(btn_lobbyRemove, 2, 0);
+			tableLayoutPanel4.Controls.Add(btn_lobbySave, 0, 0);
+			tableLayoutPanel4.Controls.Add(btn_lobbyAdd, 1, 0);
+			tableLayoutPanel4.Dock = DockStyle.Fill;
+			tableLayoutPanel4.Location = new Point(3, 19);
+			tableLayoutPanel4.Name = "tableLayoutPanel4";
+			tableLayoutPanel4.RowCount = 1;
+			tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+			tableLayoutPanel4.Size = new Size(310, 29);
+			tableLayoutPanel4.TabIndex = 0;
+			// 
+			// btn_lobbyNew
+			// 
+			btn_lobbyNew.Dock = DockStyle.Fill;
+			btn_lobbyNew.Location = new Point(234, 3);
+			btn_lobbyNew.Name = "btn_lobbyNew";
+			btn_lobbyNew.Size = new Size(73, 23);
+			btn_lobbyNew.TabIndex = 13;
+			btn_lobbyNew.Text = "New";
+			btn_lobbyNew.UseVisualStyleBackColor = true;
+			btn_lobbyNew.Click += lobbyAction_newRecord;
+			// 
+			// btn_lobbyRemove
+			// 
+			btn_lobbyRemove.Dock = DockStyle.Fill;
+			btn_lobbyRemove.Location = new Point(157, 3);
+			btn_lobbyRemove.Name = "btn_lobbyRemove";
+			btn_lobbyRemove.Size = new Size(71, 23);
+			btn_lobbyRemove.TabIndex = 12;
+			btn_lobbyRemove.Text = "Remove";
+			btn_lobbyRemove.UseVisualStyleBackColor = true;
+			btn_lobbyRemove.Click += lobbyAction_removeRecord;
+			// 
+			// btn_lobbySave
+			// 
+			btn_lobbySave.Dock = DockStyle.Fill;
+			btn_lobbySave.Location = new Point(3, 3);
+			btn_lobbySave.Name = "btn_lobbySave";
+			btn_lobbySave.Size = new Size(71, 23);
+			btn_lobbySave.TabIndex = 10;
+			btn_lobbySave.Text = "Save";
+			btn_lobbySave.UseVisualStyleBackColor = true;
+			btn_lobbySave.Click += lobbyAction_saveRecord;
+			// 
+			// btn_lobbyAdd
+			// 
+			btn_lobbyAdd.Dock = DockStyle.Fill;
+			btn_lobbyAdd.Location = new Point(80, 3);
+			btn_lobbyAdd.Name = "btn_lobbyAdd";
+			btn_lobbyAdd.Size = new Size(71, 23);
+			btn_lobbyAdd.TabIndex = 11;
+			btn_lobbyAdd.Text = "Add";
+			btn_lobbyAdd.UseVisualStyleBackColor = true;
+			btn_lobbyAdd.Click += lobbyAction_addRecord;
+			// 
+			// tabPlayerStats
+			// 
+			tabPlayerStats.Controls.Add(tableLayoutPanel2);
+			tabPlayerStats.Location = new Point(4, 24);
+			tabPlayerStats.Name = "tabPlayerStats";
+			tabPlayerStats.Padding = new Padding(3);
+			tabPlayerStats.Size = new Size(958, 394);
+			tabPlayerStats.TabIndex = 1;
+			tabPlayerStats.Text = "Player Stats";
+			tabPlayerStats.UseVisualStyleBackColor = true;
+			// 
+			// tableLayoutPanel2
+			// 
+			tableLayoutPanel2.ColumnCount = 1;
+			tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+			tableLayoutPanel2.Controls.Add(dataGridViewPlayerStats, 0, 0);
+			tableLayoutPanel2.Dock = DockStyle.Fill;
+			tableLayoutPanel2.Location = new Point(3, 3);
+			tableLayoutPanel2.Margin = new Padding(0);
+			tableLayoutPanel2.Name = "tableLayoutPanel2";
+			tableLayoutPanel2.RowCount = 1;
+			tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+			tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+			tableLayoutPanel2.Size = new Size(952, 388);
+			tableLayoutPanel2.TabIndex = 0;
+			// 
+			// dataGridViewPlayerStats
+			// 
+			dataGridViewPlayerStats.AllowUserToAddRows = false;
+			dataGridViewPlayerStats.AllowUserToDeleteRows = false;
+			dataGridViewPlayerStats.AllowUserToResizeColumns = false;
+			dataGridViewPlayerStats.AllowUserToResizeRows = false;
+			dataGridViewPlayerStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			dataGridViewPlayerStats.Columns.AddRange(new DataGridViewColumn[] { PlayerName, Suicides, Murders, Kills, Deaths, ZoneTime, FBCaptures, FlagSaves, ADTargetsDestroyed, RevivesReceived, RevivesGiven, PSPAttempts, PSPTakeovers, FBCarrierKills, DoubleKills, Headshots, KnifeKills, SniperKills, TKOTHDefenseKills, TKOTHAttackKills, ShotsPerKill, ExperiencePoints, PlayerTeam, PlayerActive, TimePlayed });
+			dataGridViewPlayerStats.Dock = DockStyle.Fill;
+			dataGridViewPlayerStats.Location = new Point(0, 0);
+			dataGridViewPlayerStats.Margin = new Padding(0);
+			dataGridViewPlayerStats.Name = "dataGridViewPlayerStats";
+			dataGridViewPlayerStats.ReadOnly = true;
+			dataGridViewPlayerStats.RowHeadersVisible = false;
+			dataGridViewPlayerStats.ScrollBars = ScrollBars.Vertical;
+			dataGridViewPlayerStats.Size = new Size(952, 388);
+			dataGridViewPlayerStats.TabIndex = 1;
+			// 
+			// PlayerName
+			// 
+			PlayerName.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+			PlayerName.HeaderText = "Player Name";
+			PlayerName.MinimumWidth = 200;
+			PlayerName.Name = "PlayerName";
+			PlayerName.ReadOnly = true;
+			PlayerName.Width = 200;
+			// 
+			// Suicides
+			// 
+			Suicides.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Suicides.HeaderText = "";
+			Suicides.Name = "Suicides";
+			Suicides.ReadOnly = true;
+			Suicides.ToolTipText = "Suicides";
+			// 
+			// Murders
+			// 
+			Murders.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Murders.HeaderText = "";
+			Murders.Name = "Murders";
+			Murders.ReadOnly = true;
+			Murders.ToolTipText = "Murders";
+			// 
+			// Kills
+			// 
+			Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Kills.HeaderText = "";
+			Kills.Name = "Kills";
+			Kills.ReadOnly = true;
+			Kills.ToolTipText = "Kills";
+			// 
+			// Deaths
+			// 
+			Deaths.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Deaths.HeaderText = "";
+			Deaths.Name = "Deaths";
+			Deaths.ReadOnly = true;
+			Deaths.ToolTipText = "Deaths";
+			// 
+			// ZoneTime
+			// 
+			ZoneTime.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			ZoneTime.HeaderText = "";
+			ZoneTime.Name = "ZoneTime";
+			ZoneTime.ReadOnly = true;
+			ZoneTime.ToolTipText = "Zone Time";
+			// 
+			// FBCaptures
+			// 
+			FBCaptures.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			FBCaptures.HeaderText = "";
+			FBCaptures.Name = "FBCaptures";
+			FBCaptures.ReadOnly = true;
+			FBCaptures.ToolTipText = "FlagBall Captures";
+			// 
+			// FlagSaves
+			// 
+			FlagSaves.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			FlagSaves.HeaderText = "";
+			FlagSaves.Name = "FlagSaves";
+			FlagSaves.ReadOnly = true;
+			FlagSaves.ToolTipText = "Flag Saves";
+			// 
+			// ADTargetsDestroyed
+			// 
+			ADTargetsDestroyed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			ADTargetsDestroyed.HeaderText = "";
+			ADTargetsDestroyed.Name = "ADTargetsDestroyed";
+			ADTargetsDestroyed.ReadOnly = true;
+			ADTargetsDestroyed.ToolTipText = "ADTargetsDestroyed";
+			// 
+			// RevivesReceived
+			// 
+			RevivesReceived.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			RevivesReceived.HeaderText = "";
+			RevivesReceived.Name = "RevivesReceived";
+			RevivesReceived.ReadOnly = true;
+			RevivesReceived.ToolTipText = "Revives Received";
+			// 
+			// RevivesGiven
+			// 
+			RevivesGiven.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			RevivesGiven.HeaderText = "";
+			RevivesGiven.Name = "RevivesGiven";
+			RevivesGiven.ReadOnly = true;
+			RevivesGiven.ToolTipText = "Revives Given";
+			// 
+			// PSPAttempts
+			// 
+			PSPAttempts.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			PSPAttempts.HeaderText = "";
+			PSPAttempts.Name = "PSPAttempts";
+			PSPAttempts.ReadOnly = true;
+			PSPAttempts.ToolTipText = "PSP Attempts";
+			// 
+			// PSPTakeovers
+			// 
+			PSPTakeovers.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			PSPTakeovers.HeaderText = "";
+			PSPTakeovers.Name = "PSPTakeovers";
+			PSPTakeovers.ReadOnly = true;
+			PSPTakeovers.ToolTipText = "PSP Takeovers";
+			// 
+			// FBCarrierKills
+			// 
+			FBCarrierKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			FBCarrierKills.HeaderText = "";
+			FBCarrierKills.Name = "FBCarrierKills";
+			FBCarrierKills.ReadOnly = true;
+			FBCarrierKills.ToolTipText = "FB Carrier Kills";
+			// 
+			// DoubleKills
+			// 
+			DoubleKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			DoubleKills.HeaderText = "";
+			DoubleKills.Name = "DoubleKills";
+			DoubleKills.ReadOnly = true;
+			DoubleKills.ToolTipText = "Double Kills";
+			// 
+			// Headshots
+			// 
+			Headshots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Headshots.HeaderText = "";
+			Headshots.Name = "Headshots";
+			Headshots.ReadOnly = true;
+			Headshots.ToolTipText = "Headshots";
+			// 
+			// KnifeKills
+			// 
+			KnifeKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			KnifeKills.HeaderText = "";
+			KnifeKills.Name = "KnifeKills";
+			KnifeKills.ReadOnly = true;
+			KnifeKills.ToolTipText = "Knife Kills";
+			// 
+			// SniperKills
+			// 
+			SniperKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			SniperKills.HeaderText = "";
+			SniperKills.Name = "SniperKills";
+			SniperKills.ReadOnly = true;
+			SniperKills.ToolTipText = "Sniper Kills";
+			// 
+			// TKOTHDefenseKills
+			// 
+			TKOTHDefenseKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			TKOTHDefenseKills.HeaderText = "";
+			TKOTHDefenseKills.Name = "TKOTHDefenseKills";
+			TKOTHDefenseKills.ReadOnly = true;
+			TKOTHDefenseKills.ToolTipText = "TKOTH Defense Kills";
+			// 
+			// TKOTHAttackKills
+			// 
+			TKOTHAttackKills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			TKOTHAttackKills.HeaderText = "";
+			TKOTHAttackKills.Name = "TKOTHAttackKills";
+			TKOTHAttackKills.ReadOnly = true;
+			TKOTHAttackKills.ToolTipText = "TKOTH Attack Kills";
+			// 
+			// ShotsPerKill
+			// 
+			ShotsPerKill.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			ShotsPerKill.HeaderText = "";
+			ShotsPerKill.Name = "ShotsPerKill";
+			ShotsPerKill.ReadOnly = true;
+			ShotsPerKill.ToolTipText = "Shots Per Kill";
+			// 
+			// ExperiencePoints
+			// 
+			ExperiencePoints.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			ExperiencePoints.HeaderText = "";
+			ExperiencePoints.Name = "ExperiencePoints";
+			ExperiencePoints.ReadOnly = true;
+			ExperiencePoints.ToolTipText = "Experience Points";
+			// 
+			// PlayerTeam
+			// 
+			PlayerTeam.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			PlayerTeam.HeaderText = "";
+			PlayerTeam.Name = "PlayerTeam";
+			PlayerTeam.ReadOnly = true;
+			PlayerTeam.ToolTipText = "Player Team";
+			// 
+			// PlayerActive
+			// 
+			PlayerActive.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			PlayerActive.HeaderText = "";
+			PlayerActive.Name = "PlayerActive";
+			PlayerActive.ReadOnly = true;
+			PlayerActive.ToolTipText = "Active";
+			// 
+			// TimePlayed
+			// 
+			TimePlayed.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			TimePlayed.HeaderText = "";
+			TimePlayed.Name = "TimePlayed";
+			TimePlayed.ReadOnly = true;
+			TimePlayed.ToolTipText = "Time Played (s)";
+			// 
+			// tabWeaponStats
+			// 
+			tabWeaponStats.Controls.Add(dataGridViewWeaponStats);
+			tabWeaponStats.Location = new Point(4, 24);
+			tabWeaponStats.Name = "tabWeaponStats";
+			tabWeaponStats.Size = new Size(958, 394);
+			tabWeaponStats.TabIndex = 2;
+			tabWeaponStats.Text = "Weapon Stats";
+			tabWeaponStats.UseVisualStyleBackColor = true;
+			// 
+			// dataGridViewWeaponStats
+			// 
+			dataGridViewWeaponStats.AllowUserToAddRows = false;
+			dataGridViewWeaponStats.AllowUserToDeleteRows = false;
+			dataGridViewWeaponStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			dataGridViewWeaponStats.Columns.AddRange(new DataGridViewColumn[] { Weapon_PlayerName, WeaponName, Timer, Weapon_Kills, Weapon_Shots });
+			dataGridViewWeaponStats.Dock = DockStyle.Fill;
+			dataGridViewWeaponStats.Location = new Point(0, 0);
+			dataGridViewWeaponStats.Name = "dataGridViewWeaponStats";
+			dataGridViewWeaponStats.ReadOnly = true;
+			dataGridViewWeaponStats.RowHeadersVisible = false;
+			dataGridViewWeaponStats.Size = new Size(958, 394);
+			dataGridViewWeaponStats.TabIndex = 1;
+			// 
+			// Weapon_PlayerName
+			// 
+			Weapon_PlayerName.HeaderText = "Player Name";
+			Weapon_PlayerName.MinimumWidth = 200;
+			Weapon_PlayerName.Name = "Weapon_PlayerName";
+			Weapon_PlayerName.ReadOnly = true;
+			Weapon_PlayerName.Width = 200;
+			// 
+			// WeaponName
+			// 
+			WeaponName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			WeaponName.HeaderText = "Weapon Name";
+			WeaponName.Name = "WeaponName";
+			WeaponName.ReadOnly = true;
+			// 
+			// Timer
+			// 
+			Timer.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Timer.HeaderText = "Time Used (s)";
+			Timer.Name = "Timer";
+			Timer.ReadOnly = true;
+			// 
+			// Weapon_Kills
+			// 
+			Weapon_Kills.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Weapon_Kills.HeaderText = "Kills";
+			Weapon_Kills.Name = "Weapon_Kills";
+			Weapon_Kills.ReadOnly = true;
+			// 
+			// Weapon_Shots
+			// 
+			Weapon_Shots.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			Weapon_Shots.HeaderText = "Shots";
+			Weapon_Shots.Name = "Weapon_Shots";
+			Weapon_Shots.ReadOnly = true;
+			// 
+			// tabLogs
+			// 
+			tabLogs.Controls.Add(dg_statsLog);
+			tabLogs.Location = new Point(4, 24);
+			tabLogs.Name = "tabLogs";
+			tabLogs.Padding = new Padding(3);
+			tabLogs.Size = new Size(958, 394);
+			tabLogs.TabIndex = 3;
+			tabLogs.Text = "Logs";
+			tabLogs.UseVisualStyleBackColor = true;
+			// 
+			// dg_statsLog
+			// 
+			dg_statsLog.AllowUserToAddRows = false;
+			dg_statsLog.AllowUserToDeleteRows = false;
+			dg_statsLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			dg_statsLog.Columns.AddRange(new DataGridViewColumn[] { statsLog_DateTime, statLog_Message });
+			dg_statsLog.Dock = DockStyle.Fill;
+			dg_statsLog.Location = new Point(3, 3);
+			dg_statsLog.Name = "dg_statsLog";
+			dg_statsLog.ReadOnly = true;
+			dg_statsLog.RowHeadersVisible = false;
+			dg_statsLog.Size = new Size(952, 388);
+			dg_statsLog.TabIndex = 2;
+			// 
+			// statsLog_DateTime
+			// 
+			statsLog_DateTime.HeaderText = "Time Stamp";
+			statsLog_DateTime.Name = "statsLog_DateTime";
+			statsLog_DateTime.ReadOnly = true;
+			statsLog_DateTime.Width = 150;
+			// 
+			// statLog_Message
+			// 
+			statLog_Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			statLog_Message.HeaderText = "Log Message";
+			statLog_Message.Name = "statLog_Message";
+			statLog_Message.ReadOnly = true;
+			// 
+			// tabStats
+			// 
+			AutoScaleDimensions = new SizeF(7F, 15F);
+			AutoScaleMode = AutoScaleMode.Font;
+			Controls.Add(tabControl1);
+			Name = "tabStats";
+			Size = new Size(966, 422);
+			tabControl1.ResumeLayout(false);
+			tabBabstats.ResumeLayout(false);
+			tableLayoutPanel1.ResumeLayout(false);
+			panel1.ResumeLayout(false);
+			groupBox4.ResumeLayout(false);
+			tableLayoutPanel3.ResumeLayout(false);
+			groupBox3.ResumeLayout(false);
+			groupBox3.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)num_WebStatsUpdates).EndInit();
+			((System.ComponentModel.ISupportInitialize)num_WebStatsReport).EndInit();
+			groupBox2.ResumeLayout(false);
+			groupBox2.PerformLayout();
+			groupBox1.ResumeLayout(false);
+			groupBox1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)babstats_table).EndInit();
+			tabLobby.ResumeLayout(false);
+			lobby_layout.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)lobby_table).EndInit();
+			panel2.ResumeLayout(false);
+			groupBox6.ResumeLayout(false);
+			tableLayoutPanel5.ResumeLayout(false);
+			tableLayoutPanel5.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)num_lobbyGamePort).EndInit();
+			groupBox5.ResumeLayout(false);
+			tableLayoutPanel4.ResumeLayout(false);
+			tabPlayerStats.ResumeLayout(false);
+			tableLayoutPanel2.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)dataGridViewPlayerStats).EndInit();
+			tabWeaponStats.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)dataGridViewWeaponStats).EndInit();
+			tabLogs.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)dg_statsLog).EndInit();
+			ResumeLayout(false);
+		}
 
-        #endregion
+		#endregion
 
-        private TabControl tabControl1;
+		private TabControl tabControl1;
         private TabPage tabBabstats;
         private TabPage tabPlayerStats;
         private TabPage tabWeaponStats;
@@ -1221,7 +1227,6 @@
         private TableLayoutPanel tableLayoutPanel5;
         private TextBox tb_lobbySiteUri;
         private TextBox tb_lobbySiteName;
-        private Label label_lobbyInfo;
         private Button btn_lobbyRandKey;
         private TextBox tb_lobbySecretKey;
         private DataGridViewTextBoxColumn babstats_id;
@@ -1231,12 +1236,13 @@
         private DataGridViewTextBoxColumn babstats_updateinterval;
         private DataGridViewCheckBoxColumn babstats_annoucements;
         private DataGridViewTextBoxColumn babstats_reportinterval;
-        private DataGridViewTextBoxColumn lobby_id;
-        private DataGridViewTextBoxColumn lobby_sitename;
-        private DataGridViewTextBoxColumn lobby_uri;
-        private DataGridViewTextBoxColumn lobby_port;
-        private DataGridViewTextBoxColumn lobby_secret;
-        private DataGridViewTextBoxColumn lobby_enabled;
         private NumericUpDown num_lobbyGamePort;
-    }
+        private CheckBox cb_lobbyEnabled;
+		private DataGridViewTextBoxColumn lobby_id;
+		private DataGridViewTextBoxColumn lobby_sitename;
+		private DataGridViewTextBoxColumn lobby_uri;
+		private DataGridViewTextBoxColumn lobby_port;
+		private DataGridViewTextBoxColumn lobby_secret;
+		private DataGridViewCheckBoxColumn lobby_enabled;
+	}
 }

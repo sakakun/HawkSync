@@ -25,7 +25,8 @@ namespace HawkSyncShared.Instances
         // NEW: Multi-endpoint Babstats runtime state
         // --------------------------------------------------------------------
         public List<BabstatsServerSettings> BabstatsServers { get; set; } = new();
-        public Dictionary<int, BabstatsServerRuntimeState> BabstatsServerState { get; set; } = new();
+        public List<LobbyServerSettings> LobbyServers { get; set; } = new();
+		public Dictionary<int, BabstatsServerRuntimeState> BabstatsServerState { get; set; } = new();
 
         /// <summary>
         /// Returns only enabled servers in deterministic UI/order sequence.
@@ -39,10 +40,22 @@ namespace HawkSyncShared.Instances
         }
 
         /// <summary>
-        /// Ensure runtime state entries exist for all configured servers.
-        /// Call after loading/reloading server list from DB.
+        /// Retrieves a collection of lobby server settings that are currently enabled.
         /// </summary>
-        public void EnsureBabstatsRuntimeState()
+        /// <returns>An enumerable collection of enabled lobby server settings, ordered by sort order and lobby server ID.</returns>
+        public IEnumerable<LobbyServerSettings> GetEnabledLobbyServers()
+        {
+            return LobbyServers
+                .Where(s => s.IsEnabled)
+                .OrderBy(s => s.SortOrder)
+                .ThenBy(s => s.LobbyServerID);
+		}
+
+		/// <summary>
+		/// Ensure runtime state entries exist for all configured servers.
+		/// Call after loading/reloading server list from DB.
+		/// </summary>
+		public void EnsureBabstatsRuntimeState()
         {
             var validIds = new HashSet<int>(BabstatsServers.Select(s => s.BabstatsServerID));
 

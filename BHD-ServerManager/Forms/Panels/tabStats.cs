@@ -40,9 +40,14 @@ namespace BHD_ServerManager.Forms.Panels
             if (!_firstLoadComplete)
             {
                 _firstLoadComplete = true;
+                // Babstats Tab
                 babstatsFormReset();
                 babstatsButtonsReset();
                 LoadWebStatsSettings();
+				// Lobby Tab
+                lobbyAction_ResetForm();
+                lobbyAction_ButtonReset();
+				LoadLobbySettings();
                 return;
             }
 
@@ -50,6 +55,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 instanceStats.ForceUIUpdate = false;
                 LoadWebStatsSettings();
+                LoadLobbySettings();
             }
         }
 
@@ -97,6 +103,34 @@ namespace BHD_ServerManager.Forms.Panels
                     server.ReportIntervalSeconds            // babstats_reportinterval ("Report (s)")
                 );
                 DataGridViewRow row = babstats_table.Rows[rowIndex];
+                row.Tag = server; // Store the server settings in the row's Tag for later reference
+            }
+        }
+
+        /// <summary>
+        /// Load web stats settings and Babstats server list via manager.
+        /// </summary>
+        public void LoadLobbySettings()
+        {
+            // Get the Babstats server settings from the database and populate the UI
+            List<LobbyServerSettings> LobbyServers = DatabaseManager.GetLobbyServers();
+
+            instanceStats!.LobbyServers = LobbyServers;
+
+            // Clear existing items
+            lobby_table.Rows.Clear();
+            // Add each server to the table
+            foreach (var server in LobbyServers)
+            {
+                int rowIndex = lobby_table.Rows.Add(
+                    server.LobbyServerID,                // lobby_id (hidden)
+                    server.SiteName,                     // lobby_sitename ("Site Name")
+                    server.ServerUri,                    // lobby_siteuri ("Lobby URL")
+                    server.GamePort,                     // lobby_gameport ("Game Port")
+                    server.SecretKey,                    // lobby_secretkey ("Secret Key")
+                    server.IsEnabled                     // lobby_enabled (bool)
+				);
+                DataGridViewRow row = lobby_table.Rows[rowIndex];
                 row.Tag = server; // Store the server settings in the row's Tag for later reference
             }
         }
@@ -182,6 +216,7 @@ namespace BHD_ServerManager.Forms.Panels
 
             // Refresh the server list
             LoadWebStatsSettings();
+
             // Reset Form
             babstatsFormReset();
             // Reset Buttons
@@ -335,7 +370,8 @@ namespace BHD_ServerManager.Forms.Panels
             num_lobbyGamePort.Value = theInstance!.profileBindPort;
             tb_lobbySecretKey.Text = string.Empty;
             tb_lobbySiteName.Text = string.Empty;
-        }
+            cb_lobbyEnabled.Checked = false;
+		}
 
         private void lobbyAction_ButtonReset()
         {
@@ -349,9 +385,28 @@ namespace BHD_ServerManager.Forms.Panels
         private void lobbyAction_saveRecord(object sender, EventArgs e)
         {
             // Collect Form Details for new lobby to be added, then add to database and refresh list
+            LobbyServerSettings updatedServer = new LobbyServerSettings(
+                _LobbySelectedID, // LobbyServerID, will be set by the database
+                tb_lobbySiteName.Text.Trim(), // SiteName
+                tb_lobbySiteUri.Text.Trim(), // ServerUri
+                (int)num_lobbyGamePort.Value, // GamePort
+                tb_lobbySecretKey.Text.Trim(), // SecretKey
+                cb_lobbyEnabled.Checked, // IsEnabled
+				0 // SortOrder
+			);
 
-            // Reset Form
-            lobbyAction_ResetForm();
+            if (!DatabaseManager.UpdateLobbyServer(updatedServer))
+            {
+                MessageBox.Show("Failed to update lobby server. Please try again.", "Update Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
+            MessageBox.Show("Lobby server updated successfully.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+			// Refresh the server list
+            LoadLobbySettings();
+			// Reset Form
+			lobbyAction_ResetForm();
             // Reset Buttons
             lobbyAction_ButtonReset();
 
@@ -360,9 +415,29 @@ namespace BHD_ServerManager.Forms.Panels
         private void lobbyAction_addRecord(object sender, EventArgs e)
         {
             // Collect Form Details for new lobby to be added, then add to database and refresh list
+            LobbyServerSettings NewServer = new LobbyServerSettings(
+                0, // LobbyServerID, will be set by the database
+                tb_lobbySiteName.Text.Trim(), // SiteName
+                tb_lobbySiteUri.Text.Trim(), // ServerUri
+                (int)num_lobbyGamePort.Value, // GamePort
+                tb_lobbySecretKey.Text.Trim(), // SecretKey
+                cb_lobbyEnabled.Checked, // IsEnabled
+                0
+            );
 
-            // Reset Form
-            lobbyAction_ResetForm();
+			// Add the new server to the database
+            if (!DatabaseManager.AddLobbyServer(NewServer))
+            {
+                MessageBox.Show("Failed to add lobby server. Please try again.", "Addition Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+			}
+
+            MessageBox.Show("Lobby server added successfully.", "Addition Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+			// Refresh the server list
+            LoadLobbySettings();
+			// Reset Form
+			lobbyAction_ResetForm();
             // Reset Buttons
             lobbyAction_ButtonReset();
         }
@@ -370,9 +445,18 @@ namespace BHD_ServerManager.Forms.Panels
         private void lobbyAction_removeRecord(object sender, EventArgs e)
         {
             // Collect Form Details for new lobby to be added, then add to database and refresh list
+            if(!DatabaseManager.RemoveLobbyServer(_LobbySelectedID))
+            {
+                MessageBox.Show("Failed to remove lobby server. Please try again.", "Removal Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-            // Reset Form
-            lobbyAction_ResetForm();
+            MessageBox.Show("Lobby server removed successfully.", "Removal Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // Refresh the server list
+            LoadLobbySettings();
+			// Reset Form
+			lobbyAction_ResetForm();
             // Reset Buttons
             lobbyAction_ButtonReset();
         }
@@ -402,9 +486,10 @@ namespace BHD_ServerManager.Forms.Panels
             tb_lobbySiteName.Text = server.SiteName;
             tb_lobbySecretKey.Text = server.SecretKey;
             num_lobbyGamePort.Value = Math.Max(num_lobbyGamePort.Minimum, Math.Min(num_lobbyGamePort.Maximum, server.GamePort));
+            cb_lobbyEnabled.Checked = server.IsEnabled;
 
-            // Buttons stats
-            btn_lobbySave.Enabled = true;
+			// Buttons stats
+			btn_lobbySave.Enabled = true;
             btn_lobbyAdd.Enabled = false;
             btn_lobbyRemove.Enabled = true;
             btn_lobbyNew.Enabled = true;

@@ -30,14 +30,21 @@ namespace HawkSyncShared.DTOs.tabStats
         int UpdateIntervalSeconds,
         int SortOrder
     );
-
-    public record WebStatsServersResponse(
-        List<BabstatsServerSettings> Servers
-    );
-
-    public record SaveBabstatsServerRequest(
+    /// <summary>
+    /// Represents a request containing server settings for a Babstats server operation.
+    /// </summary>
+    /// <param name="Server">The server settings to be used for the Babstats server request. Cannot be null.</param>
+    public record BabstatsServerRequest(
         BabstatsServerSettings Server
     );
+
+    /// <summary>
+    /// Represents a request to configure or interact with a lobby server using the specified server settings.
+    /// </summary>
+    /// <param name="Server">The settings that define the configuration and behavior of the lobby server for this request. Cannot be null.</param>
+    public record LobbyServerRequest(
+        LobbyServerSettings Server
+	);
 
     /// <summary>
     /// DTO for web stats validation request.

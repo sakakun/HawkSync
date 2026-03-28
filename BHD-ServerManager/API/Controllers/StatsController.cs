@@ -20,8 +20,8 @@ public class StatsController : ControllerBase
         return permissions.Contains(permission);
     }
 
-    [HttpPost("servers/save")]
-    public async Task<ActionResult<CommandResult>> SaveBabstatsServer([FromBody] SaveBabstatsServerRequest req) {
+    [HttpPost("babstats/servers/save")]
+    public async Task<ActionResult<CommandResult>> SaveBabstatsServer([FromBody] BabstatsServerRequest req) {
 
         if (!HasPermission("stats")) return Forbid();
 
@@ -40,8 +40,8 @@ public class StatsController : ControllerBase
 
     }
 
-    [HttpPost("servers/add")]
-    public async Task<ActionResult<CommandResult>> AddBabstatsServer([FromBody] SaveBabstatsServerRequest req) {
+    [HttpPost("babstats/servers/add")]
+    public async Task<ActionResult<CommandResult>> AddBabstatsServer([FromBody] BabstatsServerRequest req) {
 
         if (!HasPermission("stats")) return Forbid();
 
@@ -68,7 +68,7 @@ public class StatsController : ControllerBase
 
     }
 
-    [HttpPost("servers/remove")]
+    [HttpPost("babstats/servers/remove")]
     public async Task<ActionResult<CommandResult>> RemoveBabstatsServer([FromBody] int serverID) {
 
         if (!HasPermission("stats")) return Forbid();
@@ -93,7 +93,7 @@ public class StatsController : ControllerBase
 
     }
 
-    [HttpPost("servers/clearAnnoucements")]
+    [HttpPost("babstats/servers/clearAnnoucements")]
     public async Task<ActionResult<CommandResult>> ClearBabstatsAnnoucements([FromBody] bool req) {
 
         if (!HasPermission("stats")) return Forbid();
@@ -108,7 +108,7 @@ public class StatsController : ControllerBase
 
     }
 
-	[HttpPost("validate")]
+	[HttpPost("babstats/validate")]
     public async Task<ActionResult<CommandResult>> ValidateWebStatsConnection([FromBody] WebStatsValidateRequest req)
     {
         if (!HasPermission("stats")) return Forbid();
@@ -130,6 +130,79 @@ public class StatsController : ControllerBase
             Success = result.Success,
             Message = result.Message
         });
+    }
+
+    [HttpPost("lobby/servers/save")]
+    public async Task<ActionResult<CommandResult>> SaveLobbyServer([FromBody] LobbyServerRequest req) {
+
+        if (!HasPermission("stats")) return Forbid();
+
+        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerUri))
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
+    
+        bool success = DatabaseManager.UpdateLobbyServer(req.Server);
+
+        CommonCore.instanceStats!.ForceUIUpdate = true;
+
+		return Ok(new CommandResult
+        {
+            Success = success,
+            Message = "Babstats server settings saved successfully."
+		});
+
+    }
+
+    [HttpPost("lobby/servers/add")]
+    public async Task<ActionResult<CommandResult>> AddLobbyServer([FromBody] LobbyServerRequest req) {
+
+        if (!HasPermission("stats")) return Forbid();
+
+        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerUri))
+            return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
+    
+        string message = "Server Added Successfully.";
+        bool success = true;
+
+		try {
+            DatabaseManager.AddLobbyServer(req.Server);
+        } catch (Exception ex) {
+            success = false;
+            message = ex.Message;
+        }
+
+		CommonCore.instanceStats!.ForceUIUpdate = true;
+
+		return Ok(new CommandResult
+        {
+            Success = success,
+            Message = message
+		});
+
+    }
+
+    [HttpPost("lobby/servers/remove")]
+    public async Task<ActionResult<CommandResult>> RemoveLobbyServer([FromBody] int serverID) {
+
+        if (!HasPermission("stats")) return Forbid();
+
+        string message = "Server Removed Successfully.";
+        bool success = true;
+
+		try {
+            success = DatabaseManager.RemoveLobbyServer(serverID);
+		} catch (Exception ex) {
+            success = false;
+            message = ex.Message;
+        }
+
+		CommonCore.instanceStats!.ForceUIUpdate = true;
+
+		return Ok(new CommandResult
+        {
+            Success = success,
+            Message = message
+		});
+
     }
 
     private void LogStatsAction(string actionType, string description, bool success, string message)

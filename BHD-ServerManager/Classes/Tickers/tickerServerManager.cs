@@ -127,7 +127,8 @@ namespace BHD_ServerManager.Classes.Tickers
                     statsInstanceManager.RunPlayerStatsUpdate();                        // Collect Player Stats
 
                     RunBabstatsOnlineHooks();                                           // Babstats Updates and Reports
-                }
+                    RunLobbyReportingOnlineHooks();                                     // Lobby Reporting Updates and Reports
+				}
                 // 5. Scoring
                 else if (theInstance.instanceStatus == InstanceStatus.SCORING)
                 {
@@ -259,6 +260,19 @@ namespace BHD_ServerManager.Classes.Tickers
                 Task.Run(() => statsInstanceManager.SendImportData(serverCopy));
             }
         }
+
+        private static void RunLobbyReportingOnlineHooks()
+        { 
+            var enabledServers = statsInstance.GetEnabledLobbyServers().ToList();
+            if (enabledServers.Count == 0)
+            {
+                return;
+			}
+
+
+
+		}
+
 
     }
 }

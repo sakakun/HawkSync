@@ -3280,7 +3280,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             catch
             {
                 tx.Rollback();
-                throw;
+                return false;
             }
         }
 
@@ -3314,7 +3314,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             catch
             {
                 tx.Rollback();
-                throw;
+                return false;
             }
         }
 
@@ -3350,5 +3350,153 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
         }
 
-    }
+        public static List<LobbyServerSettings> GetLobbyServers()
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            var servers = new List<LobbyServerSettings>();
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT LobbyServerID, SiteName, ServerUri, GamePort, SecretKey, IsEnabled, SortOrder
+                FROM tb_lobbyServers
+                ORDER BY SortOrder, LobbyServerID;
+            ";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                servers.Add(new LobbyServerSettings(
+                    LobbyServerID: reader.GetInt32(0),
+                    SiteName: reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                    ServerUri: reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                    GamePort: reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
+                    SecretKey: reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                    IsEnabled: reader.GetInt32(5) == 1,
+                    SortOrder: reader.IsDBNull(6) ? 0 : reader.GetInt32(6)
+                ));
+            }
+
+            return servers;
+        }
+
+        public static bool UpdateLobbyServer(LobbyServerSettings server)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    UPDATE tb_lobbyServers
+                    SET SiteName = $siteName,
+                        ServerUri = $serverUri,
+                        GamePort = $gamePort,
+                        SecretKey = $secretKey,
+                        IsEnabled = $isEnabled,
+                        SortOrder = $sortOrder,
+                        UpdatedUtc = datetime('now')
+                    WHERE LobbyServerID = $id;
+                ";
+                cmd.Parameters.AddWithValue("$id", server.LobbyServerID);
+                cmd.Parameters.AddWithValue("$siteName", server.SiteName ?? string.Empty);
+                cmd.Parameters.AddWithValue("$serverUri", server.ServerUri ?? string.Empty);
+                cmd.Parameters.AddWithValue("$gamePort", server.GamePort);
+                cmd.Parameters.AddWithValue("$secretKey", server.SecretKey ?? string.Empty);
+                cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
+                cmd.Parameters.AddWithValue("$sortOrder", server.SortOrder);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", $"Updated lobby server ID: {server.LobbyServerID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                return false;
+            }
+        }
+
+        public static bool AddLobbyServer(LobbyServerSettings server)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    INSERT INTO tb_lobbyServers
+                        (SiteName, ServerUri, GamePort, SecretKey, IsEnabled, SortOrder, CreatedUtc, UpdatedUtc)
+                    VALUES
+                        ($siteName, $serverUri, $gamePort, $secretKey, $isEnabled, $sortOrder, datetime('now'), datetime('now'));
+                ";
+                cmd.Parameters.AddWithValue("$siteName", server.SiteName ?? string.Empty);
+                cmd.Parameters.AddWithValue("$serverUri", server.ServerUri ?? string.Empty);
+                cmd.Parameters.AddWithValue("$gamePort", server.GamePort);
+                cmd.Parameters.AddWithValue("$secretKey", server.SecretKey ?? string.Empty);
+                cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
+                cmd.Parameters.AddWithValue("$sortOrder", server.SortOrder);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", $"Added lobby server: {server.SiteName} ({server.ServerUri})");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                return false;
+            }
+        }
+
+        public static bool RemoveLobbyServer(int lobbyID)
+        {
+            if (!IsInitialized)
+                throw new InvalidOperationException("DatabaseManager is not initialized.");
+
+            using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
+            conn.Open();
+
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
+                    DELETE FROM tb_lobbyServers
+                    WHERE LobbyServerID = $id;
+                ";
+                cmd.Parameters.AddWithValue("$id", lobbyID);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                tx.Commit();
+                AppDebug.Log("DatabaseManager", $"Removed lobby server ID: {lobbyID}");
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                tx.Rollback();
+                return false;
+            }
+        }
+
+
+	}
 }
