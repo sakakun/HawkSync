@@ -218,17 +218,15 @@ jobs:
     - name: Copy NetLimiterBridge to Framework-Dependent output
       shell: pwsh
       run: |
-        New-Item -ItemType Directory -Force -Path ./publish/framework-dependent/ServerManager/NetLimiterBridge
         Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/framework-dependent/ServerManager/NetLimiterBridge/ `
+          -Destination ./publish/framework-dependent/ServerManager/ `
           -Recurse -Force
 
     - name: Copy NetLimiterBridge to Self-Contained output
       shell: pwsh
       run: |
-        New-Item -ItemType Directory -Force -Path ./publish/self-contained/ServerManager/NetLimiterBridge
         Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/self-contained/ServerManager/NetLimiterBridge/ `
+          -Destination ./publish/self-contained/ServerManager/ `
           -Recurse -Force
 
     # Copy HawkSyncShared to both outputs (for both ServerManager and RemoteClient)
