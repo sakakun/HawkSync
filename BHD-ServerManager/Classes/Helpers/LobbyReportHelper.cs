@@ -88,8 +88,9 @@ namespace BHD_ServerManager.Classes.Helpers
         /// <returns></returns>
         public static async Task<HeartBeatResponse> SendHeartbeat(string uriString = "http://nw.novahq.net/server/heartbeat-dll", string SKey = "SECRET_KEY", string reportPort = null!, string modString = null!, string? localIp = null, CancellationToken cancellationToken = default)
         {
-            // Per-request cancellation source that is linked to the caller's token and enforces a 10s timeout.
-            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+			// uriString default is never used as in practice the script always passes the URI, but it's there for safety and testing purposes.
+			// Per-request cancellation source that is linked to the caller's token and enforces a 10s timeout.
+			using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             linkedCts.CancelAfter(TimeSpan.FromSeconds(10));
             var ct = linkedCts.Token;
 
