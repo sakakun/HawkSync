@@ -109,6 +109,7 @@ public partial class tabProfile : UserControl
         num_remotePort.ValueChanged += Control_ValueChanged;
         num_minPing.ValueChanged += Control_ValueChanged;
         num_maxPing.ValueChanged += Control_ValueChanged;
+        num_PlayerIdleLimit.ValueChanged += Control_ValueChanged;
 
         // Wire up checkboxes
         cb_serverDedicated.CheckedChanged += Control_ValueChanged;
@@ -116,6 +117,7 @@ public partial class tabProfile : UserControl
         checkBox_enableRemote.CheckedChanged += Control_ValueChanged;
         cb_enableMinCheck.CheckedChanged += Control_ValueChanged;
         cb_enableMaxCheck.CheckedChanged += Control_ValueChanged;
+        checkBox_enableKickIdle.CheckedChanged += Control_ValueChanged;
 
         // Wire up all attribute checkboxes
         for (int i = 1; i <= 21; i++)
@@ -309,6 +311,8 @@ public partial class tabProfile : UserControl
             MaxPingValue = (int)num_maxPing.Value,
             EnableRemote = checkBox_enableRemote.Checked,
             RemotePort = (int)num_remotePort.Value,
+            EnableKickIdle = checkBox_enableKickIdle.Checked,
+            PlayerIdleLimit = (int)num_PlayerIdleLimit.Value,
             Attributes = new CommandLineFlagsDTO
             {
                 Flag01 = profileServerAttribute01.Checked,
@@ -376,6 +380,10 @@ public partial class tabProfile : UserControl
             cb_enableMaxCheck.Checked = theInstance.gameMaxPing;
             num_minPing.Value = theInstance.gameMinPingValue;
             num_maxPing.Value = theInstance.gameMaxPingValue;
+
+            // Player Idle Settings
+            checkBox_enableKickIdle.Checked = theInstance.gameEnableKickIdle;
+            num_PlayerIdleLimit.Value = theInstance.gameKickIdleTime;
 
             // Application Commandline Arguments
             profileServerAttribute01.Checked = theInstance.profileServerAttribute01;

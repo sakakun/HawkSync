@@ -28,13 +28,16 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
-			DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
+			DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+			DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
 			tableLayoutPanel1 = new TableLayoutPanel();
 			profileFileManagers = new TabControl();
 			tabProfilePage1 = new TabPage();
 			groupBox8 = new GroupBox();
 			tableLayoutPanel7 = new TableLayoutPanel();
+			num_PlayerIdleLimit = new NumericUpDown();
+			label_idleLimit = new Label();
+			checkBox_enableKickIdle = new CheckBox();
 			cb_enableMaxCheck = new CheckBox();
 			cb_enableMinCheck = new CheckBox();
 			num_maxPing = new NumericUpDown();
@@ -114,14 +117,12 @@
 			btn_saveProfile = new Button();
 			folderProfileBrowserDialog = new FolderBrowserDialog();
 			openFileDialog1 = new OpenFileDialog();
-			checkBox_enableKickIdle = new CheckBox();
-			label_idleLimit = new Label();
-			num_PlayerIdleLimit = new NumericUpDown();
 			tableLayoutPanel1.SuspendLayout();
 			profileFileManagers.SuspendLayout();
 			tabProfilePage1.SuspendLayout();
 			groupBox8.SuspendLayout();
 			tableLayoutPanel7.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).BeginInit();
 			((System.ComponentModel.ISupportInitialize)num_maxPing).BeginInit();
 			((System.ComponentModel.ISupportInitialize)num_minPing).BeginInit();
 			groupBox7.SuspendLayout();
@@ -145,7 +146,6 @@
 			((System.ComponentModel.ISupportInitialize)dgvAuditLogs).BeginInit();
 			groupBox4.SuspendLayout();
 			tableLayoutPanel4.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).BeginInit();
 			SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -221,6 +221,40 @@
 			tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 			tableLayoutPanel7.Size = new Size(422, 57);
 			tableLayoutPanel7.TabIndex = 0;
+			// 
+			// num_PlayerIdleLimit
+			// 
+			num_PlayerIdleLimit.Location = new Point(361, 31);
+			num_PlayerIdleLimit.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
+			num_PlayerIdleLimit.Name = "num_PlayerIdleLimit";
+			num_PlayerIdleLimit.Size = new Size(58, 23);
+			num_PlayerIdleLimit.TabIndex = 13;
+			num_PlayerIdleLimit.TextAlign = HorizontalAlignment.Center;
+			// 
+			// label_idleLimit
+			// 
+			label_idleLimit.AutoSize = true;
+			label_idleLimit.Dock = DockStyle.Fill;
+			label_idleLimit.Location = new Point(277, 28);
+			label_idleLimit.Name = "label_idleLimit";
+			label_idleLimit.Size = new Size(78, 29);
+			label_idleLimit.TabIndex = 12;
+			label_idleLimit.Text = "Idle Limit";
+			label_idleLimit.TextAlign = ContentAlignment.MiddleRight;
+			// 
+			// checkBox_enableKickIdle
+			// 
+			checkBox_enableKickIdle.AutoSize = true;
+			checkBox_enableKickIdle.CheckAlign = ContentAlignment.MiddleRight;
+			tableLayoutPanel7.SetColumnSpan(checkBox_enableKickIdle, 2);
+			checkBox_enableKickIdle.Dock = DockStyle.Fill;
+			checkBox_enableKickIdle.Location = new Point(277, 3);
+			checkBox_enableKickIdle.Name = "checkBox_enableKickIdle";
+			checkBox_enableKickIdle.Size = new Size(142, 22);
+			checkBox_enableKickIdle.TabIndex = 10;
+			checkBox_enableKickIdle.Text = "Kick Idle Players";
+			checkBox_enableKickIdle.TextAlign = ContentAlignment.MiddleRight;
+			checkBox_enableKickIdle.UseVisualStyleBackColor = true;
 			// 
 			// cb_enableMaxCheck
 			// 
@@ -1092,17 +1126,17 @@
 			dgvAuditLogs.AllowUserToAddRows = false;
 			dgvAuditLogs.AllowUserToDeleteRows = false;
 			dgvAuditLogs.AllowUserToResizeRows = false;
-			dataGridViewCellStyle9.BackColor = Color.FromArgb(240, 240, 240);
-			dgvAuditLogs.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle9;
+			dataGridViewCellStyle1.BackColor = Color.FromArgb(240, 240, 240);
+			dgvAuditLogs.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
 			dgvAuditLogs.BorderStyle = BorderStyle.Fixed3D;
-			dataGridViewCellStyle10.Alignment = DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle10.BackColor = Color.FromArgb(230, 230, 230);
-			dataGridViewCellStyle10.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-			dataGridViewCellStyle10.ForeColor = SystemColors.WindowText;
-			dataGridViewCellStyle10.SelectionBackColor = SystemColors.Highlight;
-			dataGridViewCellStyle10.SelectionForeColor = SystemColors.HighlightText;
-			dataGridViewCellStyle10.WrapMode = DataGridViewTriState.True;
-			dgvAuditLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
+			dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle2.BackColor = Color.FromArgb(230, 230, 230);
+			dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+			dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+			dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+			dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+			dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+			dgvAuditLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
 			dgvAuditLogs.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			dgvAuditLogs.Columns.AddRange(new DataGridViewColumn[] { Time, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3, dataGridViewTextBoxColumn4, Description, Status });
 			dgvAuditLogs.Dock = DockStyle.Fill;
@@ -1226,40 +1260,6 @@
 			// 
 			openFileDialog1.FileName = "openModFileDialog";
 			// 
-			// checkBox_enableKickIdle
-			// 
-			checkBox_enableKickIdle.AutoSize = true;
-			checkBox_enableKickIdle.CheckAlign = ContentAlignment.MiddleRight;
-			tableLayoutPanel7.SetColumnSpan(checkBox_enableKickIdle, 2);
-			checkBox_enableKickIdle.Dock = DockStyle.Fill;
-			checkBox_enableKickIdle.Location = new Point(277, 3);
-			checkBox_enableKickIdle.Name = "checkBox_enableKickIdle";
-			checkBox_enableKickIdle.Size = new Size(142, 22);
-			checkBox_enableKickIdle.TabIndex = 10;
-			checkBox_enableKickIdle.Text = "Kick Idle Players";
-			checkBox_enableKickIdle.TextAlign = ContentAlignment.MiddleRight;
-			checkBox_enableKickIdle.UseVisualStyleBackColor = true;
-			// 
-			// label_idleLimit
-			// 
-			label_idleLimit.AutoSize = true;
-			label_idleLimit.Dock = DockStyle.Fill;
-			label_idleLimit.Location = new Point(277, 28);
-			label_idleLimit.Name = "label_idleLimit";
-			label_idleLimit.Size = new Size(78, 29);
-			label_idleLimit.TabIndex = 12;
-			label_idleLimit.Text = "Idle Limit";
-			label_idleLimit.TextAlign = ContentAlignment.MiddleRight;
-			// 
-			// num_PlayerIdleLimit
-			// 
-			num_PlayerIdleLimit.Location = new Point(361, 31);
-			num_PlayerIdleLimit.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
-			num_PlayerIdleLimit.Name = "num_PlayerIdleLimit";
-			num_PlayerIdleLimit.Size = new Size(58, 23);
-			num_PlayerIdleLimit.TabIndex = 13;
-			num_PlayerIdleLimit.TextAlign = HorizontalAlignment.Center;
-			// 
 			// tabProfile
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1273,6 +1273,7 @@
 			groupBox8.ResumeLayout(false);
 			tableLayoutPanel7.ResumeLayout(false);
 			tableLayoutPanel7.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).EndInit();
 			((System.ComponentModel.ISupportInitialize)num_maxPing).EndInit();
 			((System.ComponentModel.ISupportInitialize)num_minPing).EndInit();
 			groupBox7.ResumeLayout(false);
@@ -1303,7 +1304,6 @@
 			((System.ComponentModel.ISupportInitialize)dgvAuditLogs).EndInit();
 			groupBox4.ResumeLayout(false);
 			tableLayoutPanel4.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).EndInit();
 			ResumeLayout(false);
 		}
 

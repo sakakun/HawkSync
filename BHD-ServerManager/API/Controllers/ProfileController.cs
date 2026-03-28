@@ -89,7 +89,9 @@ public class ProfileController : ControllerBase
                 request.Attributes.Flag17, request.Attributes.Flag18,
                 request.Attributes.Flag19, request.Attributes.Flag20,
                 request.Attributes.Flag21
-            )
+            ),
+            EnableKickIdle: request.EnableKickIdle,
+            PlayerIdleLimit: request.PlayerIdleLimit
         );
 
         // Save via manager
@@ -143,7 +145,9 @@ public class ProfileController : ControllerBase
                 request.Attributes.Flag17, request.Attributes.Flag18,
                 request.Attributes.Flag19, request.Attributes.Flag20,
                 request.Attributes.Flag21
-            )
+            ),
+            request.EnableKickIdle,
+            request.PlayerIdleLimit
         );
 
         var (isValid, errors) = theInstanceManager.ValidateProfileSettings(settings);

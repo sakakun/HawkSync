@@ -785,7 +785,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                             process.WaitForExit(5000); // Wait up to 5 seconds for exit
                         }
 
-                        DFBHDPatcher.Unpatch(FullFileName);
+                        // DFBHDPatcher.Unpatch(FullFileName);
 
                     }
                     catch (ArgumentException)

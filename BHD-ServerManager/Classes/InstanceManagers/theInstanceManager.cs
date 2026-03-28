@@ -58,7 +58,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         int MaxPingValue,
         bool EnableRemote,
         int RemotePort,
-        CommandLineFlags Attributes
+        CommandLineFlags Attributes,
+        bool EnableKickIdle,
+        int PlayerIdleLimit
     );
 
     /// <summary>
@@ -233,7 +235,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     MaxPingValue: ServerSettings.Get("gameMaxPingValue", 999),
                     EnableRemote: ServerSettings.Get("profileEnableRemote", false),
                     RemotePort: ServerSettings.Get("profileRemotePort", 9090),
-                    Attributes: flags
+                    Attributes: flags,
+                    EnableKickIdle: ServerSettings.Get("gameEnableKickIdle", false),
+                    PlayerIdleLimit: ServerSettings.Get("gameKickIdleTime", 120)
                 );
 
                 // Update instance
@@ -282,6 +286,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("gameMaxPingValue", settings.MaxPingValue);
                 ServerSettings.Set("profileEnableRemote", settings.EnableRemote);
                 ServerSettings.Set("profileRemotePort", settings.RemotePort);
+                // Save idle kick fields
+                ServerSettings.Set("gameEnableKickIdle", settings.EnableKickIdle);
+                ServerSettings.Set("gameKickIdleTime", settings.PlayerIdleLimit);
 
                 // Save command-line flags
                 ServerSettings.Set("profileServerAttribute01", settings.Attributes.Flag01);
@@ -407,7 +414,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     theInstance.gameLocalPlay, theInstance.gameCountryCode, theInstance.gameMinPing, theInstance.gameMaxPing,
                     theInstance.gameMinPingValue, theInstance.gameMaxPingValue,
                     theInstance.profileEnableRemote, theInstance.profileRemotePort,
-                    flags
+                    flags,
+                    theInstance.gameEnableKickIdle, // EnableKickIdle
+                    theInstance.gameKickIdleTime   // PlayerIdleLimit
                 );
 
                 var options = new JsonSerializerOptions { WriteIndented = true };
@@ -1060,6 +1069,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             theInstance.gameMaxPingValue = settings.MaxPingValue;
             theInstance.profileEnableRemote = settings.EnableRemote;
             theInstance.profileRemotePort = settings.RemotePort;
+            // Map idle kick fields
+            theInstance.gameEnableKickIdle = settings.EnableKickIdle;
+            theInstance.gameKickIdleTime = settings.PlayerIdleLimit;
 
             theInstance.profileServerAttribute01 = settings.Attributes.Flag01;
             theInstance.profileServerAttribute02 = settings.Attributes.Flag02;
@@ -1545,8 +1557,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         /// <summary>
         /// Get the current status of the embedded API
-        /// </summary>
-        /// <returns>Tuple with (isEnabled, isRunning, port)</returns>
+        /// /// <returns>Tuple with (isEnabled, isRunning, port)</returns>
         public static (bool isEnabled, bool isRunning, int port) GetApiStatus()
         {
             return (

@@ -156,4 +156,13 @@ namespace HawkSyncShared.DTOs.tabPlayers
         SAS_GUNNER = 12,
     }
 
+    public record PlayerIdleState
+    {
+        public float PosX, PosY, PosZ;
+        public float FacingYaw, FacingPitch;
+        public int ShotsFired;
+        public int Health;
+        public DateTime LastActive;
+    }
+
 }

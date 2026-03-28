@@ -5,6 +5,7 @@ using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
+using Windows.Storage;
 
 namespace BHD_ServerManager.Classes.Tickers
 {
@@ -17,6 +18,8 @@ namespace BHD_ServerManager.Classes.Tickers
 
         // Track disarmed players and their re-arm time
         private static Dictionary<int, DateTime> disarmedPlayers = new Dictionary<int, DateTime>();
+
+        private static readonly Dictionary<int, PlayerIdleState> playerIdleStates = new();
         
         // Track if weapon config has been logged
         private static bool weaponConfigLogged = false;
@@ -40,9 +43,12 @@ namespace BHD_ServerManager.Classes.Tickers
                 
                 // Check for weapon restrictions based on player count threshold
                 CheckWeaponRestrictions();
-                
-                // Clean up disconnected players from weapon restriction tracking
-                playerInstanceManager.CleanupDisconnectedPlayers();
+
+				// Check for Idle players and kick if enabled
+                CheckForIdlePlayers();
+
+				// Clean up disconnected players from weapon restriction tracking
+				playerInstanceManager.CleanupDisconnectedPlayers();
             }
 
             // Now update the UI
@@ -220,5 +226,108 @@ namespace BHD_ServerManager.Classes.Tickers
             AppDebug.Log("WeaponRestrictionCheck", $"=== CheckWeaponRestrictions END === Checked {checkedCount} players");
         }
 
+        private class PlayerIdleState
+        {
+            public float PosX, PosY, PosZ;
+            public float FacingYaw, FacingPitch;
+            public int ShotsFired;
+            public int Health;
+            public DateTime LastActive;
+        }
+
+        public static void CheckForIdlePlayers()
+        {
+            if (!thisInstance.gameEnableKickIdle)
+                return;
+
+            int idleLimit = thisInstance.gameKickIdleTime;
+            if (idleLimit == 0)
+                return;
+
+            var now = DateTime.Now;
+            var toKick = new List<int>();
+
+            foreach (var playerKvp in playerInstance.PlayerList.ToList())
+            {
+                int playerSlot = playerKvp.Key;
+                var playerInfo = playerKvp.Value;
+
+                // Read current state
+                float posX = playerInfo.PosX;
+                float posY = playerInfo.PosY;
+                float posZ = playerInfo.PosZ;
+                float yaw = playerInfo.FacingYaw;
+                float pitch = playerInfo.FacingPitch;
+                int shots = playerInfo.stat_TotalShotsFired;
+                int health = playerInfo.PlayerHealth;
+
+                AppDebug.Log("IdleCheck", $"Checking player {playerInfo.PlayerName} (slot {playerSlot}): Pos({posX}, {posY}, {posZ}), Facing({yaw}, {pitch}), ShotsFired: {shots}, Health: {health}");
+
+                if (!playerIdleStates.TryGetValue(playerSlot, out var state))
+                {
+                    // First time tracking this player
+                    playerIdleStates[playerSlot] = new PlayerIdleState
+                    {
+                        PosX = posX,
+                        PosY = posY,
+                        PosZ = posZ,
+                        FacingYaw = yaw,
+                        FacingPitch = pitch,
+                        ShotsFired = shots,
+                        Health = health,
+                        LastActive = now
+                    };
+                    continue;
+                }
+
+                // Use a threshold to ignore floating-point noise
+                const float movementThreshold = 0.01f;
+                bool moved = Math.Abs(state.PosX - posX) > movementThreshold ||
+                             Math.Abs(state.PosY - posY) > movementThreshold ||
+                             Math.Abs(state.PosZ - posZ) > movementThreshold;
+                bool turned = Math.Abs(state.FacingYaw - yaw) > movementThreshold ||
+                              Math.Abs(state.FacingPitch - pitch) > movementThreshold;
+
+                // If any activity, update state
+                if (moved || turned || state.ShotsFired != shots || (health > 0 && state.Health <= 0) || (health <= 0 && state.Health > 0))
+                {
+                    state.PosX = posX;
+                    state.PosY = posY;
+                    state.PosZ = posZ;
+                    state.FacingYaw = yaw;
+                    state.FacingPitch = pitch;
+                    state.ShotsFired = shots;
+                    state.Health = health;
+                    state.LastActive = now;
+                    continue;
+                }
+
+                // If health is 0 for the whole idle period, treat as idle
+                bool deadTooLong = health <= 0 && state.Health <= 0 && (now - state.LastActive).TotalSeconds >= idleLimit;
+                // If alive and idle
+                bool aliveAndIdle = health > 0 && (now - state.LastActive).TotalSeconds >= idleLimit;
+
+                if (deadTooLong || aliveAndIdle)
+                {
+                    toKick.Add(playerSlot);
+                }
+            }
+
+            // Kick idle players
+            foreach (var slot in toKick)
+            {
+                if (playerInstance.PlayerList.TryGetValue(slot, out var playerInfo))
+                {
+                    playerInstanceManager.KickPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
+				}
+                playerIdleStates.Remove(slot);
+            }
+
+            // Clean up tracking for disconnected players
+            var disconnected = playerIdleStates.Keys.Except(playerInstance.PlayerList.Keys).ToList();
+            foreach (var slot in disconnected)
+                playerIdleStates.Remove(slot);
+        }
     }
+
 }

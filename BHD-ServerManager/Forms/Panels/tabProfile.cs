@@ -188,6 +188,10 @@ namespace BHD_ServerManager.Forms.Panels
 			{
 				profileAttributes[i].Checked = instanceAttributes[i];
 			}
+
+			// Idle Kick Settings
+			checkBox_enableKickIdle.Checked = theInstance!.gameEnableKickIdle;
+			num_PlayerIdleLimit.Value = theInstance.gameKickIdleTime;
 		}
 
 		/// <summary>
@@ -238,6 +242,8 @@ namespace BHD_ServerManager.Forms.Panels
 				MaxPingValue: (int)num_maxPing.Value,
 				EnableRemote: checkBox_enableRemote.Checked,
 				RemotePort: (int)num_remotePort.Value,
+				EnableKickIdle: checkBox_enableKickIdle.Checked,
+				PlayerIdleLimit: (int)num_PlayerIdleLimit.Value,
 				Attributes: flags
 			);
 		}

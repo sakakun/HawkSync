@@ -23,6 +23,8 @@ public record ProfileSettingsRequest
     public int MaxPingValue { get; init; }
     public bool EnableRemote { get; init; }
     public int RemotePort { get; init; }
+    public bool EnableKickIdle { get; init; }
+    public int PlayerIdleLimit { get; init; }
     public CommandLineFlagsDTO Attributes { get; init; } = new();
 }
 
