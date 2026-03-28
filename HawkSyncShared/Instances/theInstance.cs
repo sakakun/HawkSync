@@ -90,9 +90,11 @@ namespace HawkSyncShared.Instances
         public int              gameFlagReturnTime          { get; set; } = 4;   /* Flag return time in minutes */
         public int              gameMaxTeamLives            { get; set; } = 100; /* Not Used by DFBHD, kept for legacy reasons */
 		public int              gameFullWeaponThreshold     { get; set; } = 10;  /* Number of players required for full weapons */
+        public bool             gameEnableKickIdle          { get; set; } = false;
+        public int              gameKickIdleTime            { get; set; } = 120;  /* Time in seconds before idle kick */
 
-        // Game Settings: Misc Settings
-        public bool             gameOneShotKills            { get; set; } = false;
+		// Game Settings: Misc Settings
+		public bool             gameOneShotKills            { get; set; } = false;
         public bool             gameFatBullets              { get; set; } = false;
         public bool             gameDestroyBuildings        { get; set; } = false;
         public bool             gameAllowLeftLeaning        { get; set; } = true;
