@@ -1,6 +1,6 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement.Memory;
+using BHD_ServerManager.Classes.GameManagement;
 using HawkSyncShared.Instances;
 using HawkSyncShared.DTOs.tabPlayers;
 using BHD_ServerManager.Classes.Services.NetLimiter;

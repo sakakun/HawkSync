@@ -1,5 +1,5 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.GameManagement.Memory;
+using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
@@ -94,7 +94,8 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 2. Loading Map
                 if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
                 {
-                    theInstance.instanceScoringProcRun = true;
+                    AppDebug.Log("tickerServerManagement", "Loading Map Phase");
+					theInstance.instanceScoringProcRun = true;
                     theInstance.instanceCrashCounter = 0;                               // Reset crash counter
                     tickerEvent_preGameProcessing();                                    // Run pre-game processing
                     ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
@@ -102,7 +103,8 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 3. Start Delay
                 else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
                 {
-                    if (!theInstance.instancePreGameProcRun)
+                    AppDebug.Log("tickerServerManagement", "Start Delay Phase");
+					if (!theInstance.instancePreGameProcRun)
                     {
                         mapInstance.ActualPlayingMapIndex = mapInstance.CurrentMapIndex;    // Set the actual playing map index
                         theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag
@@ -118,7 +120,8 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 4. Online (game in progress)
                 else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
                 {
-                    theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag                  
+                    AppDebug.Log("tickerServerManagement", "Online Phase");
+					theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag                                     
 
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
                     ServerMemory.GetMapData();                                          // Grab the Current Map Type and the Next Map Type

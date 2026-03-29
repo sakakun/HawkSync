@@ -18,7 +18,21 @@ namespace HawkSyncShared.SupportClasses
                 return;
             }
 
-            return;
+			// If program ran with /debug argument, log to file
+            if (Environment.GetCommandLineArgs().Length > 1 && Environment.GetCommandLineArgs()[1].Equals("/debug", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    File.AppendAllText(LogFilePath, logMessage + Environment.NewLine);
+                }
+                catch (Exception ex)
+                {
+                    // If logging fails, write to debug output
+                    Debug.WriteLine($"[ERROR] Failed to write to log file: {ex.Message}");
+                }
+			}
+
+			return;
         }
     }
 }
