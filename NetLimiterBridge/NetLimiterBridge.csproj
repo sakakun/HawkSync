@@ -12,11 +12,7 @@
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <PublishUrl>C:\Users\matth\source\repos\Publish\NetLimiterBridge\</PublishUrl>
+    <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -26,18 +22,20 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
-    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>\\VM-DEV\ServerData\Development\HawkSync\Server-Manager\Debug\net10.0-windows10.0.19041.0\NetLimiterBridge\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -56,24 +54,6 @@
   <PropertyGroup>
     <StartupObject>NetLimiterBridge.Program</StartupObject>
   </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>F6B9D872CE8A0E66C163ED5620608122E23F8764</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>NetLimiterBridge_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetZone>LocalIntranet</TargetZone>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>true</SignManifests>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Messages.cs" />
     <Compile Include="NetLimiterBridge.cs" />
@@ -87,8 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="NetLimiterBridge_TemporaryKey.pfx" />
-    <None Include="Properties\app.manifest" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8.1">
@@ -107,13 +85,13 @@
       <Version>6.5.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces">
-      <Version>10.0.5</Version>
+      <Version>8.0.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <Version>10.0.5</Version>
+      <Version>8.0.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions">
-      <Version>10.0.5</Version>
+      <Version>8.0.0</Version>
     </PackageReference>
     <PackageReference Include="NetLimiter">
       <Version>5.3.18</Version>
@@ -131,7 +109,7 @@
       <Version>1.0.119</Version>
     </PackageReference>
     <PackageReference Include="System.Data.SQLite.EF6">
-      <Version>2.0.3</Version>
+      <Version>1.0.119</Version>
     </PackageReference>
     <PackageReference Include="System.Data.SQLite.Linq">
       <Version>1.0.119</Version>
@@ -146,13 +124,13 @@
       <Version>4.6.1</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime">
-      <Version>4.3.1</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>6.1.2</Version>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Algorithms">
-      <Version>4.3.1</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Encoding">
       <Version>4.3.0</Version>
@@ -161,10 +139,10 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.X509Certificates">
-      <Version>4.3.2</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Extensions">
-      <Version>4.6.3</Version>
+      <Version>4.5.4</Version>
     </PackageReference>
     <PackageReference Include="VirusTotalNet">
       <Version>2.2.0</Version>
