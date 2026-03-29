@@ -276,10 +276,11 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
             mapInstance.NextMapName = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName!;
             mapInstance.NextMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapFile!;
             mapInstance.IsNextMap4Team = mapInstanceManager.Is4TeamMap(mapInstance.NextMapFile);
+            mapInstance.IsNextMapHideSeek = mapInstanceManager.IsHideSeek(mapInstance.NextMapFile);
 
-            mapInstance.CurrentMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][mapInstance.ActualPlayingMapIndex].MapFile;
+			mapInstance.CurrentMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][mapInstance.ActualPlayingMapIndex].MapFile;
             mapInstance.IsCurrentMap4Team = mapInstanceManager.Is4TeamMap(mapInstance.CurrentMapFile);
-
+            mapInstance.IsCurrentHideSeek = mapInstanceManager.IsHideSeek(mapInstance.CurrentMapFile);
 		}
         public static void SetNextMapType()
         {
@@ -293,8 +294,15 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
                 int nextMaptypeBytesWrite = 0;
                 WriteProcessMemory((int)processHandle, CurrentGameTypeAddr, nextMaptypeBytes, nextMaptypeBytes.Length, ref nextMaptypeBytesWrite);
 
-                // Determine if we need to enable/disable 4-team mode
-                bool shouldEnable4Teams = thisInstance.gameEnableFourTeams && 
+				// Determine if next map is a hide and seek map and update memory accordingly
+                if(mapInstance.IsNextMapHideSeek) {
+                    ServerMemory.UpdateFlagReturnTime(thisInstance.gameTimeLimit * 60); // Convert minutes to seconds and update the flag return time for hide and seek maps
+				} else {
+                    ServerMemory.UpdateFlagReturnTime();
+				}
+
+				// Determine if we need to enable/disable 4-team mode
+				bool shouldEnable4Teams = thisInstance.gameEnableFourTeams && 
                                          mapInstance.IsNextMap4Team &&
                                          (mapInstance.NextMapGameType == 1 || mapInstance.NextMapGameType == 3 || mapInstance.NextMapGameType == 8); // TDM or TKOTH or FBL
 

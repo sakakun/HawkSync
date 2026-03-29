@@ -655,6 +655,36 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
         }
 
+        /// <summary>
+        /// Check if a map file is a 4-team map (contains "4T3AM" in file contents)
+        /// </summary>
+        public static bool IsHideSeek(string mapFileName)
+        {
+            if (string.IsNullOrEmpty(mapFileName))
+                return false;
+
+            try
+            {
+                string gamePath = theInstance.profileServerPath;
+                
+                if (string.IsNullOrEmpty(gamePath))
+                    return false;
+
+                string filePath = Path.Combine(gamePath, mapFileName);
+                
+                if (!File.Exists(filePath))
+                    return false;
+
+                string fileContents = File.ReadAllText(filePath, Encoding.GetEncoding(1252));
+                return fileContents.Contains("H1D3S33K", StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("mapInstanceManager", $"Error checking if map is H1D3S33K: {ex.Message}");
+                return false;
+            }
+        }
+
         // ================================================================================
         // SERVER COORDINATION
         // ================================================================================

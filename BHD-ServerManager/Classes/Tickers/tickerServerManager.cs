@@ -167,8 +167,10 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 // Update the Global Game Type (Pinger Reasons)
                 ServerMemory.UpdateGlobalGameType();
+
                 // Update the Scores Required to Win the Game
                 ServerMemory.UpdateGameScores();
+
                 AppDebug.Log("tickerServerManagement", "Pre-game Complete");
             }
             
@@ -183,10 +185,13 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 // Read Winning Team
                 ServerMemory.ReadMemoryWinningTeam();
+
 				// Final Stats Update
 				SendScoringImportToEnabledBabstats();
+
                 // Set the Next Map Type
                 ServerMemory.SetNextMapType();
+
                 // Update the Scores Required to Win the Next Game
                 ServerMemory.UpdateGameScores();
 				// Scoreboard Delay Ticker

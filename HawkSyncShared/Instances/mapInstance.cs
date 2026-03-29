@@ -107,19 +107,29 @@ public class mapInstance
     /// </summary>
     public bool IsCurrentMap4Team { get; set; } = false;
 
-    // ================================================================================
-    // NEXT MAP INFO
-    // ================================================================================
-    
     /// <summary>
-    /// Is the next map a 4 Team Map?
+    /// Gets or sets a value indicating whether the current game mode is Hide and Seek.
     /// </summary>
-    public bool IsNextMap4Team { get; set; } = false;
+    public bool IsCurrentHideSeek { get; set; } = false;
+
+	// ================================================================================
+	// NEXT MAP INFO
+	// ================================================================================
+
+	/// <summary>
+	/// Is the next map a 4 Team Map?
+	/// </summary>
+	public bool IsNextMap4Team { get; set; } = false;
 
     /// <summary>
-    /// Next map to be played
+    /// Gets or sets a value indicating whether the next round is a hide-and-seek round.
     /// </summary>
-    public string NextMapName { get; set; } = string.Empty;
+    public bool IsNextMapHideSeek { get; set; } = false;
+
+	/// <summary>
+	/// Next map to be played
+	/// </summary>
+	public string NextMapName { get; set; } = string.Empty;
     
     /// <summary>
     /// Next map to be played

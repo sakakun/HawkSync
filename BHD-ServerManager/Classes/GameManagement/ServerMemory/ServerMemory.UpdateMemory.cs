@@ -96,9 +96,12 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
 
         }
         // Function: UpdateFlagReturnTime
-        public static void UpdateFlagReturnTime()
+        public static void UpdateFlagReturnTime(int returnTime = 999)
         {
-
+            // Allow for Overflow when needed, implmenting HideAndSeek
+            if (returnTime == 999) {
+                returnTime = thisInstance.gameFlagReturnTime;
+            } 
 
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
@@ -111,7 +114,7 @@ namespace BHD_ServerManager.Classes.GameManagement.Memory
             int FlagReturnTime = BitConverter.ToInt32(FlagReturnTimeBytes, 0);
 
             int FlagReturnTimeWritten = 0;
-            byte[] FlagReturnTimeWrite = BitConverter.GetBytes(thisInstance.gameFlagReturnTime);
+            byte[] FlagReturnTimeWrite = BitConverter.GetBytes(returnTime);
             WriteProcessMemory((int)processHandle, Ptr1Addr, FlagReturnTimeWrite, FlagReturnTimeWrite.Length, ref FlagReturnTimeWritten);
 
 
