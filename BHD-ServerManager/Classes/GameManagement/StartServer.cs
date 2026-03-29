@@ -747,8 +747,8 @@ namespace BHD_ServerManager.Classes.GameManagement
             // Game Didn't Crash Yay!  Dump Data to the Instance
             theInstance.instanceCrashCounter = 0;
 
-            // Wait for the Game to Start, 15 seconds to prevent memory corruption.
-            Thread.Sleep(5000);
+            // Wait for the Game to Start
+            Thread.Sleep(10000);
             // Get Server Memory Update
             ServerMemory.ReadMemoryServerStatus();
             // Set the Player Name of the Host of the Game Server
@@ -757,8 +757,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             ServerMemory.UpdateMapListCount();
             // Additional Game Settings to Set
             theInstanceManager.UpdateGameServer();
+            // Wait for the Game to Start, 15 seconds to prevent memory corruption.
+            Thread.Sleep(5000);
             // Set Next Game Map
             ServerMemory.UpdateNextMap(0);
+            // Wait for the Game to Start, 2 seconds to prevent memory corruption.
+            Thread.Sleep(2000);
             // Skip Map
             ServerMemory.WriteMemorySendConsoleCommand("resetgames");
 
