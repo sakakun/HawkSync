@@ -218,7 +218,7 @@ jobs:
     - name: Copy NetLimiterBridge to Framework-Dependent output
       shell: pwsh
       run: |
-        New-Item -ItemType Directory -Force -Path ./publish/self-contained/ServerManager/NetLimiterBridge
+        New-Item -ItemType Directory -Force -Path ./publish/framework-dependent/ServerManager/NetLimiterBridge
         Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
           -Destination ./publish/framework-dependent/ServerManager/NetLimiterBridge/ `
           -Recurse -Force
