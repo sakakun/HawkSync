@@ -536,6 +536,9 @@ namespace RemoteClient.Forms.Panels
             if(theInstance!.instanceStatus == InstanceStatus.OFFLINE)
                 return;
 
+            if (dataGridView_currentMaps.Rows.Count == 0)
+                return;
+
             // Reset all row colors to White
 			foreach (DataGridViewRow row in dataGridView_currentMaps.Rows)
             {
@@ -557,7 +560,7 @@ namespace RemoteClient.Forms.Panels
             }
 
             if (theInstance?.instanceStatus is InstanceStatus.ONLINE or InstanceStatus.STARTDELAY ) {
-
+                
 				// If the current map and next map are the same, highlight in light yellow to indicate loading/playing
                 if (currentMap == nextMap)
                 {
