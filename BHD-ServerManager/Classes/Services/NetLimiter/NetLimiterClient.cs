@@ -198,7 +198,7 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 
 		    try
 		    {
-		        var bridgePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NetLimiterBridge.exe");
+		        var bridgePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NetLimiterBridge", "NetLimiterBridge.exe");
 		        
 		        if (!File.Exists(bridgePath))
 		        {

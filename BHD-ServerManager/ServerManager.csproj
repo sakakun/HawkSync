@@ -84,7 +84,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HawkSyncShared\HawkSyncShared.csproj" />
-    <ProjectReference Include="..\NetLimiterBridge\NetLimiterBridge.csproj" />
   </ItemGroup>
 
   <ItemGroup>
