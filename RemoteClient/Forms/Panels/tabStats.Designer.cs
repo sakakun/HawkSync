@@ -485,7 +485,6 @@ namespace RemoteClient.Forms.Panels
 			tabLobby.Controls.Add(lobby_layout);
 			tabLobby.Location = new Point(4, 24);
 			tabLobby.Name = "tabLobby";
-			tabLobby.Padding = new Padding(3);
 			tabLobby.Size = new Size(958, 394);
 			tabLobby.TabIndex = 4;
 			tabLobby.Text = "Lobby";
@@ -499,11 +498,11 @@ namespace RemoteClient.Forms.Panels
 			lobby_layout.Controls.Add(lobby_table, 1, 0);
 			lobby_layout.Controls.Add(panel2, 0, 0);
 			lobby_layout.Dock = DockStyle.Fill;
-			lobby_layout.Location = new Point(3, 3);
+			lobby_layout.Location = new Point(0, 0);
 			lobby_layout.Name = "lobby_layout";
 			lobby_layout.RowCount = 1;
 			lobby_layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-			lobby_layout.Size = new Size(952, 388);
+			lobby_layout.Size = new Size(958, 394);
 			lobby_layout.TabIndex = 1;
 			// 
 			// lobby_table
@@ -513,12 +512,12 @@ namespace RemoteClient.Forms.Panels
 			lobby_table.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			lobby_table.Columns.AddRange(new DataGridViewColumn[] { lobby_id, lobby_sitename, lobby_uri, lobby_port, lobby_secret, lobby_enabled });
 			lobby_table.Dock = DockStyle.Fill;
-			lobby_table.Location = new Point(317, 3);
+			lobby_table.Location = new Point(319, 3);
 			lobby_table.Name = "lobby_table";
 			lobby_table.ReadOnly = true;
 			lobby_table.RowHeadersVisible = false;
 			lobby_table.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-			lobby_table.Size = new Size(632, 382);
+			lobby_table.Size = new Size(636, 388);
 			lobby_table.TabIndex = 0;
 			lobby_table.DoubleClick += lobbyAction_selectRecord;
 			// 
@@ -572,7 +571,7 @@ namespace RemoteClient.Forms.Panels
 			panel2.Location = new Point(0, 0);
 			panel2.Margin = new Padding(0);
 			panel2.Name = "panel2";
-			panel2.Size = new Size(314, 388);
+			panel2.Size = new Size(316, 394);
 			panel2.TabIndex = 1;
 			// 
 			// groupBox6
@@ -582,7 +581,7 @@ namespace RemoteClient.Forms.Panels
 			groupBox6.Location = new Point(0, 0);
 			groupBox6.Margin = new Padding(0, 3, 3, 3);
 			groupBox6.Name = "groupBox6";
-			groupBox6.Size = new Size(314, 153);
+			groupBox6.Size = new Size(316, 153);
 			groupBox6.TabIndex = 5;
 			groupBox6.TabStop = false;
 			groupBox6.Text = "Lobby Reporting Servers";
@@ -609,7 +608,7 @@ namespace RemoteClient.Forms.Panels
 			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
 			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
 			tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-			tableLayoutPanel5.Size = new Size(308, 131);
+			tableLayoutPanel5.Size = new Size(310, 131);
 			tableLayoutPanel5.TabIndex = 0;
 			// 
 			// btn_lobbyRandKey
@@ -620,7 +619,7 @@ namespace RemoteClient.Forms.Panels
 			btn_lobbyRandKey.Location = new Point(234, 66);
 			btn_lobbyRandKey.Margin = new Padding(3, 2, 5, 3);
 			btn_lobbyRandKey.Name = "btn_lobbyRandKey";
-			btn_lobbyRandKey.Size = new Size(69, 27);
+			btn_lobbyRandKey.Size = new Size(71, 27);
 			btn_lobbyRandKey.TabIndex = 14;
 			btn_lobbyRandKey.Text = "Rand";
 			btn_lobbyRandKey.UseVisualStyleBackColor = true;
@@ -631,7 +630,7 @@ namespace RemoteClient.Forms.Panels
 			tableLayoutPanel5.SetColumnSpan(tb_lobbySecretKey, 3);
 			tb_lobbySecretKey.Dock = DockStyle.Fill;
 			tb_lobbySecretKey.Location = new Point(3, 67);
-			tb_lobbySecretKey.MaxLength = 16;
+			tb_lobbySecretKey.MaxLength = 20;
 			tb_lobbySecretKey.Name = "tb_lobbySecretKey";
 			tb_lobbySecretKey.PlaceholderText = "Secret Key";
 			tb_lobbySecretKey.Size = new Size(225, 23);
@@ -680,7 +679,7 @@ namespace RemoteClient.Forms.Panels
 			cb_lobbyEnabled.Location = new Point(157, 99);
 			cb_lobbyEnabled.Name = "cb_lobbyEnabled";
 			cb_lobbyEnabled.Padding = new Padding(0, 0, 6, 0);
-			cb_lobbyEnabled.Size = new Size(148, 29);
+			cb_lobbyEnabled.Size = new Size(150, 29);
 			cb_lobbyEnabled.TabIndex = 16;
 			cb_lobbyEnabled.Text = "Enable Reporting";
 			cb_lobbyEnabled.TextAlign = ContentAlignment.MiddleRight;
@@ -690,9 +689,9 @@ namespace RemoteClient.Forms.Panels
 			// 
 			groupBox5.Controls.Add(tableLayoutPanel4);
 			groupBox5.Dock = DockStyle.Bottom;
-			groupBox5.Location = new Point(0, 337);
+			groupBox5.Location = new Point(0, 343);
 			groupBox5.Name = "groupBox5";
-			groupBox5.Size = new Size(314, 51);
+			groupBox5.Size = new Size(316, 51);
 			groupBox5.TabIndex = 4;
 			groupBox5.TabStop = false;
 			groupBox5.Text = "Server List";
@@ -713,7 +712,7 @@ namespace RemoteClient.Forms.Panels
 			tableLayoutPanel4.Name = "tableLayoutPanel4";
 			tableLayoutPanel4.RowCount = 1;
 			tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-			tableLayoutPanel4.Size = new Size(308, 29);
+			tableLayoutPanel4.Size = new Size(310, 29);
 			tableLayoutPanel4.TabIndex = 0;
 			// 
 			// btn_lobbyNew
@@ -721,7 +720,7 @@ namespace RemoteClient.Forms.Panels
 			btn_lobbyNew.Dock = DockStyle.Fill;
 			btn_lobbyNew.Location = new Point(234, 3);
 			btn_lobbyNew.Name = "btn_lobbyNew";
-			btn_lobbyNew.Size = new Size(71, 23);
+			btn_lobbyNew.Size = new Size(73, 23);
 			btn_lobbyNew.TabIndex = 13;
 			btn_lobbyNew.Text = "New";
 			btn_lobbyNew.UseVisualStyleBackColor = true;

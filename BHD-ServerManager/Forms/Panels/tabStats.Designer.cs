@@ -634,7 +634,7 @@
 			tableLayoutPanel5.SetColumnSpan(tb_lobbySecretKey, 3);
 			tb_lobbySecretKey.Dock = DockStyle.Fill;
 			tb_lobbySecretKey.Location = new Point(3, 67);
-			tb_lobbySecretKey.MaxLength = 16;
+			tb_lobbySecretKey.MaxLength = 20;
 			tb_lobbySecretKey.Name = "tb_lobbySecretKey";
 			tb_lobbySecretKey.PlaceholderText = "Secret Key";
 			tb_lobbySecretKey.Size = new Size(225, 23);
