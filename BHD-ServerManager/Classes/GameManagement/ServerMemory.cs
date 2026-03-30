@@ -1861,6 +1861,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                             PlayerStats.RoleName = PlayerCharacterClass.ToString();
                             PlayerStats.SelectedWeaponName = PlayerSelectedWeapon.ToString();
 
+                            PlayerStats = PlayerObjectSanitizer.Sanitize(PlayerStats);
+
                             // Push to List
                             currentPlayerList.Add(playerSlot, PlayerStats);
 

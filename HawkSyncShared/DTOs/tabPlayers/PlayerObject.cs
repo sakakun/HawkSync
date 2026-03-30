@@ -32,11 +32,11 @@ namespace HawkSyncShared.DTOs.tabPlayers
         public int PlayerHealth { get; set; } = 0;
 
         // In-Game Position and Facing Information
-        public float PosX { get; set; }
-        public float PosY { get; set; }
-        public float PosZ { get; set; }
-        public float FacingYaw { get; set; }
-        public float FacingPitch { get; set; }
+        public float PosX { get; set; } = 0f;
+        public float PosY { get; set; } = 0f;
+        public float PosZ { get; set; } = 0f;
+        public float FacingYaw { get; set; } = 0f;
+        public float FacingPitch { get; set; } = 0f;
 
         // Player Statistics
         public int stat_Kills { get; set; }
@@ -163,6 +163,25 @@ namespace HawkSyncShared.DTOs.tabPlayers
         public int ShotsFired;
         public int Health;
         public DateTime LastActive;
+    }
+
+    public static class PlayerObjectSanitizer
+    {
+        public static PlayerObject Sanitize(PlayerObject player)
+        {
+            player.PosX = SanitizeFloat(player.PosX);
+            player.PosY = SanitizeFloat(player.PosY);
+            player.PosZ = SanitizeFloat(player.PosZ);
+            player.FacingYaw = SanitizeFloat(player.FacingYaw);
+            player.FacingPitch = SanitizeFloat(player.FacingPitch);
+            
+            return player;
+        }
+
+        private static float SanitizeFloat(float value)
+        {
+            return (float.IsNaN(value) || float.IsInfinity(value)) ? 0f : value;
+        }
     }
 
 }
