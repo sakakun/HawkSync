@@ -16,7 +16,6 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SERVERMANAGER_PROJECT_PATH: BHD-ServerManager/ServerManager.csproj
   REMOTECLIENT_PROJECT_PATH: RemoteClient/RemoteClient.csproj
-  NETLIMITERBRIDGE_PROJECT_PATH: NetLimiterBridge/NetLimiterBridge.csproj
   HAWKSYNCSHARED_PROJECT_PATH: HawkSyncShared/HawkSyncShared.csproj
   OUTPUT_NAME: HawkSync-ServerManager
   DOTNET_VERSION: '10.0.x'
@@ -85,9 +84,6 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Setup .NET Framework Build Tools
-      uses: microsoft/setup-msbuild@v2
-
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
@@ -110,20 +106,6 @@ jobs:
     # Restore and build RemoteClient
     - name: Restore RemoteClient dependencies
       run: dotnet restore ${{ env.REMOTECLIENT_PROJECT_PATH }}
-
-    # Restore NetLimiterBridge packages (legacy .NET Framework project)
-    - name: Restore NetLimiterBridge dependencies
-      run: nuget restore ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} -PackagesDirectory ./NetLimiterBridge/packages -NonInteractive
-
-    # Build NetLimiterBridge (.NET Framework 4.8.1)
-    - name: Build NetLimiterBridge (.NET Framework 4.8.1)
-      run: |
-        msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
-          /t:Build `
-          /p:Configuration=Release `
-          /p:Platform="Any CPU" `
-          /p:PlatformTarget=x64 `
-          /p:OutputPath=bin\Release\
 
     # Build ServerManager (.NET 10.0)
     - name: Build ServerManager (.NET 10.0)
@@ -168,13 +150,6 @@ jobs:
           /p:UseCommonOutputDirectory=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
-
-    - name: Copy NetLimiterBridge to ServerManager output
-      shell: pwsh
-      run: |
-        Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/framework-dependent/ServerManager/ `
-          -Recurse -Force
 
     # Publish RemoteClient
     - name: Publish RemoteClient (Framework-Dependent)
