@@ -88,9 +88,6 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Setup .NET Framework Build Tools
-      uses: microsoft/setup-msbuild@v2
-
     # Restore and build HawkSyncShared
     - name: Restore HawkSyncShared dependencies
       run: dotnet restore ${{ env.HAWKSYNCSHARED_PROJECT_PATH }}
@@ -110,17 +107,6 @@ jobs:
     # Restore and build RemoteClient
     - name: Restore RemoteClient dependencies
       run: dotnet restore ${{ env.REMOTECLIENT_PROJECT_PATH }}
-
-    # Restore and build NetLimiterBridge
-    - name: Restore and Build NetLimiterBridge (.NET Framework 4.8.1)
-      run: |
-        msbuild ${{ env.NETLIMITERBRIDGE_PROJECT_PATH }} `
-          /t:Restore,Build `
-          /p:Configuration=Release `
-          /p:Platform="Any CPU" `
-          /p:OutputPath=bin/Release/ `
-          /p:PlatformTarget=x64 `
-          /p:RestorePackagesPath=../packages
 
     # Build ServerManager (.NET 10.0)
     - name: Build ServerManager (.NET 10.0)
@@ -213,23 +199,6 @@ jobs:
           /p:BuildProjectReferences=false `
           /p:Version="${{ needs.validate.outputs.version }}" `
           /p:PublishReadyToRun=true
-
-    # Copy NetLimiterBridge to both outputs (ServerManager only)
-    - name: Copy NetLimiterBridge to Framework-Dependent output
-      shell: pwsh
-      run: |
-        New-Item -ItemType Directory -Force -Path ./publish/framework-dependent/ServerManager/NetLimiterBridge
-        Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/framework-dependent/ServerManager/NetLimiterBridge/ `
-          -Recurse -Force
-
-    - name: Copy NetLimiterBridge to Self-Contained output
-      shell: pwsh
-      run: |
-        New-Item -ItemType Directory -Force -Path ./publish/self-contained/ServerManager/NetLimiterBridge
-        Copy-Item -Path ./NetLimiterBridge/bin/Release/* `
-          -Destination ./publish/self-contained/ServerManager/NetLimiterBridge/ `
-          -Recurse -Force
 
     # Copy HawkSyncShared to both outputs (for both ServerManager and RemoteClient)
     - name: Copy HawkSyncShared to Framework-Dependent output
