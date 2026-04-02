@@ -276,6 +276,40 @@ jobs:
           Copy-Item LICENSE.txt ./publish/self-contained/
         }
 
+    - name: Download and extract latest NetLimiterBridge release
+      shell: pwsh
+      run: |
+        $apiUrl = "https://api.github.com/repos/sakakun/NetLimiterBridge/releases/latest"
+        $headers = @{
+          Accept = "application/vnd.github+json"
+          "X-GitHub-Api-Version" = "2022-11-28"
+          "User-Agent" = "HawkSync-Release-Workflow"
+          Authorization = "Bearer ${{ secrets.GITHUB_TOKEN }}"
+        }
+
+        $release = Invoke-RestMethod -Uri $apiUrl -Headers $headers
+        $zipAsset = $release.assets | Where-Object { $_.name -match '\.zip$' } | Select-Object -First 1
+
+        if (-not $zipAsset) {
+          Write-Error "No .zip asset found in latest NetLimiterBridge release."
+          exit 1
+        }
+
+        $tempZip = "./NetLimiterBridge-latest.zip"
+        Invoke-WebRequest -Uri $zipAsset.browser_download_url -Headers $headers -OutFile $tempZip
+
+        $targets = @(
+          "./publish/framework-dependent/ServerManager/NetLimiterBridge",
+          "./publish/self-contained/ServerManager/NetLimiterBridge"
+        )
+
+        foreach ($target in $targets) {
+          New-Item -ItemType Directory -Path $target -Force | Out-Null
+          Expand-Archive -Path $tempZip -DestinationPath $target -Force
+        }
+
+        Remove-Item $tempZip -Force
+
     - name: Create release archives
       shell: pwsh
       run: |
@@ -401,4 +435,4 @@ jobs:
         make_latest: true
         generate_release_notes: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}}
