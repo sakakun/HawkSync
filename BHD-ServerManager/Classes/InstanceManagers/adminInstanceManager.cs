@@ -44,11 +44,12 @@ public static class adminInstanceManager
             }
 
             adminInstance.Users = users;
-            AppDebug.Log("adminInstanceManager", $"Loaded {users.Count} users into cache");
+            AppDebug.Log($"Users ({users.Count}) successfully loaded into cache.", AppDebug.LogLevel.Info);
+
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error loading users cache: {ex.Message}");
+            AppDebug.Log($"Error loading users cache.", AppDebug.LogLevel.Error, ex);
             adminInstance.Users = new List<UserDTO>();
         }
     }
@@ -80,21 +81,22 @@ public static class adminInstanceManager
             adminInstance.Users.RemoveAll(u => u.UserID == userID);
             adminInstance.Users.Add(userDTO);
 
-            AppDebug.Log("adminInstanceManager", $"Refreshed user {userID} in cache");
+            AppDebug.Log($"Refreshed user {record.Username} (ID: {userID}) in cache.", AppDebug.LogLevel.Info);
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error refreshing user in cache: {ex.Message}");
+            AppDebug.Log("Error refreshing user in cache.", AppDebug.LogLevel.Error, ex);
         }
     }
 
     // --- USER CRUD OPERATIONS ---
-
+    [Obsolete]
     public static List<UserDTO> GetAllUsers() => adminInstance.Users.ToList();
 
     public static UserDTO? GetUserByID(int userID) =>
         adminInstance.Users.FirstOrDefault(u => u.UserID == userID);
 
+    [Obsolete]
     public static UserDTO? GetUserByUsername(string username) =>
         adminInstance.Users.FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
 
@@ -133,15 +135,19 @@ public static class adminInstanceManager
             foreach (var permission in request.Permissions)
                 DatabaseManager.AddUserPermission(userID, permission.ToLower());
 
+            // Refresh in-memory cache
             RefreshUserInCache(userID);
+
+            // Log Audit: User Created -> To database and in-memory log
             LogAudit("system", "USER_CREATED", $"User '{request.Username}' created with ID {userID}");
 
-            AppDebug.Log("adminInstanceManager", $"Created user: {request.Username} (ID: {userID}) with {request.Permissions.Count} permissions");
+            // Application Log
+            AppDebug.Log($"Created user: {request.Username} (ID: {userID}) with {request.Permissions.Count} permissions", AppDebug.LogLevel.Info);
             return new OperationResult(true, $"User '{request.Username}' created successfully.", userID);
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error creating user: {ex.Message}");
+            AppDebug.Log("Error creating user", AppDebug.LogLevel.Error, ex);
             return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
         }
     }
@@ -199,16 +205,21 @@ public static class adminInstanceManager
             DatabaseManager.DeleteAllUserPermissions(request.UserID);
             foreach (var permission in request.Permissions)
                 DatabaseManager.AddUserPermission(request.UserID, permission.ToLower());
-
+            
+            // Refresh in-memory cache
             RefreshUserInCache(request.UserID);
+
+            // Log Audit: User Updated -> To database and in-memory log
             LogAudit("system", "USER_UPDATED", $"User ID {request.UserID} ({request.Username}) updated");
 
-            AppDebug.Log("adminInstanceManager", $"Updated user ID: {request.UserID} ({request.Username}) with {request.Permissions.Count} permissions");
+            // Application Log
+            AppDebug.Log($"Updated user ID: {request.UserID} ({request.Username}) with {request.Permissions.Count} permissions", AppDebug.LogLevel.Info);
+
             return new OperationResult(true, $"User '{request.Username}' updated successfully.", request.UserID);
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error updating user: {ex.Message}");
+            AppDebug.Log("Error updating user", AppDebug.LogLevel.Error, ex);
             return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
         }
     }
@@ -235,14 +246,19 @@ public static class adminInstanceManager
                 return new OperationResult(false, "Failed to delete user.");
 
             adminInstance.Users.RemoveAll(u => u.UserID == userID);
+
+            // Log Audit: User Deleted -> To database and in-memory log
             LogAudit("system", "USER_DELETED", $"User ID {userID} ({user.Username}) deleted");
 
-            AppDebug.Log("adminInstanceManager", $"Deleted user ID: {userID} ({user.Username})");
+            // Application Log
+            AppDebug.Log($"Deleted user ID: {userID} ({user.Username})", AppDebug.LogLevel.Info);
+
             return new OperationResult(true, $"User '{user.Username}' deleted successfully.");
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error deleting user: {ex.Message}");
+            AppDebug.Log("Error deleting user", AppDebug.LogLevel.Error, ex);
+
             return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
         }
     }
@@ -260,14 +276,14 @@ public static class adminInstanceManager
 
             if (userRecord == null)
             {
-                AppDebug.Log("adminInstanceManager", $"Authentication failed: User not found - {username}");
+                AppDebug.Log($"Authentication failed: User not found - {username}", AppDebug.LogLevel.Warning);
                 LogAudit(username, "LOGIN_FAILED", "User not found");
                 return (false, null, "Invalid username or password.");
             }
 
             if (!userRecord.IsActive)
             {
-                AppDebug.Log("adminInstanceManager", $"Authentication failed: User disabled - {username}");
+                AppDebug.Log($"Authentication failed: User disabled - {username}", AppDebug.LogLevel.Warning);
                 LogAudit(username, "LOGIN_FAILED", "Account disabled");
                 return (false, null, "This account has been disabled.");
             }
@@ -276,7 +292,7 @@ public static class adminInstanceManager
 
             if (!passwordValid)
             {
-                AppDebug.Log("adminInstanceManager", $"Authentication failed: Invalid password - {username}");
+                AppDebug.Log($"Authentication failed: Invalid password - {username}", AppDebug.LogLevel.Warning);
                 LogAudit(username, "LOGIN_FAILED", "Invalid password");
                 return (false, null, "Invalid username or password.");
             }
@@ -299,18 +315,17 @@ public static class adminInstanceManager
             RefreshUserInCache(userRecord.UserID);
             LogAudit(username, "LOGIN_SUCCESS", "User authenticated successfully");
 
-            AppDebug.Log("adminInstanceManager", $"User authenticated successfully: {username} (ID: {userRecord.UserID})");
+            AppDebug.Log($"User authenticated successfully: {username} (ID: {userRecord.UserID})", AppDebug.LogLevel.Info);
             return (true, userDTO, "Authentication successful.");
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Authentication error: {ex.Message}");
+            AppDebug.Log("Authentication error", AppDebug.LogLevel.Error, ex);
             return (false, null, $"Authentication error: {ex.Message}");
         }
     }
 
     // --- AUDIT LOGGING ---
-
     private static void LogAudit(string username, string action, string details)
     {
         try
@@ -328,14 +343,16 @@ public static class adminInstanceManager
             if (adminInstance.AuditLog.Count > MaxAuditLogEntries)
                 adminInstance.AuditLog.RemoveAt(0);
 
-            AppDebug.Log("adminInstanceManager", $"AUDIT: [{username}] {action} - {details}");
+            AppDebug.Log($"AUDIT: [{username}] {action} - {details}", AppDebug.LogLevel.Info);
+
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error logging audit: {ex.Message}");
+            AppDebug.Log("Error logging audit", AppDebug.LogLevel.Error, ex);
         }
     }
 
+    [Obsolete]
     public static List<AdminAuditLog> GetRecentAuditLog(int count = 50) =>
         adminInstance.AuditLog.OrderByDescending(x => x.Timestamp).Take(count).ToList();
 
@@ -344,18 +361,22 @@ public static class adminInstanceManager
     public static void TrackSession(string username)
     {
         adminInstance.ActiveSessions[username] = DateTime.Now;
-        AppDebug.Log("adminInstanceManager", $"Session tracked for user: {username}");
+        AppDebug.Log($"Session tracked for user: {username}", AppDebug.LogLevel.Info);
     }
 
     public static void RemoveSession(string username)
     {
         if (adminInstance.ActiveSessions.Remove(username))
         {
+            // Log Audit: Session Removed -> To database and in-memory log
             LogAudit("system", "SESSION_REMOVED", $"Session removed for user: {username}");
-            AppDebug.Log("adminInstanceManager", $"Session removed for user: {username}");
+
+            // Application Log
+            AppDebug.Log($"Session removed for user: {username}", AppDebug.LogLevel.Info);
         }
     }
 
+    [Obsolete]
     public static List<(string Username, DateTime LoginTime, TimeSpan Duration)> GetActiveSessions() =>
         adminInstance.ActiveSessions
             .Select(kvp => (kvp.Key, kvp.Value, DateTime.Now - kvp.Value))
@@ -372,12 +393,13 @@ public static class adminInstanceManager
 
         foreach (var username in staleSessions)
         {
+            AppDebug.Log($"Removing stale session for user: {username}", AppDebug.LogLevel.Info);
             RemoveSession(username);
         }
 
         if (staleSessions.Count > 0)
         {
-            AppDebug.Log("adminInstanceManager", $"Cleaned up {staleSessions.Count} stale session(s)");
+            AppDebug.Log($"Cleaned up {staleSessions.Count} stale session(s)", AppDebug.LogLevel.Info);
         }
     }
 
@@ -441,6 +463,7 @@ public static class adminInstanceManager
 
     public static List<string> GetValidPermissions() => ValidPermissions.ToList();
 
+    [Obsolete]
     public static OperationResult InitializeDefaultAdmin()
     {
         try
@@ -449,7 +472,6 @@ public static class adminInstanceManager
 
             if (users.Count > 0)
             {
-                AppDebug.Log("adminInstanceManager", "Users already exist, skipping default admin creation");
                 LoadUsersCache();
                 return new OperationResult(true, "Users already exist.");
             }
@@ -467,7 +489,7 @@ public static class adminInstanceManager
 
             if (result.Success)
             {
-                AppDebug.Log("adminInstanceManager", "Created default admin user (username: admin, password: admin)");
+                AppDebug.Log("Created default admin user (username: admin, password: admin)", AppDebug.LogLevel.Info);
                 LoadUsersCache();
             }
 
@@ -475,7 +497,7 @@ public static class adminInstanceManager
         }
         catch (Exception ex)
         {
-            AppDebug.Log("adminInstanceManager", $"Error initializing default admin: {ex.Message}");
+            AppDebug.Log($"Error initializing default admin", AppDebug.LogLevel.Error, ex);
             return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
         }
     }

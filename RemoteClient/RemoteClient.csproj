@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HawkSyncShared\HawkSyncShared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Forms\Panels\tabAdmin.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -51,10 +55,6 @@
     <Compile Update="Forms\SubPanels\PlayerCard.cs">
       <SubType>UserControl</SubType>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\HawkSyncShared\HawkSyncShared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -47,7 +47,7 @@ namespace HawkSyncShared
         /// </summary>
         public static void InitializeCore()
         {
-            AppDebug.Log("CommonCore", "Initializing core instances...");
+            AppDebug.Log("Initializing core instances...");
 
             // Initialize instances
             theInstance = new theInstance();
@@ -61,7 +61,7 @@ namespace HawkSyncShared
             // Initialize ticker
             Ticker = new Ticker();
 
-            AppDebug.Log("CommonCore", "Core initialization complete");
+            AppDebug.Log("Core initialization complete");
         }
 
     }

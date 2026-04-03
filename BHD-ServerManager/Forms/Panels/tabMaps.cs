@@ -103,8 +103,6 @@ namespace BHD_ServerManager.Forms.Panels
                 DataGridViewRow row = dataGridView_availableMaps.Rows[rowIndex];
                 row.Cells[1].ToolTipText = $"Map File: {map.MapFile}";
             }
-
-            AppDebug.Log("tabMaps", $"Loaded {allMaps.Count} available maps");
         }
 
         private void OnPlaylistAddMap(object sender, DataGridViewCellEventArgs e)
@@ -311,7 +309,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 MessageBox.Show($"Error saving playlist: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AppDebug.Log("tabMaps", $"OnSaveMapPlaylist: {ex.Message}");
+                AppDebug.Log($"OnSaveMapPlaylist Error", AppDebug.LogLevel.Error, ex);
             }
         }
 

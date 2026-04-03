@@ -86,12 +86,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 ServerMemory.WriteMemoryArmPlayer(playerSlot);
 
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} (slot {playerSlot}) has been armed");
                 return new OperationResult(true, $"Player {playerName} has been armed.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error arming player: {ex.Message}");
+                AppDebug.Log($"Error arming player", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -108,13 +107,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     return new OperationResult(false, errorMessage);
 
                 ServerMemory.WriteMemoryDisarmPlayer(playerSlot);
-
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} (slot {playerSlot}) has been disarmed");
+                
                 return new OperationResult(true, $"Player {playerName} has been disarmed.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error disarming player: {ex.Message}");
+                AppDebug.Log($"Error disarming player",  AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -132,12 +130,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 ServerMemory.WriteMemoryKillPlayer(playerSlot);
 
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} (slot {playerSlot}) has been killed");
                 return new OperationResult(true, $"Player {playerName} has been killed.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error killing player: {ex.Message}");
+                AppDebug.Log($"Error killing player", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -155,12 +152,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 ServerMemory.WriteMemorySendConsoleCommand($"punt {playerSlot}");
 
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} (slot {playerSlot}) has been kicked");
                 return new OperationResult(true, $"Player {playerName} has been kicked from the server.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error kicking player: {ex.Message}");
+                AppDebug.Log($"Error kicking player", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -181,13 +177,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 string fullMessage = $"{playerName}, {warningMessage}";
                 chatInstanceManager.SendChatMessage(fullMessage, 3);
-
-                AppDebug.Log("playerInstanceManager", $"Warning sent to player {playerName}: {warningMessage}");
+                
                 return new OperationResult(true, $"Warning sent to {playerName}.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error warning player: {ex.Message}");
+                AppDebug.Log($"Error warning player", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -205,13 +200,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 int health = enable ? 9999 : 100;
                 ServerMemory.WriteMemoryTogglePlayerGodMode(playerSlot, health);
-
-                AppDebug.Log("playerInstanceManager", $"God mode {(enable ? "enabled" : "disabled")} for player {playerName}");
+                
                 return new OperationResult(true, $"God mode {(enable ? "enabled" : "disabled")} for {playerName}.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error toggling god mode: {ex.Message}");
+                AppDebug.Log($"Error toggling god mode", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -245,7 +239,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     // Undo the team switch
                     playerInstance.PlayerChangeTeamList.Remove(existing);
-                    AppDebug.Log("playerInstanceManager", $"Team switch undone for player {playerName}");
                     return new OperationResult(true, $"Team switch for {playerName} has been undone.");
                 }
 
@@ -265,12 +258,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     _ => "Unknown"
                 };
 
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} queued for team switch to {teamName}");
                 return new OperationResult(true, $"Player {playerName} will be switched to {teamName} team for the next map.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error switching player team: {ex.Message}");
+                AppDebug.Log($"Error switching player team", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -293,15 +285,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Get weapon ID
                 int weaponId = playerInfo.SelectedWeaponID;
 
-                AppDebug.Log("CheckWeaponRestriction", 
-                    $">>> Player: {playerInfo.PlayerName}, Slot: {playerInfo.PlayerSlot}, " +
-                    $"WeaponID: {weaponId}, WeaponName: '{playerInfo.SelectedWeaponName}'");
-
                 // Check for knife and medkit (always allowed) - but may need to rearm if previously disarmed
                 if (weaponId == (int)WeaponStack.WPN_KNIFE || weaponId == (int)WeaponStack.WPN_MEDPACK)
                 {
-                    AppDebug.Log("CheckWeaponRestriction", $"  → Knife/medpack detected (always allowed)");
-                    
                     // If player was disarmed, rearm them and remove from tracking
                     if (weaponDisarmedPlayers.TryGetValue(playerInfo.PlayerSlot, out WeaponDisarmInfo? knifeDisarmInfo))
                     {
@@ -310,10 +296,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         ArmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                         
                         chatInstanceManager.SendChatMessage($"{playerInfo.PlayerName} re-armed.", 3);
-                        
-                        AppDebug.Log("CheckWeaponRestriction", 
-                            $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
-                            $"switched to knife/medpack");
                     }
                     
                     return;
@@ -321,9 +303,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 // Check if weapon is on the restricted list
                 WeaponRestrictionResult restriction = CheckWeaponRestrictionStatus(weaponId);
-
-                AppDebug.Log("CheckWeaponRestriction", 
-                    $"  → Weapon '{restriction.WeaponName}': IsFullyAllowed={restriction.IsFullyAllowed}, IsLimitedAllowed={restriction.IsLimitedAllowed}");
 
                 // LOGIC: Determine if weapon should be restricted
                 // Gold (IsFullyAllowed = true) = Always allowed, never disarm
@@ -346,17 +325,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     isWeaponRestricted = true;
                 }
 
-                AppDebug.Log("CheckWeaponRestriction", 
-                    $"  → IsWeaponRestricted: {isWeaponRestricted} (Players: {currentPlayers}/{threshold})");
-
                 // Check if player is currently in disarm cycle
                 if (weaponDisarmedPlayers.TryGetValue(playerInfo.PlayerSlot, out WeaponDisarmInfo? disarmInfo))
                 {
                     // Player is in disarm cycle
                     TimeSpan timeSinceDisarm = DateTime.Now - disarmInfo.DisarmTime;
-
-                    AppDebug.Log("CheckWeaponRestriction", 
-                        $"  → Player IN disarm cycle: {timeSinceDisarm.TotalSeconds:F1}s elapsed (need {WEAPON_DISARM_DURATION_SECONDS}s), IsRearmed: {disarmInfo.IsRearmed}");
 
                     // Check if 5 seconds have passed
                     if (timeSinceDisarm.TotalSeconds >= WEAPON_DISARM_DURATION_SECONDS)
@@ -381,10 +354,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 string message2 = $"{playerInfo.PlayerName}, weapon requires {threshold}+ players.";
                                 chatInstanceManager.SendChatMessage(message, 3);
                                 chatInstanceManager.SendChatMessage(message2, 3);
-                                
-                                AppDebug.Log("CheckWeaponRestriction", 
-                                    $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
-                                    $"Weapon {restriction.WeaponName} (ID: {weaponId}) not allowed");
                             }
                             else
                             {
@@ -396,8 +365,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 
                                 DisarmPlayer(playerInfo.PlayerSlot, playerInfo.PlayerName);
                                 
-                                AppDebug.Log("CheckWeaponRestriction", 
-                                    $"  → Extending disarm (no message) - still holding restricted weapon {restriction.WeaponName}");
                             }
                         }
                         else
@@ -412,38 +379,23 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                                 
                                 chatInstanceManager.SendChatMessage($"{playerInfo.PlayerName} re-armed.", 3);
                                 
-                                AppDebug.Log("CheckWeaponRestriction", 
-                                    $"  → RE-ARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
-                                    $"switched to {restriction.WeaponName}");
                             }
                             else
                             {
                                 // Player already rearmed and still has allowed weapon - remove from tracking
                                 weaponDisarmedPlayers.Remove(playerInfo.PlayerSlot);
-                                
-                                AppDebug.Log("CheckWeaponRestriction", 
-                                    $"  → Removed {playerInfo.PlayerName} from tracking - continues with allowed weapon");
                             }
                         }
-                    }
-                    else
-                    {
-                        AppDebug.Log("CheckWeaponRestriction", $"  → Still in disarm window, waiting...");
                     }
                     // else: Still within 5-second disarm window, do nothing
                     return;
                 }
-
-                AppDebug.Log("CheckWeaponRestriction", $"  → Player NOT in disarm cycle");
 
                 // Player NOT in disarm cycle - check if weapon is restricted
                 if (isWeaponRestricted)
                 {
                     // Weapon is RESTRICTED (Gray) - start disarm cycle
                     string weaponName = playerInfo.SelectedWeaponName ?? restriction.WeaponName ?? "Unknown";
-                    
-                    AppDebug.Log("CheckWeaponRestriction", 
-                        $"  → ⚠️ WEAPON RESTRICTED! Starting disarm cycle for {weaponName}");
                     
                     weaponDisarmedPlayers[playerInfo.PlayerSlot] = new WeaponDisarmInfo
                     {
@@ -466,25 +418,16 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         chatInstanceManager.SendChatMessage(message2, 3);
 						weaponDisarmedPlayers[playerInfo.PlayerSlot].MessageSent = true;
 
-                        AppDebug.Log("CheckWeaponRestriction", 
-                            $"  → ✅ DISARMED {playerInfo.PlayerName} (slot {playerInfo.PlayerSlot}) - " +
-                            $"Weapon {weaponName} (ID: {weaponId}) not allowed with {currentPlayers} players");
                     }
                     else
                     {
-                        AppDebug.Log("CheckWeaponRestriction", 
-                            $"  → ❌ FAILED to disarm: {result.Message}");
+                        AppDebug.Log($"FAILED to disarm", AppDebug.LogLevel.Error, new Exception(result.Message));
                     }
-                }
-                else
-                {
-                    AppDebug.Log("CheckWeaponRestriction", 
-                        $"  → ✅ Weapon ALLOWED (Green or Gold)");
                 }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("CheckWeaponRestriction", $"❌ EXCEPTION: {ex.Message}\n{ex.StackTrace}");
+                AppDebug.Log($"EXCEPTION", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -650,54 +593,9 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             foreach (var slot in disconnectedSlots)
             {
                 weaponDisarmedPlayers.Remove(slot);
-                AppDebug.Log("CheckWeaponRestriction", $"Cleaned up disconnected player from slot {slot}");
             }
         }
-
-        /// <summary>
-        /// Debug method to log current weapon restriction configuration
-        /// </summary>
-        public static void LogWeaponRestrictionConfig()
-        {
-            AppDebug.Log("WeaponConfig", "=== WEAPON RESTRICTION CONFIGURATION ===");
-            AppDebug.Log("WeaponConfig", $"Threshold: {theInstance.gameFullWeaponThreshold} players");
-            AppDebug.Log("WeaponConfig", "");
-            AppDebug.Log("WeaponConfig", "PISTOLS:");
-            AppDebug.Log("WeaponConfig", $"  Colt .45: Full={theInstance.weaponColt45}, Limited={theInstance.restrictedWeaponColt45}");
-            AppDebug.Log("WeaponConfig", $"  M9 Beretta: Full={theInstance.weaponM9Beretta}, Limited={theInstance.restrictedWeaponM9Beretta}");
-            AppDebug.Log("WeaponConfig", "");
-            AppDebug.Log("WeaponConfig", "RIFLES:");
-            AppDebug.Log("WeaponConfig", $"  CAR-15: Full={theInstance.weaponCar15}, Limited={theInstance.restrictedWeaponCar15}");
-            AppDebug.Log("WeaponConfig", $"  CAR-15 M203: Full={theInstance.weaponCar15203}, Limited={theInstance.restrictedWeaponCar15203}");
-            AppDebug.Log("WeaponConfig", $"  M16: Full={theInstance.weaponM16}, Limited={theInstance.restrictedWeaponM16}");
-            AppDebug.Log("WeaponConfig", $"  M16 M203: Full={theInstance.weaponM16203}, Limited={theInstance.restrictedWeaponM16203}");
-            AppDebug.Log("WeaponConfig", $"  G3: Full={theInstance.weaponG3}, Limited={theInstance.restrictedWeaponG3}");
-            AppDebug.Log("WeaponConfig", $"  G36: Full={theInstance.weaponG36}, Limited={theInstance.restrictedWeaponG36}");
-            AppDebug.Log("WeaponConfig", $"  MP5: Full={theInstance.weaponMP5}, Limited={theInstance.restrictedWeaponMP5}");
-            AppDebug.Log("WeaponConfig", "");
-            AppDebug.Log("WeaponConfig", "SNIPERS:");
-            AppDebug.Log("WeaponConfig", $"  M21: Full={theInstance.weaponM21}, Limited={theInstance.restrictedWeaponM21}");
-            AppDebug.Log("WeaponConfig", $"  M24: Full={theInstance.weaponM24}, Limited={theInstance.restrictedWeaponM24}");
-            AppDebug.Log("WeaponConfig", $"  McMillan .300: Full={theInstance.weaponMCRT300}, Limited={theInstance.restrictedWeaponMCRT300}");
-            AppDebug.Log("WeaponConfig", $"  Barrett: Full={theInstance.weaponBarrett}, Limited={theInstance.restrictedWeaponBarrett}");
-            AppDebug.Log("WeaponConfig", $"  PSG-1: Full={theInstance.weaponPSG1}, Limited={theInstance.restrictedWeaponPSG1}");
-            AppDebug.Log("WeaponConfig", "");
-            AppDebug.Log("WeaponConfig", "MACHINE GUNS:");
-            AppDebug.Log("WeaponConfig", $"  SAW: Full={theInstance.weaponSAW}, Limited={theInstance.restrictedWeaponSAW}");
-            AppDebug.Log("WeaponConfig", $"  M60: Full={theInstance.weaponM60}, Limited={theInstance.restrictedWeaponM60}");
-            AppDebug.Log("WeaponConfig", $"  M240: Full={theInstance.weaponM240}, Limited={theInstance.restrictedWeaponM240}");
-            AppDebug.Log("WeaponConfig", "");
-            AppDebug.Log("WeaponConfig", "OTHER:");
-            AppDebug.Log("WeaponConfig", $"  Shotgun: Full={theInstance.weaponShotgun}, Limited={theInstance.restrictedWeaponShotgun}");
-            AppDebug.Log("WeaponConfig", $"  AT4: Full={theInstance.weaponAT4}, Limited={theInstance.restrictedWeaponAT4}");
-            AppDebug.Log("WeaponConfig", $"  Frag Grenade: Full={theInstance.weaponFragGrenade}, Limited={theInstance.restrictedWeaponFragGrenade}");
-            AppDebug.Log("WeaponConfig", $"  Smoke Grenade: Full={theInstance.weaponSmokeGrenade}, Limited={theInstance.restrictedWeaponSmokeGrenade}");
-            AppDebug.Log("WeaponConfig", $"  Flash Grenade: Full={theInstance.weaponFlashGrenade}, Limited={theInstance.restrictedWeaponFlashGrenade}");
-            AppDebug.Log("WeaponConfig", $"  Claymore: Full={theInstance.weaponClaymore}, Limited={theInstance.restrictedWeaponClaymore}");
-            AppDebug.Log("WeaponConfig", $"  Satchel: Full={theInstance.weaponSatchelCharges}, Limited={theInstance.restrictedWeaponSatchelCharges}");
-            AppDebug.Log("WeaponConfig", "=== END CONFIG ===");
-        }
-
+        
         /// <summary>
         /// Re-arm all players who were previously disarmed due to weapon restrictions
         /// </summary>
@@ -716,7 +614,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     
                     string rearmMessage = $"{player.PlayerName} re-armed. Full weapons available ({currentPlayers}/{threshold} players).";
                     chatInstanceManager.SendChatMessage(rearmMessage, 3);
-					AppDebug.Log("CheckWeaponRestriction", rearmMessage);
                 }
             }
             
@@ -777,12 +674,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {playerSlot}");
                 }
 
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} banned by name and kicked");
                 return new OperationResult(true, $"Player {playerName} has been banned by name and kicked from the server.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error banning player by name: {ex.Message}");
+                AppDebug.Log($"Error banning player by name", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -821,12 +717,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     try
                     {
                         await NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress.ToString(), 32);
-                        AppDebug.Log("playerInstanceManager", $"Added IP {ipAddress} to NetLimiter filter '{theInstance.netLimiterFilterName}'");
                     }
                     catch (Exception nlEx)
                     {
-                        AppDebug.Log("playerInstanceManager", $"Warning: NetLimiter update failed: {nlEx.Message}");
-                        // Continue anyway - ban was successful
+                        AppDebug.Log($"Warning: NetLimiter update failed", AppDebug.LogLevel.Error,  nlEx);
                     }
                 }
 
@@ -835,13 +729,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {playerSlot}");
                 }
-
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} ({ipAddress}) banned by IP and kicked");
+                
                 return new OperationResult(true, $"Player {playerName} has been banned by IP and kicked from the server.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error banning player by IP: {ex.Message}");
+                AppDebug.Log($"Error banning player by IP", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -883,11 +776,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     try
                     {
                         await NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress.ToString(), 32);
-                        AppDebug.Log("playerInstanceManager", $"Added IP {ipAddress} to NetLimiter filter '{theInstance.netLimiterFilterName}'");
                     }
                     catch (Exception nlEx)
                     {
-                        AppDebug.Log("playerInstanceManager", $"Warning: NetLimiter update failed: {nlEx.Message}");
+                        AppDebug.Log($"Warning: NetLimiter update failed", AppDebug.LogLevel.Error, nlEx);
                         // Continue anyway - ban was successful
                     }
                 }
@@ -897,13 +789,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {playerSlot}");
                 }
-
-                AppDebug.Log("playerInstanceManager", $"Player {playerName} ({ipAddress}) banned by name and IP, then kicked");
+                
                 return new OperationResult(true, $"Player {playerName} has been banned by name and IP, then kicked from the server.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error banning player by both: {ex.Message}");
+                AppDebug.Log( $"Error banning player by both", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -929,13 +820,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     ServerMemory.WriteMemorySendConsoleCommand($"punt {player.PlayerSlot}");
                     kickedCount++;
                 }
-
-                AppDebug.Log("playerInstanceManager", $"Kicked all players ({kickedCount} total)");
+                
                 return new OperationResult(true, $"Kicked {kickedCount} player(s) from the server.", kickedCount);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("playerInstanceManager", $"Error kicking all players: {ex.Message}");
+                AppDebug.Log($"Error kicking all players", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }

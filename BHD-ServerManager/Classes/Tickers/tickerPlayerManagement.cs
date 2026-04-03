@@ -62,7 +62,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("tickerPlayerManagement", $"Error updating stats grids: {ex.Message}");
+                    AppDebug.Log($"Error updating stats grids", AppDebug.LogLevel.Error, ex);
                 }
             });
         }
@@ -90,11 +90,10 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     ServerMemory.WriteMemoryArmPlayer(player.Key);
                     disarmedPlayers.Remove(player.Key);
-                    AppDebug.Log("LeaningCheck", $"Re-armed player in slot {player.Key}");
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("LeaningCheck", $"Error re-arming player {player.Key}: {ex.Message}");
+                    AppDebug.Log($"Error re-arming player {player.Key}", AppDebug.LogLevel.Error, ex);
                 }
             }
 
@@ -145,8 +144,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} has been disarmed for 10 seconds - Left leaning is not allowed!";
 
                         chatInstanceManager.SendChatMessage(message, 3);
-
-						AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for left leaning");
+                        
                     }
                     // Check for right leaning violation
                     else if (checkRightLeaning && isRightLeaning)
@@ -161,13 +159,11 @@ namespace BHD_ServerManager.Classes.Tickers
                         string message = $"{DateTime.Now:HH:mm:ss} - {playerInfo.PlayerName} has been disarmed for 10 seconds - Right leaning is not allowed!";
 
                         chatInstanceManager.SendChatMessage(message, 3);
-
-						AppDebug.Log("LeaningCheck", $"Disarmed {playerInfo.PlayerName} (slot {playerSlot}) for right leaning");
                     }
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("LeaningCheck", $"Error checking lean status for player {playerSlot}: {ex.Message}");
+                    AppDebug.Log($"Error checking lean status for player {playerSlot}", AppDebug.LogLevel.Error, ex);
                 }
             }
         }
@@ -180,27 +176,20 @@ namespace BHD_ServerManager.Classes.Tickers
             // Log configuration once on first run
             if (!weaponConfigLogged)
             {
-                playerInstanceManager.LogWeaponRestrictionConfig();
                 weaponConfigLogged = true;
             }
 
             // Get current player count and threshold
             int currentPlayers = thisInstance.gameInfoNumPlayers;
             int threshold = thisInstance.gameFullWeaponThreshold;
-
-            AppDebug.Log("WeaponRestrictionCheck", $"=== CheckWeaponRestrictions START === Players: {currentPlayers}, Threshold: {threshold}");
-
+            
             // If player count is at or above threshold, all configured weapons are allowed
             if (currentPlayers >= threshold)
             {
-                AppDebug.Log("WeaponRestrictionCheck", $"Player count ({currentPlayers}) >= threshold ({threshold}) - Full weapons enabled");
-                
                 // Re-arm any players who were previously disarmed
                 playerInstanceManager.RearmAllDisarmedPlayers(currentPlayers, threshold);
                 return; // Full weapons enabled
             }
-
-            AppDebug.Log("WeaponRestrictionCheck", $"Player count ({currentPlayers}) < threshold ({threshold}) - Checking {playerInstance.PlayerList.Count} players for restricted weapons");
 
             // Below threshold - check each active player for restricted weapons
             int checkedCount = 0;
@@ -212,18 +201,15 @@ namespace BHD_ServerManager.Classes.Tickers
                 try
                 {
                     checkedCount++;
-                    AppDebug.Log("WeaponRestrictionCheck", $"[{checkedCount}] Checking player: {playerInfo.PlayerName} (slot {playerSlot}), WeaponID: {playerInfo.SelectedWeaponID}, WeaponName: {playerInfo.SelectedWeaponName}");
-                    
                     // Check this player's weapon restriction
                     playerInstanceManager.CheckWeaponRestriction(playerInfo);
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("WeaponRestrictionCheck", $"ERROR checking weapons for player {playerSlot}: {ex.Message}");
+                    AppDebug.Log($"ERROR checking weapons for player {playerSlot}", AppDebug.LogLevel.Error, ex);
                 }
             }
-
-            AppDebug.Log("WeaponRestrictionCheck", $"=== CheckWeaponRestrictions END === Checked {checkedCount} players");
+            
         }
 
         private class PlayerIdleState
@@ -260,8 +246,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 float pitch = playerInfo.FacingPitch;
                 int shots = playerInfo.stat_TotalShotsFired;
                 int health = playerInfo.PlayerHealth;
-
-                AppDebug.Log("IdleCheck", $"Checking player {playerInfo.PlayerName} (slot {playerSlot}): Pos({posX}, {posY}, {posZ}), Facing({yaw}, {pitch}), ShotsFired: {shots}, Health: {health}");
 
                 if (!playerIdleStates.TryGetValue(playerSlot, out var state))
                 {

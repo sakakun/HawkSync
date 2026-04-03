@@ -119,8 +119,6 @@ public partial class ServerManagerUI : Form
         CommonCore.instanceAdmin = snapshot.Admins;
         CommonCore.instanceStats = snapshot.Stats;
 
-        AppDebug.Log("ServerManagerUI", "Snapshot received, updating server info panel. Active Playlist: " + CommonCore.instanceMaps.ActivePlaylist);
-
         UpdateServerInfo();
     }
 

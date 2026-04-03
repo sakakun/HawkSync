@@ -1,23 +1,13 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.DTOs;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.DTOs.tabBans.Service;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using RemoteClient.Core;
-using RemoteClient.Services;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace RemoteClient.Forms.Panels
 {
@@ -281,7 +271,7 @@ namespace RemoteClient.Forms.Panels
             {
                 // Log the error if you have a logging mechanism
                 // For now, silently fail to avoid disrupting the UI
-                AppDebug.Log("tabBans", $"Error updating NetLimiter Connection Log UI: {ex.Message}");
+                AppDebug.Log($"Error updating NetLimiter Connection Log UI", AppDebug.LogLevel.Error, ex);
             }
         }
 

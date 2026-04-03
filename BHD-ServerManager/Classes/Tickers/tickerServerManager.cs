@@ -32,10 +32,7 @@ namespace BHD_ServerManager.Classes.Tickers
         {
             // Skip this tick if the previous one is still running
             if (Interlocked.CompareExchange(ref isTickerRunning, 1, 0) != 0)
-            {
-                AppDebug.Log("tickerServerManagement", "Skipping tick - previous tick still running");
                 return;
-            }
 
             try
             {
@@ -93,7 +90,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 2. Loading Map
                 if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
                 {
-                    AppDebug.Log("tickerServerManagement", "Loading Map Phase");
 					theInstance.instanceScoringProcRun = true;
                     theInstance.instanceCrashCounter = 0;                               // Reset crash counter
                     tickerEvent_preGameProcessing();                                    // Run pre-game processing
@@ -102,7 +98,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 3. Start Delay
                 else if (theInstance.instanceStatus == InstanceStatus.STARTDELAY)
                 {
-                    AppDebug.Log("tickerServerManagement", "Start Delay Phase");
 					if (!theInstance.instancePreGameProcRun)
                     {
                         mapInstance.ActualPlayingMapIndex = mapInstance.CurrentMapIndex;    // Set the actual playing map index
@@ -119,7 +114,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 // 4. Online (game in progress)
                 else if (theInstance.instanceStatus == InstanceStatus.ONLINE)
                 {
-                    AppDebug.Log("tickerServerManagement", "Online Phase");
 					theInstance.instancePreGameProcRun = true;                          // Reset pre-game processing flag                                     
 
                     ServerMemory.ReadMemoryGeneratePlayerList();                        // Generate player list.
@@ -172,8 +166,7 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 // Update the Scores Required to Win the Game
                 ServerMemory.UpdateGameScores();
-
-                AppDebug.Log("tickerServerManagement", "Pre-game Complete");
+                
             }
             
         }
@@ -199,8 +192,6 @@ namespace BHD_ServerManager.Classes.Tickers
 				// Scoreboard Delay Ticker
 				int scoreboardDelay = theInstance.gameScoreBoardDelay * 1000;
 				CommonCore.Ticker?.StartOnce("ScoreboardTicker", scoreboardDelay, () => tickerEvent_Scoreboard());
-				// Log Completion
-				AppDebug.Log("tickerServerManagement", "Scoring Processing Complete.");
             }
             
 
@@ -210,8 +201,6 @@ namespace BHD_ServerManager.Classes.Tickers
         private static void tickerEvent_Scoreboard()
         {
             ServerMemory.UpdateScoreBoardTimer();                                   // Set the scoreboard timer to 1 second.
-            AppDebug.Log("tickerServerManagement", "Scoreboard Timer Complete");    // Log the completion of the scoreboard timer
-            return;                                                                 // Should return to the main ticker loop
         }
 
         private static void RunBabstatsOnlineHooks()

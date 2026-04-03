@@ -95,8 +95,7 @@ public class EmbeddedApiHost
             .Build();
 
         _runTask = _host.RunAsync(_cts.Token);
-
-        AppDebug.Log("EmbeddedApiHost", $"API server started on http://0.0.0.0:{port}");
+        
     }
 
     /// <summary>
@@ -109,7 +108,6 @@ public class EmbeddedApiHost
             _cts.Cancel();
             await _host.StopAsync();
             _host.Dispose();
-            AppDebug.Log("EmbeddedApiHost", "API server stopped");
         }
     }
 }

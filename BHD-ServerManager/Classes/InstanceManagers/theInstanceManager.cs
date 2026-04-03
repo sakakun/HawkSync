@@ -5,17 +5,10 @@ using BHD_ServerManager.Classes.Tickers;
 using BHD_ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
-using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Diagnostics;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Windows.Storage;
 
 namespace BHD_ServerManager.Classes.InstanceManagers
 {
@@ -241,13 +234,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 // Update instance
                 ApplyProfileSettingsToInstance(settings);
-
-                AppDebug.Log("theInstanceManager", "Profile settings loaded successfully");
+                
                 return new OperationResult(true, "Profile settings loaded successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error loading profile settings: {ex.Message}");
+                AppDebug.Log($"Error loading profile settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -314,13 +306,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 // Update instance
                 ApplyProfileSettingsToInstance(settings);
-
-                AppDebug.Log("theInstanceManager", "Profile settings saved successfully");
+                
                 return new OperationResult(true, "Profile settings saved successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error saving profile settings: {ex.Message}");
+                AppDebug.Log($"Error saving profile settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -421,13 +412,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string json = JsonSerializer.Serialize(settings, options);
                 File.WriteAllText(filePath, json);
-
-                AppDebug.Log("theInstanceManager", $"Profile settings exported to {filePath}");
+                
                 return new OperationResult(true, $"Settings exported to {filePath}");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error exporting profile settings: {ex.Message}");
+                AppDebug.Log( $"Error exporting profile settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -447,13 +437,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (settings == null)
                     return (false, null, "Failed to deserialize settings.");
-
-                AppDebug.Log("theInstanceManager", $"Profile settings imported from {filePath}");
+                
                 return (true, settings, string.Empty);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error importing profile settings: {ex.Message}");
+                AppDebug.Log($"Error importing profile settings", AppDebug.LogLevel.Error, ex);
                 return (false, null, ex.Message);
             }
         }
@@ -578,12 +567,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Update instance
                 ApplyGamePlaySettingsToInstance(settings);
 
-                AppDebug.Log("theInstanceManager", "GamePlay settings loaded successfully");
                 return new OperationResult(true, "GamePlay settings loaded successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error loading gameplay settings: {ex.Message}");
+                AppDebug.Log($"Error loading gameplay settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -703,13 +691,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 // Update instance
                 ApplyGamePlaySettingsToInstance(settings);
-
-                AppDebug.Log("theInstanceManager", "GamePlay settings saved successfully");
+                
                 return new OperationResult(true, "GamePlay settings saved successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error saving gameplay settings: {ex.Message}");
+                AppDebug.Log($"Error saving gameplay settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -833,13 +820,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
                 string json = JsonSerializer.Serialize(settings, jsonOptions);
                 File.WriteAllText(filePath, json);
-
-                AppDebug.Log("theInstanceManager", $"GamePlay settings exported to {filePath}");
+                
                 return new OperationResult(true, $"Settings exported to {filePath}");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error exporting gameplay settings: {ex.Message}");
+                AppDebug.Log($"Error exporting gameplay settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -859,13 +845,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (settings == null)
                     return (false, null, "Failed to deserialize settings.");
-
-                AppDebug.Log("theInstanceManager", $"GamePlay settings imported from {filePath}");
+                
                 return (true, settings, string.Empty);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error importing gameplay settings: {ex.Message}");
+                AppDebug.Log($"Error importing gameplay settings", AppDebug.LogLevel.Error, ex);
                 return (false, null, ex.Message);
             }
         }
@@ -885,13 +870,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 );
 
                 ApplyWeaponRestrictionsToInstance(allEnabled);
-
-                AppDebug.Log("theInstanceManager", "All weapons enabled");
+                
                 return new OperationResult(true, "All weapons enabled successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error enabling all weapons: {ex.Message}");
+                AppDebug.Log($"Error enabling all weapons", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -912,12 +896,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 ApplyWeaponRestrictionsToInstance(allDisabled);
 
-                AppDebug.Log("theInstanceManager", "All weapons disabled");
                 return new OperationResult(true, "All weapons disabled successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error disabling all weapons: {ex.Message}");
+                AppDebug.Log($"Error disabling all weapons", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1208,7 +1191,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             if (string.IsNullOrWhiteSpace(theInstance.profileServerPath) || !Directory.Exists(theInstance.profileServerPath))
             {
-                AppDebug.Log("theInstanceManager", "Profile server path is invalid or does not exist.");
+                AppDebug.Log("Profile server path is invalid or does not exist.", AppDebug.LogLevel.Warning);
                 MessageBox.Show("The profile server path is invalid or does not exist. Please 'set' your server path and refresh your map list before starting the server.", "Invalid Profile Server Path", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
@@ -1267,9 +1250,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             bool isCurrentMapTeamMap = Functions.IsMapTeamBased(currentMapType);
             bool isNextMapTeamMap = Functions.IsMapTeamBased(nextMapType);
-
-            AppDebug.Log("changeTeamGameMode", $"Transition: CurrentType={currentMapType} NextType={nextMapType} Current4Team={isCurrentMap4Team} Next4Team={isNextMap4Team}");
-
+            
             // SCENARIO 1: Team-based → Non-team (2-team or 4-team → FFA/DM)
             if (isNextMapTeamMap == false && isCurrentMapTeamMap == true)
             {
@@ -1289,7 +1270,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         Team = (int)Teams.TEAM_GREEN // 0 = FFA
                     });
                 }
-                AppDebug.Log("changeTeamGameMode", "Assigned all players to FFA (Team 0)");
             }
             // SCENARIO 2: Non-team → Team-based (FFA/DM → 2-team or 4-team)
             else if (isNextMapTeamMap == true && isCurrentMapTeamMap == false)
@@ -1327,8 +1307,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                             slotNum = player.PlayerSlot,
                             Team = assignedTeam
                         });
-
-                        AppDebug.Log("changeTeamGameMode", $"Balanced new player slot {player.PlayerSlot} to team {assignedTeam}");
+                        
                     }
                 }
                 playerInstance.PlayerPreviousTeamList.Clear();
@@ -1361,8 +1340,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         Team = newTeam
                     });
                 }
-
-                AppDebug.Log("changeTeamGameMode", $"Split 2 teams into 4: {blueTeamPlayers.Count} blue→blue/yellow, {redTeamPlayers.Count} red→red/purple");
+                
             }
             // SCENARIO 4: 4-team → 2-team
             else if (isCurrentMapTeamMap && isNextMapTeamMap && isCurrentMap4Team && !isNextMap4Team)
@@ -1390,13 +1368,12 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         Team = newTeam
                     });
                 }
-
-                AppDebug.Log("changeTeamGameMode", "Merged 4 teams into 2 (Blue/Yellow→Blue, Red/Purple→Red)");
+                
             }
             // SCENARIO 5: Same team structure (2→2 or 4→4) - no changes needed
             else if (isCurrentMapTeamMap && isNextMapTeamMap)
             {
-                AppDebug.Log("changeTeamGameMode", $"Same team structure ({(isCurrentMap4Team ? "4" : "2")}→{(isNextMap4Team ? "4" : "2")}), no team changes");
+                // No changes needed
             }
         }
 
@@ -1456,7 +1433,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             if (currentMatchID == 0)
             {
                 theInstance.gameMatchID = currentDate * 1000 + 1;
-                AppDebug.Log("GenerateMatchID", $"Match ID: {theInstance.gameMatchID}");
                 ServerSettings.Set("gameMatchID", theInstance.gameMatchID);
                 return;
             }
@@ -1472,8 +1448,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 theInstance.gameMatchID = currentDate * 1000 + 1;
             }
-    
-            AppDebug.Log("GenerateMatchID", $"Match ID: {theInstance.gameMatchID}");
+            
             ServerSettings.Set("gameMatchID", theInstance.gameMatchID);
         }
 
@@ -1499,7 +1474,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", $"Error testing connection: {ex.Message}");
+                AppDebug.Log($"Error testing connection", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1523,25 +1498,18 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Case 1: Should be running but isn't
                 if (shouldBeRunning && !isCurrentlyRunning)
                 {
-                    AppDebug.Log("theInstanceManager", 
-                        $"Remote API enabled but not running. Starting on port {configuredPort}...");
-            
                     try
                     {
                         APICore.StartApiHost(configuredPort);
                     }
                     catch (Exception ex)
                     {
-                        AppDebug.Log("theInstanceManager", 
-                            $"Failed to start API host: {ex.Message}");
+                        AppDebug.Log($"Failed to start API host", AppDebug.LogLevel.Error, ex);
                     }
                 }
                 // Case 2: Should NOT be running but is
                 else if (!shouldBeRunning && isCurrentlyRunning)
                 {
-                    AppDebug.Log("theInstanceManager", 
-                        "Remote API disabled but currently running. Stopping...");
-            
                     // Fire and forget - async shutdown
                     _ = APICore.StopApiHost();
                 }
@@ -1549,8 +1517,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("theInstanceManager", 
-                    $"Error managing embedded API: {ex.Message}");
+                AppDebug.Log($"Error managing embedded API", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -1571,7 +1538,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// </summary>
         public static async Task RestartApiHost(int newPort)
         {
-            AppDebug.Log("theInstanceManager", $"Restarting API host on new port {newPort}");
             await APICore.RestartApiHost(newPort);
         }
 

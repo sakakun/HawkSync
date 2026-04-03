@@ -52,11 +52,10 @@ namespace BHD_ServerManager.Classes.Tickers
                 try
                 {
                     ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                    AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("tickerBanManagement", $"Error punting player '{playerName}' (Slot {slotNum}): {ex.Message}");
+                    AppDebug.Log($"Error punting player '{playerName}' (Slot {slotNum})", AppDebug.LogLevel.Error, ex);
                 }
             }
         }
@@ -130,7 +129,6 @@ namespace BHD_ServerManager.Classes.Tickers
         {
             AddBanRecord(ip, reason);
             await AddIpToNetLimiterFilter(ipString);
-            AppDebug.Log("tickerBanManagement", $"Auto-banned IP {ipString}: {reason}");
         }
 
         // This method runs the ticker for ban management tasks.
@@ -140,10 +138,7 @@ namespace BHD_ServerManager.Classes.Tickers
 
             // If the game server is offline, don't do anything.
             if (theInstance.instanceStatus == InstanceStatus.OFFLINE)
-            {
-                AppDebug.Log("tickerBanManagement", "Game Server is Offline");
                 return;
-            }
             
             if (theInstance.netLimiterEnabled)
             {
@@ -185,8 +180,7 @@ namespace BHD_ServerManager.Classes.Tickers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("tickerBanManagement", $"Error acquiring NetLimiter lock: {ex.Message}");
-                return;
+                AppDebug.Log($"Error acquiring NetLimiter lock", AppDebug.LogLevel.Error, ex);
             }
             finally
             {
@@ -226,7 +220,7 @@ namespace BHD_ServerManager.Classes.Tickers
                         }
                         catch (Exception ex)
                         {
-                            AppDebug.Log("tickerBanManagement", $"Error banning IP {ip} for excessive connections: {ex.Message}");
+                            AppDebug.Log($"Error banning IP {ip} for excessive connections", AppDebug.LogLevel.Error, ex);
                         }
                     });
                 }
@@ -251,8 +245,6 @@ namespace BHD_ServerManager.Classes.Tickers
 
                 int recordID = rowIndex++;
 
-                AppDebug.Log("tickerBanManagement", $"NetLimiter Connection Log - RecordID: {recordID}, IP: {ip}, Connections: {count}, VPN Status: {vpnStatus}, List Status: {listStatus}");
-
                 banInstance.NetLimiterConnectionLogs.Add(new netLimiterConnLogEntry
                 {
                     NL_rowID = recordID,
@@ -273,10 +265,7 @@ namespace BHD_ServerManager.Classes.Tickers
             string filterName = theInstance.netLimiterFilterName;
 
             if (string.IsNullOrEmpty(filterName))
-            {
-                AppDebug.Log("tickerBanManagement", "NetLimiter filter name not configured. Skipping filter sync.");
                 return;
-            }
 
             if ((DateTime.Now - _lastFilterSync) < _filterSyncInterval)
             {
@@ -289,9 +278,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 
                 // Update last sync time
                 DateTime now = _lastFilterSync = DateTime.Now;
-
-                // Log start of sync
-                AppDebug.Log("tickerBanManagement", $"Starting NetLimiter filter sync for filter '{filterName}'");
 
                 // Get current IPs in the NetLimiter filter
                 var filterIPs = await NetLimiterClient.GetFilterIpAddressesAsync(filterName);
@@ -367,8 +353,6 @@ namespace BHD_ServerManager.Classes.Tickers
                         bool added = await NetLimiterClient.AddIpToFilterAsync(filterName, ipRangeStr, 32);
                         if (added) addedCount++;
                     }
-
-                    AppDebug.Log("tickerBanManagement", $"Added IP/range {ipRangeStr} to NetLimiter filter '{filterName}'");
                 }
 
                 // Remove IPs/ranges that shouldn't be in filter
@@ -394,15 +378,13 @@ namespace BHD_ServerManager.Classes.Tickers
                         bool removed = await NetLimiterClient.RemoveIpFromFilterAsync(filterName, ipRangeStr, 32);
                         if (removed) removedCount++;
                     }
-                    AppDebug.Log("tickerBanManagement", $"Removed IP/range {ipRangeStr} from NetLimiter filter '{filterName}'");
 
                 }
-                AppDebug.Log("tickerBanManagement", $"NetLimiter filter sync complete: Added {addedCount}, Removed {removedCount} IPs");
 
             }
             catch (Exception ex)
             {
-                AppDebug.Log("tickerBanManagement", $"Error acquiring NetLimiter filter lock: {ex.Message}");
+                AppDebug.Log($"Error acquiring NetLimiter filter lock", AppDebug.LogLevel.Error, ex);
             }
             finally
             {
@@ -422,10 +404,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 foreach (var (slotNum, player) in GetActivePlayers())
                 {
                     if (BanHelper.IsPlayerWhitelisted(player, banInstance, now))
-                    {
-                        AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is whitelisted. Skipping ban checks.");
                         continue;
-                    }
 
                     bool shouldPunt = false;
                     string puntReason = string.Empty;
@@ -440,7 +419,6 @@ namespace BHD_ServerManager.Classes.Tickers
                         {
                             shouldPunt = true;
                             puntReason = $"Banned name: {bannedName.PlayerName}";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) matched banned name. Notes: {bannedName.Notes}");
                             break;
                         }
                     }
@@ -459,7 +437,6 @@ namespace BHD_ServerManager.Classes.Tickers
                                 {
                                     shouldPunt = true;
                                     puntReason = $"Banned IP: {bannedIP.PlayerIP}/{bannedIP.SubnetMask}";
-                                    AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) matched banned IP. Notes: {bannedIP.Notes}");
                                     break;
                                 }
                             }
@@ -479,7 +456,7 @@ namespace BHD_ServerManager.Classes.Tickers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("tickerBanManagement", $"Error checking banned players: {ex.Message}");
+                AppDebug.Log($"Error checking banned players", AppDebug.LogLevel.Error, ex);
             }
 
             // Punt players after enumeration
@@ -491,7 +468,7 @@ namespace BHD_ServerManager.Classes.Tickers
         {
             if (!IPAddress.TryParse(ipAddress, out IPAddress? ip))
             {
-                AppDebug.Log("tickerBanManagement", $"Invalid IP address format: {ipAddress}");
+                AppDebug.Log($"Invalid IP address format: {ipAddress}", AppDebug.LogLevel.Warning);
                 return;
             }
 
@@ -499,32 +476,20 @@ namespace BHD_ServerManager.Classes.Tickers
 
             // Exit if already banned or whitelisted
             if (banInstance.BannedPlayerIPs.Any(b => !BanHelper.IsExpiredOrInfo(b, now) && BanHelper.IsIPMatch(ip, b.PlayerIP, b.SubnetMask)))
-            {
-                AppDebug.Log("tickerBanManagement", $"IP {ipAddress} is already banned. Skipping.");
                 return;
-            }
+
             if (banInstance.WhitelistedIPs.Any(w => !BanHelper.IsExpiredOrInfo(w, now) && BanHelper.IsIPMatch(ip, w.PlayerIP, w.SubnetMask)))
-            {
-                AppDebug.Log("tickerBanManagement", $"IP {ipAddress} is whitelisted. Skipping ban for excessive connections.");
                 return;
-            }
 
             var banRecord = AddBanRecord(ip, $"Auto-banned: Excessive connections ({connectionCount}) exceeded threshold ({theInstance.netLimiterConThreshold})");
 
             try
             {
-                AppDebug.Log("tickerBanManagement", $"Banned IP {ipAddress} for excessive connections: {connectionCount} (threshold: {theInstance.netLimiterConThreshold})");
-
-                bool added = await AddIpToNetLimiterFilter(ipAddress);
-                AppDebug.Log("tickerBanManagement",
-                    added
-                        ? $"Successfully added IP {ipAddress} to NetLimiter filter '{theInstance.netLimiterFilterName}'"
-                        : $"Failed to add IP {ipAddress} to NetLimiter filter '{theInstance.netLimiterFilterName}'"
-                );
+                await AddIpToNetLimiterFilter(ipAddress);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("tickerBanManagement", $"Error adding ban record for IP {ipAddress}: {ex.Message}");
+                AppDebug.Log($"Error adding ban record for IP {ipAddress}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -589,7 +554,6 @@ namespace BHD_ServerManager.Classes.Tickers
                         {
                             shouldPunt = true;
                             puntReason = $"Proxy detected{(theInstance.proxyCheckProxyAction == 2 ? " (Auto-banned)" : " (Kicked)")}";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a PROXY. Action: {(theInstance.proxyCheckProxyAction == 2 ? "Ban" : "Kick")}");
                         }
                         if (!shouldPunt && proxyRecord.IsVpn && theInstance.proxyCheckVPNAction > 0)
                         {
@@ -597,13 +561,11 @@ namespace BHD_ServerManager.Classes.Tickers
                             puntReason = $"VPN detected{(theInstance.proxyCheckVPNAction == 2 ? " (Auto-banned)" : " (Kicked)")}";
                             if (!string.IsNullOrEmpty(proxyRecord.Provider))
                                 puntReason += $" - {proxyRecord.Provider}";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using a VPN. Action: {(theInstance.proxyCheckVPNAction == 2 ? "Ban" : "Kick")}");
                         }
                         if (!shouldPunt && proxyRecord.IsTor && theInstance.proxyCheckTORAction > 0)
                         {
                             shouldPunt = true;
                             puntReason = $"TOR detected{(theInstance.proxyCheckTORAction == 2 ? " (Auto-banned)" : " (Kicked)")}";
-                            AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) is using TOR. Action: {(theInstance.proxyCheckTORAction == 2 ? "Ban" : "Kick")}");
                         }
                         if (!shouldPunt && theInstance.proxyCheckGeoMode > 0 && !string.IsNullOrEmpty(proxyRecord.CountryCode))
                         {
@@ -617,7 +579,6 @@ namespace BHD_ServerManager.Classes.Tickers
                                     .FirstOrDefault(c => c.CountryCode.Equals(proxyRecord.CountryCode, StringComparison.OrdinalIgnoreCase));
                                 string countryName = country?.CountryName ?? proxyRecord.CountryCode;
                                 puntReason = $"Geo-blocked: {countryName} ({proxyRecord.CountryCode})";
-                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}, IP: {player.PlayerIPAddress}) from blocked country: {countryName}. Action: Kick");
                             }
                         }
                     }
@@ -634,7 +595,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("tickerBanManagement", $"Error checking proxy status for player in slot {slotNum}: {ex.Message}");
+                    AppDebug.Log($"Error checking proxy status for player in slot {slotNum}", AppDebug.LogLevel.Error, ex);
                 }
             }
 
@@ -645,20 +606,17 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     // Check if already banned (by range or single IP)
                     if (IsIpBanned(playerIP, banInstance.BannedPlayerIPs))
-                    {
-                        AppDebug.Log("tickerBanManagement", $"IP {playerIPAddress} is already banned. Skipping auto-ban.");
                         continue;
-                    }
+
                 }
 
                 try
                 {
                     ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
-                    AppDebug.Log("tickerBanManagement", $"Punting player '{playerName}' (Slot {slotNum}). Reason: {puntReason}");
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("tickerBanManagement", $"Error punting player '{playerName}' (Slot {slotNum}): {ex.Message}");
+                    AppDebug.Log($"Error punting player '{playerName}' (Slot {slotNum})", AppDebug.LogLevel.Error, ex);
                 }
             }
         }
@@ -683,7 +641,6 @@ namespace BHD_ServerManager.Classes.Tickers
                             {
                                 shouldPunt = true;
                                 puntReason = "CQB role is disabled on this server";
-                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled CQB role.");
                             }
                             break;
 
@@ -693,7 +650,6 @@ namespace BHD_ServerManager.Classes.Tickers
                             {
                                 shouldPunt = true;
                                 puntReason = "Medic role is disabled on this server";
-                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Medic role.");
                             }
                             break;
 
@@ -703,7 +659,6 @@ namespace BHD_ServerManager.Classes.Tickers
                             {
                                 shouldPunt = true;
                                 puntReason = "Sniper role is disabled on this server";
-                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Sniper role.");
                             }
                             break;
 
@@ -713,7 +668,6 @@ namespace BHD_ServerManager.Classes.Tickers
                             {
                                 shouldPunt = true;
                                 puntReason = "Gunner role is disabled on this server";
-                                AppDebug.Log("tickerBanManagement", $"Player '{player.PlayerName}' (Slot {slotNum}) is using disabled Gunner role.");
                             }
                             break;
                     }
@@ -725,7 +679,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("tickerBanManagement", $"Error checking roles for player in slot {slotNum}: {ex.Message}");
+                    AppDebug.Log($"Error checking roles for player in slot {slotNum}", AppDebug.LogLevel.Error, ex);
                 }
             }
 

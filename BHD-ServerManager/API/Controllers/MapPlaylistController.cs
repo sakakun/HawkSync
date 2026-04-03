@@ -3,7 +3,6 @@ using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabMaps;
-using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -98,7 +97,7 @@ public class MapPlaylistController : ControllerBase
         var result = mapInstanceManager.SavePlaylist(playlist.PlaylistID, maps);
 
         if (playlist.PlaylistID == CommonCore.instanceMaps!.ActivePlaylist) {
-            var updateResult = mapInstanceManager.UpdateServerMapCycle();
+            mapInstanceManager.UpdateServerMapCycle();
         }
 
         TriggerServerUIReload();
@@ -273,18 +272,21 @@ public class MapPlaylistController : ControllerBase
         {
             serverUI.Invoke(() =>
             {
-                serverUI.MapsTab?.OnRefreshMapLists(null!,null!);
+                serverUI.MapsTab.OnRefreshMapLists(null!,null!);
             });
         }
     }
 
     private bool HasPermission(string permission)
     {
+        var username = User.FindFirst("username")?.Value ?? "Unknown";
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
-        AppDebug.Log("MapPlaylistController", $"Checking user permissions, {permission} from user { User.Identity!.Name}");
-        AppDebug.Log("MapPlaylistController", $"User permissions: {string.Join(", ", permissions)}");
-        AppDebug.Log("MapPlaylistController", $"Has Permission: {permissions.Contains(permission).ToString()}");
-        return permissions.Contains(permission);
+        bool hasPerm = permissions.Contains(permission);
+        
+        if (!hasPerm)
+            AppDebug.Log($"User {username} does not have '{permissions}' permission - Forbidden", AppDebug.LogLevel.Warning);
+        
+        return hasPerm;
     }
 
     private void LogMapPlaylistAction(string actionType, string description, bool success, string message)

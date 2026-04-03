@@ -31,7 +31,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
         {
             _proxyService = proxyService ?? throw new ArgumentNullException(nameof(proxyService));
             _cacheExpiration = TimeSpan.FromDays(cacheExpirationDays);
-            AppDebug.Log("ProxyCheckManager", $"Initialized with {proxyService.ServiceName}, cache expiration: {cacheExpirationDays} days");
         }
 
         /// <summary>
@@ -80,9 +79,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     }
                 }
             }
-
-            AppDebug.Log("ProxyCheckManager", 
-                $"Reloaded cache from database: {addedCount} added, {updatedCount} updated");
             
             return addedCount + updatedCount;
         }
@@ -139,7 +135,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
         /// </summary>
         public static async Task<ProxyCheckResult> CheckIPAsync(IPAddress ipAddress)
         {
-            AppDebug.Log("CheckIPAsync", $"Attempting to check: {ipAddress.ToString()}");
 
             if (CommonCore.instanceBans == null)
                 throw new InvalidOperationException("CommonCore.banInstance is not initialized.");
@@ -153,7 +148,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
             // Step 0: Check if IP is internal/private - skip proxy check
             if (IsInternalIP(ipAddress))
             {
-                AppDebug.Log("ProxyCheckManager", $"Internal IP detected: {ipAddress} - Skipping proxy check");
                 return new ProxyCheckResult
                 {
                     Success = true,
@@ -169,7 +163,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
             var cachedRecord = GetFromMemoryCache(ipAddress);
             if (cachedRecord != null && !IsCacheExpired(cachedRecord))
             {
-                AppDebug.Log("ProxyCheckManager", $"Cache HIT (Memory): {ipAddress}");
                 return ConvertToResult(cachedRecord, fromCache: true);
             }
 
@@ -190,7 +183,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                     if (!IsCacheExpired(dbRecord))
                     {
-                        AppDebug.Log("ProxyCheckManager", $"Cache HIT (Database): {ipAddress}");
                         return ConvertToResult(dbRecord, fromCache: true);
                     }
 
@@ -199,7 +191,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
 
             // Step 3: Cache miss or expired - query the API
-            AppDebug.Log("ProxyCheckManager", $"Cache MISS: {ipAddress} - Querying {_proxyService.ServiceName}");
             var apiResult = await _proxyService.CheckIPAsync(ipAddress);
 
             if (!apiResult.Success)
@@ -207,7 +198,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 // API failed - if we have an expired cached record, return it with a warning
                 if (cachedRecord != null)
                 {
-                    AppDebug.Log("ProxyCheckManager", $"API failed, using expired cache for {ipAddress}");
+                    AppDebug.Log($"API failed, using expired cache for {ipAddress}", AppDebug.LogLevel.Error);
                     var result = ConvertToResult(cachedRecord, fromCache: true);
                     result.ErrorMessage = $"Using expired cache. API error: {apiResult.ErrorMessage}";
                     return result;
@@ -267,7 +258,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 // Update database
                 DatabaseManager.UpdateProxyRecord(existingRecord);
-                AppDebug.Log("ProxyCheckManager", $"Updated cache for {ipAddress}");
             }
             else
             {
@@ -299,8 +289,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     {
                         CommonCore.instanceBans!.ProxyRecords.Add(newRecord);
                     }
-
-                    AppDebug.Log("ProxyCheckManager", $"Added new cache entry for {ipAddress} (ID: {newId})");
                 }
             }
         }
@@ -338,7 +326,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 if (record != null)
                 {
                     record.CacheExpiry = DateTime.UtcNow.AddSeconds(-1);
-                    AppDebug.Log("ProxyCheckManager", $"Invalidated cache for {ipAddress}");
                 }
             }
         }
@@ -373,7 +360,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             if (removedCount > 0)
             {
-                AppDebug.Log("ProxyCheckManager", $"Cleaned up {removedCount} expired cache entries");
+                AppDebug.Log($"Cleaned up {removedCount} expired cache entries", AppDebug.LogLevel.Info);
             }
 
             return removedCount;

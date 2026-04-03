@@ -23,14 +23,12 @@ public class AuthController : ControllerBase
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
         
-        AppDebug.Log("AuthController", $"Login attempt from {ipAddress} for user: {request.Username}");
-        
         var (success, user, message) = adminInstanceManager.AuthenticateUser(
             request.Username, request.Password);
 
         if (!success || user == null)
         {
-            AppDebug.Log("AuthController", $"Login failed for {request.Username}: {message}");
+            AppDebug.Log($"Login failed for {request.Username}: {message}", AppDebug.LogLevel.Warning);
             
             // Log failed login attempt
             try
@@ -48,11 +46,10 @@ public class AuthController : ControllerBase
                     success: false,
                     errorMessage: message
                 );
-                AppDebug.Log("AuthController", "Failed login audit log written");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("AuthController", $"Error writing failed login audit log: {ex.Message}");
+                AppDebug.Log($"Error writing failed login audit log", AppDebug.LogLevel.Error, ex);
             }
 
             return Ok(new LoginResponse
@@ -65,11 +62,7 @@ public class AuthController : ControllerBase
         var token = GenerateJwtToken(user);
 
         adminInstanceManager.TrackSession(user.Username);
-
-        AppDebug.Log("AuthController", $"Login successful for {request.Username}");
         
-        // Log successful login
-        bool auditLogSuccess = false;
         try
         {
             DatabaseManager.LogAuditAction(
@@ -84,17 +77,10 @@ public class AuthController : ControllerBase
                 ipAddress: ipAddress,
                 success: true
             );
-            auditLogSuccess = true;
-            AppDebug.Log("AuthController", "Successful login audit log written");
         }
         catch (Exception ex)
         {
-            AppDebug.Log("AuthController", $"Error writing successful login audit log: {ex.Message}");
-        }
-
-        if (!auditLogSuccess)
-        {
-            AppDebug.Log("AuthController", "WARNING: Login was successful but audit log failed to write");
+            AppDebug.Log($"Error writing successful login audit log", AppDebug.LogLevel.Error, ex);
         }
 
         return Ok(new LoginResponse

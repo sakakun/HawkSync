@@ -3,11 +3,6 @@ using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -55,7 +50,7 @@ namespace BHD_ServerManager.Forms.Panels
 			var result = theInstanceManager.LoadGamePlaySettings();
 			if (!result.Success)
 			{
-				AppDebug.Log(Name, $"Failed to load gameplay settings: {result.Message}");
+				AppDebug.Log($"Failed to load gameplay settings", AppDebug.LogLevel.Error, new Exception(result.Message));
 				MessageBox.Show($"Failed to load gameplay settings: {result.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
@@ -88,7 +83,7 @@ namespace BHD_ServerManager.Forms.Panels
 			}
 			catch (Exception ex)
 			{
-				AppDebug.Log(Name, $"Error exporting settings: {ex.Message}");
+				AppDebug.Log($"Error exporting settings", AppDebug.LogLevel.Error, ex);
 				MessageBox.Show($"Failed to export settings: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -113,12 +108,11 @@ namespace BHD_ServerManager.Forms.Panels
 					}
 					ApplyGamePlaySettingsToUI(settings);
 					MessageBox.Show("Gameplay settings imported successfully!\n\nClick 'Save Server Settings' to apply these settings.", "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-					AppDebug.Log(Name, $"Settings imported from: {openFileDialog.FileName}");
 				}
 			}
 			catch (Exception ex)
 			{
-				AppDebug.Log(Name, $"Error importing settings: {ex.Message}");
+				AppDebug.Log($"Error importing settings", AppDebug.LogLevel.Error, ex);
 				MessageBox.Show($"Failed to import settings: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -394,12 +388,11 @@ namespace BHD_ServerManager.Forms.Panels
 			if (result.Success)
 			{
 				MessageBox.Show("Gameplay settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				AppDebug.Log(Name, "Gameplay settings saved successfully");
 			}
 			else
 			{
 				MessageBox.Show($"Failed to save gameplay settings:\n\n{result.Message}", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				AppDebug.Log(Name, $"Failed to save gameplay settings: {result.Message}");
+				AppDebug.Log($"Failed to save gameplay settings:", AppDebug.LogLevel.Error, new Exception(result.Message));
 			}
 		}
 
@@ -443,12 +436,11 @@ namespace BHD_ServerManager.Forms.Panels
 				{
 					theInstanceManager.UpdateGameServer();
 					MessageBox.Show("Gameplay settings saved and updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-					AppDebug.Log(Name, "Gameplay settings saved and updated successfully.");
 				}
 				else
 				{
 					MessageBox.Show($"Failed to save gameplay settings:\n\n{result.Message}", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-					AppDebug.Log(Name, $"Failed to save gameplay settings: {result.Message}");
+					AppDebug.Log($"Failed to save gameplay settings", AppDebug.LogLevel.Error,  new Exception(result.Message));
 				}
 			}
 		}
@@ -592,7 +584,7 @@ namespace BHD_ServerManager.Forms.Panels
 				}
 			} catch (Exception ex)
 			{
-				AppDebug.Log(Name, $"Error toggling match state: {ex.Message}");
+				AppDebug.Log($"Error toggling match state", AppDebug.LogLevel.Error, ex);
 				MessageBox.Show($"Failed to toggle match state: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}

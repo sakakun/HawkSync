@@ -157,7 +157,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
             catch (Exception ex)
             {
-                AppDebug.Log(Name, $"Error testing connection: {ex.Message}");
+                AppDebug.Log($"Error testing connection", AppDebug.LogLevel.Error, ex);
                 MessageBox.Show(
                     $"An error occurred while testing the connection:\n\n{ex.Message}",
                     "Connection Test Error",

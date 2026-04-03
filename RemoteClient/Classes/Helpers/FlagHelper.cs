@@ -4,7 +4,9 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using HawkSyncShared.SupportClasses;
+using Microsoft.Extensions.Logging;
 
 namespace RemoteClient.Classes.Helpers
 {
@@ -38,14 +40,16 @@ namespace RemoteClient.Classes.Helpers
             if (_flagCache.TryGetValue(normalizedCode, out var cachedFlag))
                 return cachedFlag != null ? new Bitmap(cachedFlag) : null;
 
+            string url = string.Format(FlagCdnUrl, normalizedCode);
+            var sw = Stopwatch.StartNew();
+
             try
             {
-                var url = string.Format(FlagCdnUrl, normalizedCode);
-                var response = await _httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var imageBytes = await response.Content.ReadAsByteArrayAsync();
+                    var imageBytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                     Bitmap flag;
                     using (var ms = new MemoryStream(imageBytes))
                     using (var tempImage = Image.FromStream(ms))
@@ -57,19 +61,25 @@ namespace RemoteClient.Classes.Helpers
                     // Cache the independent copy
                     _flagCache[normalizedCode] = flag;
 
+                    sw.Stop();
+                    AppDebug.DebugMsg($"Fetched flag for {countryCode} from {url} in {sw.ElapsedMilliseconds} ms");
+
                     // Return a clone so each caller owns their own copy
                     return new Bitmap(flag);
                 }
                 else
                 {
-                    AppDebug.Log("FlagHelper", $"Failed to fetch flag for {countryCode}: {response.StatusCode}");
+                    sw.Stop();
+                    AppDebug.Warn($"Failed to fetch flag for {countryCode} from {url}: {(int)response.StatusCode} {response.ReasonPhrase}");
                     _flagCache[normalizedCode] = null;
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("FlagHelper", $"Error fetching flag for {countryCode}: {ex.Message}");
+                sw.Stop();
+                // Log full exception object so AppDebug can include stack trace and other details in production EventLog
+                AppDebug.Error($"Error fetching flag for {countryCode} from {url}", ex);
                 _flagCache[normalizedCode] = null;
                 return null;
             }

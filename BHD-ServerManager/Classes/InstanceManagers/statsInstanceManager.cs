@@ -333,7 +333,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 gameLine = $" Game {timer}__&__{date}__&__{gametype}__&__{dedicated}__&__{servername}__&__{mapname}__&__{maxplayers}__&__{numplayers}__&__{mod}";
             }
-            AppDebug.Log("StatsManager", $"Generated Game Line: {gameLine}");
             return gameLine;
         }
         public static string GeneratePlayerLines(PlayerStatObject playerStats)
@@ -456,7 +455,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             if (!server.IsEnabled || string.IsNullOrWhiteSpace(server.ProfileID) || string.IsNullOrWhiteSpace(server.ServerPath))
             {
-                AppDebug.Log("StatsManager", $"Skipping import for server '{server.DisplayName}' due to missing configuration.");
+                AppDebug.Log($"Skipping import for server '{server.DisplayName}' due to missing configuration.", AppDebug.LogLevel.Warning);
                 return;
             }
 
@@ -472,7 +471,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             if (!string.IsNullOrWhiteSpace(response))
             {
                 string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
-                AppDebug.Log("StatsManager", $"Babstats Import Response ({server.ProfileID}): {responseData}");
+                AppDebug.Log($"Babstats Import Response ({server.ProfileID}): {responseData}", AppDebug.LogLevel.Info);
                 AddStatsLogRowSafe(thisServer, DateTime.Now, responseData, server);
             }
         }
@@ -483,7 +482,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             if (!server.IsEnabled || string.IsNullOrWhiteSpace(server.ProfileID) || string.IsNullOrWhiteSpace(server.ServerPath))
             {
-                AppDebug.Log("StatsManager", $"Skipping update for server '{server.DisplayName}' due to missing configuration.");
+                AppDebug.Log($"Skipping update for server '{server.DisplayName}' due to missing configuration.", AppDebug.LogLevel.Warning);
                 return;
             }
 
@@ -499,7 +498,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             if (!string.IsNullOrWhiteSpace(response))
             {
                 string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
-                AppDebug.Log("StatsManager", $"Babstats Update Response ({server.ProfileID}): {responseData}");
+                AppDebug.Log($"Babstats Update Response ({server.ProfileID}): {responseData}", AppDebug.LogLevel.Info);
                 AddStatsLogRowSafe(thisServer, DateTime.Now, responseData, server);
             }
         }
@@ -508,7 +507,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             if (!server.IsEnabled || string.IsNullOrWhiteSpace(server.ProfileID) || string.IsNullOrWhiteSpace(server.ServerPath))
             {
-                AppDebug.Log("StatsManager", $"Skipping update for server '{server.DisplayName}' due to missing configuration.");
+                AppDebug.Log($"Skipping update for server '{server.DisplayName}' due to missing configuration.", AppDebug.LogLevel.Warning);
                 return "";
             }
 
@@ -526,7 +525,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 AddStatsLogRowSafe(thisServer, DateTime.Now, "Report Sent.");
                 if (!string.IsNullOrEmpty(response))
                 {
-                    AppDebug.Log("StatsManager", $"Babstats Report Response: {response}");
+                    AppDebug.Log($"Babstats Report Response: {response}", AppDebug.LogLevel.Info);
                     string[] messages = response.Split(new[] { "__&__" }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var message in messages)
                     {
@@ -538,7 +537,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending report data: {ex.Message}");
+                AppDebug.Log($"Error sending report data", AppDebug.LogLevel.Error, ex);
             }
             return string.Empty;
         }
@@ -564,11 +563,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (response.IndexOf("no data sent", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     responseGood++;
-                    AppDebug.Log("StatsManager", $"Babstats Test: {endpoint} - No data sent.");
+                    AppDebug.Log($"Babstats Test: {endpoint} - No data sent.", AppDebug.LogLevel.Info);
                 }
                 else
                 {
-                    AppDebug.Log("StatsManager", $"Babstats Test: {url} - Response: {response}");
+                    AppDebug.Log($"Babstats Test: {url} - Response: {response}",  AppDebug.LogLevel.Info);
                 }
             }
             if (responseGood == 3)
@@ -590,7 +589,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             using var content = new FormUrlEncodedContent(postData);
 
             string postDataJson = JsonSerializer.Serialize(postData);
-            AppDebug.Log("StatsManager", $"Babstats POST Data {url} JSON: {postDataJson}");
+            AppDebug.Log($"Babstats POST Data {url} JSON: {postDataJson}", AppDebug.LogLevel.Info);
 
             content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
 
@@ -606,7 +605,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             var responseBytes = await response.Content.ReadAsByteArrayAsync();
             string responseContent = Encoding.GetEncoding("Windows-1252").GetString(responseBytes);
-            AppDebug.Log("StatsManager", $"Babstats Response: {responseContent}");
+            AppDebug.Log($"Babstats Response: {responseContent}", AppDebug.LogLevel.Info);
 
             return responseContent;
         }

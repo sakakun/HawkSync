@@ -91,12 +91,11 @@ namespace BHD_ServerManager.Classes.Helpers
             {
                 try
                 {
-                    AppDebug.Log("CheckIP", $"Attempting to check: {Address.ToString()}");
                     _ = ProxyCheckManager.CheckIPAsync(Address);
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("tickerBanManagement", $"Error checking IP {Address} with ProxyCheckManager: {ex.Message}");
+                    AppDebug.Log($"Error checking IP {Address} with ProxyCheckManager", AppDebug.LogLevel.Error, ex);
                 }
             }
         }

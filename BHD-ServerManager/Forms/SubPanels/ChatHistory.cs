@@ -66,21 +66,18 @@ namespace BHD_ServerManager.Forms.SubPanels
 
                 comboBox_PlayerFilter.Items.Clear();
                 comboBox_PlayerFilter.Items.Add("All Players");
-
                 if (players != null && players.Count > 0)
                 {
                     comboBox_PlayerFilter.Items.AddRange(players.ToArray());
-                    AppDebug.Log("ChatHistory", $"Loaded {players.Count} player names for filter");
                 }
-
                 comboBox_PlayerFilter.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
-                AppDebug.Log("ChatHistory", $"Failed to load player names: {ex.Message}");
                 comboBox_PlayerFilter.Items.Clear();
                 comboBox_PlayerFilter.Items.Add("All Players");
                 comboBox_PlayerFilter.SelectedIndex = 0;
+                AppDebug.Log($"Failed to load player names", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -99,10 +96,7 @@ namespace BHD_ServerManager.Forms.SubPanels
         private void LoadHistory()
         {
             if (_isLoading)
-            {
-                AppDebug.Log("ChatHistory", "Load already in progress, skipping");
                 return;
-            }
 
             _isLoading = true;
 
@@ -170,8 +164,6 @@ namespace BHD_ServerManager.Forms.SubPanels
                 _currentLogs = result.logs;
                 _totalCount = result.totalCount;
 
-                AppDebug.Log("ChatHistory", $"Loaded {_currentLogs.Count} of {_totalCount} messages (Page {_currentPage})");
-
                 // Update UI
                 UpdateDataGrid();
                 UpdatePaginationControls();
@@ -189,18 +181,20 @@ namespace BHD_ServerManager.Forms.SubPanels
             }
             catch (Exception ex)
             {
+                AppDebug.Log($"Error loading history", AppDebug.LogLevel.Error, ex);
+
                 MessageBox.Show(
                     $"Error loading chat history:\n\n{ex.Message}",
                     "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
-                AppDebug.Log("ChatHistory", $"Error loading history: {ex.Message}");
 
                 // Reset state
                 _currentLogs.Clear();
                 _totalCount = 0;
                 dataGridView_History.Rows.Clear();
+
                 label_Pagination.Text = "Error loading data";
             }
             finally
@@ -247,8 +241,6 @@ namespace BHD_ServerManager.Forms.SubPanels
                     log.MessageText
                 );
             }
-
-            AppDebug.Log("ChatHistory", $"Updated grid with {_currentLogs.Count} rows");
         }
 
         /// <summary>
@@ -271,7 +263,6 @@ namespace BHD_ServerManager.Forms.SubPanels
             btn_PrevPage.Enabled = _currentPage > 1;
             btn_NextPage.Enabled = _currentPage < totalPages;
 
-            AppDebug.Log("ChatHistory", $"Pagination: Page {_currentPage}/{totalPages}, Total: {_totalCount}");
         }
 
         /// <summary>
@@ -322,8 +313,6 @@ namespace BHD_ServerManager.Forms.SubPanels
                     {
                         LoadHistory();
                     }
-
-                    AppDebug.Log("ChatHistory", $"Page size changed to {_pageSize}");
                 }
             }
         }
@@ -347,8 +336,6 @@ namespace BHD_ServerManager.Forms.SubPanels
 
             // Update UI
             UpdatePaginationControls();
-
-            AppDebug.Log("ChatHistory", "Filters cleared");
         }
 
         /// <summary>
@@ -404,8 +391,6 @@ namespace BHD_ServerManager.Forms.SubPanels
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information
                     );
-
-                    AppDebug.Log("ChatHistory", $"Exported {_currentLogs.Count} messages to CSV: {sfd.FileName}");
                 }
                 catch (Exception ex)
                 {
@@ -415,7 +400,7 @@ namespace BHD_ServerManager.Forms.SubPanels
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error
                     );
-                    AppDebug.Log("ChatHistory", $"Export error: {ex.Message}");
+                    AppDebug.Log($"Export error", AppDebug.LogLevel.Error, ex);
                 }
             }
         }
@@ -451,7 +436,6 @@ namespace BHD_ServerManager.Forms.SubPanels
             if (dateTimePicker_To != null)
                 dateTimePicker_To.Enabled = isCustom;
 
-            AppDebug.Log("ChatHistory", $"Date range changed to index {comboBox_DateRange.SelectedIndex}, Custom: {isCustom}");
         }
 
         /// <summary>

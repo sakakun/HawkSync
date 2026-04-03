@@ -79,8 +79,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 allMaps.AddRange(defaultMaps.Where(m => m.ModType == 0));
                 allMaps.AddRange(customMapsResult.Maps);
 
-                AppDebug.Log("mapInstanceManager", $"Loaded {defaultMaps.Count} default maps, {customMapsResult.Maps.Count} custom maps");
-
                 return new AvailableMapsResult(
                     DefaultMaps: defaultMaps.Where(m => m.ModType == 0).ToList(),
                     CustomMaps: customMapsResult.Maps,
@@ -89,7 +87,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error loading available maps: {ex.Message}");
+                AppDebug.Log($"Error loading available maps", AppDebug.LogLevel.Error, ex);
                 return new AvailableMapsResult(
                     DefaultMaps: new List<MapObject>(),
                     CustomMaps: new List<MapObject>(),
@@ -137,18 +135,18 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     else
                     {
                         skippedFiles.Add(file.Name);
-                        AppDebug.Log("mapInstanceManager", $"Skipped map file: {file.Name} - {result.ErrorMessage}");
+                        AppDebug.Log($"Skipped map file: {file.Name} - {result.ErrorMessage}", AppDebug.LogLevel.Warning);
                     }
                     
                 }
 
-                AppDebug.Log("mapInstanceManager", $"Scanned {bmsFiles.Length} files, found {customMaps.Count} maps, skipped {skippedFiles.Count}");
+                AppDebug.Log($"Scanned {bmsFiles.Length} files, found {customMaps.Count} maps, skipped {skippedFiles.Count}", AppDebug.LogLevel.Info);
 
                 return new MapScanResult(true, customMaps, skippedFiles);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error scanning custom maps: {ex.Message}");
+                AppDebug.Log($"Error scanning custom maps", AppDebug.LogLevel.Error, ex);
                 return new MapScanResult(false, customMaps, skippedFiles, ex.Message);
             }
         }
@@ -253,13 +251,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         }
                         else
                         {
-                            AppDebug.Log("mapInstanceManager", 
-                                $"Warning: File '{mapFile}' has Bitmap/BitmapBytes: {bit} but could not find matching game type");
+                            AppDebug.Log($"Warning: File '{mapFile}' has Bitmap/BitmapBytes: {bit} but could not find matching game type", AppDebug.LogLevel.Warning);
                         }
                     }
 
                     if (maps.Count == 0)
                     {
+                        AppDebug.Log($"No valid game types found for file '{mapFile}' with BitmapBytes: {bitmapBytesSum} and Bitmap: {bitmapSum}", AppDebug.LogLevel.Warning);
                         return new MapScanResult(false, maps, new List<string>(), 
                             $"No valid game types found (BitmapBytes: {bitmapBytesSum}, Bitmap: {bitmapSum})");
                     }
@@ -269,6 +267,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
+                AppDebug.Log($"Error parsing map file: {filePath}", AppDebug.LogLevel.Error, ex);
                 return new MapScanResult(false, maps, new List<string>(), $"Error parsing file: {ex.Message}");
             }
         }
@@ -324,13 +323,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Update in-memory playlist
                 mapInstance.Playlists[playlistID] = maps;
 
-                AppDebug.Log("mapInstanceManager", $"Loaded playlist {playlistID} with {maps.Count} maps");
+                AppDebug.Log($"Loaded playlist {playlistID} with {maps.Count} maps", AppDebug.LogLevel.Info);
 
                 return new PlaylistResult(true, "Playlist loaded successfully.", playlistID, maps.Count);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error loading playlist {playlistID}: {ex.Message}");
+                AppDebug.Log($"Error loading playlist {playlistID}", AppDebug.LogLevel.Error, ex);
                 return new PlaylistResult(false, $"Error: {ex.Message}", playlistID, 0, ex);
             }
         }
@@ -362,6 +361,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 {
                     if (!availableMapLookup.Contains((map.MapFile, map.MapType)))
                     {
+                        AppDebug.Log($"Cannot save playlist: Map '{map.MapName}' ({map.MapFile}) is no longer available.", AppDebug.LogLevel.Warning);
                         return new PlaylistResult(false, 
                             $"Map '{map.MapName}' ({map.MapFile}) is no longer available and cannot be saved.");
                     }
@@ -373,13 +373,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Update in-memory
                 mapInstance.Playlists[playlistID] = maps;
 
-                AppDebug.Log("mapInstanceManager", $"Saved playlist {playlistID} with {maps.Count} maps");
+                AppDebug.Log($"Saved playlist {playlistID} with {maps.Count} maps", AppDebug.LogLevel.Info);
 
                 return new PlaylistResult(true, $"Playlist {playlistID} saved successfully.", playlistID, maps.Count);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error saving playlist {playlistID}: {ex.Message}");
+                AppDebug.Log($"Error saving playlist {playlistID}", AppDebug.LogLevel.Error, ex);
                 return new PlaylistResult(false, $"Error: {ex.Message}", playlistID, 0, ex);
             }
         }
@@ -401,7 +401,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error getting playlist maps: {ex.Message}");
+                AppDebug.Log($"Error getting playlist maps", AppDebug.LogLevel.Error, ex);
                 return (false, new List<MapObject>(), ex.Message);
             }
         }
@@ -447,13 +447,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     ServerMemory.UpdateMapListCount();
                 }
 
-                AppDebug.Log("mapInstanceManager", $"Set playlist {playlistID} as active");
+                AppDebug.Log($"Set playlist {playlistID} as active", AppDebug.LogLevel.Info);
 
                 return new PlaylistResult(true, $"Playlist {playlistID} is now active.", playlistID, maps.Count);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error setting active playlist: {ex.Message}");
+                AppDebug.Log($"Error setting active playlist", AppDebug.LogLevel.Error, ex);
                 return new PlaylistResult(false, $"Error: {ex.Message}", playlistID, 0, ex);
             }
         }
@@ -481,13 +481,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     maps[i].MapID = i + 1;
                 }
 
-                AppDebug.Log("mapInstanceManager", $"Randomized playlist with {maps.Count} maps");
+                AppDebug.Log($"Randomized playlist with {maps.Count} maps", AppDebug.LogLevel.Info);
 
                 return new PlaylistResult(true, "Playlist randomized successfully.", 0, maps.Count);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error randomizing playlist: {ex.Message}");
+                AppDebug.Log($"Error randomizing playlist", AppDebug.LogLevel.Error, ex);
                 return new PlaylistResult(false, $"Error: {ex.Message}", 0, 0, ex);
             }
         }
@@ -521,7 +521,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error validating playlist: {ex.Message}");
+                AppDebug.Log($"Error validating playlist", AppDebug.LogLevel.Error, ex);
                 return (false, new List<string> { $"Validation error: {ex.Message}" });
             }
         }
@@ -551,13 +551,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 File.WriteAllText(filePath, json);
 
-                AppDebug.Log("mapInstanceManager", $"Exported playlist {playlistID} to {filePath}");
+                AppDebug.Log($"Exported playlist {playlistID} to {filePath}", AppDebug.LogLevel.Info);
 
                 return new OperationResult(true, $"Playlist exported to {filePath}");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error exporting playlist: {ex.Message}");
+                AppDebug.Log($"Error exporting playlist", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -600,7 +600,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     else
                     {
                         skippedCount++;
-                        AppDebug.Log("mapInstanceManager", $"Skipped unavailable map: {map.MapName} ({map.MapFile}) - Type: {map.MapType}");
+                        AppDebug.Log($"Skipped unavailable map: {map.MapName} ({map.MapFile}) - Type: {map.MapType}", AppDebug.LogLevel.Warning);
                     }
                 }
 
@@ -610,13 +610,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     validMaps[i].MapID = i + 1;
                 }
 
-                AppDebug.Log("mapInstanceManager", $"Imported {validMaps.Count} maps, skipped {skippedCount}");
+                AppDebug.Log($"Imported {validMaps.Count} maps, skipped {skippedCount}", AppDebug.LogLevel.Info);
 
                 return (true, validMaps, validMaps.Count, skippedCount, string.Empty);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error importing playlist: {ex.Message}");
+                AppDebug.Log($"Error importing playlist", AppDebug.LogLevel.Error, ex);
                 return (false, new List<MapObject>(), 0, 0, ex.Message);
             }
         }
@@ -650,7 +650,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error checking if map is 4-team: {ex.Message}");
+                AppDebug.Log($"Error checking if map is 4-team", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }
@@ -680,7 +680,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error checking if map is H1D3S33K: {ex.Message}");
+                AppDebug.Log($"Error checking if map is H1D3S33K", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }
@@ -703,13 +703,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerMemory.UpdateMapCycle2();
                 ServerMemory.UpdateMapListCount();
 
-                AppDebug.Log("mapInstanceManager", "Updated server map cycle");
+                AppDebug.Log("Updated server map cycle", AppDebug.LogLevel.Info);
 
                 return new OperationResult(true, "Server map cycle updated successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error updating server map cycle: {ex.Message}");
+                AppDebug.Log($"Error updating server map cycle", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -733,13 +733,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 ServerMemory.UpdateNextMap(mapIndex);
 
-                AppDebug.Log("mapInstanceManager", $"Set next map to index {mapIndex}: {maps[mapIndex].MapName}");
+                AppDebug.Log($"Set next map to index {mapIndex}: {maps[mapIndex].MapName}", AppDebug.LogLevel.Info);
 
                 return new OperationResult(true, $"Next map set to: {maps[mapIndex].MapName}");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error setting next map: {ex.Message}");
+                AppDebug.Log($"Error setting next map", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -756,13 +756,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 ServerMemory.WriteMemoryScoreMap();
 
-                AppDebug.Log("mapInstanceManager", "Scored current map");
+                AppDebug.Log("Scored current map", AppDebug.LogLevel.Info);
 
                 return new OperationResult(true, "Map scored successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error scoring map: {ex.Message}");
+                AppDebug.Log($"Error scoring map", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -782,13 +782,13 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 ServerMemory.WriteMemorySendConsoleCommand("resetgames");
 
-                AppDebug.Log("mapInstanceManager", "Skipped current map");
+                AppDebug.Log("Skipped current map", AppDebug.LogLevel.Info);
 
                 return new OperationResult(true, "Map skipped successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error skipping map: {ex.Message}");
+                AppDebug.Log($"Error skipping map", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -820,11 +820,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     LoadPlaylist(i);
                 }
 
-                AppDebug.Log("mapInstanceManager", "Map playlists initialized");
+                AppDebug.Log("Map playlists initialized", AppDebug.LogLevel.Info);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("mapInstanceManager", $"Error initializing map playlists: {ex.Message}");
+                AppDebug.Log($"Error initializing map playlists", AppDebug.LogLevel.Error, ex);
             }
         }
     }

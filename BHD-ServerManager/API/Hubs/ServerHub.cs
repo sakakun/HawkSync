@@ -25,11 +25,10 @@ public class ServerHub : Hub
             _connectionToUsername[Context.ConnectionId] = username;
             adminInstanceManager.TrackSession(username);
             CommonCore.instanceAdmin!.ForceUIUpdate = true;
-            AppDebug.Log("ServerHub", $"Client subscribed: {username} (Total: {_connectedClients.Count})");
         }
         else
         {
-            AppDebug.Log("ServerHub", $"Client subscribed without username. Total: {_connectedClients.Count}");
+            AppDebug.Log($"Client subscribed without username. Total: {_connectedClients.Count}", AppDebug.LogLevel.Warning);
         }
     }
 
@@ -42,8 +41,7 @@ public class ServerHub : Hub
         {
             _connectionToUsername.Remove(Context.ConnectionId);
             adminInstanceManager.RemoveSession(username);
-            CommonCore.instanceAdmin!.ForceUIUpdate = true;
-            AppDebug.Log("ServerHub", $"Client unsubscribed: {username}");
+            CommonCore.instanceAdmin!.ForceUIUpdate = true; ;
         }
     }
 
@@ -60,7 +58,6 @@ public class ServerHub : Hub
     public override async Task OnConnectedAsync()
     {
         var username = Context.User?.FindFirst("username")?.Value ?? "Unknown";
-        AppDebug.Log("ServerHub", $"Client connected: {username} ({Context.ConnectionId})");
         await base.OnConnectedAsync();
     }
 
@@ -93,11 +90,10 @@ public class ServerHub : Hub
                 errorMessage: exception?.Message
             );
             
-            AppDebug.Log("ServerHub", $"Client disconnected: {username} ({Context.ConnectionId})");
         }
         else
         {
-            AppDebug.Log("ServerHub", $"Client disconnected: {Context.ConnectionId}");
+            AppDebug.Log($"Client disconnected: {Context.ConnectionId}", AppDebug.LogLevel.Warning);
         }
 
         await base.OnDisconnectedAsync(exception);

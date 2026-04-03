@@ -194,8 +194,6 @@ public partial class tabAdmin : UserControl
         {
             dataGridView1.FirstDisplayedScrollingRowIndex = _lastScrollIndex;
         }
-
-        AppDebug.Log("tabAdmin", $"Loaded {users.Count} users from cache (differential update)");
     }
 
     // ================================================================================

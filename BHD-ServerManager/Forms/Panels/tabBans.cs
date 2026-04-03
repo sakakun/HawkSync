@@ -1,25 +1,13 @@
 ﻿using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.Services;
 using BHD_ServerManager.Classes.Services.NetLimiter;
 using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Classes.Tickers;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Windows.Services.Maps;
 using RecordDeleteAction = BHD_ServerManager.Classes.InstanceManagers.RecordDeleteAction;
 
 namespace BHD_ServerManager.Forms.Panels
@@ -67,8 +55,6 @@ namespace BHD_ServerManager.Forms.Panels
                 return;
             }
 
-            AppDebug.Log("tabBans", "Ticker update - checking NetLimiter settings lockdown");          
-
             NetLimiter_RefreshConnections();
 
             // NetLimiter Settings Lockdown
@@ -103,7 +89,7 @@ namespace BHD_ServerManager.Forms.Panels
                     checkBox_EnableNetLimiter.Checked = false;
                     ServerSettings.Set("NetLimiterEnabled", false);
                     MessageBox.Show("Failed to start NetLimiter bridge process. NetLimiter integration has been disabled.", "NetLimiter Integration Disabled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    AppDebug.Log("tickerBanManagement", "NetLimiter integration disabled due to failure to start bridge process.");
+                    AppDebug.Log("NetLimiter integration disabled due to failure to start bridge process.", AppDebug.LogLevel.Warning);
                 }
             } 
 
@@ -130,8 +116,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
 
             var Connections = instanceBans!.NetLimiterConnectionLogs.ToList();
-
-            AppDebug.Log("tabBans", $"Refreshing NetLimiter connections log with {Connections.Count} entries.");
+            
             try
             {
                 // Create a dictionary of new data keyed by IP address for quick lookup
@@ -187,7 +172,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
             catch (Exception ex)
             {
-                AppDebug.Log("tabBans", $"Error refreshing NetLimiter connections log: {ex}");
+                AppDebug.Log($"Error refreshing NetLimiter connections log", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -245,10 +230,7 @@ namespace BHD_ServerManager.Forms.Panels
                     record.Date.ToString("yyyy-MM-dd")
                 );
             }
-
-            AppDebug.Log("tabBans",
-                $"Loaded {instanceBans.BannedPlayerNames.Count} name bans and " +
-                $"{instanceBans.BannedPlayerIPs.Count} IP bans");
+            
         }
 
         /// <summary>
@@ -665,7 +647,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 MessageBox.Show($"Error saving ban record: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AppDebug.Log("tabBans", $"Error saving ban: {ex}");
+                AppDebug.Log($"Error saving ban", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -825,7 +807,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 MessageBox.Show($"Error deleting record: {ex.Message}", "Delete Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AppDebug.Log("tabBans", $"Error deleting ban: {ex}");
+                AppDebug.Log($"Error deleting ban", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -1406,10 +1388,6 @@ namespace BHD_ServerManager.Forms.Panels
                     record.Date.ToString("yyyy-MM-dd")
                 );
             }
-
-            AppDebug.Log("tabBans",
-                $"Loaded {instanceBans.WhitelistedNames.Count} name whitelists and " +
-                $"{instanceBans.WhitelistedIPs.Count} IP whitelists");
         }
 
         /// <summary>
@@ -1850,7 +1828,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 MessageBox.Show($"Error saving whitelist record: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AppDebug.Log("tabBans", $"Error saving whitelist: {ex}");
+                AppDebug.Log($"Error saving whitelist", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -2008,7 +1986,7 @@ namespace BHD_ServerManager.Forms.Panels
             {
                 MessageBox.Show($"Error deleting record: {ex.Message}", "Delete Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AppDebug.Log("tabBans", $"Error deleting whitelist: {ex}");
+                AppDebug.Log($"Error deleting whitelist", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -2612,15 +2590,13 @@ namespace BHD_ServerManager.Forms.Panels
 
             dgProxyCountryBlockList.Rows.Clear();
 
-            var countries = banInstanceManager.LoadBlockedCountries();
+            var countries = CommonCore.instanceBans!.ProxyBlockedCountries;
 
             foreach (var country in countries.OrderBy(c => c.CountryName))
             {
                 // Add RecordID as first column (typically hidden in designer)
                 dgProxyCountryBlockList.Rows.Add(country.RecordID, country.CountryCode, country.CountryName);
             }
-
-            AppDebug.Log("tabBans", $"Loaded {countries.Count} blocked countries");
         }
 
         /// <summary>
@@ -2664,8 +2640,6 @@ namespace BHD_ServerManager.Forms.Panels
 
                 // Test with a known IP address (Google DNS - should not be a proxy/VPN)
                 var testIP = IPAddress.Parse("8.8.8.8");
-
-                AppDebug.Log("tabBans", $"Testing {serviceName} with IP: {testIP}");
 
                 // Test via manager
                 var (success, result, errorMessage) = await banInstanceManager.TestProxyService(apiKey, serviceProvider, testIP);
@@ -2720,7 +2694,7 @@ namespace BHD_ServerManager.Forms.Panels
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
 
-                AppDebug.Log("tabBans", $"Proxy service test error: {ex}");
+                AppDebug.Log($"Proxy service test error", AppDebug.LogLevel.Error, ex);
             }
             finally
             {

@@ -19,7 +19,7 @@ public class InstanceBroadcastService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        AppDebug.Log("InstanceBroadcastService", "Started");
+        AppDebug.Log("InstanceBroadcastService Started", AppDebug.LogLevel.Info);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -52,11 +52,11 @@ public class InstanceBroadcastService : BackgroundService
             }
             catch (Exception ex)
             {
-                AppDebug.Log("InstanceBroadcastService", $"Error: {ex.Message}");
+                AppDebug.Log($"Broadcast Error", AppDebug.LogLevel.Error, ex);
                 await Task.Delay(5000, stoppingToken);
             }
         }
 
-        AppDebug.Log("InstanceBroadcastService", "Stopped");
+        AppDebug.Log("InstanceBroadcastService Stopped", AppDebug.LogLevel.Info);
     }
 }

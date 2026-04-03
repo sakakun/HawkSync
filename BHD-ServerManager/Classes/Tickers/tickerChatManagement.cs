@@ -74,8 +74,6 @@ namespace BHD_ServerManager.Classes.Tickers
             string playerName = lastMessage.Substring(0, msgStart).Trim();
             string playerMessage = lastMessage.Substring(msgStart + 1).Trim();
             
-            AppDebug.Log("ProcessChatMessages", $"Last Message: {latestMessage[0]} - {latestMessage[1]} - {latestMessage[2]}");
-            
             lock (chatLog)
             {
                 // Primary check: Compare against the most recent chat log entry
@@ -114,8 +112,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 int teamNum = 3;
                 string serverTeamMessage = string.Empty;
 
-                AppDebug.Log("tickerChatManagement", $"First char: '{playerMessage[0]}' (hex: {((int)playerMessage[0]):X2}) | Full message: {playerMessage}");
-
                 // Check marker first - but only if player name matches the server host name
                 if (playerName.Equals(thisInstance.gameHostName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -142,7 +138,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     {
                         if (player.PlayerName == playerName)
                         {
-                            AppDebug.Log("tickerChatManagement", $"Matched player '{playerName}' to team {player.PlayerTeam}");
                             teamNum = player.PlayerTeam;
                             break;
                         }
@@ -168,8 +163,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 _lastProcessedPlayerName = playerName;
                 _lastProcessedMessageText = playerMessage;
                 _lastProcessedMessageTime = DateTime.Now;
-
-                AppDebug.Log("tickerChatManagement", $"Chat Message: {playerName} ({teamNum}) - {playerMessage.Substring(1)} (Type: {msgType})");
 
             }
         }
@@ -279,7 +272,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     chatInstanceManager.ProcessQueuedMessage(nextMessage);
                     instanceChat.LastMessageSent = DateTime.Now;
-                    AppDebug.Log("tickerChatManagement", $"Processed queued message (Remaining: {instanceChat.MessageQueue.Count})");
                 }
                 finally
                 {

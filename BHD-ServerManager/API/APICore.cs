@@ -33,13 +33,13 @@ namespace BHD_ServerManager.API
         {
             if (IsApiRunning)
             {
-                AppDebug.Log("APICore", $"API host already running on port {port}, skipping start");
+                AppDebug.Log($"API host already running on port {port}, skipping start", AppDebug.LogLevel.Info);
                 return;
             }
 
             if (ApiHost == null)
             {
-                AppDebug.Log("APICore", "API host is null, creating new instance");
+                AppDebug.Log("API host is null, creating new instance", AppDebug.LogLevel.Info);
                 ApiHost = new EmbeddedApiHost();
             }
 
@@ -47,13 +47,13 @@ namespace BHD_ServerManager.API
             {
                 ApiHost.Start(port);
                 IsApiRunning = true;
-                AppDebug.Log("APICore", $"✅ API host started successfully on port {port}");
+                AppDebug.Log($"API host started successfully on port {port}", AppDebug.LogLevel.Info);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("APICore", $"❌ Failed to start API host: {ex.Message}");
+                AppDebug.Log($"Failed to start API host", AppDebug.LogLevel.Error, ex);
                 IsApiRunning = false;
-                throw; // Re-throw so caller knows it failed
+                throw;
             }
         }
 
@@ -64,13 +64,13 @@ namespace BHD_ServerManager.API
         {
             if (!IsApiRunning)
             {
-                AppDebug.Log("APICore", "API host not running, skipping stop");
+                AppDebug.Log("API host not running, skipping stop", AppDebug.LogLevel.Info);
                 return;
             }
 
             if (ApiHost == null)
             {
-                AppDebug.Log("APICore", "API host is null but IsApiRunning was true, resetting flag");
+                AppDebug.Log("API host is null but IsApiRunning was true, resetting flag", AppDebug.LogLevel.Warning);
                 IsApiRunning = false;
                 return;
             }
@@ -79,11 +79,11 @@ namespace BHD_ServerManager.API
             {
                 await ApiHost.StopAsync();
                 IsApiRunning = false;
-                AppDebug.Log("APICore", "✅ API host stopped successfully");
+                AppDebug.Log("API host stopped successfully", AppDebug.LogLevel.Info);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("CommonCore", $"❌ Error stopping API host: {ex.Message}");
+                AppDebug.Log($"Error stopping API host", AppDebug.LogLevel.Error, ex);
                 // Still mark as not running even if stop failed
                 IsApiRunning = false;
             }
@@ -94,7 +94,7 @@ namespace BHD_ServerManager.API
         /// </summary>
         public static async Task RestartApiHost(int newPort)
         {
-            AppDebug.Log("APICore", $"Restarting API host on port {newPort}");
+            AppDebug.Log($"Restarting API host on port {newPort}", AppDebug.LogLevel.Info);
             
             await StopApiHost();
             
@@ -113,7 +113,7 @@ namespace BHD_ServerManager.API
         /// </summary>
         public static async Task Shutdown()
         {
-            AppDebug.Log("APICore", "Shutting down core infrastructure...");
+            AppDebug.Log("Shutting down core infrastructure...", AppDebug.LogLevel.Info);
 
             // Stop tickers
             CommonCore.Ticker?.StopAll();
@@ -127,7 +127,7 @@ namespace BHD_ServerManager.API
             // Cleanup database connections
             DatabaseManager.Shutdown();
 
-            AppDebug.Log("APICore", "Core shutdown complete");
+            AppDebug.Log("Core shutdown complete", AppDebug.LogLevel.Info);
         }
     }
 }

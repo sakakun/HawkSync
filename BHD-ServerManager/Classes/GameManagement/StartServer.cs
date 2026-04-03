@@ -36,7 +36,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 if (!File.Exists(dfvCFGPath))
                 {
-                    AppDebug.Log("createdfv", "dfv.cfg does not exist. File must exist to update values.");
+                    AppDebug.Log("dfv.cfg does not exist. File must exist to update values.", AppDebug.LogLevel.Error);
                     return false;
                 }
 
@@ -69,13 +69,11 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
 
                 File.WriteAllLines(dfvCFGPath, updatedLines);
-
-                AppDebug.Log("createdfv", "dfv.cfg updated successfully.");
                 return true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppDebug.Log("createdfv", "Error updating dfv.cfg file: " + e);
+                AppDebug.Log("Error updating dfv.cfg file", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }
@@ -121,7 +119,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 if (mapInstance.Playlists[mapInstance.ActivePlaylist] == null ||
                     mapInstance.Playlists[mapInstance.ActivePlaylist].Count == 0)
                 {
-                    AppDebug.Log("StartServer", "currentMapPlaylist is empty. Cannot create autores.bin.");
+                    AppDebug.Log("currentMapPlaylist is empty. Cannot create autores.bin.", AppDebug.LogLevel.Warning);
                     return false;
                 }
 
@@ -170,7 +168,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("StartServer", "Error calculating game options: " + ex.Message);
+                    AppDebug.Log("Error calculating game options", AppDebug.LogLevel.Error, ex);
                     return false;
                 }
 
@@ -430,9 +428,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 Thread.Sleep(1000);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppDebug.Log("StartServer", "Error creating autores.bin file: " + e);
+                AppDebug.Log("Error creating autores.bin file", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }
@@ -447,7 +445,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 if (!File.Exists(autoResPath))
                 {
-                    AppDebug.Log("ReadAutoRes", "autores.bin file does not exist.");
+                    AppDebug.Log("autores.bin file does not exist", AppDebug.LogLevel.Warning);
                     return false;
                 }
 
@@ -563,13 +561,12 @@ namespace BHD_ServerManager.Classes.GameManagement
                     writer.WriteLine();
                     writer.WriteLine("==========================================================");
                 }
-
-                AppDebug.Log("ReadAutoRes", $"Dump written to: {dumpPath}");
+                
                 return true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppDebug.Log("ReadAutoRes", "Error reading autores.bin file: " + e);
+                AppDebug.Log("Error reading autores.bin file", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }
@@ -650,7 +647,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                     if (fileMatch && titleMatch)
                     {
-                        AppDebug.Log("StartServer", $"Found existing game process: {searchProcess.ProcessName} (PID: {searchProcess.Id})");
                         theInstance.instanceAttachedPID = searchProcess.Id;
                         theInstance.instanceProcessHandle = searchProcess.Handle;
 
@@ -682,8 +678,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 // bool wasPatched = DFBHDPatcher.Patch(FullFileName);
                 // if (!wasPatched)
                 //   AppDebug.Log("startGame", "Already patched, starting as-is.");
-
-                AppDebug.Log("startGame", "No existing game process found, starting a new instance...");
 
                 // Update the dfv.cfg
                 createdfv();
@@ -737,10 +731,10 @@ namespace BHD_ServerManager.Classes.GameManagement
 
                 ServerMemory.AttachToGameProcess();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppDebug.Log("StartServer", "Error starting game: " + e.ToString());
-                MessageBox.Show("Error starting game: " + e.Message, "Start Game Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                AppDebug.Log("Error starting game", AppDebug.LogLevel.Error, ex);
+                MessageBox.Show("Error starting game: " + ex.Message, "Start Game Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
             }
 
@@ -798,7 +792,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     }
                     catch (Exception ex)
                     {
-                        AppDebug.Log("StopServer", "Error: " + ex.ToString());
+                        AppDebug.Log("Stop Error", AppDebug.LogLevel.Error, ex);
                         return false;
                     }
                     finally
@@ -808,9 +802,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 }
                 return true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppDebug.Log("StartServer", "Error stopping game: " + e.ToString());
+                AppDebug.Log("Error stopping game",  AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }

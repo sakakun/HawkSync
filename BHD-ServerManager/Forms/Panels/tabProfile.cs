@@ -75,7 +75,7 @@ namespace BHD_ServerManager.Forms.Panels
 
 			if (!result.Success)
 			{
-				AppDebug.Log(Name, $"Failed to load profile settings: {result.Message}");
+				AppDebug.Log($"Failed to load profile settings", AppDebug.LogLevel.Error, new Exception(result.Message));
 				MessageBox.Show($"Failed to load profile settings: {result.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
@@ -105,8 +105,6 @@ namespace BHD_ServerManager.Forms.Panels
 					"Success",
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Information);
-
-				AppDebug.Log(Name, "Profile settings saved successfully");
 			}
 			else
 			{
@@ -116,7 +114,7 @@ namespace BHD_ServerManager.Forms.Panels
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Warning);
 
-				AppDebug.Log(Name, $"Failed to save profile settings: {result.Message}");
+				AppDebug.Log($"Failed to save profile settings", AppDebug.LogLevel.Error, new  Exception(result.Message));
 			}
 		}
 
@@ -281,7 +279,7 @@ namespace BHD_ServerManager.Forms.Panels
 			}
 			catch (Exception ex)
 			{
-				AppDebug.Log(Name, $"Failed to open profile folder dialog: {ex.Message}");
+				AppDebug.Log($"Failed to open profile folder dialog", AppDebug.LogLevel.Error, ex);
 				MessageBox.Show("Failed to open profile folder dialog. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -307,7 +305,7 @@ namespace BHD_ServerManager.Forms.Panels
 			}
 			catch (Exception ex)
 			{
-				AppDebug.Log(Name, $"Failed to open profile file dialog: {ex.Message}");
+				AppDebug.Log($"Failed to open profile file dialog", AppDebug.LogLevel.Error, ex);
 				MessageBox.Show("Failed to open profile file dialog. Please check the logs for more details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -348,8 +346,6 @@ namespace BHD_ServerManager.Forms.Panels
 		/// </summary>
 		private void InitializeAuditLogUI()
 		{
-			AppDebug.Log("tabProfile", "Initializing audit log UI...");
-
 			// Initialize filter timer for debouncing user filter
 			_auditFilterTimer = new System.Windows.Forms.Timer
 			{
@@ -365,11 +361,9 @@ namespace BHD_ServerManager.Forms.Panels
 			if (cbAuditCategoryFilter.Items.Count > 0 && cbAuditCategoryFilter.SelectedIndex < 0)
 			{
 				cbAuditCategoryFilter.SelectedIndex = 0; // Select "All"
-				AppDebug.Log("tabProfile", $"Set default category filter to: {cbAuditCategoryFilter.SelectedItem}");
 			}
 
 			// Load initial data
-			AppDebug.Log("tabProfile", "Loading initial audit logs...");
 			LoadAuditLogs();
 		}
 
@@ -380,24 +374,21 @@ namespace BHD_ServerManager.Forms.Panels
 		{
 			try
 			{
-				AppDebug.Log("tabProfile", "LoadAuditLogs called");
 
 				if (!DatabaseManager.IsInitialized)
 				{
 					lblAuditStatus.Text = "Database not initialized";
-					AppDebug.Log("tabProfile", "Database not initialized");
+					AppDebug.Log("Database not initialized", AppDebug.LogLevel.Warning);
 					return;
 				}
 
-			// Get logs from last 24 hours
+				// Get logs from last 24 hours
 				var startDate = DateTime.UtcNow.AddHours(-24);
 				var endDate = DateTime.UtcNow;
 
 				// Apply filters
 				string? categoryFilter = _currentCategoryFilter == "All" ? null : _currentCategoryFilter;
 				string? userFilter = string.IsNullOrWhiteSpace(_currentUserFilter) ? null : _currentUserFilter;
-
-				AppDebug.Log("tabProfile", $"Fetching audit logs - Category: {_currentCategoryFilter}, User: {_currentUserFilter ?? "All"}");
 
 				var (logs, totalCount) = DatabaseManager.GetAuditLogs(
 					startDate: startDate,
@@ -406,8 +397,6 @@ namespace BHD_ServerManager.Forms.Panels
 					categoryFilter: categoryFilter,
 					limit: 500
 				);
-
-				AppDebug.Log("tabProfile", $"Retrieved {logs.Count} logs out of {totalCount} total");
 
 				// Update grid
 				dgvAuditLogs.Rows.Clear();
@@ -451,12 +440,10 @@ namespace BHD_ServerManager.Forms.Panels
 
 				// Update status label
 				lblAuditStatus.Text = $"Showing {logs.Count} of {totalCount} records | Last updated: {DateTime.Now:HH:mm:ss}";
-
-				AppDebug.Log("tabProfile", $"Loaded {logs.Count} audit logs");
 			}
 			catch (Exception ex)
 			{
-				AppDebug.Log("tabProfile", $"Failed to load audit logs: {ex.Message}");
+				AppDebug.Log($"Failed to load audit logs", AppDebug.LogLevel.Error, ex);
 				lblAuditStatus.Text = "Error loading audit logs";
 			}
 		}

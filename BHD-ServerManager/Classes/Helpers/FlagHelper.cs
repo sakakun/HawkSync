@@ -60,16 +60,15 @@ namespace BHD_ServerManager.Classes.Helpers
                     // Return a clone so each caller owns their own copy
                     return new Bitmap(flag);
                 }
-                else
-                {
-                    AppDebug.Log("FlagHelper", $"Failed to fetch flag for {countryCode}: {response.StatusCode}");
-                    _flagCache[normalizedCode] = null;
-                    return null;
-                }
+
+                AppDebug.Log($"Failed to fetch flag for {countryCode}: {response.StatusCode}", AppDebug.LogLevel.Warning);
+                _flagCache[normalizedCode] = null;
+                return null;
+
             }
             catch (Exception ex)
             {
-                AppDebug.Log("FlagHelper", $"Error fetching flag for {countryCode}: {ex.Message}");
+                AppDebug.Log($"Error fetching flag for {countryCode}", AppDebug.LogLevel.Error, ex);
                 _flagCache[normalizedCode] = null;
                 return null;
             }

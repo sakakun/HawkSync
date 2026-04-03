@@ -24,14 +24,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 instanceChat.SlapMessages = DatabaseManager.GetSlapMessages();
                 instanceChat.AutoMessages = DatabaseManager.GetAutoMessages();
 
-                AppDebug.Log("chatInstanceManager",
-                    $"Loaded {instanceChat.SlapMessages.Count} slap messages and {instanceChat.AutoMessages.Count} auto messages");
-
                 return new OperationResult(true, "Settings loaded successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error loading chat settings: {ex.Message}");
+                AppDebug.Log($"Error loading chat settings", AppDebug.LogLevel.Error, ex);
 
                 instanceChat.SlapMessages = new List<SlapMessages>();
                 instanceChat.AutoMessages = new List<AutoMessages>();
@@ -142,12 +139,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 int newId = DatabaseManager.AddSlapMessage(messageText);
                 instanceChat.SlapMessages = DatabaseManager.GetSlapMessages();
 
-                AppDebug.Log("chatInstanceManager", $"Added slap message: {messageText} (ID: {newId})");
                 return new OperationResult(true, "Slap message added successfully.", newId);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error adding slap message: {ex.Message}");
+                AppDebug.Log($"Error adding slap message", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -168,15 +164,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (removed)
                 {
                     instanceChat.SlapMessages = DatabaseManager.GetSlapMessages();
-                    AppDebug.Log("chatInstanceManager", $"Removed slap message ID: {id}");
                     return new OperationResult(true, "Slap message removed successfully.", id);
                 }
-
+                
                 return new OperationResult(false, "Failed to remove slap message from database.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error removing slap message: {ex.Message}");
+                AppDebug.Log($"Error removing slap message", AppDebug.LogLevel.Error,ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -206,12 +201,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 int newId = DatabaseManager.AddAutoMessage(messageText, triggerSeconds);
                 instanceChat.AutoMessages = DatabaseManager.GetAutoMessages();
 
-                AppDebug.Log("chatInstanceManager", $"Added auto message: {messageText} (Trigger: {triggerSeconds}s, ID: {newId})");
                 return new OperationResult(true, "Auto message added successfully.", newId);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error adding auto message: {ex.Message}");
+                AppDebug.Log($"Error adding auto message", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -232,7 +226,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (removed)
                 {
                     instanceChat.AutoMessages = DatabaseManager.GetAutoMessages();
-                    AppDebug.Log("chatInstanceManager", $"Removed auto message ID: {id}");
                     return new OperationResult(true, "Auto message removed successfully.", id);
                 }
 
@@ -240,7 +233,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error removing auto message: {ex.Message}");
+                AppDebug.Log($"Error removing auto message", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -276,12 +269,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     });
                 }
 
-                AppDebug.Log("chatInstanceManager", $"Queued message for channel {channel} (Queue size: {instanceChat.MessageQueue.Count})");
                 return new OperationResult(true, "Message queued successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error queuing chat message: {ex.Message}");
+                AppDebug.Log($"Error queuing chat message", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -295,7 +287,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             if (messageWithPrefix.Length <= queuedMessage.MaxLength)
             {
                 ServerMemory.WriteMemorySendChatMessage(queuedMessage.Channel, messageWithPrefix);
-                AppDebug.Log("chatInstanceManager", $"Sent message to channel {queuedMessage.Channel}: {messageWithPrefix}");
             }
             else
             {
@@ -309,8 +300,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             int maxContentLength = maxLength - prefix.Length;
             int position = 0;
             int chunkNum = 1;
-
-            AppDebug.Log("chatInstanceManager", $"Breaking long message into chunks (max: {maxContentLength} chars)");
 
             while (position < message.Length)
             {
@@ -326,19 +315,15 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 string chunk = message.Substring(position, chunkLength).TrimEnd();
                 ServerMemory.WriteMemorySendChatMessage(channel, prefix + chunk);
-                AppDebug.Log("chatInstanceManager", $"Chunk {chunkNum++}: '{prefix}{chunk}' ({prefix.Length + chunk.Length} chars)");
 
                 position += chunkLength;
                 while (position < message.Length && message[position] == ' ') position++;
 
                 if (position < message.Length)
                 {
-                    AppDebug.Log("chatInstanceManager", "Waiting 1 second before next chunk...");
                     System.Threading.Thread.Sleep(1000);
                 }
             }
-
-            AppDebug.Log("chatInstanceManager", "Finished sending long message");
         }
 
         public static int MapChannelIndexToChannel(int selectedIndex)
@@ -412,7 +397,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error parsing player slot replacements: {ex.Message}");
+                AppDebug.Log($"Error parsing player slot replacements", AppDebug.LogLevel.Error, ex);
                 return (false, message, ex.Message);
             }
         }
@@ -443,12 +428,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 DatabaseManager.SaveChatLog(chatLog);
                 
-                AppDebug.Log("chatInstanceManager", $"Saved chat log entry: {chatLog.PlayerName}: {chatLog.MessageText}");
                 return new OperationResult(true, "Chat log entry saved successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("chatInstanceManager", $"Error saving chat log entry: {ex.Message}");
+                AppDebug.Log($"Error saving chat log entry", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }

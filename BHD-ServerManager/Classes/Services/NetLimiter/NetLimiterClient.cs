@@ -71,8 +71,6 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 
         public static async Task<int> GetAppId(string appPath)
         {
-	        AppDebug.Log("GetAppIdAsync", "Grabbing Application ID");
-
 	        var command = new Command
 	        {
 		        Action = "getappid",
@@ -191,17 +189,15 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		{
 
 		    if (_bridgeProcess != null && !_bridgeProcess.HasExited)
-		    {
-		        AppDebug.Log("NetLimiterClient", "Bridge process already running");
-		        return;
-		    }
-
+			    return;
+		    
 		    try
 		    {
 		        var bridgePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NetLimiterBridge", "NetLimiterBridge.exe");
 		        
 		        if (!File.Exists(bridgePath))
 		        {
+			        AppDebug.Log($"NetLimiterBridge.exe not found at {bridgePath}", AppDebug.LogLevel.Error, new Exception("NetLimiterBridge.exe not found"));
 		            throw new FileNotFoundException($"NetLimiterBridge.exe not found at {bridgePath}");
 		        }
 
@@ -227,25 +223,23 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		        _bridgeProcess!.OutputDataReceived += (sender, e) => 
 		        {
 		            if (!string.IsNullOrEmpty(e.Data))
-		                AppDebug.Log("NetLimiterBridge", e.Data);
+		                AppDebug.Log(e.Data, AppDebug.LogLevel.Warning);
 		        };
 		        _bridgeProcess.ErrorDataReceived += (sender, e) => 
 		        {
 		            if (!string.IsNullOrEmpty(e.Data))
-		                AppDebug.Log("NetLimiterBridge [ERROR]", e.Data);
+		                AppDebug.Log("[ERROR]" + e.Data, AppDebug.LogLevel.Error);
 		        };
 		        
 		        _bridgeProcess.BeginOutputReadLine();
 		        _bridgeProcess.BeginErrorReadLine();
-		        
-		        AppDebug.Log("NetLimiterClient", "Bridge process started");
-		        
-        // Give it time to initialize
-        await Task.Delay(1000);
+
+		        // Give it time to initialize
+		        await Task.Delay(1000);
 		    }
 		    catch (Exception ex)
 		    {
-		        AppDebug.Log("NetLimiterClient", $"Failed to start bridge process: {ex.Message}");
+		        AppDebug.Log($"Failed to start bridge process", AppDebug.LogLevel.Error, ex);
 		        throw;
 		    }
 		}
@@ -276,11 +270,10 @@ namespace BHD_ServerManager.Classes.Services.NetLimiter
 		            _bridgeProcess.Kill();
 		            _bridgeProcess.Dispose();
 		            _bridgeProcess = null;
-		            AppDebug.Log("NetLimiterClient", "Bridge process stopped");
 		        }
 		        catch (Exception ex)
 		        {
-		            AppDebug.Log("NetLimiterClient", $"Error stopping bridge process: {ex.Message}");
+		            AppDebug.Log($"Error stopping bridge process", AppDebug.LogLevel.Error, ex);
 		        }
 		    }
 		}

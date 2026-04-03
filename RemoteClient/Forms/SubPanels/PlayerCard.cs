@@ -280,7 +280,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error
                     );
-                    AppDebug.Log("PlayerCard", $"Error in banByIP: {ex}");
+                    AppDebug.Log($"Error in banByIP", AppDebug.LogLevel.Error, ex);
                 }
             };
 
@@ -316,7 +316,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error
                     );
-                    AppDebug.Log("PlayerCard", $"Error in banByNameAndIP: {ex}");
+                    AppDebug.Log($"Error in banByNameAndIP", AppDebug.LogLevel.Error, ex);
                 }
             };
 
@@ -540,7 +540,7 @@ namespace BHD_ServerManager.Classes.PlayerManagementClasses
             }
             catch (Exception ex)
             {
-                AppDebug.Log("PlayerCard", $"Error loading flag for {countryIsoCode}: {ex.Message}");
+                AppDebug.Log($"Error loading flag for {countryIsoCode}", AppDebug.LogLevel.Error, ex);
                 if (playerFlagIcon.Image != null)
                 {
                     playerFlagIcon.Image.Dispose();

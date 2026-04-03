@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
-using Windows.Storage;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.DTOs.tabPlayers;
 
@@ -1080,14 +1079,14 @@ namespace BHD_ServerManager.Classes.GameManagement
         // Function: Update NumTeam State
         public static void UpdateNumTeams(bool isEnabled)
         {
-            AppDebug.Log("UpdateNumTeams", "Updating 4-Team Mode to: " + isEnabled);
+            AppDebug.Log("Updating 4-Team Mode to: " + isEnabled, AppDebug.LogLevel.Info);
 
 			var numTeams = 0x00A344C4;
             byte[] endTimerBytes = BitConverter.GetBytes(isEnabled ? 4 : 0);
             int bytesWritten = 0;
             WriteProcessMemory((int)processHandle, numTeams, endTimerBytes, endTimerBytes.Length, ref bytesWritten);
 
-            AppDebug.Log("UpdateNumTeams", $"4-Team Mode update complete. ({ReadNumTeams().ToString()})");
+            AppDebug.Log($"4-Team Mode update complete. ({ReadNumTeams().ToString()})", AppDebug.LogLevel.Info);
 		}
 
 
@@ -1128,9 +1127,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             int CurrentMapIndexBytesRead = 0;
             ReadProcessMemory((int)processHandle, Ptr2, CurrentMapIndexBytes, CurrentMapIndexBytes.Length, ref CurrentMapIndexBytesRead);
             int currentMapIndex = BitConverter.ToInt32(CurrentMapIndexBytes, 0);
-
-            AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.Playlists[mapInstance.ActivePlaylist].Count + " Pre-Check Current Map Index: " + currentMapIndex);
-
+            
             if (currentMapIndex + 1 >= mapInstance.Playlists[mapInstance.ActivePlaylist].Count || mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex + 1] == null)
             {
                 currentMapIndex = 0;
@@ -1140,13 +1137,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                 currentMapIndex++;
             }
 
-            AppDebug.Log("ServerMemory", "Number of Maps: " + mapInstance.Playlists[mapInstance.ActivePlaylist].Count + " Current Map Index: " + currentMapIndex);
             int currentMapType = CommonCore.instanceMaps!.CurrentGameType;
             int nextMapType = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapType;
-
-            AppDebug.Log("ServerMemory", "Current Map Type: " + mapInstance.CurrentMapName + " " + CommonCore.instanceMaps!.CurrentGameType + " " + currentMapType);
-            AppDebug.Log("ServerMemory", "Next Map Type: " + mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName + " " + mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapType + " - " + nextMapType);
-
+            
             mapInstance.NextMapGameType = nextMapType;
             mapInstance.NextMapName = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName!;
             mapInstance.NextMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapFile!;
@@ -1158,8 +1151,6 @@ namespace BHD_ServerManager.Classes.GameManagement
 		}
         public static void SetNextMapType()
         {
-            AppDebug.Log("SetNextMapType", "Updated the Map Type for the Next Map");
-
             try
             {
                 // Change the MapType for the next map
@@ -1172,16 +1163,10 @@ namespace BHD_ServerManager.Classes.GameManagement
                 bool shouldEnable4Teams = thisInstance.gameEnableFourTeams && 
                                          mapInstance.IsNextMap4Team &&
                                          (mapInstance.NextMapGameType == 1 || mapInstance.NextMapGameType == 3 || mapInstance.NextMapGameType == 8); // TDM or TKOTH or FBL
-
-				AppDebug.Log("SetNextMapType", $"Next Map: {mapInstance.NextMapName} | Next Map Type: {mapInstance.NextMapGameType} | Is 4-Team Map: {mapInstance.IsNextMap4Team} | Should Enable 4-Team Mode: {shouldEnable4Teams}");
-
+                
 				// Update the 4-team state in game memory
 				UpdateNumTeams(shouldEnable4Teams);
                 
-                AppDebug.Log("SetNextMapType", $"4-Team Mode: {(shouldEnable4Teams ? "Enabled" : "Disabled")} for next map");
-
-                AppDebug.Log("SetNextMapType", $"4-Team Mode Enabled? {ServerMemory.ReadNumTeams().ToString()}");
-
 				// Deal with the Players
 				bool isCurrentMap4Team = thisInstance.gameEnableFourTeams && 
                                         mapInstance.IsCurrentMap4Team &&
@@ -1202,14 +1187,12 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
             catch (Exception ex)
             {
-                AppDebug.Log("ServerMemory", "Something went wrong with ScoringProcessHandler: " + ex);
+                AppDebug.Log("Something went wrong with ScoringProcessHandler", AppDebug.LogLevel.Error, ex);
             }
         }
         // Update the Game Score for the next map
         public static void UpdateGameScores()
         {
-
-            AppDebug.Log("UpdateGameScores", "Updated Game Scores");
 
             // This changes the score needed to win on the next map played.
             int nextGameScore = 0;
@@ -1244,8 +1227,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             WriteProcessMemory((int)processHandle, startingPtr1, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten1);
             WriteProcessMemory((int)processHandle, startingPtr2, nextGameScoreBytes, nextGameScoreBytes.Length, ref nextGameScoreWritten2);
 
-            AppDebug.Log("UpdateGameScores", "Game Score Updated: " + nextGameScore);
-
         }
         /// <summary>
         /// Validate and normalize team switches before applying them to game memory.
@@ -1266,23 +1247,18 @@ namespace BHD_ServerManager.Classes.GameManagement
                     if (teamSwitch.Team == 3 || teamSwitch.Team == 4)
                     {
                         int normalizedTeam = ((teamSwitch.Team - 1) % 2) + 1; // Team 3→1, Team 4→2
-                        AppDebug.Log("ValidateTeamSwitches", 
-                            $"Normalizing team switch: Slot {teamSwitch.slotNum} from Team {teamSwitch.Team} → Team {normalizedTeam}. " +
-                            $"Next map '{mapInstance.NextMapName}' only supports 2 teams.");
                         teamSwitch.Team = normalizedTeam;
                     }
                     else
                     {
-                        AppDebug.Log("ValidateTeamSwitches", 
-                            $"Invalid team number detected: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}. Removing from queue.");
+                        AppDebug.Log($"Invalid team number detected: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}. Removing from queue.", AppDebug.LogLevel.Warning);
                         toRemove.Add(teamSwitch);
                     }
                 }
                 // If next map is 4-team, validate team is 1-4
                 else if (teamSwitch.Team < 1 || teamSwitch.Team > 4)
                 {
-                    AppDebug.Log("ValidateTeamSwitches", 
-                        $"Invalid team number detected: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}. Removing from queue.");
+                    AppDebug.Log($"Invalid team number detected: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}. Removing from queue.", AppDebug.LogLevel.Warning);
                     toRemove.Add(teamSwitch);
                 }
             }
@@ -1295,8 +1271,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             if (toRemove.Count > 0)
             {
-                AppDebug.Log("ValidateTeamSwitches", 
-                    $"Filtered {toRemove.Count} invalid team switch(es). {playerInstance.PlayerChangeTeamList.Count} valid switch(es) remain.");
+                AppDebug.Log($"Filtered {toRemove.Count} invalid team switch(es). {playerInstance.PlayerChangeTeamList.Count} valid switch(es) remain.", AppDebug.LogLevel.Warning);
             }
         }
 
@@ -1334,17 +1309,15 @@ namespace BHD_ServerManager.Classes.GameManagement
                 // SAFETY NET: Final validation before writing to memory
                 if (!nextMapIs4Team && (teamSwitch.Team < 1 || teamSwitch.Team > 2))
                 {
-                    AppDebug.Log("UpdatePlayerTeam", 
-                        $"SAFETY: Skipping invalid team switch - Slot {teamSwitch.slotNum} → Team {teamSwitch.Team} " +
-                        $"(Next map '{mapInstance.NextMapName}' is 2-team only)");
+                    AppDebug.Log($"SAFETY: Skipping invalid team switch - Slot {teamSwitch.slotNum} → Team {teamSwitch.Team} " +
+                                 $"(Next map '{mapInstance.NextMapName}' is 2-team only)", AppDebug.LogLevel.Warning);
                     playerInstance.PlayerChangeTeamList.RemoveAt(ii);
                     continue;
                 }
 
                 if (teamSwitch.Team < 1 || teamSwitch.Team > 4)
                 {
-                    AppDebug.Log("UpdatePlayerTeam", 
-                        $"SAFETY: Skipping invalid team number - Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}");
+                    AppDebug.Log($"SAFETY: Skipping invalid team number - Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}", AppDebug.LogLevel.Warning);
                     playerInstance.PlayerChangeTeamList.RemoveAt(ii);
                     continue;
                 }
@@ -1357,8 +1330,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 int bytesWritten = 0;
                 WriteProcessMemory((int)processHandle, playerTeamLocation, teamBytes, teamBytes.Length, ref bytesWritten);
                 
-                AppDebug.Log("UpdatePlayerTeam", 
-                    $"Applied team switch: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}");
+                AppDebug.Log($"Applied team switch: Slot {teamSwitch.slotNum} → Team {teamSwitch.Team}", AppDebug.LogLevel.Info);
                 
                 playerInstance.PlayerChangeTeamList.RemoveAt(ii);
             }
@@ -1563,9 +1535,7 @@ namespace BHD_ServerManager.Classes.GameManagement
 
             byte[] setDamageBy = BitConverter.GetBytes(0);
             int setDamageByWrite = 0;
-
-            AppDebug.Log("WriteMemoryTogglePlayerGodMode", $"Player Health Data - Base: 0x{playerNewLocationAddress:X8}, Object: 0x{playerObjectLocation:X8}, Damage Addr: 0x{(playerObjectLocation + 0x138):X8}, Health Addr: 0x{(playerObjectLocation + 0xE2):X8}");
-
+            
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0x138, setDamageBy, setDamageBy.Length, ref setDamageByWrite);
             WriteProcessMemory((int)processHandle, playerObjectLocation + 0xE2, setPlayerHealth, setPlayerHealth.Length, ref setPlayerHealthWrite);
 
@@ -1629,12 +1599,12 @@ namespace BHD_ServerManager.Classes.GameManagement
                 // If we got here, process is running and matches
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 // Process does not exist or access denied
                 thisInstance.instanceAttachedPID = null;
                 processHandle = nint.Zero; // Replace 'null' with 'IntPtr.Zero' for nint type
-                AppDebug.Log("ServerMemory", "Process not found or access denied.");
+                AppDebug.Log("Process not found or access denied.", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }
@@ -1874,9 +1844,9 @@ namespace BHD_ServerManager.Classes.GameManagement
                                 break;
                             }
                         }
-                        catch (Exception e)
+                        catch (Exception ex)
                         {
-                            AppDebug.Log("ServerMemory", "Detected an error!\n\n" + "Player Name: " + playerSlot + "\n\n" + formattedPlayerName + "\n\n" + e.ToString());
+                            AppDebug.Log("Detected an error!\n\n" + "Player Name: " + playerSlot + "\n\n" + formattedPlayerName + "\n\n", AppDebug.LogLevel.Error, ex);
                         }
 
                     }
@@ -1890,7 +1860,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             {
                 playerInstance.PlayerList[kvp.Key] = kvp.Value;
             }
-            // CoreManager.DebugLog("PlayerList Updated");
         }
         // Function: ReadMemoryGrabPlayerIPAddress
         public static string ReadMemoryGrabPlayerIPAddress(string playername)
@@ -1988,7 +1957,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             if (string.IsNullOrEmpty(PlayerName))
             {
 
-                AppDebug.Log("ServerMemory", "Something went wrong here. We can't find any player names.");
+                AppDebug.Log("Something went wrong here. We can't find any player names.", AppDebug.LogLevel.Info);
                 return new PlayerObject();
             }
 
@@ -2484,8 +2453,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             // Check if player is rolling (95 or 96) - ignore leaning status when rolling
             if (proneStatus == 95 || proneStatus == 96)
             {
-                AppDebug.Log("ReadMemoryPlayerLeaningStatus", $"Slot {playerSlot} - Rolling detected (prone: {proneStatus}), ignoring lean");
-                return 0; // Return 0 (upright) when rolling
+                return 0;
             }
 
             // Read leaning status (2 bytes)
@@ -2498,12 +2466,6 @@ namespace BHD_ServerManager.Classes.GameManagement
             // 0 = upright, 2 = left lean, 4 = right lean
             // 8 = moving upright, 10 = moving left lean, 12 = moving right lean
             int normalizedStatus = leaningStatus % 8;
-
-            AppDebug.Log("ReadMemoryPlayerLeaningStatus", 
-                $"Slot {playerSlot} - Object: 0x{playerObjectLocation:X8}, " +
-                $"Lean Addr: 0x{(playerObjectLocation + 0x102):X8}, " +
-                $"Prone Addr: 0x{(playerObjectLocation + 0x164):X8}, " +
-                $"Raw: {leaningStatus}, Normalized: {normalizedStatus}");
 
             return normalizedStatus;
         }
@@ -2687,10 +2649,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                     // (verified: GetPlayerName matches these against PSP entry entity ptrs)
                     int playerEntPtr = ReadInt(session + PLAYER_OFF_ENTITY);
                     if (playerEntPtr == 0)
-                    {
-                        AppDebug.Log("FlagScorer", $"slot={pi} team={team}: entPtr=0, skip");
                         continue;
-                    }
 
                     // entity+0x20 bit 0 = live player (sub_472650)
                     int liveFlags = ReadInt(playerEntPtr + ENTITY_FLAGS_OFF);
@@ -2709,27 +2668,19 @@ namespace BHD_ServerManager.Classes.GameManagement
                         {
                             if (!isAlive)
                             {
-                                WriteMemorySendChatMessage(8,
-                                    $"** {carrierInfo} dropped the flag (killed)! **");
+                                WriteMemorySendChatMessage(8, $"** {carrierInfo} dropped the flag (killed)! **");
                             }
                         }
-                        AppDebug.Log("FlagScorer", $"slot={pi} team={team} ent=0x{playerEntPtr:X8}: carry=0 (not holding flag)");
                         continue;
                     }
 
                     if (!isAlive)
-                    {
-                        AppDebug.Log("FlagScorer", $"slot={pi} team={team} ent=0x{playerEntPtr:X8}: not alive (flags=0x{liveFlags:X})");
                         continue;
-                    }
 
                     int flagTypePtr = ReadInt(flagItemPtr + ENTITY_TYPEPTR_OFF);
                     int flagTypeId  = (flagTypePtr != 0) ? ReadInt(flagTypePtr + TYPEDEF_TYPEID_OFF) : 0;
                     if (flagTypeId != 0xfff)
-                    {
-                        AppDebug.Log("FlagScorer", $"slot={pi} team={team}: carrying typeId={flagTypeId} (need 4095)");
                         continue;
-                    }
 
                     // Player is carrying the flag
                     currentCarriers.Add(key);
@@ -2756,9 +2707,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                     long py = ReadInt(playerEntPtr + ENTITY_POS_Y);
                     long distSq = (px - bx) * (px - bx) + (py - by) * (py - by);
 
-                    AppDebug.Log("FlagScorer",
-                        $"slot={pi} team={team} player=({px},{py}) bay=({bx},{by}) distSq={distSq} threshold={FB_SCORE_RADIUS_SQ}");
-
                     if (distSq > FB_SCORE_RADIUS_SQ) continue;
 
                     int scoreAddr = baseAddr + TEAM_SCORE_OFFSETS[team - 1];
@@ -2767,9 +2715,8 @@ namespace BHD_ServerManager.Classes.GameManagement
                     _flagScorerLastScored[playerEntPtr] = DateTime.UtcNow;
 
                     string scorerName = thisInstance._flagCarriers[key];
-                    AppDebug.Log("FlagScorer", $"SCORED: slot={pi} team={team} score {oldScore}\u2192{oldScore + 1}");
-                    WriteMemorySendChatMessage(8,
-                        $"** {scorerName} ({teamName}) scored! Score: {oldScore + 1} **");
+
+                    WriteMemorySendChatMessage(8, $"** {scorerName} ({teamName}) scored! Score: {oldScore + 1} **");
 
                     ReturnCarriedFlag(playerEntPtr);
                 }
@@ -2782,7 +2729,7 @@ namespace BHD_ServerManager.Classes.GameManagement
             }
             catch (Exception ex)
             {
-                AppDebug.Log("TickFlagScorer", "Error: " + ex);
+                AppDebug.Log("Error", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -2811,9 +2758,7 @@ namespace BHD_ServerManager.Classes.GameManagement
                 WriteInt(flagItemPtr + 0x10, ReadInt(spawnBay + SPAWNBAY_POS_Z));
                 WriteInt(flagItemPtr + 0x14, ReadInt(spawnBay + SPAWNBAY_ORIENT));
             }
-
-            AppDebug.Log("FlagScorer",
-                $"FlagReturn: player=0x{playerEntPtr:X8} flag=0x{flagItemPtr:X8} spawnBay=0x{spawnBay:X8}");
+            
         }
 
         private static void WriteInt(int address, int value)

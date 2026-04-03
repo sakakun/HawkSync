@@ -47,10 +47,9 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             string databasePath = _databasePath;
 
-            // Check if the database file exists
             if (!File.Exists(databasePath))
             {
-                AppDebug.Log("DatabaseManager", "Failed to locate the database file: " + databasePath);
+                AppDebug.Log($"Failed to locate the database file {databasePath}", AppDebug.LogLevel.Error);
                 throw new FileNotFoundException("Database file not found.", databasePath);
             }
 
@@ -118,20 +117,15 @@ namespace BHD_ServerManager.Classes.SupportClasses
         private static void UpgradeDatabase()
         {
             try
-            {
-                AppDebug.Log("DatabaseManager", "Checking database schema version...");
-                
+            {               
                 using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
                 conn.Open();
 
                 // Get current schema version (default to 0 for legacy databases)
                 int currentVersion = GetSchemaVersion(conn);
-                
-                AppDebug.Log("DatabaseManager", $"Current schema version: {currentVersion}, Target version: {CURRENT_SCHEMA_VERSION}");
 
                 if (currentVersion < CURRENT_SCHEMA_VERSION)
                 {
-                    AppDebug.Log("DatabaseManager", $"Database upgrade needed from version {currentVersion} to {CURRENT_SCHEMA_VERSION}");
                     
                     // Create a backup before upgrading
                     CreateDatabaseBackup();
@@ -149,28 +143,28 @@ namespace BHD_ServerManager.Classes.SupportClasses
                         // Update schema version
                         SetSchemaVersion(conn, tx, CURRENT_SCHEMA_VERSION);
                         
+                        // Commit
                         tx.Commit();
-                        AppDebug.Log("DatabaseManager", $"Database successfully upgraded to version {CURRENT_SCHEMA_VERSION}");
                     }
                     catch (Exception ex)
                     {
                         tx.Rollback();
-                        AppDebug.Log("DatabaseManager", $"ERROR: Database upgrade failed: {ex.Message}");
-                        throw new Exception($"Database upgrade failed: {ex.Message}", ex);
+                        AppDebug.Log($"ERROR: Database upgrade failed, rolled backed.", AppDebug.LogLevel.Error, ex);
+                        throw new Exception($"Database upgrade failed: {ex.Message}, rolled backed.", ex);
                     }
                 }
                 else if (currentVersion == CURRENT_SCHEMA_VERSION)
                 {
-                    AppDebug.Log("DatabaseManager", "Database schema is up to date");
+                    AppDebug.Log("Database schema is up to date", AppDebug.LogLevel.Info);
                 }
                 else
                 {
-                    AppDebug.Log("DatabaseManager", $"WARNING: Database schema version ({currentVersion}) is newer than expected ({CURRENT_SCHEMA_VERSION})");
+                    AppDebug.Log($"WARNING: Database schema version ({currentVersion}) is newer than expected ({CURRENT_SCHEMA_VERSION})", AppDebug.LogLevel.Warning);
                 }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Error during database upgrade check: {ex.Message}");
+                AppDebug.Log($"Error during database upgrade", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -182,12 +176,11 @@ namespace BHD_ServerManager.Classes.SupportClasses
         {
             if (!File.Exists(_schemaFilePath))
             {
-                AppDebug.Log("DatabaseManager", $"Schema file not found: {_schemaFilePath}");
+                AppDebug.Log($"Schema file not found: {_schemaFilePath}", AppDebug.LogLevel.Error);
                 throw new FileNotFoundException("Database schema file not found", _schemaFilePath);
             }
 
             string sqlContent = File.ReadAllText(_schemaFilePath);
-            AppDebug.Log("DatabaseManager", $"Loaded schema file ({sqlContent.Length} bytes)");
 
             // Parse and execute SQL statements
             var statements = ParseSqlStatements(sqlContent);
@@ -225,12 +218,10 @@ namespace BHD_ServerManager.Classes.SupportClasses
                             // Check if table exists
                             if (TableExists(conn, tx, tableName))
                             {
-                                AppDebug.Log("DatabaseManager", $"Table '{tableName}' exists - checking for missing columns...");
                                 AddMissingColumns(conn, tx, tableName, trimmed);
                             }
                             else
                             {
-                                AppDebug.Log("DatabaseManager", $"Creating new table: {tableName}");
                                 cmd.CommandText = trimmed;
                                 cmd.ExecuteNonQuery();
                                 tableCount++;
@@ -247,13 +238,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 }
                 catch (Exception ex)
                 {
-                    AppDebug.Log("DatabaseManager", $"Warning: Failed to execute statement: {ex.Message}");
-                    AppDebug.Log("DatabaseManager", $"Statement: {trimmed.Substring(0, Math.Min(100, trimmed.Length))}...");
+                    AppDebug.Log($"Warning: Failed to execute statement", AppDebug.LogLevel.Error, ex);
+                    AppDebug.Log($"Statement: {trimmed.Substring(0, Math.Min(100, trimmed.Length))}...", AppDebug.LogLevel.Error);
                     // Continue with other statements - some may fail if already applied
                 }
             }
 
-            AppDebug.Log("DatabaseManager", $"Schema application complete: {tableCount} new tables, {indexCount} indexes applied");
+            AppDebug.Log($"Schema application complete: {tableCount} new tables, {indexCount} indexes applied", AppDebug.LogLevel.Info);
         }
 
         /// <summary>
@@ -301,7 +292,6 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 statements.Add(lastStmt);
             }
 
-            AppDebug.Log("DatabaseManager", $"Parsed {statements.Count} SQL statements");
             return statements;
         }
 
@@ -325,7 +315,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Error extracting table name: {ex.Message}");
+                AppDebug.Log($"Error extracting table name", AppDebug.LogLevel.Error, ex);
             }
 
             return string.Empty;
@@ -376,7 +366,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Error parsing column definitions: {ex.Message}");
+                AppDebug.Log($"Error parsing column definitions", AppDebug.LogLevel.Error, ex);
             }
 
             return columns;
@@ -451,7 +441,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 if (missingColumns.Count > 0)
                 {
-                    AppDebug.Log("DatabaseManager", $"Found {missingColumns.Count} missing columns in '{tableName}'");
+                    AppDebug.Log($"Found {missingColumns.Count} missing columns in '{tableName}'", AppDebug.LogLevel.Info);
 
                     using var cmd = conn.CreateCommand();
                     cmd.Transaction = tx;
@@ -466,28 +456,28 @@ namespace BHD_ServerManager.Classes.SupportClasses
                             
                             if (colDef.Contains("PRIMARY KEY", StringComparison.OrdinalIgnoreCase))
                             {
-                                AppDebug.Log("DatabaseManager", $"Skipping PRIMARY KEY column '{colName}' - cannot add via ALTER TABLE");
+                                AppDebug.Log($"Skipping PRIMARY KEY column '{colName}' - cannot add via ALTER TABLE", AppDebug.LogLevel.Info);
                                 continue;
                             }
 
                             cmd.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {colDef};";
                             cmd.ExecuteNonQuery();
-                            AppDebug.Log("DatabaseManager", $"Added column '{colName}' to '{tableName}'");
+                            AppDebug.Log($"Added column '{colName}' to '{tableName}'", AppDebug.LogLevel.Info);
                         }
                         catch (Exception ex)
                         {
-                            AppDebug.Log("DatabaseManager", $"Warning: Could not add column '{colName}': {ex.Message}");
+                            AppDebug.Log($"Warning: Could not add column '{colName}'", AppDebug.LogLevel.Error,ex);
                         }
                     }
                 }
                 else
                 {
-                    AppDebug.Log("DatabaseManager", $"Table '{tableName}' is up to date - no missing columns");
+                    AppDebug.Log($"Table '{tableName}' is up to date - no missing columns", AppDebug.LogLevel.Info);
                 }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Error checking columns for table '{tableName}': {ex.Message}");
+                AppDebug.Log($"Error checking columns for table '{tableName}'", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -505,11 +495,11 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     case 1:
                         // Version 1: No custom migrations needed
                         // All changes handled by SQL file
-                        AppDebug.Log("DatabaseManager", "Version 1: No custom migrations needed");
+                        AppDebug.Log("Version 1: No custom migrations needed", AppDebug.LogLevel.Info);
                         break;
 
                     case 2:
-                        AppDebug.Log("DatabaseManager", "Version 2: No custom migrations needed");
+                        AppDebug.Log("Version 2: No custom migrations needed", AppDebug.LogLevel.Info);
                         break;
 
                     case 3:
@@ -532,7 +522,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             long existingCount = Convert.ToInt64(existsCmd.ExecuteScalar() ?? 0L);
             if (existingCount > 0)
             {
-                AppDebug.Log("DatabaseManager", "Version 3 migration skipped: tb_babstatsServers already contains data");
+                AppDebug.Log("Version 3 migration skipped: tb_babstatsServers already contains data", AppDebug.LogLevel.Info);
                 return;
             }
 
@@ -556,7 +546,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             if (string.IsNullOrWhiteSpace(serverPath) && string.IsNullOrWhiteSpace(profileId) && !isEnabled)
             {
-                AppDebug.Log("DatabaseManager", "Version 3 migration: No legacy WebStats values to seed");
+                AppDebug.Log("Version 3 migration: No legacy WebStats values to seed", AppDebug.LogLevel.Info);
                 return;
             }
 
@@ -577,7 +567,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             insertCmd.Parameters.AddWithValue("$updateInterval", Math.Clamp(updateInterval, 15, 3600));
             insertCmd.ExecuteNonQuery();
 
-            AppDebug.Log("DatabaseManager", "Version 3 migration: Seeded tb_babstatsServers from legacy WebStats settings");
+            AppDebug.Log("Version 3 migration: Seeded tb_babstatsServers from legacy WebStats settings", AppDebug.LogLevel.Info);
         }
 
         /// <summary>
@@ -632,14 +622,14 @@ namespace BHD_ServerManager.Classes.SupportClasses
             {
                 string backupPath = $"{_databasePath}.backup_{DateTime.Now:yyyyMMdd_HHmmss}";
                 File.Copy(_databasePath, backupPath, false);
-                AppDebug.Log("DatabaseManager", $"Database backup created: {backupPath}");
+                AppDebug.Log($"Database backup created: {backupPath}", AppDebug.LogLevel.Info);
                 
                 // Keep only the last 5 backups
                 CleanupOldBackups();
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Warning: Failed to create database backup: {ex.Message}");
+                AppDebug.Log($"Warning: Failed to create database backup", AppDebug.LogLevel.Error, ex);
                 // Don't throw - backup failure shouldn't prevent upgrade if user accepts risk
             }
         }
@@ -659,12 +649,12 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 foreach (var file in backupFiles)
                 {
                     File.Delete(file);
-                    AppDebug.Log("DatabaseManager", $"Deleted old backup: {file}");
+                    AppDebug.Log($"Deleted old backup: {file}", AppDebug.LogLevel.Info);
                 }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Warning: Failed to cleanup old backups: {ex.Message}");
+                AppDebug.Log($"Warning: Failed to cleanup old backups", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -712,7 +702,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 if (result != null && result != DBNull.Value)
                 {
                     tx.Commit();
-                    AppDebug.Log("DatabaseManager", $"DatabaseManager: GetSetting: ({key} - {result}) Default:({defaultValue})");
+                    AppDebug.Log($"DatabaseManager: GetSetting: ({key} - {result}) Default:({defaultValue})", AppDebug.LogLevel.Info);
                     return (string)result;
                 }
             }
@@ -768,7 +758,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
 
             tx.Commit();
-            AppDebug.Log("DatabaseManager", $"DatabaseManager: SetSetting: ({key} - {value})");
+            AppDebug.Log($"DatabaseManager: SetSetting: ({key} - {value})", AppDebug.LogLevel.Info);
         }
         /// <summary>
         /// Returns an array of default maps from the database.
@@ -805,7 +795,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"DatabaseManager: Loaded {maps.Count} default maps");
+            AppDebug.Log($"DatabaseManager: Loaded {maps.Count} default maps", AppDebug.LogLevel.Info);
 
             return maps;
         }
@@ -849,7 +839,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"DatabaseManager: Loaded {maps.Count} maps for playlist {playlistID}");
+            AppDebug.Log($"DatabaseManager: Loaded {maps.Count} maps for playlist {playlistID}", AppDebug.LogLevel.Info);
 
             return maps;
         }
@@ -905,7 +895,8 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 }
 
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", $"DatabaseManager: Saved playlist {playlistID} ({maps.Count} maps)");
+
+                AppDebug.Log($"DatabaseManager: Saved playlist {playlistID} ({maps.Count} maps)", AppDebug.LogLevel.Info);
             }
             catch
             {
@@ -944,7 +935,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {messages.Count} slap messages");
+            AppDebug.Log($"Loaded {messages.Count} slap messages", AppDebug.LogLevel.Info);
             return messages;
         }
 
@@ -978,7 +969,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Added slap message: {messageText} (ID: {newId})");
+                AppDebug.Log($"Added slap message: {messageText} (ID: {newId})", AppDebug.LogLevel.Info);
                 return (int)newId;
             }
             catch
@@ -1014,7 +1005,8 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Removed slap message ID: {slapMessageId}");
+                AppDebug.Log($"Removed slap message ID: {slapMessageId}", AppDebug.LogLevel.Info);
+
                 return rowsAffected > 0;
             }
             catch
@@ -1055,7 +1047,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {messages.Count} auto messages");
+            AppDebug.Log($"Loaded {messages.Count} auto messages", AppDebug.LogLevel.Info);
             return messages;
         }
 
@@ -1090,7 +1082,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Added auto message: {messageText} (Trigger: {triggerSeconds}s, ID: {newId})");
+                AppDebug.Log($"Added auto message: {messageText} (Trigger: {triggerSeconds}s, ID: {newId})", AppDebug.LogLevel.Info);
                 return (int)newId;
             }
             catch
@@ -1126,7 +1118,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Removed auto message ID: {autoMessageId}");
+                AppDebug.Log($"Removed auto message ID: {autoMessageId}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -1237,7 +1229,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {logs.Count} chat log entries");
+            AppDebug.Log($"Loaded {logs.Count} chat log entries", AppDebug.LogLevel.Info);
             return logs;
         }
 
@@ -1260,13 +1252,14 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     }
                     else
                     {
-                        AppDebug.Log("DatabaseManager", $"Warning: Invalid Unix timestamp {unixTimestamp}, attempting TEXT parse");
+                        AppDebug.Log($"Warning: Invalid Unix timestamp {unixTimestamp}, attempting TEXT parse", AppDebug.LogLevel.Warning);
                     }
                 }
             }
             catch (InvalidCastException)
             {
                 // Column is TEXT, fall through to string parsing
+                AppDebug.Log($"Info: Timestamp column is not INTEGER, attempting to read as TEXT", AppDebug.LogLevel.Info);
             }
 
             try
@@ -1276,18 +1269,18 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 
                 if (DateTime.TryParse(textTimestamp, out DateTime parsedDate))
                 {
-                    AppDebug.Log("DatabaseManager", $"Warning: Found TEXT timestamp (legacy format): {textTimestamp}");
+                    AppDebug.Log($"Warning: Found TEXT timestamp (legacy format): {textTimestamp}", AppDebug.LogLevel.Info);
                     return parsedDate;
                 }
                 else
                 {
-                    AppDebug.Log("DatabaseManager", $"Error: Failed to parse timestamp: {textTimestamp}");
+                    AppDebug.Log($"Error: Failed to parse timestamp: {textTimestamp}", AppDebug.LogLevel.Info);
                     return DateTime.MinValue;
                 }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Error reading timestamp: {ex.Message}");
+                AppDebug.Log($"Error reading timestamp: {ex.Message}", AppDebug.LogLevel.Error);
                 return DateTime.MinValue;
             }
         }
@@ -1320,7 +1313,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 players.Add(reader.GetString(0));
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {players.Count} distinct player names");
+            AppDebug.Log($"Loaded {players.Count} distinct player names", AppDebug.LogLevel.Info);
             return players;
         }
 
@@ -1442,7 +1435,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 }
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {logs.Count} of {totalCount} chat logs (Page {page})");
+            AppDebug.Log($"Loaded {logs.Count} of {totalCount} chat logs (Page {page})", AppDebug.LogLevel.Info);
             return (logs, totalCount);
         }
 
@@ -1476,7 +1469,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                             if (columnType == "INTEGER")
                             {
                                 isAlreadyInteger = true;
-                                AppDebug.Log("DatabaseManager", "Chat logs timestamps already migrated to INTEGER");
+                                AppDebug.Log("Chat logs timestamps already migrated to INTEGER", AppDebug.LogLevel.Info);
                                 break;
                             }
                         }
@@ -1498,7 +1491,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     originalCount = Convert.ToInt32(countCmd.ExecuteScalar());
                 }
 
-                AppDebug.Log("DatabaseManager", $"Starting migration of {originalCount} chat log records...");
+                AppDebug.Log($"Starting migration of {originalCount} chat log records...", AppDebug.LogLevel.Info);
 
                 // Create new table with INTEGER timestamp
                 using (var createCmd = conn.CreateCommand())
@@ -1540,7 +1533,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                         throw new Exception($"Migration mismatch: {originalCount} original records, {rowsAffected} migrated");
                     }
                     
-                    AppDebug.Log("DatabaseManager", $"Successfully migrated {rowsAffected} records");
+                    AppDebug.Log($"Successfully migrated {rowsAffected} records", AppDebug.LogLevel.Info);
                 }
 
                 // Validate migration - check a sample record
@@ -1556,9 +1549,10 @@ namespace BHD_ServerManager.Classes.SupportClasses
                         // Validate it's a reasonable Unix timestamp (between 2020 and 2040)
                         if (timestamp < 1577836800 || timestamp > 2209017600)
                         {
+                            AppDebug.Log($"Error: Invalid timestamp after migration: {timestamp}", AppDebug.LogLevel.Error);
                             throw new Exception($"Invalid timestamp after migration: {timestamp}");
                         }
-                        AppDebug.Log("DatabaseManager", $"Validation passed. Sample timestamp: {timestamp}");
+                        AppDebug.Log($"Validation passed. Sample timestamp: {timestamp}", AppDebug.LogLevel.Info);
                     }
                 }
 
@@ -1591,12 +1585,14 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 }
 
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", "✅ Chat logs timestamp migration completed successfully");
+                AppDebug.Log("Chat logs timestamp migration completed successfully", AppDebug.LogLevel.Info);
             }
             catch (Exception ex)
             {
                 tx.Rollback();
-                AppDebug.Log("DatabaseManager", $"❌ Migration failed: {ex.Message}");
+
+                AppDebug.Log($"Migration failed", AppDebug.LogLevel.Error, ex);
+
                 throw new Exception($"Chat log migration failed: {ex.Message}", ex);
             }
         }
@@ -1642,7 +1638,8 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {records.Count} proxy records");
+            AppDebug.Log($"Loaded {records.Count} proxy records", AppDebug.LogLevel.Info);
+
             return records;
         }
 
@@ -1685,7 +1682,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {records.Count} player name records for category {category}");
+            AppDebug.Log($"Loaded {records.Count} player name records for category {category}", AppDebug.LogLevel.Info);
             return records;
         }
 
@@ -1729,7 +1726,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {records.Count} player IP records for category {category}");
+            AppDebug.Log($"Loaded {records.Count} player IP records for category {category}", AppDebug.LogLevel.Info);
             return records;
         }
 
@@ -1771,12 +1768,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Added player name record: {record.PlayerName} (ID: {newId})");
+                AppDebug.Log($"Added player name record: {record.PlayerName} (ID: {newId})", AppDebug.LogLevel.Info);
                 return (int)newId;
             }
             catch
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to add player name record: {record.PlayerName}", AppDebug.LogLevel.Error);
                 throw;
             }
         }
@@ -1820,12 +1818,14 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Added player IP record: {record.PlayerIP}/{record.SubnetMask} (ID: {newId})");
+                AppDebug.Log($"Added player IP record: {record.PlayerIP}/{record.SubnetMask} (ID: {newId})", AppDebug.LogLevel.Info);
+
                 return (int)newId;
             }
             catch
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to add player IP record: {record.PlayerIP}/{record.SubnetMask}", AppDebug.LogLevel.Error);
                 throw;
             }
         }
@@ -1874,7 +1874,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Updated player name record ID: {record.RecordID}");
+                AppDebug.Log($"Updated player name record ID: {record.RecordID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -1930,7 +1930,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Updated player IP record ID: {record.RecordID}");
+                AppDebug.Log($"Updated player IP record ID: {record.RecordID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -1966,7 +1966,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Removed player name record ID: {recordId}");
+                AppDebug.Log($"Removed player name record ID: {recordId}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -2002,7 +2002,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Removed player IP record ID: {recordId}");
+                AppDebug.Log($"Removed player IP record ID: {recordId}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -2043,7 +2043,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {countries.Count} blocked countries");
+            AppDebug.Log($"Loaded {countries.Count} blocked countries", AppDebug.LogLevel.Info);
             return countries;
         }
 
@@ -2081,18 +2081,19 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Added blocked country: {countryCode} - {countryName} (ID: {newId})");
+                AppDebug.Log($"Added blocked country: {countryCode} - {countryName} (ID: {newId})", AppDebug.LogLevel.Info);
                 return (int)newId;
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint
             {
                 tx.Rollback();
-                AppDebug.Log("DatabaseManager", $"Country code {countryCode} already exists");
+                AppDebug.Log($"Country code {countryCode} already exists", AppDebug.LogLevel.Error, ex);
                 return -1;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to add blocked country: {countryCode} - {countryName}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2123,7 +2124,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Removed blocked country ID: {recordId}");
+                AppDebug.Log($"Removed blocked country ID: {recordId}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -2173,18 +2174,19 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Added proxy record: {record.IPAddress} (ID: {newId})");
+                AppDebug.Log($"Added proxy record: {record.IPAddress} (ID: {newId})", AppDebug.LogLevel.Info);
                 return (int)newId;
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint
             {
                 tx.Rollback();
-                AppDebug.Log("DatabaseManager", $"Proxy record for {record.IPAddress} already exists");
+                AppDebug.Log($"Proxy record for {record.IPAddress} already exists", AppDebug.LogLevel.Error, ex);
                 return -1;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to add proxy record: {record.IPAddress}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2236,14 +2238,16 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 cmd.Parameters.AddWithValue("$lastChecked", record.LastChecked.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 int rowsAffected = cmd.ExecuteNonQuery();
+                
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Updated proxy record ID: {record.RecordID}");
+                AppDebug.Log($"Updated proxy record ID: {record.RecordID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to update proxy record ID: {record.RecordID}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2274,12 +2278,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Removed proxy record ID: {recordId}");
+                AppDebug.Log($"Removed proxy record ID: {recordId}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to remove proxy record ID: {recordId}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2366,7 +2371,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 });
             }
 
-            AppDebug.Log("DatabaseManager", $"Loaded {users.Count} users");
+            AppDebug.Log($"Loaded {users.Count} users", AppDebug.LogLevel.Info);
             return users;
         }
 
@@ -2486,12 +2491,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Added user: {username} (ID: {newId})");
+                AppDebug.Log($"Added user: {username} (ID: {newId})", AppDebug.LogLevel.Info);
                 return (int)newId;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to add user: {username}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2529,12 +2535,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Updated user ID: {userID}");
+                AppDebug.Log($"Updated user ID: {userID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to update user ID: {userID}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2570,12 +2577,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Updated password for user ID: {userID}");
+                AppDebug.Log($"Updated password for user ID: {userID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to update password for user ID: {userID}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2606,7 +2614,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Deleted user ID: {userID}");
+                AppDebug.Log($"Deleted user ID: {userID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -2754,12 +2762,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Deleted {rowsAffected} permissions for user ID: {userID}");
+                AppDebug.Log($"Deleted {rowsAffected} permissions for user ID: {userID}", AppDebug.LogLevel.Info);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to delete permissions for user ID: {userID}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -2836,11 +2845,11 @@ namespace BHD_ServerManager.Classes.SupportClasses
         {
             try
             {
-                AppDebug.Log("DatabaseManager", $"LogAuditAction called: User={username}, Category={category}, Action={actionType}, Success={success}");
+                AppDebug.Log($"LogAuditAction called: User={username}, Category={category}, Action={actionType}, Success={success}", AppDebug.LogLevel.Info);
                 
                 if (!IsInitialized)
                 {
-                    AppDebug.Log("DatabaseManager", "Cannot log audit action: DatabaseManager is not initialized.");
+                    AppDebug.Log("Cannot log audit action: DatabaseManager is not initialized.", AppDebug.LogLevel.Info);
                     return;
                 }
 
@@ -2880,12 +2889,11 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 cmd.ExecuteNonQuery();
                 tx.Commit();
                 
-                AppDebug.Log("DatabaseManager", $"Audit log successfully written for {username}");
+                AppDebug.Log($"Audit log successfully written for {username}", AppDebug.LogLevel.Info);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Failed to log audit action: {ex.Message}");
-                AppDebug.Log("DatabaseManager", $"Stack trace: {ex.StackTrace}");
+                AppDebug.Log($"Failed to log audit action", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -2908,11 +2916,11 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
             try
             {
-                AppDebug.Log("DatabaseManager", $"GetAuditLogs called: Start={startDate}, End={endDate}, User={usernameFilter}, Category={categoryFilter}");
+                AppDebug.Log($"GetAuditLogs called: Start={startDate}, End={endDate}, User={usernameFilter}, Category={categoryFilter}", AppDebug.LogLevel.Info);
                 
                 if (!IsInitialized)
                 {
-                    AppDebug.Log("DatabaseManager", "GetAuditLogs: DatabaseManager is not initialized.");
+                    AppDebug.Log("GetAuditLogs: DatabaseManager is not initialized.", AppDebug.LogLevel.Info);
                     throw new InvalidOperationException("DatabaseManager is not initialized.");
                 }
 
@@ -2940,7 +2948,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     ? "WHERE " + string.Join(" AND ", whereClauses)
                     : "";
 
-                AppDebug.Log("DatabaseManager", $"GetAuditLogs: Query WHERE clause: {whereClause}");
+                AppDebug.Log($"GetAuditLogs: Query WHERE clause: {whereClause}", AppDebug.LogLevel.Info);
 
                 // Get total count
                 string countSql = $"SELECT COUNT(*) FROM tb_auditLogs {whereClause}";
@@ -2950,7 +2958,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     AddAuditFilterParameters(countCmd, startDate, endDate, usernameFilter,
                         categoryFilter, actionTypeFilter, targetFilter);
                     totalCount = Convert.ToInt32(countCmd.ExecuteScalar() ?? 0);
-                    AppDebug.Log("DatabaseManager", $"GetAuditLogs: Total count = {totalCount}");
+                    AppDebug.Log($"GetAuditLogs: Total count = {totalCount}", AppDebug.LogLevel.Info);
                 }
 
                 // Get logs
@@ -2994,11 +3002,11 @@ namespace BHD_ServerManager.Classes.SupportClasses
                     });
                 }
 
-                AppDebug.Log("DatabaseManager", $"Retrieved {logs.Count} of {totalCount} audit logs");
+                AppDebug.Log($"Retrieved {logs.Count} of {totalCount} audit logs", AppDebug.LogLevel.Info);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Failed to retrieve audit logs: {ex.Message}");
+                AppDebug.Log($"Failed to retrieve audit logs", AppDebug.LogLevel.Error, ex);
             }
 
             return (logs, totalCount);
@@ -3050,12 +3058,12 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 int deletedCount = cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AppDebug.Log("DatabaseManager", $"Deleted {deletedCount} old audit log records (kept {daysToKeep} days)");
+                AppDebug.Log($"Deleted {deletedCount} old audit log records (kept {daysToKeep} days)", AppDebug.LogLevel.Info);
                 return deletedCount;
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Failed to delete old audit logs: {ex.Message}");
+                AppDebug.Log($"Failed to delete old audit logs", AppDebug.LogLevel.Error, ex);
                 return 0;
             }
         }
@@ -3086,7 +3094,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Failed to get audit categories: {ex.Message}");
+                AppDebug.Log($"Failed to get audit categories", AppDebug.LogLevel.Error, ex);
             }
 
             return categories;
@@ -3118,7 +3126,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             }
             catch (Exception ex)
             {
-                AppDebug.Log("DatabaseManager", $"Failed to get audit action types: {ex.Message}");
+                AppDebug.Log($"Failed to get audit action types", AppDebug.LogLevel.Error, ex);
             }
 
             return actionTypes;
@@ -3140,7 +3148,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
             catch (Exception ex)
             {
                 // Handle any exceptions during shutdown gracefully
-                AppDebug.Log("DatabaseManager", "Error during database shutdown: " + ex.Message);
+                AppDebug.Log("Error during database shutdown", AppDebug.LogLevel.Error, ex);
             }
             finally
             {
@@ -3223,12 +3231,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", $"Added Babstats server: {server.DisplayName} (ID: {newId})");
+                AppDebug.Log($"Added Babstats server: {server.DisplayName} (ID: {newId})", AppDebug.LogLevel.Info);
                 return (int)newId;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to add Babstats server: {server.DisplayName}", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -3274,7 +3283,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", $"Updated Babstats server ID: {server.BabstatsServerID}");
+                AppDebug.Log($"Updated Babstats server ID: {server.BabstatsServerID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -3308,12 +3317,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", $"Removed Babstats server ID: {babstatsServerId}");
+                AppDebug.Log($"Removed Babstats server ID: {babstatsServerId}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to remove Babstats server ID: {babstatsServerId}", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }
@@ -3341,11 +3351,12 @@ namespace BHD_ServerManager.Classes.SupportClasses
                 ";
                 cmd.ExecuteNonQuery();
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", "Set EnableAnnouncements = 0 for all Babstats servers");
+                AppDebug.Log("Set EnableAnnouncements = 0 for all Babstats servers", AppDebug.LogLevel.Info);
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log("Failed to disable Babstats announcements", AppDebug.LogLevel.Error, ex);
                 throw;
             }
         }
@@ -3418,7 +3429,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", $"Updated lobby server ID: {server.LobbyServerID}");
+                AppDebug.Log($"Updated lobby server ID: {server.LobbyServerID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -3456,7 +3467,7 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", $"Added lobby server: {server.SiteName} ({server.ServerUri})");
+                AppDebug.Log($"Added lobby server: {server.SiteName} ({server.ServerUri})", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
             catch
@@ -3487,12 +3498,13 @@ namespace BHD_ServerManager.Classes.SupportClasses
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
-                AppDebug.Log("DatabaseManager", $"Removed lobby server ID: {lobbyID}");
+                AppDebug.Log($"Removed lobby server ID: {lobbyID}", AppDebug.LogLevel.Info);
                 return rowsAffected > 0;
             }
-            catch
+            catch (Exception ex)
             {
                 tx.Rollback();
+                AppDebug.Log($"Failed to remove lobby server ID: {lobbyID}", AppDebug.LogLevel.Error, ex);
                 return false;
             }
         }

@@ -100,7 +100,7 @@ namespace BHD_ServerManager.Forms.Panels
             }
             catch (Exception ex)
             {
-                AppDebug.Log("tickerPlayerHook", $"Error in tickerPlayerHook: {ex.Message}");
+                AppDebug.Log($"Error in tickerPlayerHook", AppDebug.LogLevel.Error, ex);
                 MessageBox.Show($"An error occurred while updating player cards: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
             finally

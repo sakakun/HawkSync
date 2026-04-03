@@ -141,12 +141,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Add to in-memory list
                 instanceBans.BannedPlayerNames.Add(nameRecord);
 
-                AppDebug.Log("banInstanceManager", $"Added blacklist name record: {playerName} (ID: {recordID})");
                 return new OperationResult(true, "Blacklist name record created successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding blacklist name record: {ex}");
+                AppDebug.Log($"Error adding blacklist name record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -227,12 +226,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     _ = NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress.ToString(), subnetMask);
                 }
 
-                AppDebug.Log("banInstanceManager", $"Added blacklist IP record: {ipAddress}/{subnetMask} (ID: {recordID})");
                 return new OperationResult(true, "Blacklist IP record created successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding blacklist IP record: {ex}");
+                AppDebug.Log($"Error adding blacklist IP record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -295,12 +293,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Update name record with IP association
                 CreateBidirectionalAssociation(nameResult.RecordID, ipResult.RecordID, RecordCategory.Ban);
 
-                AppDebug.Log("banInstanceManager", $"Created bidirectional blacklist: Name {nameResult.RecordID} <-> IP {ipResult.RecordID}");
                 return new DualRecordResult(true, "Blacklist records created successfully.", nameResult.RecordID, ipResult.RecordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding blacklist both records: {ex}");
+                AppDebug.Log($"Error adding blacklist both records", AppDebug.LogLevel.Error, ex);
                 return new DualRecordResult(false, $"Error: {ex.Message}", 0, 0, ex);
             }
         }
@@ -345,12 +342,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 // Update database
                 DatabaseManager.UpdatePlayerNameRecord(nameRecord);
 
-                AppDebug.Log("banInstanceManager", $"Updated blacklist name record ID {recordID}");
                 return new OperationResult(true, "Blacklist name record updated successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error updating blacklist name record: {ex}");
+                AppDebug.Log($"Error updating blacklist name record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -415,12 +411,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     });
                 }
 
-                AppDebug.Log("banInstanceManager", $"Updated blacklist IP record ID {recordID}");
                 return new OperationResult(true, "Blacklist IP record updated successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error updating blacklist IP record: {ex}");
+                AppDebug.Log($"Error updating blacklist IP record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -452,16 +447,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         ipRecord.AssociatedName = 0;
                         DatabaseManager.UpdatePlayerIPRecord(ipRecord);
-                        AppDebug.Log("banInstanceManager", $"Cleared association on IP record {ipRecord.RecordID}");
                     }
                 }
 
-                AppDebug.Log("banInstanceManager", $"Deleted blacklist name record ID {recordID}");
                 return new OperationResult(true, "Blacklist name record deleted successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error deleting blacklist name record: {ex}");
+                AppDebug.Log($"Error deleting blacklist name record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -499,16 +492,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         nameRecord.AssociatedIP = 0;
                         DatabaseManager.UpdatePlayerNameRecord(nameRecord);
-                        AppDebug.Log("banInstanceManager", $"Cleared association on name record {nameRecord.RecordID}");
                     }
                 }
 
-                AppDebug.Log("banInstanceManager", $"Deleted blacklist IP record ID {recordID}");
                 return new OperationResult(true, "Blacklist IP record deleted successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error deleting blacklist IP record: {ex}");
+                AppDebug.Log($"Error deleting blacklist IP record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -529,12 +520,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         $"Name: {nameResult.Message}; IP: {ipResult.Message}");
                 }
 
-                AppDebug.Log("banInstanceManager", $"Deleted both blacklist records: Name {nameRecordID}, IP {ipRecordID}");
                 return new OperationResult(true, "Both blacklist records deleted successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error deleting both blacklist records: {ex}");
+                AppDebug.Log($"Error deleting both blacklist records", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -546,10 +536,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             instanceBans.BannedPlayerNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Ban);
             instanceBans.BannedPlayerIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Ban);
-
-            AppDebug.Log("banInstanceManager",
-                $"Loaded {instanceBans.BannedPlayerNames.Count} name bans and {instanceBans.BannedPlayerIPs.Count} IP bans");
-
             return (instanceBans.BannedPlayerNames, instanceBans.BannedPlayerIPs);
         }
 
@@ -597,12 +583,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 nameRecord.RecordID = recordID;
                 instanceBans.WhitelistedNames.Add(nameRecord);
 
-                AppDebug.Log("banInstanceManager", $"Added whitelist name record: {playerName} (ID: {recordID})");
                 return new OperationResult(true, "Whitelist name record created successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding whitelist name record: {ex}");
+                AppDebug.Log($"Error adding whitelist name record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -652,12 +637,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ipRecord.RecordID = recordID;
                 instanceBans.WhitelistedIPs.Add(ipRecord);
 
-                AppDebug.Log("banInstanceManager", $"Added whitelist IP record: {ipAddress}/{subnetMask} (ID: {recordID})");
                 return new OperationResult(true, "Whitelist IP record created successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding whitelist IP record: {ex}");
+                AppDebug.Log($"Error adding whitelist IP record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -690,12 +674,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 CreateBidirectionalAssociation(nameResult.RecordID, ipResult.RecordID, RecordCategory.Whitelist);
 
-                AppDebug.Log("banInstanceManager", $"Created bidirectional whitelist: Name {nameResult.RecordID} <-> IP {ipResult.RecordID}");
                 return new DualRecordResult(true, "Whitelist records created successfully.", nameResult.RecordID, ipResult.RecordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding whitelist both records: {ex}");
+                AppDebug.Log($"Error adding whitelist both records", AppDebug.LogLevel.Error, ex);
                 return new DualRecordResult(false, $"Error: {ex.Message}", 0, 0, ex);
             }
         }
@@ -737,12 +720,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 DatabaseManager.UpdatePlayerNameRecord(nameRecord);
 
-                AppDebug.Log("banInstanceManager", $"Updated whitelist name record ID {recordID}");
                 return new OperationResult(true, "Whitelist name record updated successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error updating whitelist name record: {ex}");
+                AppDebug.Log($"Error updating whitelist name record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -789,12 +771,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 DatabaseManager.UpdatePlayerIPRecord(ipRecord);
 
-                AppDebug.Log("banInstanceManager", $"Updated whitelist IP record ID {recordID}");
                 return new OperationResult(true, "Whitelist IP record updated successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error updating whitelist IP record: {ex}");
+                AppDebug.Log($"Error updating whitelist IP record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -822,16 +803,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         ipRecord.AssociatedName = 0;
                         DatabaseManager.UpdatePlayerIPRecord(ipRecord);
-                        AppDebug.Log("banInstanceManager", $"Cleared association on IP whitelist record {ipRecord.RecordID}");
                     }
                 }
 
-                AppDebug.Log("banInstanceManager", $"Deleted whitelist name record ID {recordID}");
                 return new OperationResult(true, "Whitelist name record deleted successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error deleting whitelist name record: {ex}");
+                AppDebug.Log($"Error deleting whitelist name record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -859,16 +838,14 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         nameRecord.AssociatedIP = 0;
                         DatabaseManager.UpdatePlayerNameRecord(nameRecord);
-                        AppDebug.Log("banInstanceManager", $"Cleared association on name whitelist record {nameRecord.RecordID}");
                     }
                 }
 
-                AppDebug.Log("banInstanceManager", $"Deleted whitelist IP record ID {recordID}");
                 return new OperationResult(true, "Whitelist IP record deleted successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error deleting whitelist IP record: {ex}");
+                AppDebug.Log($"Error deleting whitelist IP record", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -889,12 +866,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         $"Name: {nameResult.Message}; IP: {ipResult.Message}");
                 }
 
-                AppDebug.Log("banInstanceManager", $"Deleted both whitelist records: Name {nameRecordID}, IP {ipRecordID}");
                 return new OperationResult(true, "Both whitelist records deleted successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error deleting both whitelist records: {ex}");
+                AppDebug.Log($"Error deleting both whitelist records", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -906,10 +882,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         {
             instanceBans.WhitelistedNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Whitelist);
             instanceBans.WhitelistedIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Whitelist);
-
-            AppDebug.Log("banInstanceManager",
-                $"Loaded {instanceBans.WhitelistedNames.Count} name whitelists and {instanceBans.WhitelistedIPs.Count} IP whitelists");
-
             return (instanceBans.WhitelistedNames, instanceBans.WhitelistedIPs);
         }
 
@@ -968,12 +940,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("proxyCheckGeoMode", settings.GeoMode);
                 ServerSettings.Set("proxyCheckServiceProvider", settings.ServiceProvider);
 
-                AppDebug.Log("banInstanceManager", "Proxy check settings saved");
                 return new OperationResult(true, "Proxy check settings saved successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error saving proxy check settings: {ex}");
+                AppDebug.Log($"Error saving proxy check settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1009,7 +980,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 if (proxyService != null)
                 {
                     ProxyCheckManager.Initialize(proxyService, cacheExpirationDays: (int)theInstance.proxyCheckCacheTime);
-                    AppDebug.Log("banInstanceManager", "Proxy service initialized successfully");
                     return new OperationResult(true, "Proxy service initialized successfully.");
                 }
 
@@ -1017,7 +987,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error initializing proxy service: {ex}");
+                AppDebug.Log($"Error initializing proxy service", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1054,18 +1024,17 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (result.Success)
                 {
-                    AppDebug.Log("banInstanceManager", $"Proxy service test successful for {testIP}");
                     return (true, result, string.Empty);
                 }
                 else
                 {
-                    AppDebug.Log("banInstanceManager", $"Proxy service test failed: {result.ErrorMessage}");
+                    AppDebug.Log($"Proxy service test failed:", AppDebug.LogLevel.Error, new Exception(result.ErrorMessage));
                     return (false, result, result.ErrorMessage);
                 }
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error testing proxy service: {ex}");
+                AppDebug.Log($"Error testing proxy service",AppDebug.LogLevel.Error, ex);
                 return (false, null, ex.Message);
             }
         }
@@ -1111,12 +1080,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 };
                 instanceBans.ProxyBlockedCountries.Add(newCountry);
 
-                AppDebug.Log("banInstanceManager", $"Added blocked country: {countryCode} - {countryName} (ID: {recordID})");
                 return new OperationResult(true, "Blocked country added successfully.", recordID);
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding blocked country: {ex}");
+                AppDebug.Log($"Error adding blocked country", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1126,16 +1094,17 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// </summary>
         public static OperationResult RemoveBlockedCountry(int recordID)
         {
+            var country = instanceBans.ProxyBlockedCountries.FirstOrDefault(c => c.RecordID == recordID);
+
+            if (country == null)
+                return new OperationResult(false, $"Country record ID {recordID} not found.");
+
             try
             {
-                var country = instanceBans.ProxyBlockedCountries.FirstOrDefault(c => c.RecordID == recordID);
-                if (country == null)
-                    return new OperationResult(false, $"Country record ID {recordID} not found.");
 
                 if (DatabaseManager.RemoveProxyBlockedCountry(recordID))
                 {
                     instanceBans.ProxyBlockedCountries.Remove(country);
-                    AppDebug.Log("banInstanceManager", $"Removed blocked country: {country.CountryCode} (ID: {recordID})");
                     return new OperationResult(true, "Blocked country removed successfully.", recordID);
                 }
 
@@ -1143,7 +1112,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error removing blocked country: {ex}");
+                AppDebug.Log($"Error removing blocked country", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1151,11 +1120,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Load all blocked countries from database
         /// </summary>
+        [Obsolete]
         public static List<proxyCountry> LoadBlockedCountries()
         {
             // Assuming banInstance.ProxyBlockedCountries is already loaded from database
             // If not, add database call here
-            AppDebug.Log("banInstanceManager", $"Loaded {instanceBans.ProxyBlockedCountries.Count} blocked countries");
             return instanceBans.ProxyBlockedCountries;
         }
 
@@ -1214,12 +1183,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 ServerSettings.Set("netLimiterEnableConLimit", settings.EnableConLimit);
                 ServerSettings.Set("netLimiterConThreshold", settings.ConThreshold);
 
-                AppDebug.Log("banInstanceManager", "NetLimiter settings saved");
                 return new OperationResult(true, "NetLimiter settings saved successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error saving NetLimiter settings: {ex}");
+                AppDebug.Log($"Error saving NetLimiter settings", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1241,7 +1209,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (NetLimiterClient._bridgeProcess != null)
                 {
-                    AppDebug.Log("banInstanceManager", "NetLimiter bridge process started");
                     return new OperationResult(true, "NetLimiter bridge started successfully.");
                 }
 
@@ -1249,7 +1216,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", "Error starting NetLimiter bridge: {ex}");
+                AppDebug.Log($"Error starting NetLimiter bridge", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1265,7 +1232,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 if (filters.Count > 0)
                 {
-                    AppDebug.Log("banInstanceManager", $"Retrieved {filters.Count} NetLimiter filters");
                     return (true, filters, string.Empty);
                 }
 
@@ -1273,7 +1239,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error getting NetLimiter filters: {ex}");
+                AppDebug.Log($"Error getting NetLimiter filters", AppDebug.LogLevel.Error, ex);
                 return (false, new List<string>(), ex.Message);
             }
         }
@@ -1293,12 +1259,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 await NetLimiterClient.AddIpToFilterAsync(filterName, ipAddress.ToString(), subnetMask);
 
-                AppDebug.Log("banInstanceManager", $"Added {ipAddress}/{subnetMask} to NetLimiter filter '{filterName}'");
                 return new OperationResult(true, $"IP added to filter '{filterName}' successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error adding IP to NetLimiter filter: {ex}");
+                AppDebug.Log($"Error adding IP to NetLimiter filter", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1318,12 +1283,11 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 await NetLimiterClient.RemoveIpFromFilterAsync(filterName, ipAddress.ToString(), subnetMask);
 
-                AppDebug.Log("banInstanceManager", $"Removed {ipAddress}/{subnetMask} from NetLimiter filter '{filterName}'");
                 return new OperationResult(true, $"IP removed from filter '{filterName}' successfully.");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error removing IP from NetLimiter filter: {ex}");
+                AppDebug.Log($"Error removing IP from NetLimiter filter", AppDebug.LogLevel.Error, ex);
                 return new OperationResult(false, $"Error: {ex.Message}", 0, ex);
             }
         }
@@ -1357,12 +1321,10 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                         DatabaseManager.UpdatePlayerNameRecord(nameRecord);
                     }
                 }
-
-                AppDebug.Log("banInstanceManager", $"Created bidirectional association: Name {nameRecordID} <-> IP {ipRecordID}");
             }
             catch (Exception ex)
             {
-                AppDebug.Log("banInstanceManager", $"Error creating bidirectional association: {ex}");
+                AppDebug.Log($"Error creating bidirectional association", AppDebug.LogLevel.Error, ex);
             }
         }
 
@@ -1372,7 +1334,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public static void LoadSettings()
         {
             // Database Records
-
             CommonCore.instanceBans!.BannedPlayerNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Ban);
             CommonCore.instanceBans!.BannedPlayerIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Ban);
             CommonCore.instanceBans!.WhitelistedNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Whitelist);
@@ -1384,7 +1345,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
             LoadProxyCheckSettings();
             LoadNetLimiterSettings();
-            AppDebug.Log("banInstanceManager", "All ban/whitelist settings loaded");
         }
     }
 }
