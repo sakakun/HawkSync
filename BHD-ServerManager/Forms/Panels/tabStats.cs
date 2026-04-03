@@ -4,7 +4,6 @@ using HawkSyncShared;
 using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using Windows.Media.AppBroadcasting;
 
 namespace BHD_ServerManager.Forms.Panels
 {

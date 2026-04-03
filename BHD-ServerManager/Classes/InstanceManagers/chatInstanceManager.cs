@@ -299,7 +299,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             message = message.Trim();
             int maxContentLength = maxLength - prefix.Length;
             int position = 0;
-            int chunkNum = 1;
 
             while (position < message.Length)
             {

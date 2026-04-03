@@ -12,7 +12,6 @@ namespace BHD_ServerManager.Forms.Panels
 		private theInstance? theInstance => CommonCore.theInstance;
 
 		// --- Class Variables ---
-		private new string Name = "GamePlayTabV2";
 		private List<Button> weaponButtons = new();
 		private List<Button> roleButtons = new();
 
