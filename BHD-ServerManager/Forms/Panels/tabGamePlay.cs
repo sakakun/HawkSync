@@ -3,6 +3,7 @@ using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -15,10 +16,16 @@ namespace BHD_ServerManager.Forms.Panels
 		private List<Button> weaponButtons = new();
 		private List<Button> roleButtons = new();
 
+		private static bool IsDesignTime =>
+			LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+		
 		public tabGamePlay()
 		{
 			InitializeComponent();
-
+		
+			if (IsDesignTime)
+				return;
+		
 			// Load Settings
 			LoadSettings();
 			InitializeWeaponButtons();

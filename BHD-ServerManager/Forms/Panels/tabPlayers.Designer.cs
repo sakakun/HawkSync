@@ -28,42 +28,42 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			playerTable1 = new TableLayoutPanel();
+			playerTable = new TableLayoutPanel();
 			SuspendLayout();
 			// 
 			// playerTable1
 			// 
-			playerTable1.ColumnCount = 5;
-			playerTable1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-			playerTable1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-			playerTable1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-			playerTable1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-			playerTable1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-			playerTable1.Dock = DockStyle.Fill;
-			playerTable1.Location = new Point(5, 5);
-			playerTable1.Margin = new Padding(0);
-			playerTable1.Name = "playerTable1";
-			playerTable1.Padding = new Padding(5);
-			playerTable1.RowCount = 11;
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-			playerTable1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-			playerTable1.Size = new Size(956, 412);
-			playerTable1.TabIndex = 0;
+			playerTable.ColumnCount = 5;
+			playerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+			playerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+			playerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+			playerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+			playerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+			playerTable.Dock = DockStyle.Fill;
+			playerTable.Location = new Point(5, 5);
+			playerTable.Margin = new Padding(0);
+			playerTable.Name = "playerTable";
+			playerTable.Padding = new Padding(5);
+			playerTable.RowCount = 11;
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+			playerTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+			playerTable.Size = new Size(956, 412);
+			playerTable.TabIndex = 0;
 			// 
 			// tabPlayers
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			Controls.Add(playerTable1);
+			Controls.Add(playerTable);
 			Margin = new Padding(0);
 			Name = "tabPlayers";
 			Padding = new Padding(5);
@@ -73,6 +73,6 @@
 
 		#endregion
 
-		private TableLayoutPanel playerTable1;
+		private TableLayoutPanel playerTable;
 	}
 }

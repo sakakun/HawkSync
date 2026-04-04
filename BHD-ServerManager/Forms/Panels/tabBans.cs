@@ -9,6 +9,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using RecordDeleteAction = BHD_ServerManager.Classes.InstanceManagers.RecordDeleteAction;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -18,10 +19,16 @@ namespace BHD_ServerManager.Forms.Panels
         private banInstance? instanceBans => CommonCore.instanceBans;
         private theInstance? theInstance => CommonCore.theInstance;
 
+        private static bool IsDesignTime =>
+            LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+        
         public tabBans()
         {
             InitializeComponent();
 
+            if (IsDesignTime)
+                return;
+            
             dgPlayerNamesBlacklist.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             dgPlayerNamesWhitelist.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
 

@@ -1,11 +1,7 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
-using System;
-using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -18,10 +14,16 @@ namespace BHD_ServerManager.Forms.Panels
         private DateTime _lastGridUpdate;
         private bool _autoScrollChat = true;
 
+        private static bool IsDesignTime =>
+            LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+        
         public tabChat()
         {
             InitializeComponent();
 
+            if (IsDesignTime)
+                return;
+            
             chatInstanceManager.LoadSettings();
 
             CommonCore.Ticker?.Start("ChatTabUpdate", 1000, ChatTickerHook);

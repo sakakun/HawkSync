@@ -1,113 +1,70 @@
-﻿using BHD_ServerManager.Classes.PlayerManagementClasses;
-using HawkSyncShared;
-using HawkSyncShared.DTOs.API;
-using HawkSyncShared.Instances;
+﻿using RemoteClient.Forms.SubPanels;
 using RemoteClient.Core;
+using HawkSyncShared;
+using HawkSyncShared.Instances;
+using System.ComponentModel;
+using HawkSyncShared.DTOs.API;
 
 namespace RemoteClient.Forms.Panels;
 
 public partial class tabPlayers : UserControl
 {
 
-    private theInstance? theInstance => CommonCore.theInstance;
-    private playerInstance playerInstance => CommonCore.instancePlayers!;
+    private theInstance?        theInstance         => CommonCore.theInstance;
 
-    // --- Class Variables ---
-    private bool _firstLoadComplete = false;                    // First load flag to prevent certain actions on initial load.
-
-    private PlayerCard[] playerCards = new PlayerCard[80];
-
-    // --- Generate Init. Cards ---
-    private void functionEvent_GeneratePlayerCards()
-    {
-        TableLayoutPanel PlayerCards1 = playerTable1; // 40 cards (1-40)
+    private readonly Dictionary<int, PlayerCardV2> PlayerCards = new Dictionary<int, PlayerCardV2>();
         
-        PlayerCards1.Controls.Clear();
-
-        // Configure PlayerCards1: 4 columns x 10 rows = 40 cards
-        PlayerCards1.ColumnCount = 5;
-        PlayerCards1.RowCount = 10;
-        PlayerCards1.Padding = new Padding(0, 0, 0, 0);
-
-        for (int i = 0; i < 50; i++)
-        {
-            int slotNum = i + 1;
-            PlayerCard card = new PlayerCard(slotNum);
-            card.Name = $"PlayerCard_{slotNum}";
-            card.Dock = DockStyle.Fill;
-            card.Margin = new Padding(0);
-            card.Padding = new Padding(0);
-            card.ToggleSlot((i) < theInstance!.gameMaxSlots ? true : false);
-            playerCards[i] = card;
-
-            // Cards 1-40: column = i / 10, row = i % 10
-            PlayerCards1.Controls.Add(card, i / 10, i % 10);
-        }
-    }
+    private static bool IsDesignTime =>
+        LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
 
     public tabPlayers()
     {
         InitializeComponent();
-        
-        // Subscribe to snapshot updates
-        ApiCore.OnSnapshotReceived += OnSnapshotReceived;
-    }
-
-    private void OnSnapshotReceived(ServerSnapshot snapshot)
-    {
-        if (InvokeRequired)
-        {
-            Invoke(() => OnSnapshotReceived(snapshot));
+            
+        if (IsDesignTime)
             return;
-        }
-        
-        // Update Player Cards
-        tickerPlayerHook();
+            
+        // Generate Cards
+        generateCardData();
+        PopulateCards();
     }
 
-    public void tickerPlayerHook()
+    private void generateCardData()
     {
-        playerTable1.SuspendLayout();
-        try
+        for (int i = 1; i < 51; i++)
         {
-            if (!_firstLoadComplete)
+            PlayerCardV2 playerCard = new PlayerCardV2(i);
+            playerCard.Name = $"PlayerCard_{i}";
+            playerCard.Dock = DockStyle.Fill;
+            playerCard.Margin = new Padding(0);
+            playerCard.Padding = new Padding(0);
+            playerCard.ToggleVisibility(i < theInstance!.gameMaxSlots);
+            if (System.Diagnostics.Debugger.IsAttached)
             {
-                _firstLoadComplete = true;
-                functionEvent_GeneratePlayerCards();
+                playerCard.ToggleVisibility(true);
             }
 
-            if (theInstance!.instanceStatus == InstanceStatus.OFFLINE)
-            {
-                for (int i = 0; i < 50; i++)
-                {
-                    playerCards[i].UpdateCard(null, false);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < theInstance.gameMaxSlots; i++)
-                {
-                    // Block update for players over 80 (max capacity across both tables)
-                    if (i >= 80)
-                    {
-                        break;
-                    }
-
-                    int slotNum = i + 1;
-                    if (playerInstance.PlayerList.TryGetValue(slotNum, out var playerInfo))
-                    {
-                        playerCards[i].UpdateCard(playerInfo, true);
-                    }
-                    else
-                    {
-                        playerCards[i].UpdateCard(null, true);
-                    }
-                }
-            }
-        }
-        finally
-        {
-            playerTable1.ResumeLayout();
+            PlayerCards[i] = playerCard;
+            PlayerCards[i].StartTicker(); // Call after Name is set
         }
     }
+        
+    // --- Generate Init. Cards ---
+    private void PopulateCards()
+    {
+        TableLayoutPanel PlayerTable = playerTable1;
+            
+        PlayerTable.Controls.Clear();
+
+        // Configure PlayerCards1: 5 columns x 10 rows = 50 cards
+        PlayerTable.ColumnCount = 5;
+        PlayerTable.RowCount = 10;
+        PlayerTable.Padding = new Padding(0, 0, 0, 0);
+
+        for (int i = 0; i < 50; i++)
+        {
+            PlayerTable.Controls.Add(PlayerCards[i + 1], i / 10, i % 10);
+        }
+    }
+
 }

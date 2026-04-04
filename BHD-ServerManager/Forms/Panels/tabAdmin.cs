@@ -1,13 +1,8 @@
 ﻿using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
-using static BHD_ServerManager.Classes.InstanceManagers.adminInstanceManager;
 using HawkSyncShared.Instances;
 using HawkSyncShared.DTOs.tabAdmin;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.Panels;
 
@@ -22,6 +17,9 @@ public partial class tabAdmin : UserControl
     private int _lastScrollIndex = 0;
     private const int DefaultAdminUserId = 1;
 
+    private static bool IsDesignTime =>
+        LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+    
     private enum FormMode
     {
         View,
@@ -32,6 +30,10 @@ public partial class tabAdmin : UserControl
     public tabAdmin()
     {
         InitializeComponent();
+        
+        if (IsDesignTime)
+            return;
+        
         InitializeEvents();
 
         adminInstanceManager.LoadUsersCache();

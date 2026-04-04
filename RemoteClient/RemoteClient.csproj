@@ -15,6 +15,9 @@
     <Compile Remove="Databases\**" />
     <EmbeddedResource Remove="Databases\**" />
     <None Remove="Databases\**" />
+    <Compile Update="Forms\SubPanels\PlayerCardV2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -51,9 +54,6 @@
     </Compile>
     <Compile Update="Forms\ServerManagerUI.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\SubPanels\PlayerCard.cs">
-      <SubType>UserControl</SubType>
     </Compile>
   </ItemGroup>
 
