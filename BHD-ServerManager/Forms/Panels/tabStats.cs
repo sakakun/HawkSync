@@ -4,6 +4,7 @@ using HawkSyncShared;
 using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -18,9 +19,16 @@ namespace BHD_ServerManager.Forms.Panels
         private int _BabstatsSelectedID;
         private int _LobbySelectedID;
 
+        private static bool IsDesignTime =>
+            LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+        
         public tabStats()
         {
             InitializeComponent();
+            
+            if (IsDesignTime)
+                return;
+            
             CommonCore.Ticker?.Start("StatsTabTicker", 1000, StatsTickerHook);
         }
 

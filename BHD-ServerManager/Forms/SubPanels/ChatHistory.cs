@@ -1,13 +1,7 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.Instances;
+﻿using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.SubPanels
 {
@@ -19,9 +13,16 @@ namespace BHD_ServerManager.Forms.SubPanels
         private int _pageSize = 100;
         private bool _isLoading = false;
 
+        private static bool IsDesignTime =>
+            LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");        
+        
         public ChatHistory()
         {
             InitializeComponent();
+            
+            if (IsDesignTime)
+                return;
+            
             InitializeControls();
         }
 

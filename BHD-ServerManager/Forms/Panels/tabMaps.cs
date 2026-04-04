@@ -1,18 +1,10 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using HawkSyncShared;
+﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
-using System.Data;
 using System.Text;
 using HawkSyncShared.DTOs.tabMaps;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -28,9 +20,16 @@ namespace BHD_ServerManager.Forms.Panels
         private const int PlaylistMax = 5;
         public int MapTypeFilter;
 
+        private static bool IsDesignTime =>
+            LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+        
         public tabMaps()
         {
             InitializeComponent();
+            
+            if (IsDesignTime)
+                return;
+            
             LoadSettings();
 
             CommonCore.Ticker?.Start("tabMaps", 1000, Ticker_tabMaps);

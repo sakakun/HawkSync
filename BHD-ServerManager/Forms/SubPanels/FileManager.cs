@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using BHD_ServerManager.Classes.SupportClasses;
+﻿using System.IO.Compression;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.SubPanels
 {
@@ -19,9 +10,16 @@ namespace BHD_ServerManager.Forms.SubPanels
         private readonly string[] allowedExtensions = { ".bms", ".mis", ".til" };
         private theInstance? theInstance => CommonCore.theInstance;
 
+        private static bool IsDesignTime =>
+            LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+        
         public FileManager()
         {
             InitializeComponent();
+            
+            if (IsDesignTime)
+                return;
+            
             LoadFiles();
         }
 

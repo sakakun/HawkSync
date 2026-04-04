@@ -32,13 +32,24 @@ namespace BHD_ServerManager.Classes.Tickers
         // Locks
         private static bool _netLimiterLock = false;
         private static bool _netLimiterFilterLock = false;
+        private static readonly object _playerListLock = new();
 
         // Helper: Enumerate active players (seen within threshold)
         // Returns a list snapshot to avoid enumeration issues when PlayerList is modified by other threads
         private static List<(int SlotNum, PlayerObject Player)> GetActivePlayers()
         {
             DateTime now = DateTime.Now;
-            return playerInstance.PlayerList
+            List<KeyValuePair<int, PlayerObject>> snapshot;
+
+            lock (_playerListLock)
+            {
+                // Create a shallow copy of the entries INSIDE the lock
+                // to prevent any concurrent modification during LINQ evaluation.
+                snapshot = new List<KeyValuePair<int, PlayerObject>>(playerInstance.PlayerList);
+            }
+
+            // Perform filtering OUTSIDE the lock on the safe snapshot
+            return snapshot
                 .Where(kvp => (now - kvp.Value.PlayerLastSeen).TotalSeconds <= ActivePlayerThresholdSeconds)
                 .Select(kvp => (kvp.Key, kvp.Value))
                 .ToList();

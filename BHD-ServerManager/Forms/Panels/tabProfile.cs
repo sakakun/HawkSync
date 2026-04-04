@@ -2,22 +2,10 @@
 using BHD_ServerManager.Classes.InstanceManagers;
 using BHD_ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
-using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Forms;
-using Windows.Storage;
-using Button = System.Windows.Controls.Button;
 using UserControl = System.Windows.Forms.UserControl;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms.Panels
 {
@@ -30,11 +18,18 @@ namespace BHD_ServerManager.Forms.Panels
 		private System.Windows.Forms.Timer? _auditFilterTimer;
 		private string _currentUserFilter = string.Empty;
 		private string _currentCategoryFilter = "All";
+		
+		private static bool IsDesignTime =>
+			LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
 
 		public tabProfile()
 		{
 			// Initialize the form components
 			InitializeComponent();
+			
+			if (IsDesignTime)
+				return;
+			
 			InitializeAuditLogUI();
 
 			// Initialize the profile tab with current settings

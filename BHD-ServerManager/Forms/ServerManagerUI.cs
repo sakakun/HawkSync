@@ -1,14 +1,9 @@
-using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Forms.Panels;
 using BHD_ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
-using System.Data;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
 using BHD_ServerManager.Classes.Services.NetLimiter;
-using HawkSyncShared.DTOs.tabPlayers;
+using System.ComponentModel;
 
 namespace BHD_ServerManager.Forms
 {
@@ -18,6 +13,9 @@ namespace BHD_ServerManager.Forms
         private static theInstance thisInstance => CommonCore.theInstance!;
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
+        private static bool IsDesignTime =>
+            LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+        
         // Server Manager Tabs
         public tabProfile       ProfileTab      = null!;                   // The Profile Tab User Control
         public tabGamePlay      GamePlayTab     = null!;                   // The Server Tab User Control
@@ -31,6 +29,10 @@ namespace BHD_ServerManager.Forms
         public ServerManagerUI()
         {
             InitializeComponent();
+            
+            if (IsDesignTime)
+                return;
+            
             Load += PostServerManagerInitalization;
         }
 

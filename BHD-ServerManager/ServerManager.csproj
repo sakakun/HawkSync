@@ -45,6 +45,9 @@
     <EmbeddedResource Remove="Classes\GameManagement\ServerMemory\**" />
     <None Remove="API\Controllers\Admin\**" />
     <None Remove="Classes\GameManagement\ServerMemory\**" />
+    <Compile Update="Forms\SubPanels\PlayerCardV2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

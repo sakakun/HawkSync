@@ -1,4 +1,5 @@
-﻿using HawkSyncShared.DTOs.tabPlayers;
+﻿using System.Collections.Concurrent;
+using HawkSyncShared.DTOs.tabPlayers;
 using System.Collections.Generic;
 
 namespace HawkSyncShared.Instances;
@@ -9,7 +10,7 @@ namespace HawkSyncShared.Instances;
 public class playerInstance
 {
     // Active Players
-    public Dictionary<int, PlayerObject> PlayerList { get; set; } = new();
+    public ConcurrentDictionary<int, PlayerObject> PlayerList { get; set; } = new();
     
     // Team Management
     public List<playerTeamObject> PlayerChangeTeamList { get; set; } = new();
