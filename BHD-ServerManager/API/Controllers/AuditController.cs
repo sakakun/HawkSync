@@ -3,8 +3,6 @@ using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.SupportClasses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic.Logging;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BHD_ServerManager.API.Controllers;
 
@@ -54,7 +52,7 @@ public class AuditController : ControllerBase
             AppDebug.Log("Error retrieving audit logs", AppDebug.LogLevel.Error, ex);
 
             // Add a trace id to the response so clients can report it to support
-            var traceId = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString();
+            var traceId = HttpContext.TraceIdentifier;
             Response.Headers["X-Trace-Id"] = traceId;
 
             // Return a ProblemDetails (RFC 7807) with 500 status without leaking exception details
@@ -99,7 +97,7 @@ public class AuditController : ControllerBase
             AppDebug.Log("Error retrieving audit categories", AppDebug.LogLevel.Error, ex);
 
             // Add a trace id to the response so clients can report it to support
-            var traceId = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString();
+            var traceId = HttpContext.TraceIdentifier;
             Response.Headers["X-Trace-Id"] = traceId;
 
             // Return a ProblemDetails (RFC 7807) with 500 status without leaking exception details
@@ -143,7 +141,7 @@ public class AuditController : ControllerBase
             AppDebug.Log("Error retrieving audit action types", AppDebug.LogLevel.Error, ex);
 
             // Add a trace id to the response so clients can report it to support
-            var traceId = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString();
+            var traceId = HttpContext.TraceIdentifier;
             Response.Headers["X-Trace-Id"] = traceId;
 
             // Return a ProblemDetails (RFC 7807) with 500 status without leaking exception details
@@ -205,7 +203,7 @@ public class AuditController : ControllerBase
             AppDebug.Log("Error retrieving audit stats", AppDebug.LogLevel.Error, ex);
 
             // Add a trace id to the response so clients can report it to support
-            var traceId = HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString();
+            var traceId = HttpContext.TraceIdentifier;
             Response.Headers["X-Trace-Id"] = traceId;
 
             // Return a ProblemDetails (RFC 7807) with 500 status without leaking exception details

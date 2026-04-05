@@ -1,9 +1,5 @@
 ﻿using HawkSyncShared.DTOs.API;
-using HawkSyncShared.DTOs.tabPlayers;
-using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.DTOs.tabStats;
-using HawkSyncShared.SupportClasses;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace RemoteClient.Services.Commands;

@@ -1,8 +1,4 @@
 ﻿using HawkSyncShared.DTOs.tabAdmin;
-using HawkSyncShared.DTOs.API;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace RemoteClient.Services.Commands;
 

@@ -1,11 +1,7 @@
 ﻿using HawkSyncShared.DTOs.API;
-using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.DTOs.tabBans.Service;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
-using Windows.Web.Http;
 
 namespace RemoteClient.Services.Commands;
 public class BanService

@@ -39,8 +39,6 @@ namespace RemoteClient.Forms.Panels
 		{
 			if (ReferenceEquals(listA, listB))
 				return true;
-			if (listA == null || listB == null)
-				return false;
 			if (listA.Count != listB.Count)
 				return false;
 
@@ -85,8 +83,6 @@ namespace RemoteClient.Forms.Panels
 		{
 			if (ReferenceEquals(listA, listB))
 				return true;
-			if (listA == null || listB == null)
-				return false;
 			if (listA.Count != listB.Count)
 				return false;
 
@@ -131,7 +127,7 @@ namespace RemoteClient.Forms.Panels
 		{
 			if (InvokeRequired)
 			{
-				Invoke(new Action(() => OnSnapshotReceived(snapshot)));
+				Invoke(() => OnSnapshotReceived(snapshot));
 				return;
 			}
 
@@ -145,7 +141,7 @@ namespace RemoteClient.Forms.Panels
 
 		public void UpdateWebStatsLog()
 		{
-			List<StatReportObject> logEntries = statInstance.WebStatsLog ?? new List<StatReportObject>();
+			List<StatReportObject> logEntries = statInstance.WebStatsLog;
 
 			var currentRows = new HashSet<string>();
 			foreach (DataGridViewRow row in dg_statsLog.Rows)
@@ -671,7 +667,7 @@ namespace RemoteClient.Forms.Panels
 		{
 			_LobbySelectedID = 0;
 			tb_lobbySiteUri.Text = string.Empty;
-			num_lobbyGamePort.Value = theInstance!.profileBindPort;
+			num_lobbyGamePort.Value = theInstance.profileBindPort;
 			tb_lobbySecretKey.Text = string.Empty;
 			tb_lobbySiteName.Text = string.Empty;
 			cb_lobbyEnabled.Checked = false;

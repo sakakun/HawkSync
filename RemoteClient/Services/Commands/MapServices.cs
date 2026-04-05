@@ -1,10 +1,4 @@
-﻿using HawkSyncShared.DTOs.API;
-using HawkSyncShared.DTOs.tabGameplay;
-using HawkSyncShared.DTOs.tabMaps;
-using HawkSyncShared.DTOs.tabPlayers;
-using HawkSyncShared.DTOs.tabProfile;
-using HawkSyncShared.SupportClasses;
-using System.Net.Http.Headers;
+﻿using HawkSyncShared.DTOs.tabMaps;
 using System.Net.Http.Json;
 
 namespace RemoteClient.Services.Commands;

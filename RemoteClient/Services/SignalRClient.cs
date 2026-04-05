@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.SupportClasses;
 
 namespace RemoteClient.Services;
 
@@ -40,16 +41,16 @@ public class SignalRClient : IDisposable
             .Build();
 
         // Connection events
-        _connection.Reconnecting += error =>
+        _connection.Reconnecting += _ =>
         {
-            OnConnectionStateChanged?.Invoke("🟡 Reconnecting...");
+            OnConnectionStateChanged?.Invoke("Reconnecting...");
             StopHeartbeat();
             return Task.CompletedTask;
         };
 
         _connection.Reconnected += connectionId =>
         {
-            OnConnectionStateChanged?.Invoke("🟢 Connected");
+            OnConnectionStateChanged?.Invoke("Connected");
             _ = SubscribeToUpdatesAsync();
             StartHeartbeat();
             return Task.CompletedTask;
@@ -58,8 +59,8 @@ public class SignalRClient : IDisposable
         _connection.Closed += error =>
         {
             OnConnectionStateChanged?.Invoke(error != null 
-                ? $"🔴 Disconnected: {error.Message}" 
-                : "🔴 Disconnected");
+                ? $"Disconnected: {error.Message}" 
+                : "Disconnected");
             StopHeartbeat();
             return Task.CompletedTask;
         };
@@ -72,7 +73,7 @@ public class SignalRClient : IDisposable
 
         // Connect
         await _connection.StartAsync();
-        OnConnectionStateChanged?.Invoke("🟢 Connected");
+        OnConnectionStateChanged?.Invoke("Connected");
 
         // Subscribe to updates
         await SubscribeToUpdatesAsync();
@@ -84,7 +85,7 @@ public class SignalRClient : IDisposable
     private void StartHeartbeat()
     {
         _heartbeatTimer = new System.Timers.Timer(30000); // 30 seconds
-        _heartbeatTimer.Elapsed += async (sender, e) =>
+        _heartbeatTimer.Elapsed += async (_, _) =>
         {
             if (_connection?.State == HubConnectionState.Connected)
             {
@@ -135,7 +136,10 @@ public class SignalRClient : IDisposable
                 await _connection.StopAsync();
                 await _connection.DisposeAsync();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                AppDebug.Log("SignalRClient.DisconnectAsync Error", AppDebug.LogLevel.Error, ex);
+            }
             finally
             {
                 _connection = null;

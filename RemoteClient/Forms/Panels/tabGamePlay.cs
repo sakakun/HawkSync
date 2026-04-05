@@ -3,7 +3,6 @@ using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabGameplay;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
-using System.Drawing;
 
 namespace RemoteClient.Forms.Panels;
 
@@ -15,12 +14,12 @@ public partial class tabGamePlay : UserControl
     // EDIT MODE TRACKING
     // ================================================================================
 
-    private bool _isEditing = false;
-    private bool _suppressChangeTracking = false;
+    private bool _isEditing;
+    private bool _suppressChangeTracking;
     private DateTime _lastEditTime = DateTime.MinValue;
     private System.Windows.Forms.Timer? _inactivityTimer;
     private const int INACTIVITY_TIMEOUT_SECONDS = 120; // 2 minutes
-    private bool _updatingButtons = false;
+    private bool _updatingButtons;
     private List<Button> weaponButtons = new();
     private List<Button> roleButtons = new();
     private List<Button> optionButtons = new();
@@ -454,7 +453,6 @@ public partial class tabGamePlay : UserControl
         {
             // Disable button during operation
             btn_LockLobby.Enabled = false;
-            var originalText = btn_LockLobby.Text;
             btn_LockLobby.Text = "UN/LOCKING";
 
             // Call API to lock lobby
@@ -775,13 +773,11 @@ public partial class tabGamePlay : UserControl
             }
 
             // Prompt user to save the file
-            using SaveFileDialog saveFileDialog = new()
-            {
-                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                FilterIndex = 1,
-                RestoreDirectory = true,
-                FileName = exportResponse.FileName
-            };
+            using SaveFileDialog saveFileDialog = new();
+            saveFileDialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 1;
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.FileName = exportResponse.FileName;
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -815,12 +811,10 @@ public partial class tabGamePlay : UserControl
         try
         {
             // Prompt user to select a file
-            using OpenFileDialog openFileDialog = new()
-            {
-                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                FilterIndex = 1,
-                RestoreDirectory = true
-            };
+            using OpenFileDialog openFileDialog = new();
+            openFileDialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.RestoreDirectory = true;
 
             if (openFileDialog.ShowDialog() != DialogResult.OK)
                 return;
@@ -958,7 +952,6 @@ public partial class tabGamePlay : UserControl
         {
             // Disable button during operation
             btn_MatchStateToggle.Enabled = false;
-            var originalText = btn_MatchStateToggle.Text;
             btn_MatchStateToggle.Text = "TOGGLING...";
 
             // Call API to toggle match state

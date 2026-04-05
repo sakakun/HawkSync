@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace HawkSyncShared.SupportClasses
@@ -8,7 +6,7 @@ namespace HawkSyncShared.SupportClasses
     public static class AppDebug
     {
         private static readonly string LogFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppDebug.log");
-        private static readonly string EventSource = AppDomain.CurrentDomain.FriendlyName ?? "HawkSync";
+        private static readonly string EventSource = AppDomain.CurrentDomain.FriendlyName;
 
         public enum LogLevel
         {
@@ -33,18 +31,18 @@ namespace HawkSyncShared.SupportClasses
             [CallerFilePath] string callerFilePath = "",
             [CallerLineNumber] int callerLineNumber = 0)
         {
-            string className = Path.GetFileNameWithoutExtension(callerFilePath) ?? "<unknown>";
+            string className = Path.GetFileNameWithoutExtension(callerFilePath);
             string time = DateTime.Now.ToString("o"); // ISO 8601
             string exceptionPart = exception is null ? string.Empty : $"{Environment.NewLine}Exception: {exception}";
             string formatted = $"[{level}][{className}.{callerMember}:line {callerLineNumber}] {time} - {message}{exceptionPart}";
 
             bool isDebuggerAttached = Debugger.IsAttached;
-            bool fileLoggingRequested = false;
+            bool fileLoggingRequested;
 
             try
             {
-                var args = Environment.GetCommandLineArgs();
-                fileLoggingRequested = args != null && Array.Exists(args, a => a.Equals("/debug", StringComparison.OrdinalIgnoreCase));
+                string[] args = Environment.GetCommandLineArgs();
+                fileLoggingRequested = Array.Exists(args, a => a.Equals("/debug", StringComparison.OrdinalIgnoreCase));
             }
             catch
             {

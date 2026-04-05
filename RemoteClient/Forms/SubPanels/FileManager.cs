@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using RemoteClient.Services.Commands;
-using RemoteClient.Core;
-using RemoteClient.Services;
+﻿using RemoteClient.Core;
 
 namespace RemoteClient.Forms.SubPanels
 {

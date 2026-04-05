@@ -1,9 +1,7 @@
 ﻿using RemoteClient.Forms.SubPanels;
-using RemoteClient.Core;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
 using System.ComponentModel;
-using HawkSyncShared.DTOs.API;
 
 namespace RemoteClient.Forms.Panels;
 

@@ -1,5 +1,4 @@
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
 using RemoteClient.Core;
 using RemoteClient.Forms;
 

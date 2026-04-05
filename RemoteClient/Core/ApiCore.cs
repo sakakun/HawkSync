@@ -15,13 +15,13 @@ public static class ApiCore
     public static ApiClient? ApiClient { get; private set; }
     public static SignalRClient? SignalRClient { get; private set; }
     public static UserInfoDTO? CurrentUser { get; private set; }
-    public static string ServerUrl { get; private set; } = string.Empty;
     
     // ================================================================================
     // CURRENT STATE (Latest Snapshot)
     // ================================================================================
     
     public static ServerSnapshot? CurrentSnapshot { get; private set; }
+    
     public static DateTime LastUpdate { get; private set; } = DateTime.MinValue;
     
     // ================================================================================
@@ -47,7 +47,6 @@ public static class ApiCore
     /// </summary>
     public static async Task InitializeAsync(string serverUrl, string jwtToken, UserInfoDTO user)
     {
-        ServerUrl = serverUrl;
         CurrentUser = user;
         
         // Create clients
@@ -68,7 +67,6 @@ public static class ApiCore
     private static void HandleSnapshotReceived(ServerSnapshot snapshot)
     {
         CurrentSnapshot = snapshot;
-        LastUpdate = DateTime.Now;
         
         // Broadcast to all subscribers (tabs)
         OnSnapshotReceived?.Invoke(snapshot);
@@ -96,6 +94,6 @@ public static class ApiCore
 
     public static bool HasPermission(string permission)
     {
-        return CurrentUser?.Permissions?.Any(p => string.Equals(p, permission, StringComparison.OrdinalIgnoreCase)) == true;
+        return CurrentUser?.Permissions.Any(p => string.Equals(p, permission, StringComparison.OrdinalIgnoreCase)) == true;
     }
 }

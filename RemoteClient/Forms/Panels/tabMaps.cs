@@ -2,7 +2,6 @@
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.Instances;
-using HawkSyncShared.SupportClasses;
 using RemoteClient.Core;
 using System.Text;
 
@@ -11,14 +10,14 @@ namespace RemoteClient.Forms.Panels
     public partial class tabMaps : UserControl
     {
 
-        private static theInstance? theInstance => CommonCore.theInstance!;
+        private static theInstance theInstance => CommonCore.theInstance!;
         private static mapInstance mapInstance => CommonCore.instanceMaps!;
 
         // Local state
         private List<MapDTO> _availableMaps = new();
         private List<MapDTO> _currentPlaylist = new();
         private int _selectedPlaylist = 1;
-        private bool IsEditMode = false;
+        private bool IsEditMode;
 
         public tabMaps()
         {
@@ -53,7 +52,7 @@ namespace RemoteClient.Forms.Panels
         public void methodFunction_UpdateMapControls()
         {
             bool isActivePlaylist = (mapInstance.ActivePlaylist == _selectedPlaylist);
-            bool isServerOnline = (theInstance!.instanceStatus != InstanceStatus.OFFLINE);
+            bool isServerOnline = (theInstance.instanceStatus != InstanceStatus.OFFLINE);
 
             btn_mapControl1.Enabled = isActivePlaylist && isServerOnline;
             btn_mapControl2.Enabled = isActivePlaylist && isServerOnline;
@@ -91,45 +90,45 @@ namespace RemoteClient.Forms.Panels
         private void WireUpEvents()
         {
             // Map type filter buttons
-            btn_mapTypeALL.Click += (s, e) => FilterAvailableMaps(null);
-            btn_mapTypeDM.Click += (s, e) => FilterAvailableMaps(0);
-            btn_mapTypeTDM.Click += (s, e) => FilterAvailableMaps(1);
-            btn_mapTypeCOOP.Click += (s, e) => FilterAvailableMaps(2);
-            btn_mapTypeTKOTH.Click += (s, e) => FilterAvailableMaps(3);
-            btn_mapTypeKOTH.Click += (s, e) => FilterAvailableMaps(4);
-            btn_mapTypeSD.Click += (s, e) => FilterAvailableMaps(5);
-            btn_mapTypeAD.Click += (s, e) => FilterAvailableMaps(6);
-            btn_mapTypeCTF.Click += (s, e) => FilterAvailableMaps(7);
-            btn_mapTypeFB.Click += (s, e) => FilterAvailableMaps(8);
+            btn_mapTypeALL.Click += (_, _) => FilterAvailableMaps(null);
+            btn_mapTypeDM.Click += (_, _) => FilterAvailableMaps(0);
+            btn_mapTypeTDM.Click += (_, _) => FilterAvailableMaps(1);
+            btn_mapTypeCOOP.Click += (_, _) => FilterAvailableMaps(2);
+            btn_mapTypeTKOTH.Click += (_, _) => FilterAvailableMaps(3);
+            btn_mapTypeKOTH.Click += (_, _) => FilterAvailableMaps(4);
+            btn_mapTypeSD.Click += (_, _) => FilterAvailableMaps(5);
+            btn_mapTypeAD.Click += (_, _) => FilterAvailableMaps(6);
+            btn_mapTypeCTF.Click += (_, _) => FilterAvailableMaps(7);
+            btn_mapTypeFB.Click += (_, _) => FilterAvailableMaps(8);
 
             // Playlist selection
-            btn_loadPlaylist1.Click += (s, e) => actionClick_loadMapPlaylist1();
-            btn_loadPlaylist2.Click += (s, e) => actionClick_loadMapPlaylist2();
-            btn_loadPlaylist3.Click += (s, e) => actionClick_loadMapPlaylist3();
-            btn_loadPlaylist4.Click += (s, e) => actionClick_loadMapPlaylist4();
-            btn_loadPlaylist5.Click += (s, e) => actionClick_loadMapPlaylist5();
+            btn_loadPlaylist1.Click += (_, _) => actionClick_loadMapPlaylist1();
+            btn_loadPlaylist2.Click += (_, _) => actionClick_loadMapPlaylist2();
+            btn_loadPlaylist3.Click += (_, _) => actionClick_loadMapPlaylist3();
+            btn_loadPlaylist4.Click += (_, _) => actionClick_loadMapPlaylist4();
+            btn_loadPlaylist5.Click += (_, _) => actionClick_loadMapPlaylist5();
 
             // Playlist editing
-            dataGridView_availableMaps.CellDoubleClick += (s, e) => AddMapToPlaylist(e.RowIndex);
-            dataGridView_currentMaps.CellDoubleClick += (s, e) => RemoveMapFromPlaylist(e.RowIndex);
-            btn_playListControlB4.Click += (s, e) => MoveMapUp();
-            btn_playListControlB3.Click += (s, e) => MoveMapDown();
-            btn_playListControlB1.Click += (s, e) => ClearPlaylist();
-            btn_playListControlB2.Click += async (s, e) => await SavePlaylist();
-            btn_playListControlB5.Click += async (s, e) => await SetActivePlaylist();
+            dataGridView_availableMaps.CellDoubleClick += (_, e) => AddMapToPlaylist(e.RowIndex);
+            dataGridView_currentMaps.CellDoubleClick += (_, e) => RemoveMapFromPlaylist(e.RowIndex);
+            btn_playListControlB4.Click += (_, _) => MoveMapUp();
+            btn_playListControlB3.Click += (_, _) => MoveMapDown();
+            btn_playListControlB1.Click += (_, _) => ClearPlaylist();
+            btn_playListControlB2.Click += async (_, _) => await SavePlaylist();
+            btn_playListControlB5.Click += async (_, _) => await SetActivePlaylist();
 
             // Import/Export
-            btn_mapControl7.Click += async (s, e) => await ExportPlaylist();
-            btn_mapControl6.Click += async (s, e) => await ImportPlaylist();
+            btn_mapControl7.Click += async (_, _) => await ExportPlaylist();
+            btn_mapControl6.Click += async (_, _) => await ImportPlaylist();
 
             // Randomize
-            btn_mapControl5.Click += (s, e) => RandomizePlaylist();
+            btn_mapControl5.Click += (_, _) => RandomizePlaylist();
 
             // Server actions
-            btn_mapControl4.Click += async (s, e) => await RefreshAvailableMaps();
-            btn_mapControl3.Click += async (s, e) => await SkipMap();
-            btn_mapControl2.Click += async (s, e) => await ScoreMap();
-            btn_mapControl1.Click += async (s, e) => await PlayNextMap();
+            btn_mapControl4.Click += async (_, _) => await RefreshAvailableMaps();
+            btn_mapControl3.Click += async (_, _) => await SkipMap();
+            btn_mapControl2.Click += async (_, _) => await ScoreMap();
+            btn_mapControl1.Click += async (_, _) => await PlayNextMap();
         }
 
         // --- UI/Local Playlist Logic ---
@@ -269,10 +268,10 @@ namespace RemoteClient.Forms.Panels
         private void methodFunction_selectPlaylist(int playlistID)
         {
             Color selected = SystemColors.ActiveBorder;
-            Color notSelected = Button.DefaultBackColor;
+            Color notSelected = DefaultBackColor;
 
             // Set selected playlist
-            mapInstance!.SelectedPlaylist = playlistID;
+            mapInstance.SelectedPlaylist = playlistID;
 
             // Update button colors
             btn_loadPlaylist1.BackColor = playlistID == 1 ? selected : notSelected;
@@ -335,7 +334,7 @@ namespace RemoteClient.Forms.Panels
                 return;
             }
 
-            if(mapInstance.ActivePlaylist == _selectedPlaylist && theInstance!.instanceStatus != InstanceStatus.OFFLINE)
+            if(mapInstance.ActivePlaylist == _selectedPlaylist && theInstance.instanceStatus != InstanceStatus.OFFLINE)
             {
                 DialogResult result2 = MessageBox.Show(
                     "This is the active playlist. Updating will update the game-server too, continue?",
@@ -376,11 +375,11 @@ namespace RemoteClient.Forms.Panels
                 MessageBox.Show("Failed to export playlist.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            using var saveDialog = new SaveFileDialog
-            {
-                Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*",
-                FileName = $"Playlist_{_selectedPlaylist}_{DateTime.Now:yyyyMMdd_HHmmss}.json"
-            };
+
+            using var saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+            saveDialog.FileName = $"Playlist_{_selectedPlaylist}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            
             if (saveDialog.ShowDialog() == DialogResult.OK)
             {
                 var json = System.Text.Json.JsonSerializer.Serialize(playlist, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
@@ -424,7 +423,7 @@ namespace RemoteClient.Forms.Panels
                         }
 
                         if (!int.TryParse(parts[0], out int mapType)) { skippedCount++; continue; }
-                        if (!int.TryParse(parts[1], out int modType)) { skippedCount++; continue; }
+                        if (!int.TryParse(parts[1], out int _)) { skippedCount++; continue; }
                         string fileName = parts[2].Trim();
 
                         // Try to find in default or custom maps
@@ -540,7 +539,7 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         public void UpdateCurrentMapHighlighting()
         {
-            if(theInstance!.instanceStatus == InstanceStatus.OFFLINE)
+            if(theInstance.instanceStatus == InstanceStatus.OFFLINE)
                 return;
 
             if (dataGridView_currentMaps.Rows.Count == 0)
@@ -560,13 +559,13 @@ namespace RemoteClient.Forms.Panels
             int nextMap = mapInstance.CurrentMapIndex + 1;
 
 
-            if(theInstance!.gameLoopMaps != 2) {
+            if(theInstance.gameLoopMaps != 2) {
 
                 dataGridView_currentMaps.Rows[currentMap].DefaultCellStyle.BackColor = Color.LightYellow;
 				return;
             }
 
-            if (theInstance?.instanceStatus is InstanceStatus.ONLINE or InstanceStatus.STARTDELAY ) {
+            if (theInstance.instanceStatus is InstanceStatus.ONLINE or InstanceStatus.STARTDELAY ) {
                 
 				// If the current map and next map are the same, highlight in light yellow to indicate loading/playing
                 if (currentMap == nextMap)

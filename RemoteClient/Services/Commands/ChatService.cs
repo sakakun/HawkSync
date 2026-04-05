@@ -2,10 +2,7 @@
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
-using System;
-using System.Collections.Generic;
 using System.Net.Http.Json;
-using System.Text;
 
 namespace RemoteClient.Services.Commands;
 

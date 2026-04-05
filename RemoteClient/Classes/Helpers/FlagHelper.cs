@@ -1,12 +1,6 @@
-using System;
-using System.Drawing;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using HawkSyncShared.SupportClasses;
-using Microsoft.Extensions.Logging;
 
 namespace RemoteClient.Classes.Helpers
 {

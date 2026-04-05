@@ -648,7 +648,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                     if (fileMatch && titleMatch)
                     {
                         theInstance.instanceAttachedPID = searchProcess.Id;
-                        theInstance.instanceProcessHandle = searchProcess.Handle;
 
                         SetProcessWindowTitle(searchProcess, windowTitle);
 
@@ -725,7 +724,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 // Set MaxWorkingSet and instanceAttachedPID directly from the started process
                 process.MaxWorkingSet = new nint(0x7fffffff);
                 theInstance.instanceAttachedPID = process.Id;
-                theInstance.instanceProcessHandle = process.Handle;
 
                 SetProcessWindowTitle(process, windowTitle);
 
@@ -737,9 +735,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 MessageBox.Show("Error starting game: " + ex.Message, "Start Game Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
             }
-
-            // Game Didn't Crash Yay!  Dump Data to the Instance
-            theInstance.instanceCrashCounter = 0;
 
             // Wait for the Game to Start
             Thread.Sleep(10000);

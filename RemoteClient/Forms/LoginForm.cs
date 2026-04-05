@@ -1,9 +1,10 @@
 using RemoteClient.Services;
 using HawkSyncShared.DTOs.API;
+using HawkSyncShared.SupportClasses;
 
 namespace RemoteClient.Forms;
 
-public partial class LoginForm : Form
+public partial class LoginForm
 {
     private ApiClient? _apiClient;
 
@@ -129,13 +130,17 @@ public partial class LoginForm : Form
                     txtServerUrl.Text = lines[0];
                     chkRememberServer.Checked = true;
                 }
+
                 if (lines.Length >= 2)
                 {
                     txtUsername.Text = lines[1];
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            AppDebug.Log("Error Occured", AppDebug.LogLevel.Error, ex);
+        }
     }
 
     private void SaveSettings(string serverUrl, string username)
@@ -146,7 +151,10 @@ public partial class LoginForm : Form
             Directory.CreateDirectory(Path.GetDirectoryName(settingsPath)!);
             File.WriteAllLines(settingsPath, new[] { serverUrl, username });
         }
-        catch { }
+        catch (Exception ex)
+        {
+            AppDebug.Log("Error Occured", AppDebug.LogLevel.Error, ex);
+        }
     }
 
     private static string GetSettingsFilePath()

@@ -1,7 +1,8 @@
-using System;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
+namespace HawkSyncShared.SupportClasses;
 
 public class IPConvert : JsonConverter<IPAddress>
 {

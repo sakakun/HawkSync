@@ -1,12 +1,9 @@
 ﻿using BHD_ServerManager.Classes.GameManagement;
 using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
-using HawkSyncShared.SupportClasses;
-using System.ComponentModel;
 using System.Diagnostics;
 
 namespace BHD_ServerManager.Classes.Tickers
@@ -18,12 +15,13 @@ namespace BHD_ServerManager.Classes.Tickers
         private static theInstance          theInstance     => CommonCore.theInstance!;
         private static mapInstance          mapInstance     => CommonCore.instanceMaps!;
         private static chatInstance         chatInstance    => CommonCore.instanceChat!;
+        // ReSharper disable once UnusedMember.Local
         private static banInstance          banInstance     => CommonCore.instanceBans!;
         private static statInstance         statsInstance   => CommonCore.instanceStats!;
         private static playerInstance       playerInstance  => CommonCore.instancePlayers!;
 
         // Lock for thread safety (if needed for shared resources)
-        private static int isTickerRunning = 0;
+        private static int isTickerRunning;
 
         // Runtime state for lobby server heartbeats
         private static readonly Dictionary<int, DateTime> lobbyServerHeartbeatTimes = new();
@@ -66,7 +64,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     // If the server is offline, we can skip the rest of the processing
                     theInstance.instanceNextUpdateTime = currentTime.AddSeconds(5);
-                    theInstance.instanceLastUpdateTime = currentTime;
                     return;
                 }
 
@@ -79,7 +76,6 @@ namespace BHD_ServerManager.Classes.Tickers
                     ServerMemory.ReadMemoryCurrentMissionName();                        // Get Current Mission Name
                     ServerMemory.ReadMemoryCurrentGameType();                           // Get Current Game Type
                     ServerMemory.ReadMemoryCurrentNumPlayers();                         // Get Current Number of Players
-                    ServerMemory.ReadMapCycleCounter();                                 // Map Cycle Counter (How Maps Have Been Played)
                     ServerMemory.ReadMemoryCurrentMapIndex();                           // Read current map index
                     // Score Reading
                     ServerMemory.ReadMemoryCurrentGameWinConditions();                  // Read Current Game Win Conditions
@@ -91,7 +87,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 if (theInstance.instanceStatus == InstanceStatus.LOADINGMAP)
                 {
 					theInstance.instanceScoringProcRun = true;
-                    theInstance.instanceCrashCounter = 0;                               // Reset crash counter
                     tickerEvent_preGameProcessing();                                    // Run pre-game processing
                     ServerMemory.UpdatePlayerTeam();                                    // Move players to their teams if applicable
                 }
@@ -136,7 +131,6 @@ namespace BHD_ServerManager.Classes.Tickers
                 }
 
                 theInstance.instanceNextUpdateTime = currentTime.AddSeconds(1);
-                theInstance.instanceLastUpdateTime = currentTime;
             } 
             finally
             {
@@ -154,7 +148,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 
                 // Resets
                 chatInstance.AutoMessageCounter = 0;
-                chatInstance.ChatLog?.Clear();
+                chatInstance.ChatLog.Clear();
                 playerInstance.PlayerList.Clear();
                 statsInstanceManager.ResetPlayerStats();
 
@@ -278,7 +272,7 @@ namespace BHD_ServerManager.Classes.Tickers
                 {
                     lobbyServerHeartbeatTimes[server.LobbyServerID] = now;
                     LobbyServerSettings serverCopy = server;
-                    Task.Run(() => BHD_ServerManager.Classes.Helpers.LobbyReportHelper.SendHeartbeat(
+                    Task.Run(() => Helpers.LobbyReportHelper.SendHeartbeat(
                         uriString: serverCopy.ServerUri,
                         SKey: serverCopy.SecretKey,
                         reportPort: serverCopy.GamePort.ToString()

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Timer = System.Timers.Timer;
+﻿using Timer = System.Timers.Timer;
 
 namespace HawkSyncShared.SupportClasses
 {

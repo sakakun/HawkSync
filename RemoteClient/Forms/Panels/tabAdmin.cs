@@ -1,12 +1,7 @@
-﻿using FontAwesome.Sharp;
-using HawkSyncShared;
+﻿using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabAdmin;
-using HawkSyncShared.SupportClasses;
 using RemoteClient.Core;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
 
 namespace RemoteClient.Forms.Panels;
 
@@ -17,14 +12,11 @@ public partial class tabAdmin : UserControl
     // ================================================================================
 
     private int _selectedUserID = -1;
-    private bool _isEditMode = false;
-
-    // Add these fields to your class
-    private DateTime _lastUserListRefresh = DateTime.MinValue;
-    private const int UserListRefreshIntervalSeconds = 10;
+    private bool _isEditMode;
+    
     // Add this field to your class to persist the last selected user ID
-    private int? _lastSelectedUserId = null;
-    private int _lastScrollIndex = 0;
+    private int? _lastSelectedUserId;
+    private int _lastScrollIndex;
 
     private enum FormMode
     {
@@ -70,7 +62,7 @@ public partial class tabAdmin : UserControl
     {
         if(InvokeRequired)
         {
-            Invoke(new Action(() => OnSnapshotReceived(snapshot)));
+            Invoke(() => OnSnapshotReceived(snapshot));
             return;
         }
 
@@ -111,7 +103,7 @@ public partial class tabAdmin : UserControl
 
         // Build a lookup for quick access
         var userDict = users.ToDictionary(u => u.UserID);
-        var onlineUsers = new HashSet<string>(CommonCore.instanceAdmin!.ActiveSessions.Keys, StringComparer.OrdinalIgnoreCase);
+        var onlineUsers = new HashSet<string>(CommonCore.instanceAdmin.ActiveSessions.Keys, StringComparer.OrdinalIgnoreCase);
 
         // Track which user IDs are present in the grid
         var gridUserIds = new HashSet<int>();

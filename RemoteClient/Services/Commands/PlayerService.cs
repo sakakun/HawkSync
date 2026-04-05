@@ -1,10 +1,6 @@
 ﻿using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 
 namespace RemoteClient.Services.Commands;
 

@@ -13,8 +13,8 @@ namespace RemoteClient.Forms.Panels
 {
     public partial class tabBans : UserControl
     {
-        private theInstance? theInstance => CommonCore.theInstance;
-        private banInstance? banInstance => CommonCore.instanceBans;
+        private theInstance theInstance => CommonCore.theInstance!;
+        private banInstance banInstance => CommonCore.instanceBans!;
 
         public tabBans()
         {
@@ -49,17 +49,17 @@ namespace RemoteClient.Forms.Panels
         private void UpdateUIElements()
         {
             // Update Blacklist and Whitelist UI
-            UpdateNameListUI(dgPlayerNamesBlacklist, banInstance!.BannedPlayerNames, tabBlacklist);
-            UpdateNameListUI(dgPlayerNamesWhitelist, banInstance!.WhitelistedNames, tabWhitelist);
-            UpdateIPListUI(dgPlayerAddressBlacklist, banInstance!.BannedPlayerIPs, tabBlacklist);
-            UpdateIPListUI(dgPlayerAddressWhitelist, banInstance!.WhitelistedIPs, tabWhitelist);
+            UpdateNameListUI(dgPlayerNamesBlacklist, banInstance.BannedPlayerNames, tabBlacklist);
+            UpdateNameListUI(dgPlayerNamesWhitelist, banInstance.WhitelistedNames, tabWhitelist);
+            UpdateIPListUI(dgPlayerAddressBlacklist, banInstance.BannedPlayerIPs, tabBlacklist);
+            UpdateIPListUI(dgPlayerAddressWhitelist, banInstance.WhitelistedIPs, tabWhitelist);
 
             // Update Country Proxy Block List UI
             UpdateProxyCountryBlockListUI();
             // Netlimiter Connection Log UI
             UpdateNetLimiterConnectionLogUI();
             // Proxy Settings UI
-            ProxyCheck_LoadSettings(null!, null!);
+            ProxyCheck_LoadSettings();
             LoadProxyBlockedCountries();
             // Netlimiter Settings UI
             NetLimiter_LoadSettings();
@@ -68,10 +68,10 @@ namespace RemoteClient.Forms.Panels
 
         private void UpdateNameListUI(DataGridView grid, List<banInstancePlayerName> nameList, TabPage tab)
         {
-            if (banControls.SelectedTab != tab || !tab.Visible || nameList == null)
+            if (banControls.SelectedTab != tab || !tab.Visible)
                 return;
 
-            if (banInstance!.ForceUIUpdates) { grid.Rows.Clear(); }
+            if (banInstance.ForceUIUpdates) { grid.Rows.Clear(); }
 
             var recordDict = nameList.ToDictionary(n => n.RecordID);
 
@@ -115,10 +115,10 @@ namespace RemoteClient.Forms.Panels
 
         private void UpdateIPListUI(DataGridView grid, List<banInstancePlayerIP> ipList, TabPage tab)
         {
-            if (banControls.SelectedTab != tab || !tab.Visible || ipList == null)
+            if (banControls.SelectedTab != tab || !tab.Visible)
                 return;
 
-            if (banInstance!.ForceUIUpdates) { grid.Rows.Clear(); }
+            if (banInstance.ForceUIUpdates) { grid.Rows.Clear(); }
 
             var recordDict = ipList.ToDictionary(ip => ip.RecordID);
 
@@ -139,7 +139,7 @@ namespace RemoteClient.Forms.Panels
                     presentRecordIDs.Add(recordID);
 
                     if (!Equals(row.Cells[1].Value, record.PlayerIP.ToString()))
-                        row.Cells[1].Value = record.PlayerIP.ToString() + "/" + record.SubnetMask;
+                        row.Cells[1].Value = record.PlayerIP + "/" + record.SubnetMask;
                     var dateStr = record.Date.ToString("yyyy-MM-dd");
                     if (!Equals(row.Cells[2].Value, dateStr))
                         row.Cells[2].Value = dateStr;
@@ -153,7 +153,7 @@ namespace RemoteClient.Forms.Panels
                 {
                     grid.Rows.Add(
                         record.RecordID,
-                        record.PlayerIP.ToString() + "/" + record.SubnetMask,
+                        record.PlayerIP + "/" + record.SubnetMask,
                         record.Date.ToString("yyyy-MM-dd")
                     );
                 }
@@ -165,9 +165,7 @@ namespace RemoteClient.Forms.Panels
             // Only update UI if the Proxy Checking tab is currently selected and visible
             if (banControls.SelectedTab != tabProxyChecking || !tabProxyChecking.Visible)
                 return;
-
-            if (banInstance == null || banInstance.ProxyBlockedCountries == null) return;
-
+            
             // Build a HashSet of current RecordIDs in the ProxyBlockedCountries list
             HashSet<int> currentRecordIDs = banInstance.ProxyBlockedCountries.Select(c => c.RecordID).ToHashSet();
 
@@ -210,16 +208,12 @@ namespace RemoteClient.Forms.Panels
             // Only update UI if the Netlimiter tab is currently selected and visible
             if (banControls.SelectedTab != tabNetlimiter || !tabNetlimiter.Visible)
                 return;
-
-            if (banInstance == null || banInstance.NetLimiterConnectionLogs == null)
-                return;
-
+            
             try
             {
                 // Create a dictionary of new data keyed by IP address for quick lookup
                 var connectionDict = banInstance.NetLimiterConnectionLogs
-                    .Where(c => c != null)
-                    .ToDictionary(c => c.NL_ipAddress ?? string.Empty, c => c);
+                    .ToDictionary(c => c.NL_ipAddress, c => c);
 
                 // Track which rows to remove
                 var rowsToRemove = new List<DataGridViewRow>();
@@ -236,8 +230,8 @@ namespace RemoteClient.Forms.Panels
                         // Update existing row
                         row.Cells[0].Value = conn.NL_rowID;
                         row.Cells[2].Value = conn.NL_numCons;
-                        row.Cells[3].Value = conn.NL_vpnStatus ?? string.Empty;
-                        row.Cells[4].Value = conn.NL_notes ?? string.Empty;
+                        row.Cells[3].Value = conn.NL_vpnStatus;
+                        row.Cells[4].Value = conn.NL_notes;
 
                         // Remove from dictionary so we know it's been processed
                         connectionDict.Remove(existingIp);
@@ -260,10 +254,10 @@ namespace RemoteClient.Forms.Panels
                 {
                     dg_NetlimiterConnectionLog.Rows.Add(
                         conn.NL_rowID,
-                        conn.NL_ipAddress ?? string.Empty,
+                        conn.NL_ipAddress,
                         conn.NL_numCons,
-                        conn.NL_vpnStatus ?? string.Empty,
-                        conn.NL_notes ?? string.Empty
+                        conn.NL_vpnStatus,
+                        conn.NL_notes
                     );
                 }
             }
@@ -277,7 +271,7 @@ namespace RemoteClient.Forms.Panels
 
         private void RefreshBlacklistWhitelist(object sender, EventArgs e)
         {
-            banInstance!.ForceUIUpdates = true;
+            banInstance.ForceUIUpdates = true;
             UpdateUIElements();
         }
 
@@ -395,7 +389,7 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         private void Blacklist_NameGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0 || banInstance == null)
+            if (e.RowIndex < 0)
                 return;
 
             var recordID = (int)dgPlayerNamesBlacklist.Rows[e.RowIndex].Cells[0].Value!;
@@ -411,7 +405,7 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         private void Blacklist_IPGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0 || banInstance == null)
+            if (e.RowIndex < 0)
                 return;
 
             var recordID = (int)dgPlayerAddressBlacklist.Rows[e.RowIndex].Cells[0].Value!;
@@ -427,8 +421,6 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         private void LoadBlacklistRecordForEditing(banInstancePlayerName? nameRecord, banInstancePlayerIP? ipRecord)
         {
-            if (banInstance == null)
-                return;
 
             // Set selected record IDs
             _blacklistSelectedRecordIDName = nameRecord?.RecordID ?? -1;
@@ -474,10 +466,7 @@ namespace RemoteClient.Forms.Panels
                 blacklist_IPAddressTxt.Text = string.Empty;
                 blacklist_IPSubnetTxt.Text = "32";
             }
-
-            // Load common data (use nameRecord first, fallback to ipRecord)
-            var dataRecord = nameRecord ?? (object?)ipRecord;
-
+            
             if (nameRecord != null)
             {
                 blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
@@ -534,8 +523,6 @@ namespace RemoteClient.Forms.Panels
         }
         private async void Blacklist_Save_Click(object sender, EventArgs e)
         {
-            if (banInstance == null)
-                return;
 
             // Gather form data
             var recordType = blacklist_PermBan.Checked
@@ -553,12 +540,12 @@ namespace RemoteClient.Forms.Panels
             bool isIPVisible = blacklist_IPAddress.Visible && !string.IsNullOrWhiteSpace(blacklist_IPAddressTxt.Text);
 
             // Parse IP if needed
-            IPAddress? ipAddress = null;
             int subnetMask = 32;
 
             if (isIPVisible)
             {
-                if (!IPAddress.TryParse(blacklist_IPAddressTxt.Text.Trim(), out ipAddress))
+                bool isIPAddress = IPAddress.TryParse(blacklist_IPAddressTxt.Text.Trim(), out _);
+                if (!isIPAddress)
                 {
                     MessageBox.Show("Invalid IP Address format.", "Validation Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -691,8 +678,6 @@ namespace RemoteClient.Forms.Panels
         }
         private async void blacklist_btnDelete_Click(object sender, EventArgs e)
         {
-            if (banInstance == null)
-                return;
 
             bool hasName = _blacklistSelectedRecordIDName != -1;
             bool hasIP = _blacklistSelectedRecordIDIP != -1;
@@ -803,11 +788,6 @@ namespace RemoteClient.Forms.Panels
         // Add this method to your tabBans class
         private void ExportBlacklistToJson(string filePath)
         {
-            if (banInstance == null)
-            {
-                MessageBox.Show("No ban data available to export.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
             var exportData = new BlacklistImportModel();
             exportData.BannedPlayerIPs = banInstance.BannedPlayerIPs;
@@ -848,12 +828,10 @@ namespace RemoteClient.Forms.Panels
                     if (firstLine.Equals("[IpAddresses]", StringComparison.OrdinalIgnoreCase))
                     {
                         await ImportLegacyBannedIps(filePath);
-                        return;
                     }
                     else if (firstLine.Equals("[Players]", StringComparison.OrdinalIgnoreCase))
                     {
                         await ImportLegacyBannedNames(filePath);
-                        return;
                     }
                     else
                     {
@@ -1207,7 +1185,7 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         private void Whitelist_NameGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0 || banInstance == null)
+            if (e.RowIndex < 0)
                 return;
 
             var recordID = (int)dgPlayerNamesWhitelist.Rows[e.RowIndex].Cells[0].Value!;
@@ -1223,7 +1201,7 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         private void Whitelist_IPGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0 || banInstance == null)
+            if (e.RowIndex < 0)
                 return;
 
             var recordID = (int)dgPlayerAddressWhitelist.Rows[e.RowIndex].Cells[0].Value!;
@@ -1239,8 +1217,6 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         private void LoadWhitelistRecordForEditing(banInstancePlayerName? nameRecord, banInstancePlayerIP? ipRecord)
         {
-            if (banInstance == null)
-                return;
 
             // Set selected record IDs
             _whitelistSelectedRecordIDName = nameRecord?.RecordID ?? -1;
@@ -1286,10 +1262,7 @@ namespace RemoteClient.Forms.Panels
                 textBox_addressWL.Text = string.Empty;
                 cb_subnetWL.Text = "32";
             }
-
-            // Load common data (use nameRecord first, fallback to ipRecord)
-            var dataRecord = nameRecord ?? (object?)ipRecord;
-
+            
             if (nameRecord != null)
             {
                 dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
@@ -1346,8 +1319,6 @@ namespace RemoteClient.Forms.Panels
         }
         private async void Whitelist_Save_Click(object sender, EventArgs e)
         {
-            if (banInstance == null)
-                return;
 
             var recordType = checkBox_permWL.Checked
                 ? banInstanceRecordType.Permanent
@@ -1363,12 +1334,11 @@ namespace RemoteClient.Forms.Panels
             bool isNameVisible = groupBox10.Visible && !string.IsNullOrWhiteSpace(textBox_playerNameWL.Text);
             bool isIPVisible = groupBox9.Visible && !string.IsNullOrWhiteSpace(textBox_addressWL.Text);
 
-            IPAddress? ipAddress = null;
             int subnetMask = 32;
 
             if (isIPVisible)
             {
-                if (!IPAddress.TryParse(textBox_addressWL.Text.Trim(), out ipAddress))
+                if (!IPAddress.TryParse(textBox_addressWL.Text.Trim(), out _))
                 {
                     MessageBox.Show("Invalid IP Address format.", "Validation Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1502,8 +1472,6 @@ namespace RemoteClient.Forms.Panels
         }
         private async void wlControlDelete_Click(object sender, EventArgs e)
         {
-            if (banInstance == null)
-                return;
 
             bool hasName = _whitelistSelectedRecordIDName != -1;
             bool hasIP = _whitelistSelectedRecordIDIP != -1;
@@ -1607,11 +1575,6 @@ namespace RemoteClient.Forms.Panels
 
         private void ExportWhitelistToJson(string filePath)
         {
-            if (banInstance == null)
-            {
-                MessageBox.Show("No whitelist data available to export.", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
             var exportData = new BlacklistImportModel
             {
@@ -1772,8 +1735,8 @@ namespace RemoteClient.Forms.Panels
         // ================================================================================
 
         // Add these fields to your class
-        private bool _isEditingProxyCheck = false;
-        private bool _suppressProxyCheckChangeTracking = false;
+        private bool _isEditingProxyCheck;
+        private bool _suppressProxyCheckChangeTracking;
         private DateTime _lastProxyCheckEditTime = DateTime.MinValue;
         private System.Windows.Forms.Timer? _proxyCheckInactivityTimer;
         private const int PROXYCHECK_INACTIVITY_TIMEOUT_SECONDS = 120;
@@ -1798,7 +1761,7 @@ namespace RemoteClient.Forms.Panels
             if ((DateTime.Now - _lastProxyCheckEditTime).TotalSeconds >= PROXYCHECK_INACTIVITY_TIMEOUT_SECONDS)
             {
                 _isEditingProxyCheck = false;
-                ProxyCheck_LoadSettings(null!, null!);
+                ProxyCheck_LoadSettings();
                 // Optionally, show a message to the user
                 MessageBox.Show(
                     "ProxyCheck settings refreshed due to inactivity.\nAny unsaved changes were discarded.",
@@ -1848,7 +1811,7 @@ namespace RemoteClient.Forms.Panels
         }
 
         // Update ProxyCheck_LoadSettings to respect editing state
-        private void ProxyCheck_LoadSettings(object sender, EventArgs e)
+        private void ProxyCheck_LoadSettings()
         {
             if (_isEditingProxyCheck)
                 return;
@@ -1856,8 +1819,6 @@ namespace RemoteClient.Forms.Panels
             _suppressProxyCheckChangeTracking = true;
             try
             {
-                if (theInstance == null)
-                    return;
 
                 cb_enableProxyCheck.Checked = theInstance.proxyCheckEnabled;
                 textBox_ProxyAPIKey.Text = theInstance.proxyCheckAPIKey;
@@ -1951,7 +1912,7 @@ namespace RemoteClient.Forms.Panels
                     _isEditingProxyCheck = false;
                     MessageBox.Show("ProxyCheck settings saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     // Optionally reload settings/UI here
-                    ProxyCheck_LoadSettings(sender, e);
+                    ProxyCheck_LoadSettings();
                 }
                 else
                 {
@@ -1971,7 +1932,7 @@ namespace RemoteClient.Forms.Panels
             _lastProxyCheckEditTime = DateTime.MinValue;
 
             // Reload settings from the server instance
-            ProxyCheck_LoadSettings(sender, e);
+            ProxyCheck_LoadSettings();
 
             // Optionally, notify the user
             MessageBox.Show(
@@ -1986,8 +1947,6 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         private void LoadProxyBlockedCountries()
         {
-            if (banInstance == null)
-                return;
 
             var countries = banInstance.ProxyBlockedCountries;
             var countryDict = countries.ToDictionary(c => c.RecordID);
@@ -2185,8 +2144,8 @@ namespace RemoteClient.Forms.Panels
         // ================================================================================
 
         // Add these fields to your class
-        private bool _isEditingNetLimiter = false;
-        private bool _suppressNetLimiterChangeTracking = false;
+        private bool _isEditingNetLimiter;
+        private bool _suppressNetLimiterChangeTracking;
         private DateTime _lastNetLimiterEditTime = DateTime.MinValue;
         private System.Windows.Forms.Timer? _netLimiterInactivityTimer;
         private const int NETLIMITER_INACTIVITY_TIMEOUT_SECONDS = 120;
@@ -2254,8 +2213,6 @@ namespace RemoteClient.Forms.Panels
             _suppressNetLimiterChangeTracking = true;
             try
             {
-                if (theInstance == null)
-                    return;
 
                 checkBox_EnableNetLimiter.Checked = theInstance.netLimiterEnabled;
                 textBox_NetLimiterHost.Text = theInstance.netLimiterHost;
@@ -2274,8 +2231,7 @@ namespace RemoteClient.Forms.Panels
 
         private async void NetLimiter_SaveSettings(object sender, EventArgs e)
         {
-            if (theInstance == null)
-                return;
+
             var settings = new NetLimiterSettingsRequest
             {
                 NetLimiterEnabled = checkBox_EnableNetLimiter.Checked,
@@ -2327,7 +2283,7 @@ namespace RemoteClient.Forms.Panels
         {
             var (success, filters, errorMessage) = await ApiCore.ApiClient!.Ban.GetNetLimiterFiltersAsync();
 
-            if (!success || filters == null || filters.Count == 0)
+            if (!success || filters.Count == 0)
             {
                 MessageBox.Show(errorMessage ?? "No filters were retrieved from NetLimiter.",
                     "No Filters Found",

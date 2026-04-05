@@ -4,7 +4,6 @@ using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
-using RemoteClient.Forms.SubPanels;
 using System.Net.Http.Json;
 
 namespace RemoteClient.Forms.Panels;
@@ -17,8 +16,8 @@ public partial class tabProfile : UserControl
 	// EDIT MODE TRACKING
 	// ================================================================================
 
-	private bool _isEditing = false;
-    private bool _suppressChangeTracking = false;
+	private bool _isEditing;
+    private bool _suppressChangeTracking;
     private DateTime _lastEditTime = DateTime.MinValue;
     private System.Windows.Forms.Timer? _inactivityTimer;
     private const int INACTIVITY_TIMEOUT_SECONDS = 120; // 2 minutes
@@ -154,10 +153,6 @@ public partial class tabProfile : UserControl
     {
         if (_isEditing)
         {
-            // Calculate time until auto-refresh
-            int secondsRemaining = INACTIVITY_TIMEOUT_SECONDS -
-                (int)(DateTime.Now - _lastEditTime).TotalSeconds;
-
             // Change save button appearance
             btn_saveProfile.BackColor = Color.Orange;
             btn_saveProfile.Text = $"Save";
@@ -165,7 +160,7 @@ public partial class tabProfile : UserControl
         else
         {
             // Reset background
-            this.BackColor = SystemColors.Control;
+            BackColor = SystemColors.Control;
 
             // Reset save button
             btn_saveProfile.BackColor = SystemColors.Control;
@@ -192,7 +187,7 @@ public partial class tabProfile : UserControl
         }
         // else: User is editing - don't overwrite their changes
 
-        bool currentState = (theInstance!.instanceStatus == InstanceStatus.OFFLINE);
+        bool currentState = (theInstance.instanceStatus == InstanceStatus.OFFLINE);
 
         // Enable/disable profile controls based on server status
         btn_profileBrowse1.Enabled = currentState;
@@ -347,7 +342,7 @@ public partial class tabProfile : UserControl
         try
         {
             // File Path Textbox Fields
-            tb_profileServerPath.Text = theInstance!.profileServerPath;
+            tb_profileServerPath.Text = theInstance.profileServerPath;
             tb_modFile.Text = theInstance.profileModFileName;
 
             // Host Information
@@ -483,7 +478,7 @@ public partial class tabProfile : UserControl
 		{
 			Interval = 500 // 500ms debounce
 		};
-		_auditFilterTimer.Tick += (s, e) =>
+		_auditFilterTimer.Tick += (_, _) =>
 		{
 			_auditFilterTimer.Stop();
 			LoadAuditLogs();
@@ -527,7 +522,7 @@ public partial class tabProfile : UserControl
 				Limit = 500
 			};
 
-			Console.WriteLine($"[tabProfile] Fetching audit logs - Category: {_currentCategoryFilter}, User: {_currentUserFilter ?? "All"}");
+			Console.WriteLine($"[tabProfile] Fetching audit logs - Category: {_currentCategoryFilter}, User: {_currentUserFilter}");
 
 			// Call API using HttpClient
 			var httpResponse = await ApiCore.ApiClient._httpClient.PostAsJsonAsync("/api/audit/logs", request);

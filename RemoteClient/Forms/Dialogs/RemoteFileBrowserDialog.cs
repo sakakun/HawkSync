@@ -3,7 +3,7 @@ using RemoteClient.Core;
 
 namespace RemoteClient.Forms.Dialogs;
 
-public partial class RemoteFileBrowserDialog : Form
+public class RemoteFileBrowserDialog : Form
 {
     private string _currentPath = string.Empty;
     private string? _selectedPath;

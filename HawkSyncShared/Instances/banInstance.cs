@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
+using HawkSyncShared.SupportClasses;
 
 namespace HawkSyncShared.Instances
 {

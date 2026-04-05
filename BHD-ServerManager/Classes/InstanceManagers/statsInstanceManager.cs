@@ -275,19 +275,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         // --- Other business logic and network methods remain unchanged ---
         // (GeneratePlayerStatLine, GenerateWeaponStatLines, GenerateUpdateData, GenerateReportData, ResetPlayerStats, SendImportData, SendUpdateData, SendReportData, TestBabstatsConnectionAsync, SendBabstatsData, AddStatsLogRowSafe)
 
-        public static string GenerateImportData()
-        {
-            string importData = string.Empty;
-            importData += "ServerID " + theInstance.WebStatsProfileID + "\n";
-            importData += GenerateGameLine() + "\n";
-            foreach (var playerStat in instanceStats.playerStatsList.Values)
-            {
-                importData += GeneratePlayerLines(playerStat);
-            }
-            importData += "\n\n\n\n";
-            return importData;
-        }
-
         public static string GenerateImportData(BabstatsServerSettings server)
         {
             ArgumentNullException.ThrowIfNull(server);
@@ -321,7 +308,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             string maxplayers = theInstance.gameMaxSlots.ToString() ?? "0";
             string numplayers = playerInstance.PlayerList?.Count.ToString() ?? "0";
             string winner = theInstance.gameMatchWinner.ToString();
-            string mod = (theInstance.profileServerType == 0) ? "7" : "8";
+            string mod = "7";  // 7 = BHD, 8 = BHDTS
 
             string gameLine = string.Empty;
             if (theInstance.instanceStatus == InstanceStatus.SCORING)
@@ -388,22 +375,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                 WeaponStatLines += "   Weapon " + weaponStat.WeaponID + " " + weaponStat.TimeUsed + " " + weaponStat.Kills + " " + weaponStat.Shots + "\n";
             }
             return WeaponStatLines;
-        }
-
-        public static string GenerateUpdateData()
-        {
-            string updateData = string.Empty;
-            updateData += "ServerID " + theInstance.WebStatsProfileID + "\n";
-            updateData += GenerateGameLine() + "\n";
-            foreach (var playerStat in instanceStats.playerStatsList.Values)
-            {
-                PlayerObject Player = playerStat.PlayerStatsCurrent;
-                updateData += "  Player " + Player.PlayerName + "\n";
-                updateData += "   PlayerStats " + Player.PlayerTimePlayed + " " + Player.PlayerTeam + " " + Player.SelectedWeaponID + "\n";
-                updateData += "\n";
-            }
-            updateData += "End\n\n\n\n";
-            return updateData;
         }
 
         public static string GenerateUpdateData(BabstatsServerSettings server)

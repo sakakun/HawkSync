@@ -1,22 +1,7 @@
 ﻿using HawkSyncShared.DTOs.API;
-using HawkSyncShared.DTOs.tabAdmin;
-using HawkSyncShared.DTOs.tabBans;
-using HawkSyncShared.DTOs.tabBans.Service;
-using HawkSyncShared.DTOs.tabGameplay;
-using HawkSyncShared.DTOs.tabMaps;
-using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.DTOs.tabProfile;
-using HawkSyncShared.DTOs.tabStats;
-using HawkSyncShared.SupportClasses;
-using RemoteClient.Services.Commands;
-using System;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Cryptography;
-using System.Threading.Channels;
-using System.Windows.Forms;
-using Windows.Gaming.Input;
-using Windows.Services.Maps;
 namespace RemoteClient.Services.Commands;
 
 public class FileSystemService

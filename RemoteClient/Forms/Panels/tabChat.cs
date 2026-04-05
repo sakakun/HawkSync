@@ -2,15 +2,6 @@
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace RemoteClient.Forms.Panels
 {
@@ -32,7 +23,7 @@ namespace RemoteClient.Forms.Panels
             dataGridView_chatMessages.Scroll += dataGridView_chatMessages_Scroll;
 
             // Wire up Enter key for chat message send
-            tb_chatMessage.KeyDown += (s, e) =>
+            tb_chatMessage.KeyDown += (_, e) =>
             {
                 if (e.KeyCode == Keys.Enter)
                 {
@@ -42,7 +33,7 @@ namespace RemoteClient.Forms.Panels
             };
 
             // Wire up Enter key for auto message add
-            tb_autoMessage.KeyDown += (s, e) =>
+            tb_autoMessage.KeyDown += (_, e) =>
             {
                 if (e.KeyCode == Keys.Enter)
                 {
@@ -52,7 +43,7 @@ namespace RemoteClient.Forms.Panels
             };
 
             // Wire up Enter key for slap message add
-            tb_slapMessage.KeyDown += (s, e) =>
+            tb_slapMessage.KeyDown += (_, e) =>
             {
                 if (e.KeyCode == Keys.Enter)
                 {
@@ -100,14 +91,14 @@ namespace RemoteClient.Forms.Panels
         /// </summary>
         public void functionEvent_UpdateSlapMessages()
         {
-            var slapMessages = CommonCore.instanceChat!.SlapMessages;
+
             var dgv = dg_slapMessages;
 
             // Preserve scroll position
             int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
 
             // Build lookup for fast access
-            var managerDict = slapMessages.ToDictionary(x => x.SlapMessageId);
+            var managerDict = CommonCore.instanceChat!.SlapMessages.ToDictionary(x => x.SlapMessageId);
 
             // Remove rows not in manager
             for (int i = dgv.Rows.Count - 1; i >= 0; i--)
@@ -118,7 +109,7 @@ namespace RemoteClient.Forms.Panels
             }
 
             // Update existing rows and add new ones
-            foreach (var msg in slapMessages)
+            foreach (var msg in CommonCore.instanceChat.SlapMessages)
             {
                 bool found = false;
                 for (int i = 0; i < dgv.Rows.Count; i++)

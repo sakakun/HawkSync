@@ -1,21 +1,18 @@
-﻿using System.Windows.Documents;
+﻿namespace RemoteClient.Forms.SubPanels;
 
-namespace RemoteClient.Forms.SubPanels;
-using RemoteClient.Core;
+using Core;
 using Classes.Helpers;
-
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
-
 using System.Net;
 using System.Text;
 using System.ComponentModel;
 
 public partial class PlayerCardV2 : UserControl
 {
-    private int _playerSlot = 0;
+    private int _playerSlot;
 
     private PlayerObject                playerData      { get; set; } = new PlayerObject();
     private string                      CountryCode     { get; set; } = string.Empty;
@@ -56,6 +53,29 @@ public partial class PlayerCardV2 : UserControl
         CommonCore.Ticker!.Start($"Ticker_{Name}", 1000, PlayerCardTicker);
     }
     
+    private void RunSafe(Func<Task> action)
+    {
+        _ = RunSafeInternal(action);
+    }
+
+    private async Task RunSafeInternal(Func<Task> action)
+    {
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            AppDebug.Log("Unhandled async UI action", AppDebug.LogLevel.Error, ex);
+            MessageBox.Show(
+                $"Unexpected error: {ex.Message}",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+    }
+    
     private void PlayerCardTicker()
     {
         
@@ -82,24 +102,15 @@ public partial class PlayerCardV2 : UserControl
         playerData = _playerData;
         
         // Invoke Begin
-        BeginInvoke(async () =>
-        {
-            try
-            {
-                await UpdatePlayerCard();
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log($"Error updating player card", AppDebug.LogLevel.Error, ex);
-            }
-        });
+        BeginInvoke(() => RunSafe(UpdatePlayerCard));
+
         
     }
     
     private async Task UpdatePlayerCard()
     {
         // Decode Base64 and interpret as Windows-1252
-        byte[] decodedBytes = Convert.FromBase64String(playerData.PlayerNameBase64 ?? "");
+        byte[] decodedBytes = Convert.FromBase64String(playerData.PlayerNameBase64);
         string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
         
         label_dataPlayerNameRole.UseCompatibleTextRendering = true;
@@ -108,8 +119,8 @@ public partial class PlayerCardV2 : UserControl
         label_dataIPinfo.Text = playerData.PlayerIPAddress;
             
         // Update icon based on proxy detection and team
-        UpdatePlayerIconAsync(playerData.PlayerIPAddress, playerData.PlayerTeam);
-        await UpdateCountryDataAsync(playerData.PlayerIPAddress);
+        UpdatePlayerIconAsync(playerData.PlayerTeam);
+        await UpdateCountryDataAsync();
             
         contextMenu.Items[0].Text = decodedPlayerName;
         contextMenu.Items[1].Text = $"Ping: {playerData.PlayerPing} ms";
@@ -122,7 +133,7 @@ public partial class PlayerCardV2 : UserControl
     {
         cardMenu.Items.Clear();
         
-        var playerName = new ToolStripMenuItem(playerData.PlayerName ?? "Unknown");
+        var playerName = new ToolStripMenuItem(playerData.PlayerName);
         var playerPing = new ToolStripMenuItem($"Ping: {playerData.PlayerPing} ms");
         var armCommand = CreateArmMenuItem();
         var disarmCommand = CreateDisarmMenuItem();
@@ -204,7 +215,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateArmMenuItem()
     {
         var command = new ToolStripMenuItem("Arm Player");
-        command.Click += async (sender, e) =>
+        command.Click += async (_, _) =>
         {
             var result = await ApiCore.ApiClient!.Player.ArmPlayerAsync(playerData.PlayerSlot, playerData.PlayerName);
                 
@@ -221,7 +232,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateDisarmMenuItem()
     {
         var command = new ToolStripMenuItem("Disarm Player");
-        command.Click += async (sender, e) =>
+        command.Click += async (_, _) =>
         {
             var result = await ApiCore.ApiClient!.Player.DisarmPlayerAsync(playerData.PlayerSlot, playerData.PlayerName);
                 
@@ -249,7 +260,7 @@ public partial class PlayerCardV2 : UserControl
         foreach (var slapMessage in chatInstance!.SlapMessages)
         {
             var slapItem = new ToolStripMenuItem(slapMessage.SlapMessageText);
-            slapItem.Click += async (sender, e) =>
+            slapItem.Click += async (_, _) =>
             {
 
                 var result = await ApiCore.ApiClient!.Player.WarnPlayerAsync(playerData.PlayerSlot, playerData.PlayerName, slapMessage.SlapMessageText);
@@ -270,7 +281,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateKickMenuItem()
     {
         var command = new ToolStripMenuItem("Kick Player");
-        command.Click += async (sender, e) =>
+        command.Click += async (_, _) =>
         {
             var result = await ApiCore.ApiClient!.Player.KickPlayerAsync(playerData.PlayerSlot, playerData.PlayerName);
                                
@@ -287,7 +298,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateKillMenuItem()
     {
         var command = new ToolStripMenuItem("Kill Player");
-        command.Click += async (sender, e) =>
+        command.Click += async (_, _) =>
         {
             var result = await ApiCore.ApiClient!.Player.KillPlayerAsync(playerData.PlayerSlot, playerData.PlayerName);
                 
@@ -313,7 +324,7 @@ public partial class PlayerCardV2 : UserControl
         command.DropDownItems.Add(banByNameAndIP);
 
         // Ban by Name
-        banByName.Click += async (sender, e) =>
+        banByName.Click += async (_, _) =>
         {
             var result = await ApiCore.ApiClient!.Player.BanPlayerAsync(playerData.PlayerSlot, playerData.PlayerName, string.Empty, false);
             
@@ -326,11 +337,11 @@ public partial class PlayerCardV2 : UserControl
         };
 
         // Ban by IP (Async)
-        banByIP.Click += async (sender, e) =>
+        banByIP.Click += async (_, _) =>
         {
             try
             {
-                if (!IPAddress.TryParse(playerData.PlayerIPAddress, out IPAddress? ipAddress))
+                if (!IPAddress.TryParse(playerData.PlayerIPAddress, out _))
                 {
                     MessageBox.Show(
                         $"Invalid IP address: {playerData.PlayerIPAddress}",
@@ -363,11 +374,11 @@ public partial class PlayerCardV2 : UserControl
         };
 
         // Ban by Both (Async)
-        banByNameAndIP.Click += async (sender, e) =>
+        banByNameAndIP.Click += async (_, _) =>
         {
             try
             {
-                if (!IPAddress.TryParse(playerData.PlayerIPAddress, out IPAddress? ipAddress))
+                if (!IPAddress.TryParse(playerData.PlayerIPAddress, out _))
                 {
                     MessageBox.Show(
                         $"Invalid IP address: {playerData.PlayerIPAddress}",
@@ -404,7 +415,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateGodModeMenuItem()
     {
         var command = new ToolStripMenuItem(playerData.IsGod ? "Disable God Mode" : "Enable God Mode");
-        command.Click += async (sender, e) =>
+        command.Click += async (_, _) =>
         {
             var result = await ApiCore.ApiClient!.Player.ToggleGodPlayerAsync(playerData.PlayerSlot, playerData.PlayerName);
 
@@ -446,7 +457,7 @@ public partial class PlayerCardV2 : UserControl
         if (!theInstance!.gameEnableFourTeams || !mapInstance.IsNextMap4Team)
         {
             var command = new ToolStripMenuItem(existingSwitch != null ? "Cancel Team Switch" : "Switch Team");
-            command.Click += async (sender, e) =>
+            command.Click += async (_, _) =>
             {
                 var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(
                     playerData.PlayerSlot, 
@@ -471,7 +482,7 @@ public partial class PlayerCardV2 : UserControl
         // If already queued, clicking cancels the switch
         if (existingSwitch != null)
         {
-            switchTeamMenu.Click += async (sender, e) =>
+            switchTeamMenu.Click += async (_, _) =>
             {
                 var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(
                     playerData.PlayerSlot, 
@@ -511,7 +522,7 @@ public partial class PlayerCardV2 : UserControl
 
             int targetTeam = teamOption.Team; // Capture for lambda
 
-            teamItem.Click += async (sender, e) =>
+            teamItem.Click += async (_, _) =>
             {
                 var result = await ApiCore.ApiClient!.Player.SwitchTeamPlayerAsync(playerData.PlayerSlot, playerData.PlayerName, playerData.PlayerTeam, targetTeam);
 
@@ -536,7 +547,7 @@ public partial class PlayerCardV2 : UserControl
     private void ContextMenu_Opening(object? sender, CancelEventArgs e)
     {
         // Refresh dynamic content
-        contextMenu.Items[0].Text = playerData.PlayerName ?? "Unknown";
+        contextMenu.Items[0].Text = playerData.PlayerName;
         contextMenu.Items[1].Text = $"Ping: {playerData.PlayerPing} ms";
 
         // Refresh slap messages
@@ -577,7 +588,7 @@ public partial class PlayerCardV2 : UserControl
     /// <summary>
     /// Update player icon based on team and proxy status
     /// </summary>
-    private void UpdatePlayerIconAsync(string ipAddress, int team)
+    private void UpdatePlayerIconAsync(int team)
     {
         if (playerData.IsProxyDetected)
         {
@@ -603,7 +614,7 @@ public partial class PlayerCardV2 : UserControl
     /// <summary>
     /// Fetch and update country code and flag for new player
     /// </summary>
-    private async Task UpdateCountryDataAsync(string ipAddress)
+    private async Task UpdateCountryDataAsync()
     {
         string? code = playerData.CountryCode;
 

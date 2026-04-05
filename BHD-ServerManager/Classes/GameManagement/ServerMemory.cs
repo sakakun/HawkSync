@@ -1027,23 +1027,6 @@ namespace BHD_ServerManager.Classes.GameManagement
                 return;
             }
         }
-        // Function: UpdateMapCycleCounter
-        public static void ReadMapCycleCounter()
-        {
-
-            byte[] currentMapCycleCountBytes = new byte[4];
-            int currentMapCycleCountRead = 0;
-
-            int mapCycleCounterPtr = baseAddr + 0x5ED644;
-
-            ReadProcessMemory((int)processHandle, mapCycleCounterPtr, currentMapCycleCountBytes, currentMapCycleCountBytes.Length, ref currentMapCycleCountRead);
-
-            int currentMapCycleCount = BitConverter.ToInt32(currentMapCycleCountBytes, 0);
-
-            thisInstance.gameInfoMapCycleIndex = currentMapCycleCount;
-
-
-        }
         // Function: Update Start Delay Timer
         public static void ReadStartDelayTimer()
         {
