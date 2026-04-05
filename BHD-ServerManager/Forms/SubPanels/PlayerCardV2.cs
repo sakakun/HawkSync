@@ -1,22 +1,18 @@
-﻿using System.Windows.Documents;
-
-namespace ServerManager.Forms.SubPanels;
+﻿namespace ServerManager.Forms.SubPanels;
+using Classes.Services.ProxyDetection;
 using Classes.Helpers;
 using Classes.InstanceManagers;
-using Classes.SupportClasses;
-
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
-
 using System.Net;
 using System.Text;
 using System.ComponentModel;
 
 public partial class PlayerCardV2 : UserControl
 {
-    private int _playerSlot = 0;
+    private int _playerSlot;
 
     private PlayerObject                playerData      { get; set; } = new PlayerObject();
     private string                      CountryCode     { get; set; } = string.Empty;
@@ -57,6 +53,29 @@ public partial class PlayerCardV2 : UserControl
         CommonCore.Ticker!.Start($"Ticker_{Name}", 1000, PlayerCardTicker);
     }
     
+    private void RunSafe(Func<Task> action)
+    {
+        _ = RunSafeInternal(action);
+    }
+
+    private async Task RunSafeInternal(Func<Task> action)
+    {
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            AppDebug.Log("Unhandled async UI action", AppDebug.LogLevel.Error, ex);
+            MessageBox.Show(
+                $"Unexpected error: {ex.Message}",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+    }
+    
     private void PlayerCardTicker()
     {
         
@@ -79,24 +98,14 @@ public partial class PlayerCardV2 : UserControl
         playerData = _playerData;
         
         // Invoke Begin
-        BeginInvoke(async () =>
-        {
-            try
-            {
-                await UpdatePlayerCard();
-            }
-            catch (Exception ex)
-            {
-                AppDebug.Log($"Error updating player card", AppDebug.LogLevel.Error, ex);
-            }
-        });
+        BeginInvoke(() => RunSafe(UpdatePlayerCard));
         
     }
     
     private async Task UpdatePlayerCard()
     {
         // Decode Base64 and interpret as Windows-1252
-        byte[] decodedBytes = Convert.FromBase64String(playerData.PlayerNameBase64 ?? "");
+        byte[] decodedBytes = Convert.FromBase64String(playerData.PlayerNameBase64);
         string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
         
         label_dataPlayerNameRole.UseCompatibleTextRendering = true;
@@ -119,7 +128,7 @@ public partial class PlayerCardV2 : UserControl
     {
         cardMenu.Items.Clear();
         
-        var playerName = new ToolStripMenuItem(playerData.PlayerName ?? "Unknown");
+        var playerName = new ToolStripMenuItem(playerData.PlayerName);
         var playerPing = new ToolStripMenuItem($"Ping: {playerData.PlayerPing} ms");
         var armCommand = CreateArmMenuItem();
         var disarmCommand = CreateDisarmMenuItem();
@@ -201,7 +210,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateArmMenuItem()
     {
         var command = new ToolStripMenuItem("Arm Player");
-        command.Click += (sender, e) =>
+        command.Click += (_, _) =>
         {
             var result = playerInstanceManager.ArmPlayer(playerData.PlayerSlot, playerData.PlayerName);
             
@@ -218,7 +227,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateDisarmMenuItem()
     {
         var command = new ToolStripMenuItem("Disarm Player");
-        command.Click += (sender, e) =>
+        command.Click += (_, _) =>
         {
             var result = playerInstanceManager.DisarmPlayer(playerData.PlayerSlot, playerData.PlayerName);
             
@@ -246,7 +255,7 @@ public partial class PlayerCardV2 : UserControl
         foreach (var slapMessage in chatInstance!.SlapMessages)
         {
             var slapItem = new ToolStripMenuItem(slapMessage.SlapMessageText);
-            slapItem.Click += (sender, e) =>
+            slapItem.Click += (_, _) =>
             {
                 var result = playerInstanceManager.WarnPlayer(
                     playerData.PlayerSlot, 
@@ -270,7 +279,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateKickMenuItem()
     {
         var command = new ToolStripMenuItem("Kick Player");
-        command.Click += (sender, e) =>
+        command.Click += (_, _) =>
         {
             var result = playerInstanceManager.KickPlayer(playerData.PlayerSlot, playerData.PlayerName);
             
@@ -287,7 +296,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateKillMenuItem()
     {
         var command = new ToolStripMenuItem("Kill Player");
-        command.Click += (sender, e) =>
+        command.Click += (_, _) =>
         {
             var result = playerInstanceManager.KillPlayer(playerData.PlayerSlot, playerData.PlayerName);
             
@@ -313,7 +322,7 @@ public partial class PlayerCardV2 : UserControl
         command.DropDownItems.Add(banByNameAndIP);
 
         // Ban by Name
-        banByName.Click += (sender, e) =>
+        banByName.Click += (_, _) =>
         {
             var result = playerInstanceManager.BanPlayerByName(playerData.PlayerName, playerData.PlayerSlot);
             
@@ -326,7 +335,7 @@ public partial class PlayerCardV2 : UserControl
         };
 
         // Ban by IP (Async)
-        banByIP.Click += async (sender, e) =>
+        banByIP.Click += async (_, _) =>
         {
             try
             {
@@ -367,7 +376,7 @@ public partial class PlayerCardV2 : UserControl
         };
 
         // Ban by Both (Async)
-        banByNameAndIP.Click += async (sender, e) =>
+        banByNameAndIP.Click += async (_, _) =>
         {
             try
             {
@@ -413,7 +422,7 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateGodModeMenuItem()
     {
         var command = new ToolStripMenuItem(playerData.IsGod ? "Disable God Mode" : "Enable God Mode");
-        command.Click += (sender, e) =>
+        command.Click += (_, _) =>
         {
             var result = playerInstanceManager.ToggleGodMode(
                 playerData.PlayerSlot, 
@@ -440,10 +449,9 @@ public partial class PlayerCardV2 : UserControl
     private ToolStripMenuItem CreateSwitchTeamMenuItem()
     {
         var mapInstance = CommonCore.instanceMaps!;
-        var playerInstance = CommonCore.instancePlayers!;
-
+        
         // Check if already queued for team switch
-        var existingSwitch = playerInstance.PlayerChangeTeamList.FirstOrDefault(p => p.slotNum == playerData.PlayerSlot);
+        var existingSwitch = playerInstance!.PlayerChangeTeamList.FirstOrDefault(p => p.slotNum == playerData.PlayerSlot);
 
         // Check game type - disable for DM (0) and KOTH (4)
         if (mapInstance.CurrentGameType == 0 || mapInstance.CurrentGameType == 4)
@@ -460,7 +468,7 @@ public partial class PlayerCardV2 : UserControl
         if (!theInstance!.gameEnableFourTeams || !mapInstance.IsNextMap4Team)
         {
             var command = new ToolStripMenuItem(existingSwitch != null ? "Cancel Team Switch" : "Switch Team");
-            command.Click += (sender, e) =>
+            command.Click += (_, _) =>
             {
                 var result = playerInstanceManager.SwitchPlayerTeam(
                     playerData.PlayerSlot,
@@ -485,7 +493,7 @@ public partial class PlayerCardV2 : UserControl
         // If already queued, clicking cancels the switch
         if (existingSwitch != null)
         {
-            switchTeamMenu.Click += (sender, e) =>
+            switchTeamMenu.Click += (_, _) =>
             {
                 var result = playerInstanceManager.SwitchPlayerTeam(
                     playerData.PlayerSlot,
@@ -525,7 +533,7 @@ public partial class PlayerCardV2 : UserControl
 
             int targetTeam = teamOption.Team; // Capture for lambda
 
-            teamItem.Click += (sender, e) =>
+            teamItem.Click += (_, _) =>
             {
                 var result = playerInstanceManager.SwitchPlayerTeam(
                     playerData.PlayerSlot,
@@ -555,7 +563,7 @@ public partial class PlayerCardV2 : UserControl
     private void ContextMenu_Opening(object? sender, CancelEventArgs e)
     {
         // Refresh dynamic content
-        contextMenu.Items[0].Text = playerData.PlayerName ?? "Unknown";
+        contextMenu.Items[0].Text = playerData.PlayerName;
         contextMenu.Items[1].Text = $"Ping: {playerData.PlayerPing} ms";
 
         // Refresh slap messages

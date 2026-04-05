@@ -3,12 +3,10 @@ using ServerManager.Classes.Helpers;
 using ServerManager.Classes.Services.NetLimiter;
 using ServerManager.Classes.SupportClasses;
 using ServerManager.Classes.SupportClasses.Networking;
-using ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Net;
 
 namespace ServerManager.Classes.Tickers
@@ -30,8 +28,8 @@ namespace ServerManager.Classes.Tickers
         private const int ActivePlayerThresholdSeconds = 4;
 
         // Locks
-        private static bool _netLimiterLock = false;
-        private static bool _netLimiterFilterLock = false;
+        private static bool _netLimiterLock;
+        private static bool _netLimiterFilterLock;
         private static readonly object _playerListLock = new();
 
         // Helper: Enumerate active players (seen within threshold)
@@ -62,6 +60,7 @@ namespace ServerManager.Classes.Tickers
             {
                 try
                 {
+                    _ = puntReason; // Currently unused, but can be logged or used for more advanced punt logic in the future
                     ServerMemory.WriteMemorySendConsoleCommand("punt " + slotNum);
                 }
                 catch (Exception ex)
@@ -72,7 +71,7 @@ namespace ServerManager.Classes.Tickers
         }
 
         // Helper: Add ban record for IP
-        private static banInstancePlayerIP AddBanRecord(IPAddress ip, string notes)
+        private static void AddBanRecord(IPAddress ip, string notes)
         {
             var banRecord = new banInstancePlayerIP
             {
@@ -90,15 +89,14 @@ namespace ServerManager.Classes.Tickers
             banRecord.RecordID = DatabaseManager.AddPlayerIPRecord(banRecord);
             banInstance.BannedPlayerIPs.Add(banRecord);
             banInstance.ForceUIUpdates = true;
-            return banRecord;
         }
 
         // Helper: Add IP to NetLimiter filter
-        private static async Task<bool> AddIpToNetLimiterFilter(string ipAddress)
+        private static async Task AddIpToNetLimiterFilter(string ipAddress)
         {
             if (!string.IsNullOrEmpty(theInstance.netLimiterFilterName))
-                return await NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress, 32);
-            return false;
+                await NetLimiterClient.AddIpToFilterAsync(theInstance.netLimiterFilterName, ipAddress, 32);
+
         }
 
         // Helper: Evaluate proxy/VPN/TOR/Geo ban logic for an IP
@@ -182,7 +180,7 @@ namespace ServerManager.Classes.Tickers
                 int appId = await NetLimiterClient.GetAppId(gameServerPath);
                 var connections = await NetLimiterClient.GetConnectionsAsync(appId);
 
-                if (connections != null && connections.Count > 0)
+                if (connections.Count > 0)
                 {
                     AnalyzeConnections(connections);
                     await SyncNetLimiterFilterAsync();
@@ -342,7 +340,7 @@ namespace ServerManager.Classes.Tickers
                 var ipsToRemove = filterIPSet.Except(shouldBeBannedIPs).ToList();
 
                 // Add missing IPs/ranges to filter
-                int addedCount = 0;
+
                 foreach (var ipRangeStr in ipsToAdd)
                 {
                     if (ipRangeStr.Contains("-"))
@@ -355,19 +353,16 @@ namespace ServerManager.Classes.Tickers
                         for (uint ip = s; ip <= e; ip++)
                         {
                             var ipStr = IpRange.UintToIp(ip).ToString();
-                            bool added = await NetLimiterClient.AddIpToFilterAsync(filterName, ipStr, 32);
-                            if (added) addedCount++;
+                            await NetLimiterClient.AddIpToFilterAsync(filterName, ipStr, 32);
                         }
                     }
                     else
                     {
-                        bool added = await NetLimiterClient.AddIpToFilterAsync(filterName, ipRangeStr, 32);
-                        if (added) addedCount++;
+                        await NetLimiterClient.AddIpToFilterAsync(filterName, ipRangeStr, 32);
                     }
                 }
 
                 // Remove IPs/ranges that shouldn't be in filter
-                int removedCount = 0;
                 foreach (var ipRangeStr in ipsToRemove)
                 {
                     if (ipRangeStr.Contains("-"))
@@ -380,14 +375,12 @@ namespace ServerManager.Classes.Tickers
                         for (uint ip = s; ip <= e; ip++)
                         {
                             var ipStr = IpRange.UintToIp(ip).ToString();
-                            bool removed = await NetLimiterClient.RemoveIpFromFilterAsync(filterName, ipStr, 32);
-                            if (removed) removedCount++;
+                            await NetLimiterClient.RemoveIpFromFilterAsync(filterName, ipStr, 32);
                         }
                     }
                     else
                     {
-                        bool removed = await NetLimiterClient.RemoveIpFromFilterAsync(filterName, ipRangeStr, 32);
-                        if (removed) removedCount++;
+                         await NetLimiterClient.RemoveIpFromFilterAsync(filterName, ipRangeStr, 32);
                     }
 
                 }
@@ -492,7 +485,7 @@ namespace ServerManager.Classes.Tickers
             if (banInstance.WhitelistedIPs.Any(w => !BanHelper.IsExpiredOrInfo(w, now) && BanHelper.IsIPMatch(ip, w.PlayerIP, w.SubnetMask)))
                 return;
 
-            var banRecord = AddBanRecord(ip, $"Auto-banned: Excessive connections ({connectionCount}) exceeded threshold ({theInstance.netLimiterConThreshold})");
+            AddBanRecord(ip, $"Auto-banned: Excessive connections ({connectionCount}) exceeded threshold ({theInstance.netLimiterConThreshold})");
 
             try
             {
@@ -615,6 +608,8 @@ namespace ServerManager.Classes.Tickers
             {
                 if (shouldBan && playerIP != null)
                 {
+                    _ = playerIPAddress; // Store original IP string for logging or future use
+                    _ = puntReason; // Currently unused, but can be logged or used for more advanced ban logic in the future
                     // Check if already banned (by range or single IP)
                     if (IsIpBanned(playerIP, banInstance.BannedPlayerIPs))
                         continue;
@@ -634,7 +629,6 @@ namespace ServerManager.Classes.Tickers
 
         public static void CheckAndPuntDisabledRoles()
         {
-            DateTime now = DateTime.Now;
             var slotsToPunt = new List<(int SlotNum, string PlayerName, string PuntReason)>();
 
             foreach (var (slotNum, player) in GetActivePlayers())

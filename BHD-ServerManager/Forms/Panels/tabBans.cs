@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json;
 using RecordDeleteAction = ServerManager.Classes.InstanceManagers.RecordDeleteAction;
 using System.ComponentModel;
+using ServerManager.Classes.Services.ProxyDetection;
 
 namespace ServerManager.Forms.Panels
 {
@@ -58,7 +59,7 @@ namespace ServerManager.Forms.Panels
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(tabBansTicker));
+                Invoke(tabBansTicker);
                 return;
             }
 
@@ -118,7 +119,7 @@ namespace ServerManager.Forms.Panels
             
             if (InvokeRequired)
             {
-                Invoke(new Action(NetLimiter_RefreshConnections));
+                Invoke(NetLimiter_RefreshConnections);
                 return;
             }
 
@@ -128,8 +129,7 @@ namespace ServerManager.Forms.Panels
             {
                 // Create a dictionary of new data keyed by IP address for quick lookup
                 var connectionDict = Connections
-                    .Where(c => c != null)
-                    .ToDictionary(c => c.NL_ipAddress ?? string.Empty, c => c);
+                   .ToDictionary(c => c.NL_ipAddress, c => c);
 
                 // Track which rows to remove
                 var rowsToRemove = new List<DataGridViewRow>();
@@ -146,8 +146,8 @@ namespace ServerManager.Forms.Panels
                         // Update existing row
                         row.Cells[0].Value = conn.NL_rowID;
                         row.Cells[2].Value = conn.NL_numCons;
-                        row.Cells[3].Value = conn.NL_vpnStatus ?? string.Empty;
-                        row.Cells[4].Value = conn.NL_notes ?? string.Empty;
+                        row.Cells[3].Value = conn.NL_vpnStatus;
+                        row.Cells[4].Value = conn.NL_notes;
 
                         // Remove from dictionary so we know it's been processed
                         connectionDict.Remove(existingIp);
@@ -170,10 +170,10 @@ namespace ServerManager.Forms.Panels
                 {
                     dg_NetlimiterConnectionLog.Rows.Add(
                         conn.NL_rowID,
-                        conn.NL_ipAddress ?? string.Empty,
+                        conn.NL_ipAddress,
                         conn.NL_numCons,
-                        conn.NL_vpnStatus ?? string.Empty,
-                        conn.NL_notes ?? string.Empty
+                        conn.NL_vpnStatus,
+                        conn.NL_notes
                     );
                 }
             }
@@ -823,7 +823,7 @@ namespace ServerManager.Forms.Panels
         /// </summary>
         private RecordDeleteAction Blacklist_ShowDeleteConfirmationDialog(bool hasName, bool hasIP, string playerName, string ipAddress)
         {
-            string message = "This record has an associated ";
+            string message;
 
             if (hasName && hasIP)
             {
@@ -998,8 +998,6 @@ namespace ServerManager.Forms.Panels
             }
 
             // Load common data (use nameRecord first, fallback to ipRecord)
-            var dataRecord = nameRecord ?? (object?)ipRecord;
-
             if (nameRecord != null)
             {
                 blacklist_DateStart.MinDate = DateTimePicker.MinimumDateTime;
@@ -1119,12 +1117,10 @@ namespace ServerManager.Forms.Panels
                     if (firstLine.Equals("[IpAddresses]", StringComparison.OrdinalIgnoreCase))
                     {
                         ImportLegacyBannedIps(filePath, sender, e);
-                        return;
                     }
                     else if (firstLine.Equals("[Players]", StringComparison.OrdinalIgnoreCase))
                     {
                         ImportLegacyBannedNames(filePath, sender, e);
-                        return;
                     }
                     else
                     {
@@ -1504,8 +1500,9 @@ namespace ServerManager.Forms.Panels
         /// <summary>
         /// Handle click event to reset all whitelist form fields to default values.
         /// </summary>
-        private void Whitelist_Reset_Click(object sender, EventArgs e)
+        private void Whitelist_Reset_Click()
         {
+            
             // Player Name
             textBox_playerNameWL.Text = String.Empty;
             // IP Address
@@ -1820,7 +1817,7 @@ namespace ServerManager.Forms.Panels
                 // Reset selection IDs and form
                 _whitelistSelectedRecordIDName = -1;
                 _whitelistSelectedRecordIDIP = -1;
-                Whitelist_Reset_Click(sender, e);
+                Whitelist_Reset_Click();
                 panel2.Visible = false;
 
                 // Control Buttons
@@ -1869,7 +1866,7 @@ namespace ServerManager.Forms.Panels
             _whitelistSelectedRecordIDName = -1;
             _whitelistSelectedRecordIDIP = -1;
             // Reset and Hide
-            Whitelist_Reset_Click(sender, e);
+            Whitelist_Reset_Click();
 
             // Control Buttons
             wlControlClose.Visible = false;
@@ -1980,7 +1977,7 @@ namespace ServerManager.Forms.Panels
                 // Reset form
                 _whitelistSelectedRecordIDName = -1;
                 _whitelistSelectedRecordIDIP = -1;
-                Whitelist_Reset_Click(sender, e);
+                Whitelist_Reset_Click();
                 panel2.Visible = false;
 
                 // Refresh the data
@@ -2002,7 +1999,7 @@ namespace ServerManager.Forms.Panels
         /// </summary>
         private RecordDeleteAction Whitelist_ShowDeleteConfirmationDialog(bool hasName, bool hasIP, string playerName, string ipAddress)
         {
-            string message = "This record has an associated ";
+            string message;
 
             if (hasName && hasIP)
             {
@@ -2177,8 +2174,6 @@ namespace ServerManager.Forms.Panels
             }
 
             // Load common data (use nameRecord first, fallback to ipRecord)
-            var dataRecord = nameRecord ?? (object?)ipRecord;
-
             if (nameRecord != null)
             {
                 dateTimePicker_WLstart.MinDate = DateTimePicker.MinimumDateTime;
@@ -2779,7 +2774,7 @@ namespace ServerManager.Forms.Panels
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => NetLimiter_RefreshFilters(sender, e)));
+                Invoke(() => NetLimiter_RefreshFilters(sender, e));
                 return;
             }
 
@@ -2795,7 +2790,7 @@ namespace ServerManager.Forms.Panels
             }
 
             // Get filters via manager
-            var (success, filters, errorMessage) = await banInstanceManager.GetNetLimiterFilters();
+            var (success, filters, _) = await banInstanceManager.GetNetLimiterFilters();
 
             if (!success || filters.Count == 0)
             {

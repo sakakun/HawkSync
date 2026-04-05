@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Text;
 
 namespace ServerManager.Classes.SupportClasses
 {
@@ -32,30 +30,6 @@ namespace ServerManager.Classes.SupportClasses
             for (int i = 0; i < hexString.Length; i += 2)
                 retval[i / 2] = Convert.ToByte(hexString.Substring(i, 2), 16);
             return retval;
-        }
-        public static string ShowFileDialog(bool saveDialog, string filter, string title, string initialDirectory, string defaultFileName = "")
-        {
-            if (saveDialog)
-            {
-                using var sfd = new SaveFileDialog
-                {
-                    Filter = filter,
-                    Title = title,
-                    InitialDirectory = initialDirectory,
-                    FileName = defaultFileName
-                };
-                return sfd.ShowDialog() == DialogResult.OK ? sfd.FileName : string.Empty;
-            }
-            else
-            {
-                using var ofd = new OpenFileDialog
-                {
-                    Filter = filter,
-                    Title = title,
-                    InitialDirectory = initialDirectory
-                };
-                return ofd.ShowDialog() == DialogResult.OK ? ofd.FileName : string.Empty;
-            }
         }
         public static int CalulateGameOptions(bool autoBalance, bool friendlyFire, bool friendlyTags, bool friendlyFireWarning, bool showTracers, bool showTeamClays, bool allowAutoRange)
         {

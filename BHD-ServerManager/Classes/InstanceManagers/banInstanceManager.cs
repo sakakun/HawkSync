@@ -3,8 +3,10 @@ using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using ServerManager.Classes.SupportClasses;
 using ServerManager.Classes.Services.NetLimiter;
+using ServerManager.Classes.Services.ProxyDetection.Services;
 using ServerManager.Classes.SupportClasses.Networking;
 using System.Net;
+using ServerManager.Classes.Services.ProxyDetection;
 
 namespace ServerManager.Classes.InstanceManagers
 {

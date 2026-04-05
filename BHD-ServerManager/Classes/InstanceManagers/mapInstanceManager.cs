@@ -162,12 +162,12 @@ namespace ServerManager.Classes.InstanceManagers
                 using (FileStream fsSourceDDS = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 using (BinaryReader binaryReader = new BinaryReader(fsSourceDDS))
                 {
-                    string first_line = string.Empty;
-                    string mapName = string.Empty;
+                    string first_line;
+                    string mapName;
             
                     try
                     {
-                        first_line = File.ReadLines(filePath, Encoding.GetEncoding(1252)).First().ToString();
+                        first_line = File.ReadLines(filePath, Encoding.GetEncoding(1252)).First();
                     }
                     catch (Exception e)
                     {
@@ -181,7 +181,7 @@ namespace ServerManager.Classes.InstanceManagers
             
                     foreach (string f in first_line_arr)
                     {
-                        string tmp = f.Trim().Replace("\0", "".ToString());
+                        string tmp = f.Trim().Replace("\0", "");
                         if (!string.IsNullOrEmpty(tmp))
                             first_line_list.Add(tmp);
                     }
@@ -224,7 +224,6 @@ namespace ServerManager.Classes.InstanceManagers
                     }
 
                     // Map to game type info and add a separate entry for each supported game type
-                    var gameTypes = new List<int>();
                     int currentMapID = mapID;
             
                     foreach (var bit in gameTypeBits)
@@ -233,7 +232,6 @@ namespace ServerManager.Classes.InstanceManagers
 
                         if (match != null)
                         {
-                            gameTypes.Add(match.DatabaseId);
 
                             var mapEntry = new MapObject
                             {
@@ -342,7 +340,7 @@ namespace ServerManager.Classes.InstanceManagers
                 if (playlistID < 1 || playlistID > 5)
                     return new PlaylistResult(false, "Invalid playlist ID. Must be between 1 and 5.");
 
-                if (maps == null || maps.Count == 0)
+                if (maps.Count == 0)
                     return new PlaylistResult(false, "Cannot save an empty playlist.");
 
                 // Validate maps exist
@@ -414,7 +412,7 @@ namespace ServerManager.Classes.InstanceManagers
                 if (playlistID < 1 || playlistID > 5)
                     return new PlaylistResult(false, "Invalid playlist ID. Must be between 1 and 5.");
 
-                var (success, maps, error) = GetPlaylistMaps(playlistID);
+                var (success, maps, _) = GetPlaylistMaps(playlistID);
                 if (!success || maps.Count == 0)
                     return new PlaylistResult(false, $"Playlist {playlistID} is empty or not loaded.");
 
@@ -462,7 +460,7 @@ namespace ServerManager.Classes.InstanceManagers
         {
             try
             {
-                if (maps == null || maps.Count == 0)
+                if (maps.Count == 0)
                     return new PlaylistResult(false, "Cannot randomize an empty playlist.");
 
                 var random = new Random();

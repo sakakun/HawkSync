@@ -1,18 +1,12 @@
-﻿using HawkSyncShared.DTOs;
-using HawkSyncShared.DTOs.Audit;
+﻿using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using Microsoft.Data.Sqlite;
-using System;
-using System.Diagnostics;
 using System.Net;
 using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using ServerManager.Classes.InstanceManagers;
 
 namespace ServerManager.Classes.SupportClasses
@@ -505,10 +499,8 @@ namespace ServerManager.Classes.SupportClasses
                     case 3:
                         MigrateBabstatsServersFromSettings(conn, tx);
                         break;
-
                     default:
-                        // No custom migrations for this version
-                        break;
+                        return;
                 }
             }
         }
@@ -1334,7 +1326,7 @@ namespace ServerManager.Classes.SupportClasses
                 throw new InvalidOperationException("DatabaseManager is not initialized.");
 
             var logs = new List<ChatLogObject>();
-            int totalCount = 0;
+            int totalCount;
 
             using var conn = new SqliteConnection($"Data Source={_databasePath};Mode=ReadWrite;");
             conn.Open();
@@ -1483,7 +1475,7 @@ namespace ServerManager.Classes.SupportClasses
                 }
 
                 // Count existing records
-                int originalCount = 0;
+                int originalCount;
                 using (var countCmd = conn.CreateCommand())
                 {
                     countCmd.Transaction = tx;
@@ -1760,7 +1752,7 @@ namespace ServerManager.Classes.SupportClasses
                 cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
                 cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
                 // Convert 0 to NULL for foreign key
-                cmd.Parameters.AddWithValue("$associatedIP", record.AssociatedIP > 0 ? (object)record.AssociatedIP : DBNull.Value);
+                cmd.Parameters.AddWithValue("$associatedIP", record.AssociatedIP > 0 ? record.AssociatedIP : DBNull.Value);
                 cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
                 cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
                 cmd.Parameters.AddWithValue("$notes", record.Notes);
@@ -1810,7 +1802,7 @@ namespace ServerManager.Classes.SupportClasses
                 cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
                 cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
                 // Convert 0 to NULL for foreign key
-                cmd.Parameters.AddWithValue("$associatedName", record.AssociatedName > 0 ? (object)record.AssociatedName : DBNull.Value);
+                cmd.Parameters.AddWithValue("$associatedName", record.AssociatedName > 0 ? record.AssociatedName : DBNull.Value);
                 cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
                 cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
                 cmd.Parameters.AddWithValue("$notes", record.Notes);
@@ -1866,7 +1858,7 @@ namespace ServerManager.Classes.SupportClasses
                 cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
                 cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
                 // Convert 0 to NULL for foreign key
-                cmd.Parameters.AddWithValue("$associatedIP", record.AssociatedIP > 0 ? (object)record.AssociatedIP : DBNull.Value);
+                cmd.Parameters.AddWithValue("$associatedIP", record.AssociatedIP > 0 ? record.AssociatedIP : DBNull.Value);
                 cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
                 cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
                 cmd.Parameters.AddWithValue("$notes", record.Notes);
@@ -1922,7 +1914,7 @@ namespace ServerManager.Classes.SupportClasses
                 cmd.Parameters.AddWithValue("$date", record.Date.ToString("yyyy-MM-dd HH:mm:ss"));
                 cmd.Parameters.AddWithValue("$expireDate", record.ExpireDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value);
                 // Convert 0 to NULL for foreign key
-                cmd.Parameters.AddWithValue("$associatedName", record.AssociatedName > 0 ? (object)record.AssociatedName : DBNull.Value);
+                cmd.Parameters.AddWithValue("$associatedName", record.AssociatedName > 0 ? record.AssociatedName : DBNull.Value);
                 cmd.Parameters.AddWithValue("$recordType", (int)record.RecordType);
                 cmd.Parameters.AddWithValue("$recordCategory", record.RecordCategory);
                 cmd.Parameters.AddWithValue("$notes", record.Notes);
@@ -2486,7 +2478,7 @@ namespace ServerManager.Classes.SupportClasses
                 cmd.Parameters.AddWithValue("$passwordHash", passwordHash);
                 cmd.Parameters.AddWithValue("$salt", salt);
                 cmd.Parameters.AddWithValue("$isActive", isActive ? 1 : 0);
-                cmd.Parameters.AddWithValue("$notes", notes ?? string.Empty);
+                cmd.Parameters.AddWithValue("$notes", notes);
 
                 var newId = (long)cmd.ExecuteScalar()!;
                 tx.Commit();
@@ -2530,7 +2522,7 @@ namespace ServerManager.Classes.SupportClasses
                 cmd.Parameters.AddWithValue("$userID", userID);
                 cmd.Parameters.AddWithValue("$username", username);
                 cmd.Parameters.AddWithValue("$isActive", isActive ? 1 : 0);
-                cmd.Parameters.AddWithValue("$notes", notes ?? string.Empty);
+                cmd.Parameters.AddWithValue("$notes", notes);
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 tx.Commit();
@@ -3220,9 +3212,9 @@ namespace ServerManager.Classes.SupportClasses
                     ($displayName, $serverPath, $profileId, $isEnabled, $announcements, $reportInterval, $updateInterval, $sortOrder, datetime('now'), datetime('now'));
                     SELECT last_insert_rowid();
                 ";
-                cmd.Parameters.AddWithValue("$displayName", server.DisplayName ?? string.Empty);
-                cmd.Parameters.AddWithValue("$serverPath", server.ServerPath ?? string.Empty);
-                cmd.Parameters.AddWithValue("$profileId", server.ProfileID ?? string.Empty);
+                cmd.Parameters.AddWithValue("$displayName", server.DisplayName);
+                cmd.Parameters.AddWithValue("$serverPath", server.ServerPath);
+                cmd.Parameters.AddWithValue("$profileId", server.ProfileID);
                 cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
                 cmd.Parameters.AddWithValue("$announcements", server.EnableAnnouncements ? 1 : 0);
                 cmd.Parameters.AddWithValue("$reportInterval", server.ReportIntervalSeconds);
@@ -3272,9 +3264,9 @@ namespace ServerManager.Classes.SupportClasses
                     WHERE BabstatsServerID = $id;
                 ";
                 cmd.Parameters.AddWithValue("$id", server.BabstatsServerID);
-                cmd.Parameters.AddWithValue("$displayName", server.DisplayName ?? string.Empty);
-                cmd.Parameters.AddWithValue("$serverPath", server.ServerPath ?? string.Empty);
-                cmd.Parameters.AddWithValue("$profileId", server.ProfileID ?? string.Empty);
+                cmd.Parameters.AddWithValue("$displayName", server.DisplayName);
+                cmd.Parameters.AddWithValue("$serverPath", server.ServerPath);
+                cmd.Parameters.AddWithValue("$profileId", server.ProfileID);
                 cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
                 cmd.Parameters.AddWithValue("$announcements", server.EnableAnnouncements ? 1 : 0);
                 cmd.Parameters.AddWithValue("$reportInterval", server.ReportIntervalSeconds);
@@ -3420,10 +3412,10 @@ namespace ServerManager.Classes.SupportClasses
                     WHERE LobbyServerID = $id;
                 ";
                 cmd.Parameters.AddWithValue("$id", server.LobbyServerID);
-                cmd.Parameters.AddWithValue("$siteName", server.SiteName ?? string.Empty);
-                cmd.Parameters.AddWithValue("$serverUri", server.ServerUri ?? string.Empty);
+                cmd.Parameters.AddWithValue("$siteName", server.SiteName);
+                cmd.Parameters.AddWithValue("$serverUri", server.ServerUri);
                 cmd.Parameters.AddWithValue("$gamePort", server.GamePort);
-                cmd.Parameters.AddWithValue("$secretKey", server.SecretKey ?? string.Empty);
+                cmd.Parameters.AddWithValue("$secretKey", server.SecretKey);
                 cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
                 cmd.Parameters.AddWithValue("$sortOrder", server.SortOrder);
 
@@ -3458,10 +3450,10 @@ namespace ServerManager.Classes.SupportClasses
                     VALUES
                         ($siteName, $serverUri, $gamePort, $secretKey, $isEnabled, $sortOrder, datetime('now'), datetime('now'));
                 ";
-                cmd.Parameters.AddWithValue("$siteName", server.SiteName ?? string.Empty);
-                cmd.Parameters.AddWithValue("$serverUri", server.ServerUri ?? string.Empty);
+                cmd.Parameters.AddWithValue("$siteName", server.SiteName);
+                cmd.Parameters.AddWithValue("$serverUri", server.ServerUri);
                 cmd.Parameters.AddWithValue("$gamePort", server.GamePort);
-                cmd.Parameters.AddWithValue("$secretKey", server.SecretKey ?? string.Empty);
+                cmd.Parameters.AddWithValue("$secretKey", server.SecretKey);
                 cmd.Parameters.AddWithValue("$isEnabled", server.IsEnabled ? 1 : 0);
                 cmd.Parameters.AddWithValue("$sortOrder", server.SortOrder);
 

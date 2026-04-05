@@ -705,6 +705,12 @@ namespace ServerManager.Classes.GameManagement
                 if (theInstance.profileServerAttribute21) { ProgramArguments += tabProfile.profileServerAttribute21.Text + " "; }
                 if (theInstance.profileServerAttribute04) { ProgramArguments += tabProfile.profileServerAttribute04.Text + " " + theInstance.profileModFileName + " "; }
 
+                if (mapInstance.Playlists[mapInstance.ActivePlaylist].Count == 0)
+                {
+                    MessageBox.Show("No maps in the active playlist! Please add at least one map before starting the server.", "Playlist Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+                
                 // Start Game
                 var startInfo = new ProcessStartInfo
                 {

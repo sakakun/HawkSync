@@ -1,11 +1,7 @@
-﻿using ServerManager;
-using HawkSyncShared;
-using HawkSyncShared.SupportClasses;
+﻿using HawkSyncShared;
 using ServerManager.Classes.GameManagement;
 using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using ServerManager.Classes.SupportClasses;
-using ServerManager.Forms;
 
 namespace ServerManager.Classes.Tickers
 {
@@ -13,16 +9,14 @@ namespace ServerManager.Classes.Tickers
     {
         private static theInstance thisInstance => CommonCore.theInstance!;
         private static chatInstance instanceChat => CommonCore.instanceChat!;
-        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
         private static readonly object tickerLock = new();
-        private static bool _autoMessageRecoveryDone = false;
+        private static bool _autoMessageRecoveryDone;
 
         // For deduplication of chat messages
-        private static string? _lastProcessedPlayerName = null;
-        private static string? _lastProcessedMessageText = null;
-        private static DateTime _lastProcessedMessageTime = DateTime.MinValue;
+        private static string? _lastProcessedPlayerName;
+        private static string? _lastProcessedMessageText;
 
         public static void runTicker()
         {
@@ -54,7 +48,7 @@ namespace ServerManager.Classes.Tickers
             // Read memory immediately on ticker thread to avoid missing messages
             var latestMessage = ServerMemory.ReadMemoryLastChatMessage();
             
-            if (latestMessage == null || latestMessage.Length < 3)
+            if (latestMessage.Length < 3)
                 return;
 
             string lastMessage = latestMessage[1];
@@ -64,8 +58,6 @@ namespace ServerManager.Classes.Tickers
                 return;
 
             var chatLog = instanceChat.ChatLog;
-            if (chatLog == null)
-                return;
 
             int msgStart = lastMessage.IndexOf(':');
             if (msgStart < 0)
@@ -110,7 +102,7 @@ namespace ServerManager.Classes.Tickers
 
                 // Find player team number
                 int teamNum = 3;
-                string serverTeamMessage = string.Empty;
+                string serverTeamMessage;
 
                 // Check marker first - but only if player name matches the server host name
                 if (playerName.Equals(thisInstance.gameHostName, StringComparison.OrdinalIgnoreCase))
@@ -162,7 +154,6 @@ namespace ServerManager.Classes.Tickers
                 // Update deduplication tracking
                 _lastProcessedPlayerName = playerName;
                 _lastProcessedMessageText = playerMessage;
-                _lastProcessedMessageTime = DateTime.Now;
 
             }
         }
@@ -177,7 +168,7 @@ namespace ServerManager.Classes.Tickers
             }
 
             var autoMessages = instanceChat.AutoMessages;
-            if (autoMessages == null || autoMessages.Count == 0)
+            if (autoMessages.Count == 0)
                 return;
 
             // Calculate elapsed minutes since map started
@@ -219,7 +210,7 @@ namespace ServerManager.Classes.Tickers
                 return;
 
             var autoMessages = instanceChat.AutoMessages;
-            if (autoMessages == null || autoMessages.Count == 0)
+            if (autoMessages.Count == 0)
                 return;
 
             // Calculate elapsed minutes since map started
@@ -284,7 +275,6 @@ namespace ServerManager.Classes.Tickers
         {
             _lastProcessedPlayerName = null;
             _lastProcessedMessageText = null;
-            _lastProcessedMessageTime = DateTime.MinValue;
             _autoMessageRecoveryDone = false;
 
             // Clear message queue on reset

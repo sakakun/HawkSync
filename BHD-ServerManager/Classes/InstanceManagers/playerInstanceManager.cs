@@ -14,7 +14,6 @@ namespace ServerManager.Classes.InstanceManagers
     public static class playerInstanceManager
     {
         private static theInstance theInstance => CommonCore.theInstance!;
-        private static banInstance banInstance => CommonCore.instanceBans!;
 
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
 
@@ -31,7 +30,7 @@ namespace ServerManager.Classes.InstanceManagers
             public int RestrictedWeaponId { get; set; }
             public string RestrictedWeaponName { get; set; } = string.Empty;
             public bool MessageSent { get; set; }
-            public bool IsRearmed { get; set; } = false;
+            public bool IsRearmed { get; set; }
         }
 
 		// ================================================================================
@@ -255,6 +254,7 @@ namespace ServerManager.Classes.InstanceManagers
                     2 => "Red",
                     3 => "Yellow",
                     4 => "Violet",
+                    // ReSharper disable once UnreachableSwitchArmDueToIntegerAnalysis
                     _ => "Unknown"
                 };
 
@@ -289,7 +289,7 @@ namespace ServerManager.Classes.InstanceManagers
                 if (weaponId == (int)WeaponStack.WPN_KNIFE || weaponId == (int)WeaponStack.WPN_MEDPACK)
                 {
                     // If player was disarmed, rearm them and remove from tracking
-                    if (weaponDisarmedPlayers.TryGetValue(playerInfo.PlayerSlot, out WeaponDisarmInfo? knifeDisarmInfo))
+                    if (weaponDisarmedPlayers.TryGetValue(playerInfo.PlayerSlot, out _))
                     {
                         weaponDisarmedPlayers.Remove(playerInfo.PlayerSlot);
                         
@@ -395,7 +395,7 @@ namespace ServerManager.Classes.InstanceManagers
                 if (isWeaponRestricted)
                 {
                     // Weapon is RESTRICTED (Gray) - start disarm cycle
-                    string weaponName = playerInfo.SelectedWeaponName ?? restriction.WeaponName ?? "Unknown";
+                    string weaponName = playerInfo.SelectedWeaponName;
                     
                     weaponDisarmedPlayers[playerInfo.PlayerSlot] = new WeaponDisarmInfo
                     {
@@ -694,9 +694,6 @@ namespace ServerManager.Classes.InstanceManagers
                 if (!isValid)
                     return new OperationResult(false, errorMessage);
 
-                if (ipAddress == null)
-                    return new OperationResult(false, "IP address cannot be null.");
-
                 // Add ban via banInstanceManager (CORRECTED METHOD NAME)
                 var banResult = banInstanceManager.AddBlacklistIPRecord(
                     ipAddress: ipAddress,
@@ -752,9 +749,6 @@ namespace ServerManager.Classes.InstanceManagers
 
                 if (string.IsNullOrWhiteSpace(playerName))
                     return new OperationResult(false, "Player name cannot be empty.");
-
-                if (ipAddress == null)
-                    return new OperationResult(false, "IP address cannot be null.");
 
                 // Add both bans via banInstanceManager (CORRECTED METHOD NAME)
                 var banResult = banInstanceManager.AddBlacklistBothRecords(

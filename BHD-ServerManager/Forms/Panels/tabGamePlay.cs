@@ -43,7 +43,7 @@ namespace ServerManager.Forms.Panels
 		{
 			if (InvokeRequired)
 			{
-				Invoke(new Action(Ticker_GamePlayTab));
+				Invoke(Ticker_GamePlayTab);
 				return;
 			}
 			UpdateServerControls();
@@ -67,13 +67,12 @@ namespace ServerManager.Forms.Panels
 		{
 			try
 			{
-				using SaveFileDialog saveFileDialog = new()
-				{
-					Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-					FilterIndex = 1,
-					RestoreDirectory = true,
-					FileName = $"GamePlaySettings_{DateTime.Now:yyyyMMdd_HHmmss}.json"
-				};
+				using SaveFileDialog saveFileDialog = new();
+				saveFileDialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+				saveFileDialog.FilterIndex = 1;
+				saveFileDialog.RestoreDirectory = true;
+				saveFileDialog.FileName = $"GamePlaySettings_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+
 				if (saveFileDialog.ShowDialog() == DialogResult.OK)
 				{
 					var result = theInstanceManager.ExportGamePlaySettings(saveFileDialog.FileName);
@@ -98,12 +97,11 @@ namespace ServerManager.Forms.Panels
 		{
 			try
 			{
-				using OpenFileDialog openFileDialog = new()
-				{
-					Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-					FilterIndex = 1,
-					RestoreDirectory = true
-				};
+				using OpenFileDialog openFileDialog = new();
+				openFileDialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+				openFileDialog.FilterIndex = 1;
+				openFileDialog.RestoreDirectory = true;
+
 				if (openFileDialog.ShowDialog() == DialogResult.OK)
 				{
 					var (success, settings, errorMessage) = theInstanceManager.ImportGamePlaySettings(openFileDialog.FileName);

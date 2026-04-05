@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace ServerManager.Forms
 {
-    public partial class ServerManagerUI : Form
+    public partial class ServerManagerUI
     {
 
         private static theInstance thisInstance => CommonCore.theInstance!;
@@ -65,7 +65,7 @@ namespace ServerManager.Forms
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action(Ticker_ServerManagerUI));
+                this.Invoke(Ticker_ServerManagerUI);
                 return;
             }
 

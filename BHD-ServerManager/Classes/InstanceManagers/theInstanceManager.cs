@@ -2,7 +2,6 @@
 using ServerManager.Classes.GameManagement;
 using ServerManager.Classes.SupportClasses;
 using ServerManager.Classes.Tickers;
-using ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
@@ -168,10 +167,8 @@ namespace ServerManager.Classes.InstanceManagers
 
     public static class theInstanceManager
     {
-        private static ServerManagerUI thisServer => Program.ServerManagerUI!;
         private static theInstance theInstance => CommonCore.theInstance!;
         private static playerInstance playerInstance => CommonCore.instancePlayers!;
-        private static statInstance instanceStats => CommonCore.instanceStats!;
 
         // ================================================================================
         // PROFILE SETTINGS MANAGEMENT
@@ -756,15 +753,15 @@ namespace ServerManager.Classes.InstanceManagers
                 if (!result.Success)
                     return result;
 
-            // Get current settings from instance
-            var options = new ServerOptions(
-                theInstance.gameOptionAutoBalance, theInstance.gameOptionShowTracers,
-                theInstance.gameShowTeamClays, theInstance.gameOptionAutoRange,
-                theInstance.gameCustomSkins, theInstance.gameDestroyBuildings,
-                theInstance.gameFatBullets, theInstance.gameOneShotKills,
-                theInstance.gameAllowLeftLeaning, theInstance.gameAllowRightLeaning,
-                theInstance.gameEnableFourTeams
-            );
+                // Get current settings from instance
+                var options = new ServerOptions(
+                    theInstance.gameOptionAutoBalance, theInstance.gameOptionShowTracers,
+                    theInstance.gameShowTeamClays, theInstance.gameOptionAutoRange,
+                    theInstance.gameCustomSkins, theInstance.gameDestroyBuildings,
+                    theInstance.gameFatBullets, theInstance.gameOneShotKills,
+                    theInstance.gameAllowLeftLeaning, theInstance.gameAllowRightLeaning,
+                    theInstance.gameEnableFourTeams
+                );
 
                 var friendlyFire = new FriendlyFireSettings(
                     theInstance.gameOptionFF, theInstance.gameFriendlyFireKills,
@@ -909,31 +906,6 @@ namespace ServerManager.Classes.InstanceManagers
         // VALIDATION HELPERS
         // ================================================================================
 
-        private static bool ValidateServerPath(string path, out string error)
-        {
-            error = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                error = "Server path cannot be empty.";
-                return false;
-            }
-
-            if (!Directory.Exists(path))
-            {
-                error = $"Server path does not exist: {path}";
-                return false;
-            }
-
-            if (!File.Exists(Path.Combine(path, "dfbhd.exe")))
-            {
-                error = "Server path does not contain dfbhd.exe";
-                return false;
-            }
-
-            return true;
-        }
-
         private static bool ValidateBindIP(string ip, out string error)
         {
             error = string.Empty;
@@ -947,7 +919,7 @@ namespace ServerManager.Classes.InstanceManagers
             if (ip == "0.0.0.0")
                 return true;
 
-            if (!IPAddress.TryParse(ip, out IPAddress? address))
+            if (!IPAddress.TryParse(ip, out _))
             {
                 error = $"Invalid IP address format: {ip}";
                 return false;
@@ -1252,7 +1224,7 @@ namespace ServerManager.Classes.InstanceManagers
             bool isNextMapTeamMap = Functions.IsMapTeamBased(nextMapType);
             
             // SCENARIO 1: Team-based → Non-team (2-team or 4-team → FFA/DM)
-            if (isNextMapTeamMap == false && isCurrentMapTeamMap == true)
+            if (isNextMapTeamMap == false && isCurrentMapTeamMap)
             {
                 foreach (var playerRecord in playerInstance.PlayerList)
                 {
@@ -1272,7 +1244,7 @@ namespace ServerManager.Classes.InstanceManagers
                 }
             }
             // SCENARIO 2: Non-team → Team-based (FFA/DM → 2-team or 4-team)
-            else if (isNextMapTeamMap == true && isCurrentMapTeamMap == false)
+            else if (isNextMapTeamMap && isCurrentMapTeamMap == false)
             {
                 // Restore players who were on teams before FFA
                 foreach (playerTeamObject playerObj in playerInstance.PlayerPreviousTeamList)
@@ -1524,6 +1496,7 @@ namespace ServerManager.Classes.InstanceManagers
         /// <summary>
         /// Get the current status of the embedded API
         /// /// <returns>Tuple with (isEnabled, isRunning, port)</returns>
+        /// </summary>
         public static (bool isEnabled, bool isRunning, int port) GetApiStatus()
         {
             return (

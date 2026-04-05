@@ -10,7 +10,7 @@ namespace ServerManager.Forms.Panels
         private theInstance? theInstance => CommonCore.theInstance;
         private chatInstance? chatInstance => CommonCore.instanceChat;
 
-        private bool _firstLoadComplete = false;
+        private bool _firstLoadComplete;
         private DateTime _lastGridUpdate;
         private bool _autoScrollChat = true;
 
@@ -38,7 +38,7 @@ namespace ServerManager.Forms.Panels
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(ChatTickerHook));
+                Invoke(ChatTickerHook);
                 return;
             }
 
@@ -116,14 +116,13 @@ namespace ServerManager.Forms.Panels
         /// </summary>
         public void functionEvent_UpdateSlapMessages()
         {
-            var slapMessages = CommonCore.instanceChat!.SlapMessages;
             var dgv = dg_slapMessages;
 
             // Preserve scroll position
             int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
 
             // Build lookup for fast access
-            var managerDict = slapMessages.ToDictionary(x => x.SlapMessageId);
+            var managerDict = CommonCore.instanceChat!.SlapMessages.ToDictionary(x => x.SlapMessageId);
 
             // Remove rows not in manager
             for (int i = dgv.Rows.Count - 1; i >= 0; i--)
@@ -134,7 +133,7 @@ namespace ServerManager.Forms.Panels
             }
 
             // Update existing rows and add new ones
-            foreach (var msg in slapMessages)
+            foreach (var msg in CommonCore.instanceChat.SlapMessages)
             {
                 bool found = false;
                 for (int i = 0; i < dgv.Rows.Count; i++)

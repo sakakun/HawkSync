@@ -1,8 +1,8 @@
-﻿using ServerManager.Classes.SupportClasses;
-using HawkSyncShared;
+﻿using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
+using ServerManager.Classes.Services.ProxyDetection;
 using System.Net;
 
 namespace ServerManager.Classes.Helpers

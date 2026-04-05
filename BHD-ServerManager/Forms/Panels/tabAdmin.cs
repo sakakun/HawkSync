@@ -10,11 +10,11 @@ public partial class tabAdmin : UserControl
 {
     private adminInstance adminInstance => CommonCore.instanceAdmin!;
     private int _selectedUserID = -1;
-    private bool _isEditMode = false;
+    private bool _isEditMode;
     private DateTime _lastUserListRefresh = DateTime.MinValue;
     private const int UserListRefreshIntervalSeconds = 10;
-    private int? _lastSelectedUserId = null;
-    private int _lastScrollIndex = 0;
+    private int? _lastSelectedUserId;
+    private int _lastScrollIndex;
     private const int DefaultAdminUserId = 1;
 
     private static bool IsDesignTime =>
@@ -60,7 +60,7 @@ public partial class tabAdmin : UserControl
     {
         if (InvokeRequired)
         {
-            Invoke(new Action(TickerAdminTick));
+            Invoke(TickerAdminTick);
             return;
         }
 

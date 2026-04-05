@@ -1,8 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 
-namespace ServerManager.Classes.SupportClasses
-{
+namespace ServerManager.Classes.Services.ProxyDetection;
+
     /// <summary>
     /// Result from a proxy check service.
     /// </summary>
@@ -41,4 +40,3 @@ namespace ServerManager.Classes.SupportClasses
         /// </summary>
         string ServiceName { get; }
     }
-}

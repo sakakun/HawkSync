@@ -1,13 +1,10 @@
 ﻿using HawkSyncShared.Instances;
 using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
-using System;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
-using System.Windows.Navigation;
+using ServerManager.Classes.SupportClasses;
 
-namespace ServerManager.Classes.SupportClasses
+namespace ServerManager.Classes.Services.ProxyDetection
 {
     /// <summary>
     /// Static manager for proxy checking with in-memory caching using CommonCore.banInstance.ProxyRecords.
@@ -163,7 +160,7 @@ namespace ServerManager.Classes.SupportClasses
             var cachedRecord = GetFromMemoryCache(ipAddress);
             if (cachedRecord != null && !IsCacheExpired(cachedRecord))
             {
-                return ConvertToResult(cachedRecord, fromCache: true);
+                return ConvertToResult(cachedRecord);
             }
 
             // Step 2: If expired in memory, check database (might have been updated by another process)
@@ -183,7 +180,7 @@ namespace ServerManager.Classes.SupportClasses
 
                     if (!IsCacheExpired(dbRecord))
                     {
-                        return ConvertToResult(dbRecord, fromCache: true);
+                        return ConvertToResult(dbRecord);
                     }
 
                     cachedRecord = dbRecord;
@@ -199,7 +196,7 @@ namespace ServerManager.Classes.SupportClasses
                 if (cachedRecord != null)
                 {
                     AppDebug.Log($"API failed, using expired cache for {ipAddress}", AppDebug.LogLevel.Error);
-                    var result = ConvertToResult(cachedRecord, fromCache: true);
+                    var result = ConvertToResult(cachedRecord);
                     result.ErrorMessage = $"Using expired cache. API error: {apiResult.ErrorMessage}";
                     return result;
                 }
@@ -296,7 +293,7 @@ namespace ServerManager.Classes.SupportClasses
         /// <summary>
         /// Convert a proxyRecord to a ProxyCheckResult.
         /// </summary>
-        private static ProxyCheckResult ConvertToResult(proxyRecord record, bool fromCache)
+        private static ProxyCheckResult ConvertToResult(proxyRecord record)
         {
             return new ProxyCheckResult
             {

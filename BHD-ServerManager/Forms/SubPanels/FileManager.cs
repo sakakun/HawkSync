@@ -311,7 +311,7 @@ namespace ServerManager.Forms.SubPanels
         private bool IsMapInPlaylists(string fileName)
         {
             var mapInstance = CommonCore.instanceMaps;
-            if (mapInstance == null || mapInstance.Playlists == null)
+            if (mapInstance == null)
             {
                 return false;
             }

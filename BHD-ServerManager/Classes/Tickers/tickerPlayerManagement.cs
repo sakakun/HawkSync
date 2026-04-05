@@ -20,7 +20,7 @@ namespace ServerManager.Classes.Tickers
         private static readonly Dictionary<int, PlayerIdleState> playerIdleStates = new();
         
         // Track if weapon config has been logged
-        private static bool weaponConfigLogged = false;
+        private static bool weaponConfigLogged;
 
         // Helper for UI thread safety
         private static void SafeInvoke(Control control, Action action)
@@ -190,7 +190,7 @@ namespace ServerManager.Classes.Tickers
             }
 
             // Below threshold - check each active player for restricted weapons
-            int checkedCount = 0;
+
             foreach (var playerKvp in playerInstance.PlayerList.ToList())
             {
                 int playerSlot = playerKvp.Key;
@@ -198,7 +198,6 @@ namespace ServerManager.Classes.Tickers
 
                 try
                 {
-                    checkedCount++;
                     // Check this player's weapon restriction
                     playerInstanceManager.CheckWeaponRestriction(playerInfo);
                 }

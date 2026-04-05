@@ -30,16 +30,13 @@ namespace ServerManager.Classes.InstanceManagers
             foreach (var playerRecord in playerInstance.PlayerList)
             {
                 var playerObj = playerRecord.Value;
-                if (playerObj != null && playerObj.PlayerNameBase64 != null)
-                {
-                    UpdatePlayerStats(playerObj);
-                }
+                UpdatePlayerStats(playerObj);
             }
         }
 
         public static void UpdatePlayerStats(PlayerObject CurrentPlayerObject)
         {
-            if (CurrentPlayerObject == null || string.IsNullOrEmpty(CurrentPlayerObject.PlayerNameBase64))
+            if (string.IsNullOrEmpty(CurrentPlayerObject.PlayerNameBase64))
                 return;
 
             if (!instanceStats.playerStatsList.TryGetValue(CurrentPlayerObject.PlayerNameBase64, out var statObj))
@@ -96,8 +93,6 @@ namespace ServerManager.Classes.InstanceManagers
 
         public static PlayerObject ComparePlayerStats(PlayerObject CurrentPlayerObject, PlayerObject PreviousPlayerObject)
         {
-            if (CurrentPlayerObject == null || PreviousPlayerObject == null)
-                return new PlayerObject();
 
             return new PlayerObject
             {
@@ -145,7 +140,7 @@ namespace ServerManager.Classes.InstanceManagers
 
         private static PlayerObject ClonePlayerObject(PlayerObject obj)
         {
-            if (obj == null) return new PlayerObject();
+
             return new PlayerObject
             {
                 PlayerSlot = obj.PlayerSlot,
@@ -198,7 +193,7 @@ namespace ServerManager.Classes.InstanceManagers
 
             if (dataGridViewPlayerStats.InvokeRequired)
             {
-                dataGridViewPlayerStats.Invoke(new Action(PopulatePlayerStatsGrid));
+                dataGridViewPlayerStats.Invoke(PopulatePlayerStatsGrid);
                 return;
             }
 
@@ -250,7 +245,7 @@ namespace ServerManager.Classes.InstanceManagers
 
             if (dataGridViewWeaponStats.InvokeRequired)
             {
-                dataGridViewWeaponStats.Invoke(new Action(PopulateWeaponStatsGrid));
+                dataGridViewWeaponStats.Invoke(PopulateWeaponStatsGrid);
                 return;
             }
 
@@ -301,16 +296,16 @@ namespace ServerManager.Classes.InstanceManagers
 
             string timer = timerSeconds.ToString();
             string date = DateTime.Now.ToString("yyyy-M-d HH:mm:ss");
-            string gametype = instanceMaps.CurrentGameType.ToString() ?? "0";
+            string gametype = instanceMaps.CurrentGameType.ToString();
             string dedicated = theInstance.gameDedicated ? "1" : "0";
             string servername = theInstance.gameServerName;
             string mapname = instanceMaps.CurrentMapName;
-            string maxplayers = theInstance.gameMaxSlots.ToString() ?? "0";
-            string numplayers = playerInstance.PlayerList?.Count.ToString() ?? "0";
+            string maxplayers = theInstance.gameMaxSlots.ToString();
+            string numplayers = playerInstance.PlayerList.Count.ToString();
             string winner = theInstance.gameMatchWinner.ToString();
             string mod = "7";  // 7 = BHD, 8 = BHDTS
 
-            string gameLine = string.Empty;
+            string gameLine;
             if (theInstance.instanceStatus == InstanceStatus.SCORING)
             {
                 gameLine = $" Game {timer}__&__{date}__&__{gametype}__&__{dedicated}__&__{servername}__&__{mapname}__&__{maxplayers}__&__{numplayers}__&__{winner}__&__{mod}";
@@ -323,7 +318,7 @@ namespace ServerManager.Classes.InstanceManagers
         }
         public static string GeneratePlayerLines(PlayerStatObject playerStats)
         {
-            string PlayerLines = string.Empty;
+            string PlayerLines;
             PlayerObject player = playerStats.PlayerStatsCurrent;
             PlayerLines = "  Player " + player.PlayerName + "__&__" + player.PlayerIPAddress + "\n";
             PlayerLines += GeneratePlayerStatLine(player);
@@ -332,7 +327,7 @@ namespace ServerManager.Classes.InstanceManagers
         }
         public static string GeneratePlayerStatLine(PlayerObject player)
         {
-            string PlayerStatLine = string.Empty;
+            string PlayerStatLine;
             PlayerStatLine = "   PlayerStats ";
             PlayerStatLine += player.stat_Suicides + " ";
             PlayerStatLine += player.stat_Murders + " ";
@@ -402,7 +397,6 @@ namespace ServerManager.Classes.InstanceManagers
             reportData += "DFBHD\n";
             foreach (var playerStat in instanceStats.playerStatsList.Values)
             {
-                PlayerObject Player = playerStat.PlayerStatsCurrent;
                 reportData += GeneratePlayerLines(playerStat);
                 reportData += "\n";
             }
@@ -550,7 +544,7 @@ namespace ServerManager.Classes.InstanceManagers
         {
             var handler = new HttpClientHandler
             {
-                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
             };
 
             using var httpClient = new HttpClient(handler);

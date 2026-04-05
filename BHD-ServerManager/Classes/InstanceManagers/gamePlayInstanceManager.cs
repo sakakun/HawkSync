@@ -1,6 +1,4 @@
-﻿using ServerManager.Forms.Panels;
-using HawkSyncShared.SupportClasses;
-using HawkSyncShared.Instances;
+﻿using HawkSyncShared.Instances;
 
 namespace ServerManager.Classes.InstanceManagers
 {

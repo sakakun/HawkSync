@@ -48,7 +48,7 @@ namespace ServerManager.Forms.Panels
 		{
 			if (InvokeRequired)
 			{
-				Invoke(new Action(Ticker_ProfileTab));
+				Invoke(Ticker_ProfileTab);
 				return;
 			}
 
@@ -346,7 +346,7 @@ namespace ServerManager.Forms.Panels
 			{
 				Interval = 500 // 500ms debounce
 			};
-			_auditFilterTimer.Tick += (s, e) =>
+			_auditFilterTimer.Tick += (_, _) =>
 			{
 				_auditFilterTimer.Stop();
 				LoadAuditLogs();
@@ -484,7 +484,7 @@ namespace ServerManager.Forms.Panels
 			{
 				ServerMemory.DetachFromGameProcess();
 				CommonCore.theInstance!.instanceAttachedPID = null;
-				CommonCore.theInstance!.instanceStatus = InstanceStatus.OFFLINE;
+				CommonCore.theInstance.instanceStatus = InstanceStatus.OFFLINE;
 				btn_toggleProcessAttach.Text = "Attach Process";
 			}		
 		}

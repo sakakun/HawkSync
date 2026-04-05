@@ -16,8 +16,6 @@ namespace ServerManager.Forms.Panels
 
         // --- Class Variables ---
         private const int MapTypeAll = 9;
-        private const int PlaylistMin = 1;
-        private const int PlaylistMax = 5;
         public int MapTypeFilter;
 
         private static bool IsDesignTime =>
@@ -39,7 +37,7 @@ namespace ServerManager.Forms.Panels
         {
             if(InvokeRequired)
             {
-                Invoke(new Action(Ticker_tabMaps));
+                Invoke(Ticker_tabMaps);
                 return;
             }
 
@@ -639,7 +637,7 @@ namespace ServerManager.Forms.Panels
                 }
 
                 if (!int.TryParse(parts[0], out int mapType)) { skippedCount++; continue; }
-                if (!int.TryParse(parts[1], out int modType)) { skippedCount++; continue; }
+                if (!int.TryParse(parts[1], out _)) { skippedCount++; continue; }
                 string fileName = parts[2].Trim();
 
                 var map1 = DefaultMaps.FirstOrDefault(m =>

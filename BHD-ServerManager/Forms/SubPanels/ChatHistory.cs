@@ -8,10 +8,10 @@ namespace ServerManager.Forms.SubPanels
     public partial class ChatHistory : UserControl
     {
         private List<ChatLogObject> _currentLogs = new();
-        private int _totalCount = 0;
+        private int _totalCount;
         private int _currentPage = 1;
         private int _pageSize = 100;
-        private bool _isLoading = false;
+        private bool _isLoading;
 
         private static bool IsDesignTime =>
             LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");        
@@ -63,14 +63,15 @@ namespace ServerManager.Forms.SubPanels
         {
             try
             {
-                var players = DatabaseManager.GetDistinctPlayerNames(500);
+                var players = DatabaseManager.GetDistinctPlayerNames();
 
                 comboBox_PlayerFilter.Items.Clear();
                 comboBox_PlayerFilter.Items.Add("All Players");
-                if (players != null && players.Count > 0)
+                if (players.Count > 0)
                 {
-                    comboBox_PlayerFilter.Items.AddRange(players.ToArray());
+                    comboBox_PlayerFilter.Items.AddRange(players.Select(static p => (object)p).ToArray());
                 }
+
                 comboBox_PlayerFilter.SelectedIndex = 0;
             }
             catch (Exception ex)
@@ -237,7 +238,7 @@ namespace ServerManager.Forms.SubPanels
             {
                 dataGridView_History.Rows.Add(
                     log.MessageTimeStamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
-                    log.TeamDisplay ?? "Unknown",
+                    log.TeamDisplay,
                     log.PlayerName,
                     log.MessageText
                 );
@@ -344,7 +345,7 @@ namespace ServerManager.Forms.SubPanels
         /// </summary>
         private void btn_ExportCSV_Click(object sender, EventArgs e)
         {
-            if (_currentLogs == null || _currentLogs.Count == 0)
+            if (_currentLogs.Count == 0)
             {
                 MessageBox.Show(
                     "No data to export. Please load chat history first.",
@@ -378,7 +379,7 @@ namespace ServerManager.Forms.SubPanels
                     {
                         // Escape fields for CSV (wrap in quotes, escape internal quotes)
                         string timestamp = log.MessageTimeStamp.ToString("yyyy-MM-dd HH:mm:ss");
-                        string team = EscapeCsvField(log.TeamDisplay ?? "Unknown");
+                        string team = EscapeCsvField(log.TeamDisplay);
                         string player = EscapeCsvField(log.PlayerName);
                         string messageType = log.MessageType.ToString();
                         string message = EscapeCsvField(log.MessageText);
@@ -469,11 +470,11 @@ namespace ServerManager.Forms.SubPanels
                 {
                     dataGridView_History.Rows[e.RowIndex].DefaultCellStyle.BackColor = teamValue switch
                     {
-                        "Server" => System.Drawing.Color.LightYellow,
-                        "Blue" => System.Drawing.Color.LightBlue,
-                        "Red" => System.Drawing.Color.LightCoral,
-                        "Global" => System.Drawing.Color.LightGreen,
-                        _ => System.Drawing.Color.White
+                        "Server" => Color.LightYellow,
+                        "Blue" => Color.LightBlue,
+                        "Red" => Color.LightCoral,
+                        "Global" => Color.LightGreen,
+                        _ => Color.White
                     };
                 }
             }

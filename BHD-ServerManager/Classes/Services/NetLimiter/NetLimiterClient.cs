@@ -1,12 +1,7 @@
-﻿using ServerManager.Classes.SupportClasses;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using HawkSyncShared.SupportClasses;
 
 namespace ServerManager.Classes.Services.NetLimiter
@@ -59,7 +54,7 @@ namespace ServerManager.Classes.Services.NetLimiter
 			        }
 
 			        Response response = JsonSerializer.Deserialize<Response>(responseJson, JsonOptions)!;
-			        return response!;
+			        return response;
 		        }
 	        }
 	        finally
@@ -220,12 +215,12 @@ namespace ServerManager.Classes.Services.NetLimiter
 		        _bridgeProcess = Process.Start(startInfo);
 		        
 		        // Optional: Capture output for debugging
-		        _bridgeProcess!.OutputDataReceived += (sender, e) => 
+		        _bridgeProcess!.OutputDataReceived += (_, e) => 
 		        {
 		            if (!string.IsNullOrEmpty(e.Data))
 		                AppDebug.Log(e.Data, AppDebug.LogLevel.Warning);
 		        };
-		        _bridgeProcess.ErrorDataReceived += (sender, e) => 
+		        _bridgeProcess.ErrorDataReceived += (_, e) => 
 		        {
 		            if (!string.IsNullOrEmpty(e.Data))
 		                AppDebug.Log("[ERROR]" + e.Data, AppDebug.LogLevel.Error);

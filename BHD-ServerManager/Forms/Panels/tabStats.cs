@@ -40,7 +40,7 @@ namespace ServerManager.Forms.Panels
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(StatsTickerHook));
+                Invoke(StatsTickerHook);
                 return;
             }
 
