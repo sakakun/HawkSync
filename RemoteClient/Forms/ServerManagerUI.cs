@@ -37,6 +37,13 @@ public partial class ServerManagerUI
         
         Load += PostServerManagerInitalization;
 
+        // Unsubscribe when the form closes to prevent ObjectDisposedException
+        FormClosed += (_, _) =>
+        {
+            ApiCore.OnConnectionStateChanged -= OnConnectionStateChanged;
+            ApiCore.OnSnapshotReceived -= OnSnapshotReceived;
+        };
+        
         // Initial update
         UpdateServerInfo();
     }
@@ -79,6 +86,9 @@ public partial class ServerManagerUI
     // EVENT HANDLER - Connection state changed
     private void OnConnectionStateChanged(string state)
     {
+        // Guard against the race where SignalR fires during or after disposal
+        if (IsDisposed || !IsHandleCreated) return;
+
         if (InvokeRequired)
         {
             Invoke(() => OnConnectionStateChanged(state));
@@ -91,7 +101,6 @@ public partial class ServerManagerUI
                 "Connection Lost", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-        // If the connection state indicates a disconnection, close the UI
         if (state.Contains("Disconnected"))
         {
             MessageBox.Show("Connection to the server has been lost. The Server Manager will now close.", 
@@ -103,12 +112,15 @@ public partial class ServerManagerUI
     // EVENT HANDLER - Snapshot received
     private void OnSnapshotReceived(ServerSnapshot snapshot)
     {
+        // Guard against the race where SignalR fires during or after disposal
+        if (IsDisposed || !IsHandleCreated) return;
+
         if (InvokeRequired)
         {
             Invoke(() => OnSnapshotReceived(snapshot));
             return;
         }
-        
+    
         // Update the Core Instances
         CommonCore.theInstance = snapshot.ServerData;
         CommonCore.instanceChat = snapshot.Chat;
@@ -121,6 +133,8 @@ public partial class ServerManagerUI
         UpdateServerInfo();
     }
 
+    
+    
     private void UpdateServerInfo()
     {
         if (ApiCore.CurrentSnapshot == null) return;

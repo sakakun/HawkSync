@@ -78,6 +78,9 @@ public partial class PlayerCardV2 : UserControl
     
     private void PlayerCardTicker()
     {
+
+        if (!IsHandleCreated)
+            return;
         
         // Does playerInstance.PlayerList has a key with same value of playerSlot
         if (!playerInstance!.PlayerList.ContainsKey(_playerSlot))
