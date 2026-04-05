@@ -442,8 +442,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
         public static void ResetPlayerStats()
         {
             instanceStats.playerStatsList.Clear();
-            instanceStats.lastPlayerStatsUpdate = DateTime.MinValue;
-            instanceStats.lastPlayerStatsReport = DateTime.MinValue;
         }
 
 // --- ASYNC NETWORK METHODS WITH UI INVOKE FIXES ---
@@ -633,8 +631,6 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
                 
                 logRecord.ReportContent = scopedMessage;
-                logRecord.BabstatsServerID = server.BabstatsServerID;
-                logRecord.BabstatsServerName = serverLabel;
             }
 
             CommonCore.instanceStats!.WebStatsLog.Add(logRecord);

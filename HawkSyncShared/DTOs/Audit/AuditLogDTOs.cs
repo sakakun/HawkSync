@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace HawkSyncShared.DTOs.Audit;
 
 /// <summary>

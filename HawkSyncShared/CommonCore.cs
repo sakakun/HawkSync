@@ -1,8 +1,5 @@
 ﻿using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace HawkSyncShared
 {

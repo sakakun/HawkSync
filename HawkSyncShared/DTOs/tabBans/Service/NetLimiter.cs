@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HawkSyncShared.DTOs.tabBans.Service;
+﻿namespace HawkSyncShared.DTOs.tabBans.Service;
 
 public class NetLimiterSettingsRequest
 {

@@ -1,20 +1,10 @@
 ﻿using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.DTOs.tabStats;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace HawkSyncShared.Instances
 {
     public class statInstance
     {
-        // --------------------------------------------------------------------
-        // Transitional legacy scheduling fields (kept for compatibility)
-        // Remove after ticker/send pipeline is fully migrated to per-server state.
-        // --------------------------------------------------------------------
-        public DateTime lastPlayerStatsUpdate { get; set; } = DateTime.MinValue;
-        public DateTime lastPlayerStatsReport { get; set; } = DateTime.MinValue;
-
         // Current match/player stat tracking
         public Dictionary<string, PlayerStatObject> playerStatsList { get; set; } = new();
 
@@ -82,15 +72,13 @@ namespace HawkSyncShared.Instances
         }
 
         // Force Update Flag
-        public bool ForceUIUpdate { get; set; } = false;
+        public bool ForceUIUpdate { get; set; } 
     }
 
     public class BabstatsServerRuntimeState
     {
         public DateTime LastPlayerStatsUpdate { get; set; } = DateTime.MinValue;
         public DateTime LastPlayerStatsReport { get; set; } = DateTime.MinValue;
-        public int ConsecutiveFailureCount { get; set; } = 0;
-        public string LastError { get; set; } = string.Empty;
     }
 
     public class PlayerStatObject
@@ -112,9 +100,5 @@ namespace HawkSyncShared.Instances
     {
         public required DateTime ReportDate { get; set; }
         public required string ReportContent { get; set; }
-
-        // Optional context fields for multi-endpoint logging
-        public int? BabstatsServerID { get; set; }
-        public string? BabstatsServerName { get; set; }
     }
 }

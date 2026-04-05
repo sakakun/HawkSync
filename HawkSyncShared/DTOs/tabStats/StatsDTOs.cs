@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HawkSyncShared.DTOs.tabStats
+﻿namespace HawkSyncShared.DTOs.tabStats
 {
     /// <summary>
     /// Legacy single-server web stats configuration settings.

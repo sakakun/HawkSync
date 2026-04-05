@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HawkSyncShared.DTOs.API;
+﻿namespace HawkSyncShared.DTOs.API;
 
 public record CommandResult
 {

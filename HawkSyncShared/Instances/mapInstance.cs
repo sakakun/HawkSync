@@ -1,6 +1,4 @@
-﻿using HawkSyncShared.Instances;
-using System.Collections.Generic;
-using HawkSyncShared.DTOs.tabMaps;
+﻿using HawkSyncShared.DTOs.tabMaps;
 
 namespace HawkSyncShared.Instances;
 

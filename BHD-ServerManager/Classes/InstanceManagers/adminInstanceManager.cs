@@ -1,5 +1,4 @@
-﻿using BCrypt.Net;
-using HawkSyncShared;
+﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
 using BHD_ServerManager.Classes.SupportClasses;
@@ -126,7 +125,7 @@ public static class adminInstanceManager
                 passwordHash,
                 salt,
                 request.IsActive,
-                request.Notes ?? string.Empty
+                request.Notes
             );
 
             if (userID <= 0)
@@ -184,7 +183,7 @@ public static class adminInstanceManager
                 request.UserID,
                 request.Username,
                 request.IsActive,
-                request.Notes ?? string.Empty
+                request.Notes
             );
 
             if (!updateSuccess)

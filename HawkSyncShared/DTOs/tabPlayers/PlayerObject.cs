@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HawkSyncShared.DTOs.tabPlayers
+﻿namespace HawkSyncShared.DTOs.tabPlayers
 {
     public class PlayerObject
     {
@@ -13,14 +10,14 @@ namespace HawkSyncShared.DTOs.tabPlayers
         public int PlayerTeam { get; set; } // 0=Self, 1= Blue, 2 Red PlayerTeam
 
         // Player Status Information
-        public int PlayerPing { get; set; } = 0;
-        public int PlayerTimePlayed { get; set; } = 0; // Total time played in seconds
+        public int PlayerPing { get; set; } 
+        public int PlayerTimePlayed { get; set; } // Total time played in seconds
         public DateTime PlayerJoined { get; set; } = DateTime.Now;
         public DateTime PlayerLastSeen { get; set; } = DateTime.Now;
 
         // God Mode
-        public bool IsGod { get; set; } = false;
-        public bool IsProxyDetected { get; set; } = false;
+        public bool IsGod { get; set; } 
+        public bool IsProxyDetected { get; set; }
         public string? CountryCode { get; set; }
 
         // Character Information
@@ -29,14 +26,14 @@ namespace HawkSyncShared.DTOs.tabPlayers
 
         // In-Game Values
         public int ActiveZoneTime { get; set; }
-        public int PlayerHealth { get; set; } = 0;
+        public int PlayerHealth { get; set; } 
 
         // In-Game Position and Facing Information
-        public float PosX { get; set; } = 0f;
-        public float PosY { get; set; } = 0f;
-        public float PosZ { get; set; } = 0f;
-        public float FacingYaw { get; set; } = 0f;
-        public float FacingPitch { get; set; } = 0f;
+        public float PosX { get; set; } 
+        public float PosY { get; set; } 
+        public float PosZ { get; set; } 
+        public float FacingYaw { get; set; }
+        public float FacingPitch { get; set; }
 
         // Player Statistics
         public int stat_Kills { get; set; }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HawkSyncShared.DTOs.tabAdmin;
+﻿using HawkSyncShared.DTOs.tabAdmin;
 
 namespace HawkSyncShared.Instances;
 
@@ -21,10 +20,10 @@ public class adminInstance
     public bool ForceUIUpdate = false;
 }
 
-public class AdminAuditLog
+public record AdminAuditLog
 {
-    public DateTime Timestamp { get; set; }
-    public string Username { get; set; } = string.Empty;
-    public string Action { get; set; } = string.Empty;
-    public string Details { get; set; } = string.Empty;
+    public DateTime Timestamp;
+    public required string Username;
+    public required string Action;
+    public required string Details;
 }

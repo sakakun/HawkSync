@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HawkSyncShared.DTOs.tabAdmin
+﻿namespace HawkSyncShared.DTOs.tabAdmin
 { 
     /// <summary>
     /// Represents a user record from the database.

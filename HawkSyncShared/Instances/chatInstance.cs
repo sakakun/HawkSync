@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace HawkSyncShared.Instances
 {
@@ -10,9 +8,7 @@ namespace HawkSyncShared.Instances
         public List<AutoMessages> AutoMessages { get; set; } = new List<AutoMessages>();
         public List<ChatLogObject> ChatLog { get; set; } = new List<ChatLogObject>();
         [JsonIgnore]
-        public int AutoMessageCounter { get; set; } = 0;
-        [JsonIgnore]
-        public int lastChatLogIndex { get; set; } = 0;
+        public int AutoMessageCounter { get; set; }
         [JsonIgnore]
         public DateTime lastAutoMessageSent { get; set; } = DateTime.MinValue;
         [JsonIgnore]
@@ -20,16 +16,16 @@ namespace HawkSyncShared.Instances
         [JsonIgnore]
         public DateTime LastMessageSent { get; set; } = DateTime.MinValue;
         [JsonIgnore]
-        public bool IsProcessingMessage { get; set; } = false;
+        public bool IsProcessingMessage { get; set; }
 
     }
 
-    public class QueuedChatMessage
+    public record QueuedChatMessage
     {
-        public string Message { get; set; } = string.Empty;
-        public int Channel { get; set; }
-        public int MaxLength { get; set; } = 59;
-        public DateTime QueuedAt { get; set; } = DateTime.Now;
+        public required string Message;
+        public int Channel;
+        public int MaxLength = 59;
+        public DateTime QueuedAt = DateTime.Now;
     }
 
     public class ChatLogObject
@@ -44,15 +40,15 @@ namespace HawkSyncShared.Instances
 
     public class SlapMessages
     {
-        public int SlapMessageId { get; set; } = 0;
+        public int SlapMessageId { get; set; }
         public string SlapMessageText { get; set; } = string.Empty;
     }
 
     public class AutoMessages
     {
-        public int AutoMessageId { get; set; } = 0;
+        public int AutoMessageId { get; set; }
         public string AutoMessageText { get; set; } = string.Empty;
-        public int AutoMessageTigger { get; set; } = 0;
+        public int AutoMessageTigger { get; set; }
     }
 
     public class ChatSettingsObject

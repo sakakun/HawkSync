@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HawkSyncShared.DTOs.tabAdmin
+﻿namespace HawkSyncShared.DTOs.tabAdmin
 {
     public record UserDTO
     {
@@ -19,11 +13,11 @@ namespace HawkSyncShared.DTOs.tabAdmin
 
     public class CreateUserRequestDTO
     {
-        public string Username { get; set; } = "";
-        public string Password { get; set; } = "";
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
         public List<string> Permissions { get; set; } = new();
         public bool IsActive { get; set; }
-        public string Notes { get; set; } = "";
+        public string Notes { get; set; } = string.Empty;
     }
 
     public class UpdateUserRequestDTO

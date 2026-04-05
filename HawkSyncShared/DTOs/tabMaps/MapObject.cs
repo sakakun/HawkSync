@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace HawkSyncShared.DTOs.tabMaps
+﻿namespace HawkSyncShared.DTOs.tabMaps
 {
 
     public class MapObject

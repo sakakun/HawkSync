@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace HawkSyncShared.DTOs.tabMaps
+﻿namespace HawkSyncShared.DTOs.tabMaps
 {
     public class GameTypeObject
     {
