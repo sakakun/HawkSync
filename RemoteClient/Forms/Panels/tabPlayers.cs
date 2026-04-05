@@ -36,7 +36,7 @@ public partial class tabPlayers : UserControl
             playerCard.Dock = DockStyle.Fill;
             playerCard.Margin = new Padding(0);
             playerCard.Padding = new Padding(0);
-            playerCard.ToggleVisibility(i < theInstance!.gameMaxSlots);
+            playerCard.ToggleVisibility(i < theInstance!.gameMaxSlots + 1);
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 playerCard.ToggleVisibility(true);
