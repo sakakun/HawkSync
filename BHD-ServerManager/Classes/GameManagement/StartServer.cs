@@ -1,8 +1,6 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.GameManagement.Patcher;
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Forms.Panels;
+﻿using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.Forms.Panels;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
@@ -12,7 +10,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace BHD_ServerManager.Classes.GameManagement
+namespace ServerManager.Classes.GameManagement
 {
     // Ideally this should be a static class to manage server start operations.
 

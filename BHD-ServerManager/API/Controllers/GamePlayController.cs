@@ -1,6 +1,6 @@
-using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.GameManagement;
+using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
@@ -10,7 +10,7 @@ using HawkSyncShared.Instances;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BHD_ServerManager.API.Controllers;
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -509,7 +509,7 @@ public class GamePlayController : ControllerBase
                 message = "Invalid game server path. Please configure the server path in Profile settings.";
                 return Ok(new CommandResult { Success = false, Message = message });
             }
-            bool started = BHD_ServerManager.Classes.GameManagement.StartServer.startGame();
+            bool started = ServerManager.Classes.GameManagement.StartServer.startGame();
             if (started)
             {
                 ServerMemory.ReadMemoryServerStatus();
@@ -552,7 +552,7 @@ public class GamePlayController : ControllerBase
                 message = "Server is not running.";
                 return Ok(new CommandResult { Success = false, Message = message });
             }
-            BHD_ServerManager.Classes.GameManagement.StartServer.stopGame();
+            ServerManager.Classes.GameManagement.StartServer.stopGame();
             success = true;
             message = "Game server stopped successfully.";
             return Ok(new CommandResult { Success = success, Message = message });

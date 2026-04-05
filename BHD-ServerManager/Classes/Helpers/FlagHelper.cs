@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using HawkSyncShared.SupportClasses;
 
-namespace BHD_ServerManager.Classes.Helpers
+namespace ServerManager.Classes.Helpers
 {
     /// <summary>
     /// Helper class to fetch and cache country flag images by ISO code

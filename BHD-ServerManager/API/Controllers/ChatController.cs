@@ -1,12 +1,14 @@
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.InstanceManagers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.DTOs.tabPlayers;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared.Instances;
 using HawkSyncShared.DTOs.Audit;
+
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -25,7 +27,7 @@ public class ChatController : ControllerBase
 
         LogChatAction(
             actionType: "SendMessage",
-            target: command.Message ?? string.Empty,
+            target: command.Message,
             extra: $"Channel: {command.Channel}",
             success: result.Success,
             message: result.Message
@@ -38,10 +40,10 @@ public class ChatController : ControllerBase
     public ActionResult<CommandResult> AddAutoMessage([FromBody] AutoMessageRequest request)
     {
         if (!HasPermission("chat")) return Forbid();
-        var result = chatInstanceManager.AddAutoMessage(request.Message!, request.Interval);
+        var result = chatInstanceManager.AddAutoMessage(request.Message, request.Interval);
         LogChatAction(
             actionType: "AddAutoMessage",
-            target: request.Message ?? string.Empty,
+            target: request.Message,
             extra: $"Interval: {request.Interval}",
             success: result.Success,
             message: result.Message
@@ -53,10 +55,10 @@ public class ChatController : ControllerBase
     public ActionResult<CommandResult> RemoveAutoMessage([FromBody] RemoveMessageRequest request)
     {
         if (!HasPermission("chat")) return Forbid();
-        var result = chatInstanceManager.RemoveAutoMessage(int.Parse(request.Id!));
+        var result = chatInstanceManager.RemoveAutoMessage(int.Parse(request.Id));
         LogChatAction(
             actionType: "RemoveAutoMessage",
-            target: request.Id ?? string.Empty,
+            target: request.Id,
             extra: string.Empty,
             success: result.Success,
             message: result.Message
@@ -68,10 +70,10 @@ public class ChatController : ControllerBase
     public ActionResult<CommandResult> AddSlapMessage([FromBody] SlapMessageRequest request)
     {
         if (!HasPermission("chat")) return Forbid();
-        var result = chatInstanceManager.AddSlapMessage(request.Message!);
+        var result = chatInstanceManager.AddSlapMessage(request.Message);
         LogChatAction(
             actionType: "AddSlapMessage",
-            target: request.Message ?? string.Empty,
+            target: request.Message,
             extra: string.Empty,
             success: result.Success,
             message: result.Message
@@ -83,10 +85,10 @@ public class ChatController : ControllerBase
     public ActionResult<CommandResult> RemoveSlapMessage([FromBody] RemoveMessageRequest request)
     {
         if (!HasPermission("chat")) return Forbid();
-        var result = chatInstanceManager.RemoveSlapMessage(int.Parse(request.Id!));
+        var result = chatInstanceManager.RemoveSlapMessage(int.Parse(request.Id));
         LogChatAction(
             actionType: "RemoveSlapMessage",
-            target: request.Id ?? string.Empty,
+            target: request.Id,
             extra: string.Empty,
             success: result.Success,
             message: result.Message
@@ -152,26 +154,38 @@ public class ChatController : ControllerBase
 
 }
 
-public class AutoMessageRequest { public string? Message { get; set; } public int Interval { get; set; } }
-public class SlapMessageRequest { public string? Message { get; set; } }
-public class RemoveMessageRequest { public string? Id { get; set; } }
-
-public class ChatHistoryRequest
+public record AutoMessageRequest
 {
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
-    public string? PlayerFilter { get; set; }
-    public int? TypeFilter { get; set; }
-    public int? TeamFilter { get; set; }
-    public string? SearchText { get; set; }
-    public int Page { get; set; } = 1;
-    public int PageSize { get; set; } = 100;
+    public required string Message;
+    public required int Interval;
 }
 
-public class ChatHistoryResponse
+public record SlapMessageRequest
 {
-    public List<ChatLogObject> Logs { get; set; } = new();
-    public int TotalCount { get; set; }
-    public int Page { get; set; }
-    public int PageSize { get; set; }
+    public required string Message;
 }
+
+public record RemoveMessageRequest
+{
+    public required string Id;
+}
+
+public record ChatHistoryRequest
+{
+    public required DateTime? StartDate;
+    public required DateTime? EndDate;
+    public required string? PlayerFilter;
+    public required int? TypeFilter;
+    public required int? TeamFilter;
+    public required string? SearchText;
+    public required int Page = 1;
+    public required int PageSize = 100;
+}
+
+public record ChatHistoryResponse
+{
+    public required List<ChatLogObject> Logs;
+    public required int TotalCount;
+    public required int Page;
+    public required int PageSize;
+    }

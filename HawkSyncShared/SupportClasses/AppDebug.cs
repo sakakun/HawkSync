@@ -78,7 +78,7 @@ namespace HawkSyncShared.SupportClasses
                 {
                     if (!EventLog.SourceExists(EventSource))
                     {
-                        // Creating a source requires admin rights on Windows; if it fails we'll fallback below.
+                        // Creating a source requires admin rights on Windows; if it fails we'll fall back below.
                         EventLog.CreateEventSource(new EventSourceCreationData(EventSource, "Application"));
                     }
 

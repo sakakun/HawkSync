@@ -1,23 +1,4 @@
-﻿using System;
-using System.IO;
-
-/// <summary>
-/// Patches dfbhd.exe in two independent areas:
-///
-///   1. Max-players cap: raises the server player limit from 50/51 to 80/81.
-///
-///   2. 4-team PSP announcements: in the original binary sub_4AFD70 and sub_4AFE00
-///      both contain a hard-coded early-return for teams other than 1 (Red) and
-///      2 (Blue), which silently skips the network message that triggers the
-///      "enemy is taking over a spawn point" audio cue and status-text overlay.
-///      NOPing those two conditional jumps lets teams 3 (Yellow) and 4 (Violet)
-///      reach the same broadcast path as Red and Blue.
-///
-/// Call Patch() before starting the server process, Unpatch() after stopping it.
-/// Safe to call multiple times — IsPatched() guards against double-patching.
-/// </summary>
-/// 
-namespace BHD_ServerManager.Classes.GameManagement.Patcher;
+﻿namespace ServerManager.Classes.GameManagement.Patcher;
 
 public static class DFBHDPatcher
 {
@@ -87,7 +68,7 @@ public static class DFBHDPatcher
         // Read entire file to detect 4-byte immediate patterns for team-3/4
         fs.Position = 0;
         var all = new byte[fs.Length];
-        fs.Read(all, 0, all.Length);
+        fs.ReadExactly(all);
 
         byte[] t3Orig = { 0x07, 0x10, 0x00, 0x00 };
         byte[] t4Orig = { 0x06, 0x10, 0x00, 0x00 };
@@ -206,7 +187,7 @@ public static class DFBHDPatcher
 
         var whole = new byte[fs.Length];
         fs.Position = 0;
-        fs.Read(whole, 0, whole.Length);
+        fs.ReadExactly(whole);
 
         byte[] t3Orig = { 0x07, 0x10, 0x00, 0x00 };
         byte[] t4Orig = { 0x06, 0x10, 0x00, 0x00 };

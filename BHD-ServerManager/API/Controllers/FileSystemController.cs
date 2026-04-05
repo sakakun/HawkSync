@@ -1,4 +1,4 @@
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Compression;
 
-namespace BHD_ServerManager.API.Controllers;
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/filesystem")]
@@ -282,10 +282,10 @@ public class FileSystemController : ControllerBase
     {
         if(!HasPermission("profile")) return Forbid();
 
-        string fileName = file != null ? Path.GetFileName(file.FileName) : string.Empty;
+        string fileName = Path.GetFileName(file.FileName);
         bool success = false;
         string message = string.Empty;
-        int count = 0;
+        int count;
         try
         {
             var theInstance = CommonCore.theInstance;
@@ -301,7 +301,7 @@ public class FileSystemController : ControllerBase
                 return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
-            if (file == null || file.Length == 0)
+            if (file.Length == 0)
             {
                 message = "No file provided";
                 return Ok(new FileOperationResponse { Success = false, Message = message });
@@ -413,7 +413,7 @@ public class FileSystemController : ControllerBase
     {
         if(!HasPermission("profile")) return Forbid();
 
-        string fileNames = string.Join(", ", request.FileNames ?? new List<string>());
+        string fileNames = string.Join(", ", request.FileNames);
         bool success = false;
         string message = string.Empty;
         int deletedCount = 0;
@@ -430,9 +430,9 @@ public class FileSystemController : ControllerBase
             var filesInUse = new List<string>();
             var mapInstance = CommonCore.instanceMaps;
             
-            if (mapInstance != null && mapInstance.Playlists != null)
+            if (mapInstance != null)
             {
-                foreach (var fileName in request.FileNames!)
+                foreach (var fileName in request.FileNames)
                 {
                     var extension = Path.GetExtension(fileName).ToLower();
                     if (extension == ".bms")
@@ -459,7 +459,7 @@ public class FileSystemController : ControllerBase
                 return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
-            foreach (var fileName in request.FileNames!)
+            foreach (var fileName in request.FileNames)
             {
                 var filePath = Path.Combine(theInstance.profileServerPath, fileName);
                 if (System.IO.File.Exists(filePath))

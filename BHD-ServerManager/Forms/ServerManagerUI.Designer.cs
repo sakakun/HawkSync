@@ -1,7 +1,7 @@
 ﻿using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace BHD_ServerManager.Forms
+namespace ServerManager.Forms
 {
     partial class ServerManagerUI : Form
     {

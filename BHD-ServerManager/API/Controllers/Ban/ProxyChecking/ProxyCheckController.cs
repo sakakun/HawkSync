@@ -1,15 +1,11 @@
-﻿using BHD_ServerManager.Classes.InstanceManagers;
+﻿using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabBans.Service;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using static BHD_ServerManager.API.Controllers.ProfileController;
 
-namespace BHD_ServerManager.API.Controllers.Ban.ProxyChecking;
+namespace ServerManager.API.Controllers.Ban.ProxyChecking;
 
 [ApiController]
 [Route("api/ban/proxycheck")]
@@ -26,7 +22,7 @@ public class ProxyCheckController : ControllerBase
     {
         if(!HasPermission("bans")) return Forbid();
 
-        if (request == null || string.IsNullOrWhiteSpace(request.ApiKey) || string.IsNullOrWhiteSpace(request.IPAddress))
+        if (string.IsNullOrWhiteSpace(request.ApiKey) || string.IsNullOrWhiteSpace(request.IPAddress))
         {
             return BadRequest(new ProxyCheckTestResult { Success = false, ErrorMessage = "Invalid request." });
         }
@@ -68,12 +64,7 @@ public class ProxyCheckController : ControllerBase
     public ActionResult<CommandResult> SaveProxyCheckSettings([FromBody] ProxyCheck request)
     {
         if(!HasPermission("bans")) return Forbid();
-
-        if (request == null)
-        {
-            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
-        }
-
+        
         // Map DTO to record
         var proxySettings = new ProxyCheckSettings(
             Enabled: request.ProxyCheckEnabled,
@@ -103,7 +94,7 @@ public class ProxyCheckController : ControllerBase
     {
         if(!HasPermission("bans")) return Forbid();
 
-        if (req == null || string.IsNullOrWhiteSpace(req.CountryCode) || string.IsNullOrWhiteSpace(req.CountryName))
+        if (string.IsNullOrWhiteSpace(req.CountryCode) || string.IsNullOrWhiteSpace(req.CountryName))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
         var result = banInstanceManager.AddBlockedCountry(req.CountryCode, req.CountryName);
@@ -116,7 +107,7 @@ public class ProxyCheckController : ControllerBase
     {
         if(!HasPermission("bans")) return Forbid();
 
-        if (req == null || req.RecordID <= 0)
+        if (req.RecordID <= 0)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
         var result = banInstanceManager.RemoveBlockedCountry(req.RecordID);

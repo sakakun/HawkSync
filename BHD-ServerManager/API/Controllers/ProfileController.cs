@@ -1,5 +1,5 @@
-﻿using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
+﻿using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
@@ -10,9 +10,9 @@ using HawkSyncShared.DTOs.tabStats;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using static BHD_ServerManager.Classes.InstanceManagers.theInstanceManager;
+using static ServerManager.Classes.InstanceManagers.theInstanceManager;
 
-namespace BHD_ServerManager.API.Controllers;
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/profile")]

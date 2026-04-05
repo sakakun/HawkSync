@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace BHD_ServerManager.Classes.SupportClasses
+namespace ServerManager.Classes.SupportClasses
 {
     /// <summary>
     /// IP2Location.io API implementation.

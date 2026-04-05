@@ -1,4 +1,4 @@
-﻿using BHD_ServerManager.Classes.SupportClasses;
+﻿using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-namespace BHD_ServerManager.Classes.Helpers
+namespace ServerManager.Classes.Helpers
 {
     public static class BanHelper
     {

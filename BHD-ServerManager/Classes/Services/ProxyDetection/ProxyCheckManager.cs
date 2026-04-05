@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
 
-namespace BHD_ServerManager.Classes.SupportClasses
+namespace ServerManager.Classes.SupportClasses
 {
     /// <summary>
     /// Static manager for proxy checking with in-memory caching using CommonCore.banInstance.ProxyRecords.

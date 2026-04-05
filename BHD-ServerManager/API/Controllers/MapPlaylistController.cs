@@ -1,5 +1,5 @@
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabMaps;
@@ -7,7 +7,7 @@ using HawkSyncShared.SupportClasses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BHD_ServerManager.API.Controllers;
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/maps")]

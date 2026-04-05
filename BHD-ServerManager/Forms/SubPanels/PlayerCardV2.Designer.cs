@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.SubPanels;
+namespace ServerManager.Forms.SubPanels;
 
 partial class PlayerCardV2
 {

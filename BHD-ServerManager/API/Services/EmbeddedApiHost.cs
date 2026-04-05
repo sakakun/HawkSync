@@ -5,11 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using BHD_ServerManager.API.Hubs;
+using ServerManager.API.Hubs;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.SupportClasses;
 
-namespace BHD_ServerManager.API.Services;
+namespace ServerManager.API.Services;
 
 /// <summary>
 /// Embedded API host that runs alongside WinForms UI

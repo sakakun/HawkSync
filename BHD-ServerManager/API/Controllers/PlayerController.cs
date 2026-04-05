@@ -1,5 +1,5 @@
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace BHD_ServerManager.API.Controllers;
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

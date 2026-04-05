@@ -13,9 +13,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.InstanceManagers;
 
-namespace BHD_ServerManager.Classes.SupportClasses
+namespace ServerManager.Classes.SupportClasses
 {
     // Static manager that opens the SQLite file on startup and holds an exclusive lock
     // for the lifetime of the process. All database operations must be executed through

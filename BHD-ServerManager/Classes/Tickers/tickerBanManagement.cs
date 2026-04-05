@@ -1,9 +1,9 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.Helpers;
-using BHD_ServerManager.Classes.Services.NetLimiter;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Classes.SupportClasses.Networking;
-using BHD_ServerManager.Forms;
+﻿using ServerManager.Classes.GameManagement;
+using ServerManager.Classes.Helpers;
+using ServerManager.Classes.Services.NetLimiter;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.SupportClasses.Networking;
+using ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
@@ -11,7 +11,7 @@ using HawkSyncShared.SupportClasses;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Net;
 
-namespace BHD_ServerManager.Classes.Tickers
+namespace ServerManager.Classes.Tickers
 {
     public class tickerBanManagement
     {

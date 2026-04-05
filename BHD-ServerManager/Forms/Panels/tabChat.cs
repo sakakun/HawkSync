@@ -1,9 +1,9 @@
 ﻿using HawkSyncShared;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.Panels
+namespace ServerManager.Forms.Panels
 {
     public partial class tabChat : UserControl
     {

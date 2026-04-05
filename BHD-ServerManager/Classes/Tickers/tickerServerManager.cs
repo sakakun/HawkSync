@@ -1,12 +1,12 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Forms;
+﻿using ServerManager.Classes.GameManagement;
+using ServerManager.Classes.InstanceManagers;
+using ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
 using System.Diagnostics;
 
-namespace BHD_ServerManager.Classes.Tickers
+namespace ServerManager.Classes.Tickers
 {
     public class tickerServerManager
     {

@@ -1,5 +1,5 @@
-﻿﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Forms;
+﻿﻿using ServerManager.Classes.GameManagement;
+using ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.DTOs.tabStats;
@@ -9,7 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
-namespace BHD_ServerManager.Classes.InstanceManagers
+namespace ServerManager.Classes.InstanceManagers
 {
     public static class statsInstanceManager
     {

@@ -1,13 +1,13 @@
-﻿using BHD_ServerManager;
+﻿using ServerManager;
 using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.GameManagement;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Forms;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.Forms;
 
-namespace BHD_ServerManager.Classes.Tickers
+namespace ServerManager.Classes.Tickers
 {
     public static class tickerChatManagement
     {

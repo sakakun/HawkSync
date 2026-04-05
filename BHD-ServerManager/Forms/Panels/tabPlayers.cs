@@ -1,9 +1,9 @@
-﻿using BHD_ServerManager.Forms.SubPanels;
+﻿using ServerManager.Forms.SubPanels;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.Panels
+namespace ServerManager.Forms.Panels
 {
     public partial class tabPlayers : UserControl
     {

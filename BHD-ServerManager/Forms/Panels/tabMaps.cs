@@ -1,12 +1,12 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using System.Text;
 using HawkSyncShared.DTOs.tabMaps;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.Panels
+namespace ServerManager.Forms.Panels
 {
     public partial class tabMaps : UserControl
     {

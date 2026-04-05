@@ -1,11 +1,11 @@
-using BHD_ServerManager.Forms.Panels;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Forms.Panels;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.Services.NetLimiter;
+using ServerManager.Classes.Services.NetLimiter;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms
+namespace ServerManager.Forms
 {
     public partial class ServerManagerUI : Form
     {

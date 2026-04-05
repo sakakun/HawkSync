@@ -4,15 +4,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.API.Services;
+using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.API.Services;
 using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.SupportClasses;
 
-namespace BHD_ServerManager.API.Controllers;
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

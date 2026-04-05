@@ -1,4 +1,4 @@
-﻿using BHD_ServerManager.Classes.SupportClasses;
+﻿using ServerManager.Classes.SupportClasses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using HawkSyncShared.SupportClasses;
 
-namespace BHD_ServerManager.Classes.Services.NetLimiter
+namespace ServerManager.Classes.Services.NetLimiter
 {
     public static class NetLimiterClient
     {

@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.DTOs.Audit;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
 
-namespace BHD_ServerManager.API.Hubs;
+namespace ServerManager.API.Hubs;
 
 [Authorize]
 public class ServerHub : Hub

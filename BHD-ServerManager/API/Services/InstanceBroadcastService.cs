@@ -3,10 +3,10 @@ using Microsoft.Extensions.Hosting;
 using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.DTOs;
-using BHD_ServerManager.API.Hubs;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.API.Hubs;
+using ServerManager.Classes.SupportClasses;
 
-namespace BHD_ServerManager.API.Services;
+namespace ServerManager.API.Services;
 
 public class InstanceBroadcastService : BackgroundService
 {

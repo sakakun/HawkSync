@@ -1,9 +1,9 @@
 ﻿using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.SupportClasses;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.SubPanels
+namespace ServerManager.Forms.SubPanels
 {
     public partial class ChatHistory : UserControl
     {

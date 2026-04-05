@@ -1,10 +1,10 @@
 ﻿using HawkSyncShared;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.DTOs.tabAdmin;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.Panels;
+namespace ServerManager.Forms.Panels;
 
 public partial class tabAdmin : UserControl
 {

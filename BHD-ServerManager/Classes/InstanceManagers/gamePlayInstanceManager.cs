@@ -1,8 +1,8 @@
-﻿using BHD_ServerManager.Forms.Panels;
+﻿using ServerManager.Forms.Panels;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
 
-namespace BHD_ServerManager.Classes.InstanceManagers
+namespace ServerManager.Classes.InstanceManagers
 {
     public static class gamePlayInstanceManager
     {

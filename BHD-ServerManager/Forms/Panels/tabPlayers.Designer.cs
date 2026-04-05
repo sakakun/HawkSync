@@ -1,4 +1,4 @@
-﻿namespace BHD_ServerManager.Forms.Panels
+﻿namespace ServerManager.Forms.Panels
 {
     partial class tabPlayers
     {

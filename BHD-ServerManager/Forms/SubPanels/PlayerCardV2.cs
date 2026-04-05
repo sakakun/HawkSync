@@ -1,6 +1,6 @@
 ﻿using System.Windows.Documents;
 
-namespace BHD_ServerManager.Forms.SubPanels;
+namespace ServerManager.Forms.SubPanels;
 using Classes.Helpers;
 using Classes.InstanceManagers;
 using Classes.SupportClasses;

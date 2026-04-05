@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BHD_ServerManager.Classes.SupportClasses
+namespace ServerManager.Classes.SupportClasses
 {
     public static class ServerSettings
     {

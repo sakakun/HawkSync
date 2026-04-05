@@ -1,13 +1,10 @@
-﻿using BHD_ServerManager.Classes.InstanceManagers;
+﻿using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabBans.Service;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BHD_ServerManager.API.Controllers.Ban.ProxyChecking;
+namespace ServerManager.API.Controllers.Ban.ProxyChecking;
 
 [ApiController]
 [Route("api/ban/netlimiter")]
@@ -23,20 +20,15 @@ public class NetLimiterController : ControllerBase
     public ActionResult<CommandResult> SaveNetLimiterSettings([FromBody] NetLimiterSettingsRequest request)
     {
         if(!HasPermission("bans")) return Forbid();
-
-        if (request == null)
-        {
-            return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
-        }
-
+        
         // Map DTO to internal model
         var netLimiterSettings = new NetLimiterSettings(
             Enabled: request.NetLimiterEnabled,
-            Host: request.NetLimiterHost ?? string.Empty,
+            Host: request.NetLimiterHost,
             Port: request.NetLimiterPort,
-            Username: request.NetLimiterUsername ?? string.Empty,
-            Password: request.NetLimiterPassword ?? string.Empty,
-            FilterName: request.NetLimiterFilterName ?? string.Empty,
+            Username: request.NetLimiterUsername,
+            Password: request.NetLimiterPassword,
+            FilterName: request.NetLimiterFilterName,
             EnableConLimit: request.NetLimiterEnableConLimit,
             ConThreshold: request.NetLimiterConThreshold
         );
@@ -60,15 +52,15 @@ public class NetLimiterController : ControllerBase
 
         // You may need to adjust this to your actual manager/service logic
         bool success = true;
-        string? errorMessage = string.Empty;
-        List<string>? filters = Program.ServerManagerUI!.BanTab.comboBox_NetLimiterFilterName.Items.Cast<string>()
-            .ToList() ?? new List<string>();
+        string errorMessage = string.Empty;
+        List<string> filters = Program.ServerManagerUI!.BanTab.comboBox_NetLimiterFilterName.Items.Cast<string>()
+            .ToList();
 
         return Ok(new NetLimiterFiltersResponse
         {
             Success = success,
             Message = errorMessage,
-            Filters = filters ?? new List<string>()
+            Filters = filters
         });
     }
 

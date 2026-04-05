@@ -1,17 +1,17 @@
-﻿using BHD_ServerManager.Forms;
+﻿using ServerManager.Forms;
 using HawkSyncShared;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Classes.Services;
-using BHD_ServerManager.Classes.Services.NetLimiter;
-using BHD_ServerManager.Classes.SupportClasses.Networking;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.Services;
+using ServerManager.Classes.Services.NetLimiter;
+using ServerManager.Classes.SupportClasses.Networking;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace BHD_ServerManager.Classes.InstanceManagers
+namespace ServerManager.Classes.InstanceManagers
 {
     // ================================================================================
     // DTOs (Data Transfer Objects)

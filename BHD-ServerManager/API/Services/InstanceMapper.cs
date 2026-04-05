@@ -3,7 +3,7 @@ using HawkSyncShared.DTOs.API;
 using HawkSyncShared.Instances;
 using System.Text;
 
-namespace BHD_ServerManager.API.Services;
+namespace ServerManager.API.Services;
 
 public static class InstanceMapper
 {

@@ -1,6 +1,6 @@
-﻿using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.Services.NetLimiter;
-using BHD_ServerManager.Classes.SupportClasses;
+﻿using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.Services.NetLimiter;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabBans;
 using HawkSyncShared.Instances;
@@ -8,10 +8,10 @@ using HawkSyncShared.SupportClasses;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using RecordDeleteAction = BHD_ServerManager.Classes.InstanceManagers.RecordDeleteAction;
+using RecordDeleteAction = ServerManager.Classes.InstanceManagers.RecordDeleteAction;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.Panels
+namespace ServerManager.Forms.Panels
 {
     public partial class tabBans : UserControl
     {

@@ -1,4 +1,4 @@
-﻿namespace BHD_ServerManager.Forms.SubPanels
+﻿namespace ServerManager.Forms.SubPanels
 {
     partial class FileManager
     {

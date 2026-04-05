@@ -1,4 +1,4 @@
-﻿namespace BHD_ServerManager.Classes.Services.NetLimiter
+﻿namespace ServerManager.Classes.Services.NetLimiter
 {
 	public class Command
 	{

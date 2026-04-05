@@ -1,10 +1,10 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared.Instances;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared.DTOs.tabAdmin;
 
-namespace BHD_ServerManager.Classes.InstanceManagers;
+namespace ServerManager.Classes.InstanceManagers;
 
 public static class adminInstanceManager
 {

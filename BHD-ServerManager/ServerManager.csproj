@@ -2,26 +2,13 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-	<BuildNumber>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmm"))</BuildNumber>
-	<AssemblyInformationalVersion>$(BuildNumber)</AssemblyInformationalVersion>
-	<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
-    <RootNamespace>BHD_ServerManager</RootNamespace>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-	<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
-    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <BaseOutputPath></BaseOutputPath>
-    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
-    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
-    <EnableNETAnalyzers>False</EnableNETAnalyzers>
-    <PackageOutputPath>\bin\$(AssemblyName)</PackageOutputPath>
-    <Platforms>AnyCPU</Platforms>
-    <Configurations>Debug;Release</Configurations>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-	<NoWarn>NU1701</NoWarn>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

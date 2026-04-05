@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using Windows.Graphics.Display;
+﻿using System.Net;
 
-namespace BHD_ServerManager.Classes.SupportClasses.Networking
+namespace ServerManager.Classes.SupportClasses.Networking
 {
         public class IpRange
         {

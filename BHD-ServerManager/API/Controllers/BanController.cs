@@ -1,14 +1,13 @@
-using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
-using HawkSyncShared.DTOs;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabBans;
-using HawkSyncShared.DTOs.tabPlayers;
-using HawkSyncShared.Instances;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/ban")]
@@ -105,7 +104,7 @@ public class BanController : ControllerBase
     {
         if (!HasPermission("bans")) return Forbid();
 
-        if (req == null || req.RecordID <= 0)
+        if (req.RecordID <= 0)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
         OperationResult opResult;
@@ -222,7 +221,7 @@ public class BanController : ControllerBase
     {
         if (!HasPermission("bans")) return Forbid();
 
-        if (req == null || req.RecordID <= 0)
+        if (req.RecordID <= 0)
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
         OperationResult opResult;

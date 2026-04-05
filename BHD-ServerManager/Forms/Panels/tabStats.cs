@@ -1,12 +1,12 @@
-﻿using BHD_ServerManager.Classes.InstanceManagers;
-using BHD_ServerManager.Classes.SupportClasses;
+﻿using ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabStats;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.Panels
+namespace ServerManager.Forms.Panels
 {
     public partial class tabStats : UserControl
     {

@@ -1,9 +1,9 @@
 using HawkSyncShared;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Forms;
-using BHD_ServerManager.API;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.Forms;
+using ServerManager.API;
 
-namespace BHD_ServerManager
+namespace ServerManager
 {
 	public static class Program
 	{

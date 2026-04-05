@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HawkSyncShared;
-using BHD_ServerManager.API.Services;
+using ServerManager.API.Services;
 using HawkSyncShared.DTOs.API;
 
-namespace BHD_ServerManager.API.Controllers;
+namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

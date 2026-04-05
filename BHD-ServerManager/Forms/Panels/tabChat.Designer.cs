@@ -1,4 +1,4 @@
-﻿namespace BHD_ServerManager.Forms.Panels
+﻿namespace ServerManager.Forms.Panels
 {
     partial class tabChat
     {
@@ -40,7 +40,7 @@
 			comboBox_chatGroup = new ComboBox();
 			tb_chatMessage = new TextBox();
 			tabHistory = new TabPage();
-			chatHistory1 = new BHD_ServerManager.Forms.SubPanels.ChatHistory();
+			chatHistory1 = new ServerManager.Forms.SubPanels.ChatHistory();
 			tabAutoMessages = new TabPage();
 			tableLayoutPanel3 = new TableLayoutPanel();
 			dg_autoMessages = new DataGridView();

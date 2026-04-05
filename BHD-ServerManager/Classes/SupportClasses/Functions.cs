@@ -2,7 +2,7 @@
 using System.Text;
 using System.Windows.Forms;
 
-namespace BHD_ServerManager.Classes.SupportClasses
+namespace ServerManager.Classes.SupportClasses
 {
     public static class Functions
     {

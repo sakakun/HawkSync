@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace BHD_ServerManager.API.Services;
+namespace ServerManager.API.Services;
 
 /// <summary>
 /// Provides a cryptographically secure JWT signing key that is generated once at application startup

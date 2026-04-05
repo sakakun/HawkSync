@@ -1,12 +1,12 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
+using ServerManager.Classes.GameManagement;
 using HawkSyncShared.Instances;
 using HawkSyncShared.DTOs.tabPlayers;
-using BHD_ServerManager.Classes.Services.NetLimiter;
+using ServerManager.Classes.Services.NetLimiter;
 using System.Net;
 
-namespace BHD_ServerManager.Classes.InstanceManagers
+namespace ServerManager.Classes.InstanceManagers
 {
     /// <summary>
     /// Manager for player-related operations (kick, kill, ban, etc.)

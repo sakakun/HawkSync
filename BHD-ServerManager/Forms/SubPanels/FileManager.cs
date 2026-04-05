@@ -3,7 +3,7 @@ using HawkSyncShared;
 using HawkSyncShared.Instances;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.SubPanels
+namespace ServerManager.Forms.SubPanels
 {
     public partial class FileManager : UserControl
     {

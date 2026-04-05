@@ -1,8 +1,8 @@
-﻿using BHD_ServerManager.API;
-using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Classes.Tickers;
-using BHD_ServerManager.Forms;
+﻿using ServerManager.API;
+using ServerManager.Classes.GameManagement;
+using ServerManager.Classes.SupportClasses;
+using ServerManager.Classes.Tickers;
+using ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
@@ -10,7 +10,7 @@ using HawkSyncShared.SupportClasses;
 using System.Net;
 using System.Text.Json;
 
-namespace BHD_ServerManager.Classes.InstanceManagers
+namespace ServerManager.Classes.InstanceManagers
 {
     // ================================================================================
     // DTOs (Data Transfer Objects)

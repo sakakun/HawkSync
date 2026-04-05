@@ -6,7 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 /*
-namespace BHD_ServerManager.Classes.Services.ProxyDetection
+namespace ServerManager.Classes.Services.ProxyDetection
 {
     internal class ProxyExampleCalls
     {

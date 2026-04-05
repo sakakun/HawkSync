@@ -1,16 +1,13 @@
-﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.SupportClasses;
-using BHD_ServerManager.Forms;
+﻿using ServerManager.Classes.GameManagement;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
-using Windows.Gaming.Input;
 
-namespace BHD_ServerManager.Classes.InstanceManagers
+namespace ServerManager.Classes.InstanceManagers
 {
     // ================================================================================
     // DTOs (Data Transfer Objects)

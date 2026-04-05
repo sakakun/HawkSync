@@ -1,4 +1,4 @@
-﻿namespace BHD_ServerManager.Forms.Panels
+﻿namespace ServerManager.Forms.Panels
 {
     partial class tabProfile
     {
@@ -93,7 +93,7 @@
 			profileServerAttribute20 = new CheckBox();
 			profileServerAttribute21 = new CheckBox();
 			tabFileManager = new TabPage();
-			fileManager1 = new BHD_ServerManager.Forms.SubPanels.FileManager();
+			fileManager1 = new ServerManager.Forms.SubPanels.FileManager();
 			panel1 = new Panel();
 			groupBoxLogs = new GroupBox();
 			tableLayoutPanelAuditLogs = new TableLayoutPanel();

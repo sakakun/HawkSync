@@ -1,9 +1,9 @@
-﻿using BHD_ServerManager.API.Services;
-using BHD_ServerManager.Classes.SupportClasses;
+﻿using ServerManager.API.Services;
+using ServerManager.Classes.SupportClasses;
 using HawkSyncShared.SupportClasses;
 using HawkSyncShared;
 
-namespace BHD_ServerManager.API
+namespace ServerManager.API
 {
     public static class APICore
     {

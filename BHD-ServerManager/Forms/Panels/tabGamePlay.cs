@@ -1,11 +1,11 @@
 ﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.InstanceManagers;
+using ServerManager.Classes.GameManagement;
+using ServerManager.Classes.InstanceManagers;
 using HawkSyncShared.Instances;
 using System.ComponentModel;
 
-namespace BHD_ServerManager.Forms.Panels
+namespace ServerManager.Forms.Panels
 {
 	public partial class tabGamePlay : UserControl
 	{

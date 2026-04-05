@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.SupportClasses;
-using BHD_ServerManager.Classes.GameManagement;
+using ServerManager.Classes.GameManagement;
 
-namespace BHD_ServerManager.Classes.Helpers
+namespace ServerManager.Classes.Helpers
 {
     public static class LobbyReportHelper
     {
