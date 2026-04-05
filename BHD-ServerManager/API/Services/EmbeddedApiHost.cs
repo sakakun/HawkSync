@@ -6,8 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ServerManager.API.Hubs;
-using HawkSyncShared.SupportClasses;
-using ServerManager.Classes.SupportClasses;
 
 namespace ServerManager.API.Services;
 
@@ -17,7 +15,6 @@ namespace ServerManager.API.Services;
 public class EmbeddedApiHost
 {
     private IHost? _host;
-    private Task? _runTask;
     private readonly CancellationTokenSource _cts = new();
 
     /// <summary>
@@ -94,7 +91,7 @@ public class EmbeddedApiHost
             })
             .Build();
 
-        _runTask = _host.RunAsync(_cts.Token);
+        _host.RunAsync(_cts.Token);
         
     }
 

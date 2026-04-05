@@ -428,7 +428,7 @@ namespace ServerManager.Forms.Panels
 			}
 			else
 			{
-				StartServer.stopGame();
+				_ = StartServer.stopGame();
 			}
 		}
 

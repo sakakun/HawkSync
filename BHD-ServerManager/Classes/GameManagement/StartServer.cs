@@ -30,7 +30,7 @@ namespace ServerManager.Classes.GameManagement
         {
             try
             {
-                string dfvCFGPath = Path.Combine(theInstance.profileServerPath!, "dfv.cfg");
+                string dfvCFGPath = Path.Combine(theInstance.profileServerPath, "dfv.cfg");
 
                 if (!File.Exists(dfvCFGPath))
                 {
@@ -114,15 +114,14 @@ namespace ServerManager.Classes.GameManagement
         {
             try
             {
-                if (mapInstance.Playlists[mapInstance.ActivePlaylist] == null ||
-                    mapInstance.Playlists[mapInstance.ActivePlaylist].Count == 0)
+                if (mapInstance.Playlists[mapInstance.ActivePlaylist].Count == 0)
                 {
                     AppDebug.Log("currentMapPlaylist is empty. Cannot create autores.bin.", AppDebug.LogLevel.Warning);
                     return false;
                 }
 
-                string autoResPath = Path.Combine(theInstance.profileServerPath!, "autores.bin");
-                string dfvCFGPath = Path.Combine(theInstance.profileServerPath!, "dfv.cfg");
+                string autoResPath = Path.Combine(theInstance.profileServerPath, "autores.bin");
+                string dfvCFGPath = Path.Combine(theInstance.profileServerPath, "dfv.cfg");
 
                 string text = File.ReadAllText(dfvCFGPath);
                 text = text.Replace("// DISPLAY", "[Display]");
@@ -240,16 +239,16 @@ namespace ServerManager.Classes.GameManagement
                 byte[] windowedModeBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameWindowedMode));
                 byte[] serverNameBytes = Encoding.Default.GetBytes(theInstance.gameServerName);
                 byte[] countryCodeBytes = Encoding.Default.GetBytes(theInstance.gameCountryCode);
-                byte[] bindAddressBytes = Encoding.Default.GetBytes(theInstance.profileBindIP!);
-                byte[] firstMapFileBytes = Encoding.Default.GetBytes(firstMap.MapFile!);
+                byte[] bindAddressBytes = Encoding.Default.GetBytes(theInstance.profileBindIP);
+                byte[] firstMapFileBytes = Encoding.Default.GetBytes(firstMap.MapFile);
                 byte[] maxSlotsBytes = BitConverter.GetBytes(theInstance.gameMaxSlots);
                 byte[] dedicatedBytes = BitConverter.GetBytes(Convert.ToInt32(theInstance.gameDedicated));
                 byte[] gameScoreBytes = BitConverter.GetBytes(theInstance.gameScoreKills);
-                byte[] serverPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordLobby!);
-                byte[] redTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordRed!);
-                byte[] blueTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordBlue!);
-                byte[] yellowTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordYellow!);
-                byte[] violetTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordViolet!);
+                byte[] serverPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordLobby);
+                byte[] redTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordRed);
+                byte[] blueTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordBlue);
+                byte[] yellowTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordYellow);
+                byte[] violetTeamPasswordBytes = Encoding.Default.GetBytes(theInstance.gamePasswordViolet);
                 byte[] gamePlayOptionsBytes = BitConverter.GetBytes(gamePlayOptions);
                 byte[] loopMapsBytes = BitConverter.GetBytes(loopMaps);
                 byte[] gameTypeBytes = BitConverter.GetBytes(firstMap.MapType);
@@ -407,8 +406,8 @@ namespace ServerManager.Classes.GameManagement
                 foreach (var map in activePlaylist)
                 {
                     WriteMapEntryBytes(
-                        map.MapFile ?? "NA.bms",
-                        map.MapName ?? "NA",
+                        map.MapFile,
+                        map.MapName,
                         map.ModType == 9);
                 }
 
@@ -437,8 +436,8 @@ namespace ServerManager.Classes.GameManagement
         {
             try
             {
-                string autoResPath = Path.Combine(theInstance.profileServerPath!, "autores.bin");
-                string dumpPath = Path.Combine(theInstance.profileServerPath!, "autores_dump.txt");
+                string autoResPath = Path.Combine(theInstance.profileServerPath, "autores.bin");
+                string dumpPath = Path.Combine(theInstance.profileServerPath, "autores_dump.txt");
 
 
                 if (!File.Exists(autoResPath))
@@ -599,7 +598,7 @@ namespace ServerManager.Classes.GameManagement
         public static bool CheckForExistingProcess()
         {
             string file_name = "dfbhd.exe";
-            string FullFileName = Path.Combine(theInstance.profileServerPath!, file_name);
+            string FullFileName = Path.Combine(theInstance.profileServerPath, file_name);
             string windowTitle = $"BHD Server - {theInstance.gameServerName}";
 
             // Defensive: run process enumeration in a lock to prevent race conditions
@@ -608,8 +607,8 @@ namespace ServerManager.Classes.GameManagement
                 // Enumerate processes by name (fast, but MainModule access can block)
                 foreach (var searchProcess in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file_name)))
                 {
-                    bool fileMatch = false;
-                    bool titleMatch = false;
+                    bool fileMatch;
+                    bool titleMatch;
 
                     // Access MainModule in a try-catch to avoid blocking the main thread
                     try
@@ -664,7 +663,7 @@ namespace ServerManager.Classes.GameManagement
         public static bool startGame()
         {
             string file_name = "dfbhd.exe";
-            string FullFileName = Path.Combine(theInstance.profileServerPath!, file_name);
+            string FullFileName = Path.Combine(theInstance.profileServerPath, file_name);
             string windowTitle = $"BHD Server - {theInstance.gameServerName}";
 
             try
@@ -758,8 +757,6 @@ namespace ServerManager.Classes.GameManagement
         // Function: stopGame
         public static bool stopGame()
         {
-            string file_name = "dfbhd.exe";
-            string FullFileName = Path.Combine(theInstance.profileServerPath!, file_name);
 
             try
             {

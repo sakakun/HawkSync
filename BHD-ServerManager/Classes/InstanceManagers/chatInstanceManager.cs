@@ -1,13 +1,8 @@
-﻿using ServerManager.Forms;
-using HawkSyncShared;
+﻿using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
 using ServerManager.Classes.GameManagement;
 using HawkSyncShared.Instances;
 using ServerManager.Classes.SupportClasses;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Windows.Forms;
 
 namespace ServerManager.Classes.InstanceManagers
 {
@@ -42,20 +37,11 @@ namespace ServerManager.Classes.InstanceManagers
         {
             if (dgv.InvokeRequired)
             {
-                dgv.Invoke(new Action(() => UpdateGridWithMessages(dgv, messages, columnIndices)));
+                dgv.Invoke(() => UpdateGridWithMessages(dgv, messages, columnIndices));
                 return;
             }
 
             int scrollIndex = dgv.FirstDisplayedScrollingRowIndex >= 0 ? dgv.FirstDisplayedScrollingRowIndex : 0;
-
-            // With this:
-            var managerDict = messages.ToDictionary(
-                m =>
-                {
-                    var idProp = m?.GetType().GetProperty("SlapMessageId") ?? m?.GetType().GetProperty("AutoMessageId");
-                    return Convert.ToInt32(idProp?.GetValue(m));
-                }
-            );
 
             // Remove rows not in manager
             for (int i = dgv.Rows.Count - 1; i >= 0; i--)
@@ -320,7 +306,7 @@ namespace ServerManager.Classes.InstanceManagers
 
                 if (position < message.Length)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                 }
             }
         }
@@ -332,7 +318,6 @@ namespace ServerManager.Classes.InstanceManagers
                 1 => 3,
                 2 => 4,
                 3 => 5,
-				0 => 1,
                 _ => 1
             };
         }
@@ -360,11 +345,11 @@ namespace ServerManager.Classes.InstanceManagers
                     return (true, message, string.Empty);
 
                 string parsedMessage = message;
-                int startIndex = message.IndexOf("{P:");
+                int startIndex = message.IndexOf("{P:", StringComparison.Ordinal);
 
                 while (startIndex != -1)
                 {
-                    int endIndex = message.IndexOf("}", startIndex);
+                    int endIndex = message.IndexOf("}", startIndex, StringComparison.Ordinal);
                     if (endIndex <= startIndex)
                         break;
 
@@ -389,7 +374,8 @@ namespace ServerManager.Classes.InstanceManagers
                         parsedMessage = parsedMessage.Replace($"{{P:{playerSlot}}}", playerName);
                     }
 
-                    startIndex = parsedMessage.IndexOf("{P:", endIndex);
+                    startIndex = parsedMessage.IndexOf("{P:", endIndex, StringComparison.Ordinal);
+
                 }
 
                 return (true, parsedMessage, string.Empty);
@@ -422,9 +408,6 @@ namespace ServerManager.Classes.InstanceManagers
         {
             try
             {
-                if (chatLog == null)
-                    return new OperationResult(false, "Chat log entry cannot be null.");
-
                 DatabaseManager.SaveChatLog(chatLog);
                 
                 return new OperationResult(true, "Chat log entry saved successfully.");

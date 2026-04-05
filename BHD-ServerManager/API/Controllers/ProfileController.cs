@@ -3,14 +3,9 @@ using ServerManager.Classes.SupportClasses;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
-using HawkSyncShared.DTOs.tabBans;
-using HawkSyncShared.DTOs.tabBans.Service;
 using HawkSyncShared.DTOs.tabProfile;
-using HawkSyncShared.DTOs.tabStats;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using static ServerManager.Classes.InstanceManagers.theInstanceManager;
 
 namespace ServerManager.API.Controllers;
 
@@ -222,7 +217,7 @@ public class ProfileController : ControllerBase
         {
             serverUI.Invoke(() =>
             {
-                serverUI.ProfileTab?.Profile_LoadSettings();
+                serverUI.ProfileTab.Profile_LoadSettings();
             });
         }
     }

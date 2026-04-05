@@ -275,7 +275,7 @@ public class GamePlayController : ControllerBase
         {
             serverUI.Invoke(() =>
             {
-                serverUI.GamePlayTab?.LoadSettings();
+                serverUI.GamePlayTab.LoadSettings();
             });
         }
     }
@@ -509,7 +509,7 @@ public class GamePlayController : ControllerBase
                 message = "Invalid game server path. Please configure the server path in Profile settings.";
                 return Ok(new CommandResult { Success = false, Message = message });
             }
-            bool started = ServerManager.Classes.GameManagement.StartServer.startGame();
+            bool started = Classes.GameManagement.StartServer.startGame();
             if (started)
             {
                 ServerMemory.ReadMemoryServerStatus();
@@ -552,7 +552,7 @@ public class GamePlayController : ControllerBase
                 message = "Server is not running.";
                 return Ok(new CommandResult { Success = false, Message = message });
             }
-            ServerManager.Classes.GameManagement.StartServer.stopGame();
+            _ = Classes.GameManagement.StartServer.stopGame();
             success = true;
             message = "Game server stopped successfully.";
             return Ok(new CommandResult { Success = success, Message = message });

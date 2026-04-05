@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using HawkSyncShared;
 using HawkSyncShared.SupportClasses;
-using HawkSyncShared.DTOs;
 using ServerManager.API.Hubs;
-using ServerManager.Classes.SupportClasses;
 
 namespace ServerManager.API.Services;
 

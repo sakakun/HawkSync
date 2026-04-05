@@ -3,10 +3,7 @@ using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 
 namespace ServerManager.Classes.Helpers
 {
@@ -58,7 +55,7 @@ namespace ServerManager.Classes.Helpers
         }
 
         // Should be moved to BanHelper.cs
-        public static bool IsPlayerWhitelisted(PlayerObject player, banInstance banInstance, DateTime now)
+        public static bool IsPlayerWhitelisted(PlayerObject player, DateTime now)
         {
             foreach (var whitelistedName in banInstance.WhitelistedNames)
             {

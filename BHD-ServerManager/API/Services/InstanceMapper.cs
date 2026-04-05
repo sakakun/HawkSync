@@ -1,7 +1,5 @@
-﻿using HawkSyncShared;
-using HawkSyncShared.DTOs.API;
+﻿using HawkSyncShared.DTOs.API;
 using HawkSyncShared.Instances;
-using System.Text;
 
 namespace ServerManager.API.Services;
 

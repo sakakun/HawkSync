@@ -41,7 +41,7 @@ public class ServerHub : Hub
         {
             _connectionToUsername.Remove(Context.ConnectionId);
             adminInstanceManager.RemoveSession(username);
-            CommonCore.instanceAdmin!.ForceUIUpdate = true; ;
+            CommonCore.instanceAdmin!.ForceUIUpdate = true;
         }
     }
 
@@ -57,7 +57,6 @@ public class ServerHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var username = Context.User?.FindFirst("username")?.Value ?? "Unknown";
         await base.OnConnectedAsync();
     }
 

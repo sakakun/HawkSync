@@ -25,7 +25,7 @@ public class StatsController : ControllerBase
 
         if (!HasPermission("stats")) return Forbid();
 
-        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerPath))
+        if (string.IsNullOrWhiteSpace(req.Server.ServerPath))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
     
         bool success = DatabaseManager.UpdateBabstatsServer(req.Server);
@@ -45,7 +45,7 @@ public class StatsController : ControllerBase
 
         if (!HasPermission("stats")) return Forbid();
 
-        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerPath))
+        if (string.IsNullOrWhiteSpace(req.Server.ServerPath))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
     
         string message = "Server Added Successfully.";
@@ -74,7 +74,7 @@ public class StatsController : ControllerBase
         if (!HasPermission("stats")) return Forbid();
 
         string message = "Server Removed Successfully.";
-        bool success = true;
+        bool success;
 
 		try {
             success = DatabaseManager.RemoveBabstatsServer(serverID);
@@ -113,7 +113,7 @@ public class StatsController : ControllerBase
     {
         if (!HasPermission("stats")) return Forbid();
 
-        if (req == null || string.IsNullOrWhiteSpace(req.ServerPath))
+        if (string.IsNullOrWhiteSpace(req.ServerPath))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid request." });
 
         var result = await theInstanceManager.TestWebStatsConnectionAsync(req.ServerPath);
@@ -137,7 +137,7 @@ public class StatsController : ControllerBase
 
         if (!HasPermission("stats")) return Forbid();
 
-        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerUri))
+        if (string.IsNullOrWhiteSpace(req.Server.ServerUri))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
     
         bool success = DatabaseManager.UpdateLobbyServer(req.Server);
@@ -157,7 +157,7 @@ public class StatsController : ControllerBase
 
         if (!HasPermission("stats")) return Forbid();
 
-        if (req == null || string.IsNullOrWhiteSpace(req.Server.ServerUri))
+        if (string.IsNullOrWhiteSpace(req.Server.ServerUri))
             return BadRequest(new CommandResult { Success = false, Message = "Invalid path." });
     
         string message = "Server Added Successfully.";
@@ -186,7 +186,7 @@ public class StatsController : ControllerBase
         if (!HasPermission("stats")) return Forbid();
 
         string message = "Server Removed Successfully.";
-        bool success = true;
+        bool success;
 
 		try {
             success = DatabaseManager.RemoveLobbyServer(serverID);

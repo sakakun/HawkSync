@@ -37,7 +37,6 @@ namespace ServerManager.Classes.GameManagement
         const int PROCESS_WM_READ = 0x0010;
         const int PROCESS_VM_WRITE = 0x0020;
         const int PROCESS_VM_OPERATION = 0x0008;
-        const int PROCESS_ALL_ACCESS = 0x1F0FFF;
         const int PROCESS_QUERY_INFORMATION = 0x0400;
         const uint WM_KEYDOWN = 0x0100;
         const uint WM_KEYUP = 0x0101;
@@ -174,7 +173,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] AllowCustomSkinsBytes = new byte[4];
             int AllowCustomSkinsRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, AllowCustomSkinsBytes, AllowCustomSkinsBytes.Length, ref AllowCustomSkinsRead);
-            int AllowCustomSkins = BitConverter.ToInt32(AllowCustomSkinsBytes, 0);
 
             int AllowCustomSkinsWritten = 0;
             byte[] AllowCustomSkinsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameCustomSkins));
@@ -195,13 +193,10 @@ namespace ServerManager.Classes.GameManagement
             byte[] DestroyBuildingsBytes = new byte[4];
             int DestroyBuildingsRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, DestroyBuildingsBytes, DestroyBuildingsBytes.Length, ref DestroyBuildingsRead);
-            int DestroyBuildings = BitConverter.ToInt32(DestroyBuildingsBytes, 0);
 
             int DestroyBuildingsWritten = 0;
-            byte[] DestroyBuildingsWrite = new byte[4];
-            DestroyBuildingsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameDestroyBuildings));
+            byte[] DestroyBuildingsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameDestroyBuildings));
             WriteProcessMemory((int)processHandle, Ptr1Addr, DestroyBuildingsWrite, DestroyBuildingsWrite.Length, ref DestroyBuildingsWritten);
-
 
         }
         // Function: UpdateFatBullets
@@ -217,11 +212,9 @@ namespace ServerManager.Classes.GameManagement
             byte[] FatBulletsBytes = new byte[4];
             int FatBulletsRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, FatBulletsBytes, FatBulletsBytes.Length, ref FatBulletsRead);
-            int FatBullets = BitConverter.ToInt32(FatBulletsBytes, 0);
 
             int FatBulletsWritten = 0;
-            byte[] FatBulletsWrite = new byte[4];
-            FatBulletsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameFatBullets));
+            byte[] FatBulletsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameFatBullets));
 
             WriteProcessMemory((int)processHandle, Ptr1Addr, FatBulletsWrite, FatBulletsWrite.Length, ref FatBulletsWritten);
 
@@ -240,7 +233,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] FlagReturnTimeBytes = new byte[4];
             int FlagReturnTimeRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, FlagReturnTimeBytes, FlagReturnTimeBytes.Length, ref FlagReturnTimeRead);
-            int FlagReturnTime = BitConverter.ToInt32(FlagReturnTimeBytes, 0);
 
             int FlagReturnTimeWritten = 0;
             byte[] FlagReturnTimeWrite = BitConverter.GetBytes(thisInstance.gameFlagReturnTime);
@@ -260,7 +252,7 @@ namespace ServerManager.Classes.GameManagement
             byte[] MinPingBytes = new byte[4];
             int MaxPingRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, MinPingBytes, MinPingBytes.Length, ref MaxPingRead);
-            int MinPing = BitConverter.ToInt32(MinPingBytes, 0);
+
             int MinPingWritten = 0;
             byte[] MinPingWrite = BitConverter.GetBytes(thisInstance.gameMinPing);
             WriteProcessMemory((int)processHandle, Ptr1Addr, MinPingWrite, MinPingWrite.Length, ref MinPingWritten);
@@ -280,7 +272,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] MinPingValueBytes = new byte[4];
             int MinPingValueRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, MinPingValueBytes, MinPingValueBytes.Length, ref MinPingValueRead);
-            int MinPingValue = BitConverter.ToInt32(MinPingValueBytes, 0);
 
             int MinPingValueWritten = 0;
             byte[] MinPingValueWrite = BitConverter.GetBytes(thisInstance.gameMinPingValue);
@@ -301,10 +292,8 @@ namespace ServerManager.Classes.GameManagement
             byte[] MaxPingBytes = new byte[4];
             int MaxPingRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr + 0x4, MaxPingBytes, MaxPingBytes.Length, ref MaxPingRead);
-            int MaxPing = BitConverter.ToInt32(MaxPingBytes, 0);
 
-            byte[] MaxPingWrite = new byte[4];
-            MaxPingWrite = BitConverter.GetBytes(thisInstance.gameMaxPing);
+            byte[] MaxPingWrite = BitConverter.GetBytes(thisInstance.gameMaxPing);
 
             int MaxPingWritten = 0;
             WriteProcessMemory((int)processHandle, Ptr1Addr + 0x4, MaxPingWrite, MaxPingWrite.Length, ref MaxPingWritten);
@@ -324,7 +313,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] MaxPingValueBytes = new byte[4];
             int MaxPingValueRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, MaxPingValueBytes, MaxPingValueBytes.Length, ref MaxPingValueRead);
-            int MaxPingValue = BitConverter.ToInt32(MaxPingValueBytes, 0);
 
             int MaxPingValueWritten = 0;
             byte[] MaxPingValueWrite = BitConverter.GetBytes(thisInstance.gameMaxPingValue);
@@ -345,11 +333,9 @@ namespace ServerManager.Classes.GameManagement
             byte[] OneShotKillsBytes = new byte[4];
             int OneShotKillsRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, OneShotKillsBytes, OneShotKillsBytes.Length, ref OneShotKillsRead);
-            int OneShotKills = BitConverter.ToInt32(OneShotKillsBytes, 0);
 
             int OneShotKillsWritten = 0;
-            byte[] OneShotKillsWrite = new byte[4];
-            OneShotKillsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameOneShotKills));
+            byte[] OneShotKillsWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameOneShotKills));
 
             WriteProcessMemory((int)processHandle, Ptr1Addr, OneShotKillsWrite, OneShotKillsWrite.Length, ref OneShotKillsWritten);
 
@@ -368,7 +354,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] PSPTakeOverTimeBytes = new byte[4];
             int PSPTakeOverTimeRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr + 0x4, PSPTakeOverTimeBytes, PSPTakeOverTimeBytes.Length, ref PSPTakeOverTimeRead);
-            int PSPTakeOverTimeValue = BitConverter.ToInt32(PSPTakeOverTimeBytes, 0);
 
             int PSPTakeOverTimeWritten = 0;
             byte[] PSPTakeOverTimeWrite = BitConverter.GetBytes(thisInstance.gamePSPTOTimer);
@@ -389,7 +374,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] RequireNovaBytes = new byte[4];
             int RequireNovaRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, RequireNovaBytes, RequireNovaBytes.Length, ref RequireNovaRead);
-            int RequireNova = BitConverter.ToInt32(RequireNovaBytes, 0);
 
             int RequireNovaWritten = 0;
             byte[] RequireNovaWrite = BitConverter.GetBytes(Convert.ToInt32(thisInstance.gameRequireNova));
@@ -410,7 +394,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] RespawnTimeBytes = new byte[4];
             int RespawnTimeRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, RespawnTimeBytes, RespawnTimeBytes.Length, ref RespawnTimeRead);
-            int RespawnTime = BitConverter.ToInt32(RespawnTimeBytes, 0);
 
             int RespawnTimeWritten = 0;
             byte[] RespawnTimeWrite = BitConverter.GetBytes(thisInstance.gameRespawnTime);
@@ -556,7 +539,7 @@ namespace ServerManager.Classes.GameManagement
         public static void UpdateGamePlayOptions()
         {
 
-            int gameOptions = 0;
+            int gameOptions;
             try
             {
                 gameOptions = Functions.CalulateGameOptions(thisInstance.gameOptionAutoBalance, thisInstance.gameOptionFF, thisInstance.gameOptionFriendlyTags, thisInstance.gameOptionFFWarn, thisInstance.gameOptionShowTracers, thisInstance.gameShowTeamClays, thisInstance.gameOptionAutoRange);
@@ -577,7 +560,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] GamePlayOptionsOneBytes = new byte[4];
             int GamePlayOptionsOneRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, GamePlayOptionsOneBytes, GamePlayOptionsOneBytes.Length, ref GamePlayOptionsOneRead);
-            int GamePlayOptionsOne = BitConverter.ToInt32(GamePlayOptionsOneBytes, 0);
 
             int GamePlayOptionsOneWritten = 0;
             WriteProcessMemory((int)processHandle, Ptr1Addr, gameOptionsBytes, gameOptionsBytes.Length, ref GamePlayOptionsOneWritten);
@@ -594,13 +576,7 @@ namespace ServerManager.Classes.GameManagement
             int Ptr1Read = 0;
             ReadProcessMemory((int)processHandle, baseAddr + 0x001BF400, Ptr1, Ptr1.Length, ref Ptr1Read);
             int Ptr2 = BitConverter.ToInt32(Ptr1, 0);
-
-            byte[] ServerName = new byte[31];
-            int ServerNamePtrRead = 0;
-            ReadProcessMemory((int)processHandle, Ptr2 + 0x4, ServerName, ServerName.Length, ref ServerNamePtrRead);
-            string ServerNameQuery = Encoding.GetEncoding(1252).GetString(ServerName).Replace("\0", "");
-            // end Server Query Name
-
+            
             // Server Name Display
             byte[] Ptr3 = new byte[4];
             int Ptr3Read = 0;
@@ -610,7 +586,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] ServerNameDisplay = new byte[31];
             int ServerNameRead = 0;
             ReadProcessMemory((int)processHandle, ServerDisplayerName + 0x30, ServerNameDisplay, ServerNameDisplay.Length, ref ServerNameRead);
-            string ServerDisplayName = Encoding.GetEncoding(1252).GetString(ServerNameDisplay).Replace("\0", "");
             // end Server Name Display
 
             // since either one or the other isn't what it should be.. just update them both. Call it a day.
@@ -634,7 +609,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] MOTDBytes = new byte[85];
             int MOTDRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, MOTDBytes, MOTDBytes.Length, ref MOTDRead);
-            string MOTD = Encoding.GetEncoding(1252).GetString(MOTDBytes).Replace("\0", "");
 
             int MOTDWritten = 0;
             byte[] MOTDWrite = Encoding.GetEncoding(1252).GetBytes(thisInstance.gameMOTD);
@@ -655,7 +629,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] TimeLimitBytes = new byte[4];
             int TimeLimitRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, TimeLimitBytes, TimeLimitBytes.Length, ref TimeLimitRead);
-            int TimeLimit = BitConverter.ToInt32(TimeLimitBytes, 0);
 
             int TimeLimitWritten = 0;
             byte[] TimeLimitWrite = BitConverter.GetBytes(thisInstance.gameTimeLimit);
@@ -676,7 +649,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] LoopMapsBytes = new byte[4];
             int LoopMapsRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, LoopMapsBytes, LoopMapsBytes.Length, ref LoopMapsRead);
-            int LoopMaps = BitConverter.ToInt32(LoopMapsBytes, 0);
 
             int LoopMapsWritten = 0;
             byte[] LoopMapsWrite = BitConverter.GetBytes(thisInstance.gameLoopMaps);
@@ -697,7 +669,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] StartDelayBytes = new byte[4];
             int StartDelayRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, StartDelayBytes, StartDelayBytes.Length, ref StartDelayRead);
-            int StartDelay = BitConverter.ToInt32(StartDelayBytes, 0);
 
             int StartDelayWritten = 0;
             byte[] StartDelayWrite = BitConverter.GetBytes(thisInstance.gameStartDelay);
@@ -718,7 +689,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] MaxSlotsBytes = new byte[4];
             int MaxSlotsRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, MaxSlotsBytes, MaxSlotsBytes.Length, ref MaxSlotsRead);
-            int MaxSlots = BitConverter.ToInt32(MaxSlotsBytes, 0);
 
             int MaxSlotsWritten = 0;
             byte[] MaxSlotsWrite = BitConverter.GetBytes(thisInstance.gameMaxSlots);
@@ -730,9 +700,6 @@ namespace ServerManager.Classes.GameManagement
         public static void UpdateFriendlyFireKills()
         {
 
-
-            var baseAddr = 0x400000;
-
             byte[] Ptr1 = new byte[4];
             int Ptr1Read = 0;
             ReadProcessMemory((int)processHandle, baseAddr + 0x000DB684, Ptr1, Ptr1.Length, ref Ptr1Read);
@@ -741,7 +708,6 @@ namespace ServerManager.Classes.GameManagement
             byte[] FriendlyFireKillsBytes = new byte[4];
             int FriendlyFireKillsRead = 0;
             ReadProcessMemory((int)processHandle, Ptr1Addr, FriendlyFireKillsBytes, FriendlyFireKillsBytes.Length, ref FriendlyFireKillsRead);
-            int FriendlyFireKills = BitConverter.ToInt32(FriendlyFireKillsBytes, 0);
 
             int FriendlyFireKillsWritten = 0;
             byte[] FriendlyFireKillsWrite = BitConverter.GetBytes(thisInstance.gameFriendlyFireKills);
@@ -839,7 +805,7 @@ namespace ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, mapCycleServerAddress, mapCycleListAddress, mapCycleListAddress.Length, ref mapCycleListAddressRead);
             int mapCycleList = BitConverter.ToInt32(mapCycleListAddress, 0);
 
-            foreach (MapObject entry in mapInstance.Playlists[0])
+            foreach (MapObject _ in mapInstance.Playlists[0])
             {
                 int mapFileIndexLocation = mapCycleList;
 
@@ -885,10 +851,10 @@ namespace ServerManager.Classes.GameManagement
 
             // Write the first map
             var firstMap = mapInstance.Playlists[mapInstance.ActivePlaylist][0];
-            WriteFixedString(firstMap.MapFile!, 28);
+            WriteFixedString(firstMap.MapFile, 28);
             bw.Write(new byte[256]); // adjust this padding as needed
 
-            string mapName = firstMap.MapName!;
+            string mapName = firstMap.MapName;
             if (mapName.Length > 31)
                 mapName = mapName.Substring(0, 31);
             WriteFixedString(mapName, 28);
@@ -904,10 +870,10 @@ namespace ServerManager.Classes.GameManagement
             for (int i = 1; i < mapInstance.Playlists[mapInstance.ActivePlaylist].Count; i++)
             {
                 var map = mapInstance.Playlists[mapInstance.ActivePlaylist][i];
-                WriteFixedString(map.MapFile!, 28);
+                WriteFixedString(map.MapFile, 28);
                 bw.Write(new byte[256]); // adjust this padding as needed
 
-                string name = map.MapName!;
+                string name = map.MapName;
                 if (name.Length > 31)
                     name = name.Substring(0, 31);
                 WriteFixedString(name, 28);
@@ -961,7 +927,7 @@ namespace ServerManager.Classes.GameManagement
             {
                 int mapFileIndexLocation = mapCycleList;
                 byte[] mapFileBytes = new byte[0x20]; // 32 bytes
-                byte[] nameBytes = Encoding.ASCII.GetBytes(mapInstance.Playlists[mapInstance.ActivePlaylist][i].MapFile!);
+                byte[] nameBytes = Encoding.ASCII.GetBytes(mapInstance.Playlists[mapInstance.ActivePlaylist][i].MapFile);
                 Array.Copy(nameBytes, mapFileBytes, Math.Min(nameBytes.Length, mapFileBytes.Length));
                 int mapFileBytesWritten = 0;
                 WriteProcessMemory((int)processHandle, mapFileIndexLocation, mapFileBytes, mapFileBytes.Length, ref mapFileBytesWritten);
@@ -977,7 +943,7 @@ namespace ServerManager.Classes.GameManagement
         // Function: UpdateNovaID
         public static void UpdateNovaID()
         {
-            if (thisInstance.gameRequireNova == true)
+            if (thisInstance.gameRequireNova)
             {
                 return; // since we are requiring nova login, just return.
             }
@@ -1017,14 +983,6 @@ namespace ServerManager.Classes.GameManagement
             {
                 int UpdatePingerQuery = 0;
                 WriteProcessMemory((int)processHandle, startingPtr, read_currentgametype, read_currentgametype.Length, ref UpdatePingerQuery);
-
-                return;
-            }
-            else
-            {
-
-                // no update required... Exit the function.
-                return;
             }
         }
         // Function: Update Start Delay Timer
@@ -1111,7 +1069,7 @@ namespace ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, Ptr2, CurrentMapIndexBytes, CurrentMapIndexBytes.Length, ref CurrentMapIndexBytesRead);
             int currentMapIndex = BitConverter.ToInt32(CurrentMapIndexBytes, 0);
             
-            if (currentMapIndex + 1 >= mapInstance.Playlists[mapInstance.ActivePlaylist].Count || mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex + 1] == null)
+            if (currentMapIndex + 1 >= mapInstance.Playlists[mapInstance.ActivePlaylist].Count)
             {
                 currentMapIndex = 0;
             }
@@ -1119,13 +1077,12 @@ namespace ServerManager.Classes.GameManagement
             {
                 currentMapIndex++;
             }
-
-            int currentMapType = CommonCore.instanceMaps!.CurrentGameType;
+            
             int nextMapType = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapType;
             
             mapInstance.NextMapGameType = nextMapType;
-            mapInstance.NextMapName = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName!;
-            mapInstance.NextMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapFile!;
+            mapInstance.NextMapName = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapName;
+            mapInstance.NextMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][currentMapIndex].MapFile;
             mapInstance.IsNextMap4Team = mapInstanceManager.Is4TeamMap(mapInstance.NextMapFile);
 
             mapInstance.CurrentMapFile = mapInstance.Playlists[mapInstance.ActivePlaylist][mapInstance.ActualPlayingMapIndex].MapFile;
@@ -1153,7 +1110,7 @@ namespace ServerManager.Classes.GameManagement
 				// Deal with the Players
 				bool isCurrentMap4Team = thisInstance.gameEnableFourTeams && 
                                         mapInstance.IsCurrentMap4Team &&
-                                        (CommonCore.instanceMaps!.CurrentGameType == 1 || CommonCore.instanceMaps!.CurrentGameType == 3 || CommonCore.instanceMaps!.CurrentGameType == 8);
+                                        (CommonCore.instanceMaps!.CurrentGameType == 1 || CommonCore.instanceMaps.CurrentGameType == 3 || CommonCore.instanceMaps.CurrentGameType == 8);
                 
                 theInstanceManager.changeTeamGameMode(
                     CommonCore.instanceMaps!.CurrentGameType, 
@@ -1178,9 +1135,9 @@ namespace ServerManager.Classes.GameManagement
         {
 
             // This changes the score needed to win on the next map played.
-            int nextGameScore = 0;
-            var startingPtr1 = 0;
-            var startingPtr2 = 0;
+            int nextGameScore;
+            int startingPtr1;
+            int startingPtr2;
 
             switch (mapInstance.NextMapGameType)
             {
@@ -1331,7 +1288,7 @@ namespace ServerManager.Classes.GameManagement
             {
                 NextMapIndex = mapInstance.Playlists[mapInstance.ActivePlaylist].Count;
             }
-            else if (mapInstance.Playlists[mapInstance.ActivePlaylist][NextMapIndex - 1] != null)
+            else
             {
                 NextMapIndex--;
             }
@@ -1350,8 +1307,7 @@ namespace ServerManager.Classes.GameManagement
                 return;
             }
 
-            var startingPtr1 = 0;
-            startingPtr1 = baseAddr + 0x5F3740;
+            int startingPtr1 = baseAddr + 0x5F3740;
             byte[] timerBytes = BitConverter.GetBytes(10);
             int timerWritten1 = 0;
             WriteProcessMemory((int)processHandle, startingPtr1, timerBytes, timerBytes.Length, ref timerWritten1);
@@ -1771,13 +1727,13 @@ namespace ServerManager.Classes.GameManagement
                     int playerTeamLocation = playerlistStartingLocation + 0x90;
                     ReadProcessMemory((int)processHandle, playerTeamLocation, playerTeamBytes, playerTeamBytes.Length, ref buffer);
                     int playerTeam = BitConverter.ToInt32(playerTeamBytes, 0);
-                    string playerIP = ReadMemoryGrabPlayerIPAddress(formattedPlayerName).ToString();
+                    string playerIP = ReadMemoryGrabPlayerIPAddress(formattedPlayerName);
 
                     PlayerObject PlayerStats = ReadMemoryPlayerStats(playerSlot);
                     CharacterClass PlayerCharacterClass = (CharacterClass)PlayerStats.RoleID;
                     WeaponStack PlayerSelectedWeapon = (WeaponStack)PlayerStats.SelectedWeaponID;
 
-                    Dictionary<int, List<WeaponStack>> PlayerWeapons = new Dictionary<int, List<WeaponStack>>();
+                    // Remove: Dictionary<int, List<WeaponStack>> PlayerWeapons = new Dictionary<int, List<WeaponStack>>();
 
                     if (string.IsNullOrEmpty(formattedPlayerName) || string.IsNullOrWhiteSpace(formattedPlayerName))
                     {
@@ -1788,7 +1744,6 @@ namespace ServerManager.Classes.GameManagement
                         else
                         {
                             playerlistStartingLocation += 0xAF33C;
-                            continue;
                         }
                     }
                     else
@@ -1986,6 +1941,7 @@ namespace ServerManager.Classes.GameManagement
             }
 
             // Trail Checks
+            /*
             int[] offsets2 =
             {
                 // 20 fields before the first offset
@@ -2009,29 +1965,30 @@ namespace ServerManager.Classes.GameManagement
                 0x000ADAF4 + 44, 0x000ADAF4 + 48, 0x000ADAF4 + 52, 0x000ADAF4 + 56, 0x000ADAF4 + 60,
                 0x000ADAF4 + 64, 0x000ADAF4 + 68, 0x000ADAF4 + 72, 0x000ADAF4 + 76, 0x000ADAF4 + 80
             };
-
+            */
+            
             // Remove offsets in offsets2 that are present in offsets
-            int[] filteredOffsets2 = offsets2.Except(offsets).ToArray();
+            //int[] filteredOffsets2 = offsets2.Except(offsets).ToArray();
 
-            var stats2 = new int[filteredOffsets2.Length];
-            for (int i = 0; i < filteredOffsets2.Length; i++)
-            {
-                byte[] read_data = new byte[4];
-                ReadProcessMemory((int)processHandle, beginaddr + filteredOffsets2[i], read_data, read_data.Length, ref bytesread);
-                stats2[i] = BitConverter.ToInt32(read_data, 0);
-            }
+            //var stats2 = new int[filteredOffsets2.Length];
+            //for (int i = 0; i < filteredOffsets2.Length; i++)
+            //{
+            //    byte[] read_data = new byte[4];
+            //    ReadProcessMemory((int)processHandle, beginaddr + filteredOffsets2[i], read_data, read_data.Length, ref bytesread);
+            //    stats2[i] = BitConverter.ToInt32(read_data, 0);
+            //}
 
             // For offsets2, skip entries where stats2[i] == 0
-            string offsets2Log = string.Join(", ",
-                filteredOffsets2
-                    .Select((offset, i) => (offset, value: stats2[i]))
-                    .Where(pair => pair.value != 0)
-                    .Select(pair => $"{beginaddr + pair.offset:X8}:{pair.offset:X8} => {pair.value}\n")
-            );
+            //string offsets2Log = string.Join(", ",
+            //    filteredOffsets2
+            //        .Select((offset, i) => (offset, value: stats2[i]))
+            //        .Where(pair => pair.value != 0)
+            //        .Select(pair => $"{beginaddr + pair.offset:X8}:{pair.offset:X8} => {pair.value}\n")
+            //);
             // AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsets2Log);
             
             // Score Offsets
-            string offsetsLog = string.Join(", ", offsets.Select((offset, i) => $"{beginaddr + offset:X8}:{offset:X8} => {stats[i]}\n"));
+            // string offsetsLog = string.Join(", ", offsets.Select((offset, i) => $"{beginaddr + offset:X8}:{offset:X8} => {stats[i]}\n"));
             // AppDebug.Log("PlayerStats", $"{PlayerName} :" + offsetsLog);
 
             // Read Player Flag Time
@@ -2167,7 +2124,7 @@ namespace ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, TABLE2_ADDR + (int)(idx * 4), buf, buf.Length, ref bytesread);
             uint deltaA = BitConverter.ToUInt32(buf, 0);
 
-            long prod = (long)masked * (long)((int)deltaA - (int)baseA);
+            long prod = masked * (long)((int)deltaA - (int)baseA);
             uint low = (uint)prod;
             uint high = (uint)((ulong)prod >> 32);
             uint valA = ((low >> 0x16) | (high << 0x0a)) + baseA;
@@ -2182,7 +2139,7 @@ namespace ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, (int)table3base + (int)(idx * 4) + 4, buf, buf.Length, ref bytesread);
             uint deltaB = BitConverter.ToUInt32(buf, 0);
 
-            long prod2 = (long)masked * (long)((int)deltaB - (int)baseB);
+            long prod2 = masked * (long)((int)deltaB - (int)baseB);
             uint low2 = (uint)prod2;
             uint high2 = (uint)((ulong)prod2 >> 32);
             uint valB = ((low2 >> 0x16) | (high2 << 0x0a)) + baseB;
@@ -2228,13 +2185,13 @@ namespace ServerManager.Classes.GameManagement
             ReadProcessMemory((int)processHandle, msgTypeAddr, msgType, msgType.Length, ref msgTypeRead);
             string msgTypeBytes = BitConverter.ToString(msgType).Replace("-", "");
 
-            return new string[] { ChatLogAddr.ToString(), LastMessage, msgTypeBytes };
+            return new[] { ChatLogAddr.ToString(), LastMessage, msgTypeBytes };
         }
 
         public static void ReadMemoryCurrentGameWinConditions()
         {
-            int scoreAddress1 = 0;
-            int scoreAddress2 = 0;
+            int scoreAddress1;
+            int scoreAddress2;
             int gameTypeId = CommonCore.instanceMaps!.CurrentGameType;
 
             // CommonCore.instanceMaps!.CurrentGameType
@@ -2325,8 +2282,8 @@ namespace ServerManager.Classes.GameManagement
             //     BLUE OFFSET = 0x5E0808
             //     RED OFFSET  = 0x5E08F0
 
-            int scoreAddress1 = 0;
-            int scoreAddress2 = 0;
+            int scoreAddress1;
+            int scoreAddress2;
             int gameTypeId = CommonCore.instanceMaps!.CurrentGameType;
 
             switch (gameTypeId)
@@ -2381,7 +2338,6 @@ namespace ServerManager.Classes.GameManagement
 
             thisInstance.gameInfoBlueScore = blueTeamScore;
             thisInstance.gameInfoRedScore = redTeamScore;
-            return;
 
         }
 
@@ -2394,8 +2350,7 @@ namespace ServerManager.Classes.GameManagement
                 return;
             }
 
-            var startingPtr1 = 0;
-            startingPtr1 = baseAddr + 0x5F3740;
+            int startingPtr1 = baseAddr + 0x5F3740;
             byte[] timerBytes = BitConverter.GetBytes(10);
             int timerWritten1 = 0;
             WriteProcessMemory((int)processHandle, startingPtr1, timerBytes, timerBytes.Length, ref timerWritten1);
@@ -2467,7 +2422,7 @@ namespace ServerManager.Classes.GameManagement
             int bytesRead = 0;
             ReadProcessMemory((int)processHandle, address, buf, maxLen, ref bytesRead);
             int len = Array.IndexOf(buf, (byte)0);
-            return System.Text.Encoding.ASCII.GetString(buf, 0, len < 0 ? bytesRead : len);
+            return Encoding.ASCII.GetString(buf, 0, len < 0 ? bytesRead : len);
         }
 
         private const int ENTITY_ARRAY_BASE    = 0x00715900;
@@ -2492,12 +2447,12 @@ namespace ServerManager.Classes.GameManagement
             int container = ReadInt(PLAYER_LIST_PTR);
             if (container == 0) return "Unknown";
             int count     = ReadInt(container);
-            int baseAddr  = ReadInt(container + 4);
+            int containerAddr  = ReadInt(container + 4);
             if (baseAddr == 0 || count <= 0) return "Unknown";
 
             for (int i = 0; i < count; i++)
             {
-                int session = baseAddr + i * PLAYER_STRIDE;
+                int session = containerAddr + i * PLAYER_STRIDE;
                 if (ReadInt(session + PLAYER_OFF_ENTITY) == playerEntityPtr)
                     return ReadString(session + PLAYER_OFF_NAME);
             }
@@ -2682,7 +2637,6 @@ namespace ServerManager.Classes.GameManagement
                         continue;
 
                     // Look up this team's bay position (hardcoded from the .mis file)
-                    if (team < 3 || team > 4) continue;
                     long bx = FB_BAY_POS[team].X;
                     long by = FB_BAY_POS[team].Y;
 

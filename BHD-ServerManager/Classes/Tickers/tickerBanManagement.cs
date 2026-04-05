@@ -414,7 +414,7 @@ namespace ServerManager.Classes.Tickers
             {
                 foreach (var (slotNum, player) in GetActivePlayers())
                 {
-                    if (BanHelper.IsPlayerWhitelisted(player, banInstance, now))
+                    if (BanHelper.IsPlayerWhitelisted(player, now))
                         continue;
 
                     bool shouldPunt = false;
@@ -537,7 +537,7 @@ namespace ServerManager.Classes.Tickers
                     if (!IPAddress.TryParse(player.PlayerIPAddress, out IPAddress? playerIP))
                         continue;
 
-                    if (BanHelper.IsPlayerWhitelisted(player, banInstance, now))
+                    if (BanHelper.IsPlayerWhitelisted(player, now))
                         continue;
 
                     var (shouldBan, banReason) = EvaluateProxyBan(playerIP);

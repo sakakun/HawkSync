@@ -1,15 +1,10 @@
-﻿using ServerManager.Forms;
-using HawkSyncShared;
-using ServerManager.Classes.InstanceManagers;
+﻿using HawkSyncShared;
 using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using ServerManager.Classes.SupportClasses;
-using ServerManager.Classes.Services;
 using ServerManager.Classes.Services.NetLimiter;
 using ServerManager.Classes.SupportClasses.Networking;
 using System.Net;
-using System.Text;
-using System.Text.Json;
 
 namespace ServerManager.Classes.InstanceManagers
 {
@@ -166,9 +161,6 @@ namespace ServerManager.Classes.InstanceManagers
             try
             {
                 // Validation
-                if (ipAddress == null)
-                    return new OperationResult(false, "IP address is required.");
-
                 if (subnetMask < 0 || subnetMask > 32)
                     return new OperationResult(false, "Subnet mask must be between 0 and 32.");
 
@@ -254,7 +246,7 @@ namespace ServerManager.Classes.InstanceManagers
                 var existingName = instanceBans.BannedPlayerNames
                     .FirstOrDefault(x => x.PlayerName.Equals(playerName.Trim(), StringComparison.OrdinalIgnoreCase));
                 if (existingName != null)
-                    return new DualRecordResult(false, "Player name already exists in the blacklist.", existingName.RecordID, 0);
+                    return new DualRecordResult(false, "Player name already exists in the blacklist.", existingName.RecordID);
 
                 // Duplicate check: exact IP/subnet
                 var existingIP = instanceBans.BannedPlayerIPs
@@ -371,8 +363,6 @@ namespace ServerManager.Classes.InstanceManagers
                     return new OperationResult(false, $"Record ID {recordID} not found.");
 
                 // Validation
-                if (ipAddress == null)
-                    return new OperationResult(false, "IP address is required.");
 
                 if (subnetMask < 0 || subnetMask > 32)
                     return new OperationResult(false, "Subnet mask must be between 0 and 32.");
@@ -607,8 +597,6 @@ namespace ServerManager.Classes.InstanceManagers
         {
             try
             {
-                if (ipAddress == null)
-                    return new OperationResult(false, "IP address is required.");
 
                 if (subnetMask < 0 || subnetMask > 32)
                     return new OperationResult(false, "Subnet mask must be between 0 and 32.");
@@ -747,10 +735,7 @@ namespace ServerManager.Classes.InstanceManagers
                 var ipRecord = instanceBans.WhitelistedIPs.FirstOrDefault(x => x.RecordID == recordID);
                 if (ipRecord == null)
                     return new OperationResult(false, $"Record ID {recordID} not found.");
-
-                if (ipAddress == null)
-                    return new OperationResult(false, "IP address is required.");
-
+                
                 if (subnetMask < 0 || subnetMask > 32)
                     return new OperationResult(false, "Subnet mask must be between 0 and 32.");
 
@@ -962,7 +947,7 @@ namespace ServerManager.Classes.InstanceManagers
                 if (ProxyCheckManager.IsInitialized)
                     return new OperationResult(true, "Proxy service already initialized.");
 
-                IProxyCheckService? proxyService = null;
+                IProxyCheckService? proxyService;
 
                 if (theInstance.proxyCheckServiceProvider == 1)
                 {
@@ -977,13 +962,9 @@ namespace ServerManager.Classes.InstanceManagers
                     return new OperationResult(false, "No valid proxy service provider selected.");
                 }
 
-                if (proxyService != null)
-                {
-                    ProxyCheckManager.Initialize(proxyService, cacheExpirationDays: (int)theInstance.proxyCheckCacheTime);
-                    return new OperationResult(true, "Proxy service initialized successfully.");
-                }
-
-                return new OperationResult(false, "Failed to create proxy service instance.");
+                ProxyCheckManager.Initialize(proxyService, cacheExpirationDays: (int)theInstance.proxyCheckCacheTime);
+                return new OperationResult(true, "Proxy service initialized successfully.");
+                
             }
             catch (Exception ex)
             {
@@ -1002,7 +983,7 @@ namespace ServerManager.Classes.InstanceManagers
         {
             try
             {
-                IProxyCheckService? proxyService = null;
+                IProxyCheckService? proxyService;
 
                 if (serviceProvider == 1)
                 {
@@ -1016,10 +997,7 @@ namespace ServerManager.Classes.InstanceManagers
                 {
                     return (false, null, "Invalid service provider.");
                 }
-
-                if (proxyService == null)
-                    return (false, null, "Failed to create proxy service instance.");
-
+                
                 var result = await proxyService.CheckIPAsync(testIP);
 
                 if (result.Success)
@@ -1335,13 +1313,13 @@ namespace ServerManager.Classes.InstanceManagers
         {
             // Database Records
             CommonCore.instanceBans!.BannedPlayerNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Ban);
-            CommonCore.instanceBans!.BannedPlayerIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Ban);
-            CommonCore.instanceBans!.WhitelistedNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Whitelist);
-            CommonCore.instanceBans!.WhitelistedIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Whitelist);
-            CommonCore.instanceBans!.ConnectionHistory = DatabaseManager.GetPlayerNameRecords(RecordCategory.ConnectionHistory);
-            CommonCore.instanceBans!.IPConnectionHistory = DatabaseManager.GetPlayerIPRecords(RecordCategory.ConnectionHistory);
-            CommonCore.instanceBans!.ProxyRecords = DatabaseManager.GetProxyRecords();
-            CommonCore.instanceBans!.ProxyBlockedCountries = DatabaseManager.GetProxyBlockedCountries();
+            CommonCore.instanceBans.BannedPlayerIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Ban);
+            CommonCore.instanceBans.WhitelistedNames = DatabaseManager.GetPlayerNameRecords(RecordCategory.Whitelist);
+            CommonCore.instanceBans.WhitelistedIPs = DatabaseManager.GetPlayerIPRecords(RecordCategory.Whitelist);
+            CommonCore.instanceBans.ConnectionHistory = DatabaseManager.GetPlayerNameRecords(RecordCategory.ConnectionHistory);
+            CommonCore.instanceBans.IPConnectionHistory = DatabaseManager.GetPlayerIPRecords(RecordCategory.ConnectionHistory);
+            CommonCore.instanceBans.ProxyRecords = DatabaseManager.GetProxyRecords();
+            CommonCore.instanceBans.ProxyBlockedCountries = DatabaseManager.GetProxyBlockedCountries();
 
             LoadProxyCheckSettings();
             LoadNetLimiterSettings();

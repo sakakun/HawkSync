@@ -1,17 +1,11 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Globalization;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabMaps;
 using HawkSyncShared.SupportClasses;
-using ServerManager.Classes.GameManagement;
 
 namespace ServerManager.Classes.Helpers
 {
@@ -19,10 +13,10 @@ namespace ServerManager.Classes.Helpers
     {
         // Reused static HttpClient for connection pooling and to avoid socket exhaustion.
         // We use per-call CancellationTokenSource with a 10s CancelAfter to enforce the 10s kill time.
-        private static readonly HttpClient s_httpClient = new HttpClient
+        private static readonly HttpClient s_httpClient = new()
         {
             // Use an infinite timeout on the client itself and enforce per-request timeout via CancellationToken.
-            Timeout = System.Threading.Timeout.InfiniteTimeSpan
+            Timeout = Timeout.InfiniteTimeSpan
         };
 
         // Cache HttpClient instances keyed by local IP (string). "default" key reuses s_httpClient.
@@ -31,7 +25,7 @@ namespace ServerManager.Classes.Helpers
         // Returns an HttpClient bound to the given local IP. If localIp is null/empty, returns the default shared client.
         private static HttpClient GetOrCreateHttpClientForLocalIp(string? localIp)
         {
-            var key = string.IsNullOrWhiteSpace(localIp) ? "default" : localIp!.Trim();
+            var key = string.IsNullOrWhiteSpace(localIp) ? "default" : localIp.Trim();
 
             // Treat explicit "0.0.0.0" (IPv4 Any) as the default behaviour:
             // the script passes "selected" IP; when it passes "0.0.0.0" we should not bind the outgoing socket
@@ -72,7 +66,7 @@ namespace ServerManager.Classes.Helpers
                     }
                 };
 
-                return new HttpClient(handler, disposeHandler: true) { Timeout = System.Threading.Timeout.InfiniteTimeSpan };
+                return new HttpClient(handler, disposeHandler: true) { Timeout = Timeout.InfiniteTimeSpan };
             });
         }
 
@@ -82,6 +76,7 @@ namespace ServerManager.Classes.Helpers
         /// </summary>
         /// <param name="uriString"></param>
         /// <param name="SKey"></param>
+        /// <param name="localIp"></param>
         /// <param name="reportPort"></param>
         /// <param name="modString"></param>
         /// <param name="cancellationToken">Optional token. Method enforces a 10 second per-request timeout in addition to this token.</param>
@@ -91,7 +86,9 @@ namespace ServerManager.Classes.Helpers
 			// uriString default is never used as in practice the script always passes the URI, but it's there for safety and testing purposes.
 			// Per-request cancellation source that is linked to the caller's token and enforces a 10s timeout.
 			using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            
             linkedCts.CancelAfter(TimeSpan.FromSeconds(10));
+            
             var ct = linkedCts.Token;
 
             try
@@ -107,17 +104,17 @@ namespace ServerManager.Classes.Helpers
                     return new HeartBeatResponse { StatusCode = 0, ReasonPhrase = "Missing CommonCore instances" };
                 }
 
-                var serverName = theInstance.gameServerName ?? string.Empty;
-                var serverPort = reportPort ?? theInstance.profileBindPort.ToString();
-                var serverMessage = theInstance.gameMOTD ?? string.Empty;
-                var countryCode = theInstance.gameCountryCode ?? string.Empty;
+                var serverName = theInstance.gameServerName;
+                var serverPort = reportPort;
+                var serverMessage = theInstance.gameMOTD;
+                var countryCode = theInstance.gameCountryCode;
                 var isDedicated = theInstance.gameDedicated ? "Dedicated" : "Non-Dedicated";
                 var numPlayers = theInstance.gameInfoNumPlayers.ToString();
                 var maxPlayers = theInstance.gameMaxSlots.ToString();
-                var mapType = GameTypeObject.GetShortName(maps.CurrentGameType) ?? string.Empty;
-                var mapName = maps.CurrentMapName ?? string.Empty;
-                var mapFile = maps.CurrentMapFile ?? string.Empty;
-                var modText = IsTeamSaber() + (modString ?? string.Empty);
+                var mapType = GameTypeObject.GetShortName(maps.CurrentGameType);
+                var mapName = maps.CurrentMapName;
+                var mapFile = maps.CurrentMapFile;
+                var modText = IsTeamSaber() + (modString);
 
                 var isPassworded = "HiddenPassword";
                 if (string.IsNullOrEmpty(theInstance.gamePasswordLobby) &&
@@ -147,7 +144,7 @@ namespace ServerManager.Classes.Helpers
                     ["MaxPlayers"] = maxPlayers,
                     ["MissionName"] = mapName,
                     ["MissionFile"] = mapFile,
-                    ["TimeRemaining"] = (theInstance.gameInfoTimeRemaining.TotalSeconds*60).ToString(),
+                    ["TimeRemaining"] = (theInstance.gameInfoTimeRemaining.TotalSeconds * 60).ToString(CultureInfo.InvariantCulture),
                     ["Password"] = isPassworded,
                     ["Message"] = serverMessage,
                     ["Mod"] = modText,
@@ -206,7 +203,7 @@ namespace ServerManager.Classes.Helpers
 
         private static string UrlEncode(string value, Encoding enc)
         {
-            if (value == null) return string.Empty;
+
             var bytes = enc.GetBytes(value);
             var sb = new StringBuilder();
             foreach (byte b in bytes)
@@ -231,7 +228,7 @@ namespace ServerManager.Classes.Helpers
         private static string IsTeamSaber()
         {
             // If file "EXP1.pff" exists in the game directoy.
-            if (System.IO.File.Exists(System.IO.Path.Combine(CommonCore.theInstance!.profileServerPath, "EXP1.pff")))
+            if (File.Exists(Path.Combine(CommonCore.theInstance!.profileServerPath, "EXP1.pff")))
             {
                 return "TS:";
             }
@@ -248,7 +245,7 @@ namespace ServerManager.Classes.Helpers
                 ["0"] = new
                 {
                     Name = CommonCore.theInstance!.gameHostName,
-                    NameBase64Encoded = Convert.ToBase64String(Encoding.GetEncoding(1252).GetBytes(CommonCore.theInstance!.gameHostName)),
+                    NameBase64Encoded = Convert.ToBase64String(Encoding.GetEncoding(1252).GetBytes(CommonCore.theInstance.gameHostName)),
                     Kills = "0",
                     Deaths = "0",
                     WeaponId = "5",

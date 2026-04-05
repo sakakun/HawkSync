@@ -24,7 +24,7 @@ public class PlayerController : ControllerBase
 
         string playerName = AppFunc.FB64(command.PlayerName);
         var result = playerInstanceManager.ArmPlayer(command.PlayerSlot, playerName);
-        LogPlayerAction("ArmPlayer", playerName ?? "", result.Success, result.Message);
+        LogPlayerAction("ArmPlayer", playerName, result.Success, result.Message);
         return Ok(new CommandResult
         {
             Success = result.Success,
@@ -108,22 +108,22 @@ public class PlayerController : ControllerBase
 
         OperationResult result;
 
-        if (!banIP && (playerName == string.Empty || playerName == null))
+        if (!banIP && (playerName == string.Empty))
         {
-            result = playerInstanceManager.BanPlayerByName(playerName!, playerSlot, username!);
-            LogPlayerAction("BanPlayerByName", playerName!, result.Success, result.Message);
+            result = playerInstanceManager.BanPlayerByName(playerName, playerSlot, username);
+            LogPlayerAction("BanPlayerByName", playerName, result.Success, result.Message);
             return Ok(new CommandResult
             {
                 Success = result.Success,
                 Message = result.Message
             });
         }
-        if (banIP && (playerName == string.Empty || playerName == null))
+        if (banIP && (playerName == string.Empty))
         {
             if (IPAddress.TryParse(playerIP, out IPAddress? ipAddress))
             {
-                result = await playerInstanceManager.BanPlayerByIPAsync(ipAddress, playerName!, playerSlot, username!);
-                LogPlayerAction("BanPlayerByIP", playerIP ?? "", result.Success, result.Message);
+                result = await playerInstanceManager.BanPlayerByIPAsync(ipAddress, playerName, playerSlot, username);
+                LogPlayerAction("BanPlayerByIP", playerIP, result.Success, result.Message);
             }
             else
             {
@@ -140,11 +140,11 @@ public class PlayerController : ControllerBase
                 Message = result.Message
             });
         }
-        if(banIP && !(playerName == string.Empty || playerName == null))
+        if(banIP && !(playerName == string.Empty))
         {
             if (IPAddress.TryParse(playerIP, out IPAddress? ipAddress))
             {
-                result = await playerInstanceManager.BanPlayerByBothAsync(playerName, ipAddress, playerSlot, username!);
+                result = await playerInstanceManager.BanPlayerByBothAsync(playerName, ipAddress, playerSlot, username);
                 LogPlayerAction("BanPlayerByBoth", $"{playerName} ({playerIP})", result.Success, result.Message);
             }
             else
@@ -162,7 +162,7 @@ public class PlayerController : ControllerBase
                 Message = result.Message
             });
         }
-        LogPlayerAction("BanPlayer", playerName!, false, "Invalid ban parameters.");
+        LogPlayerAction("BanPlayer", playerName, false, "Invalid ban parameters.");
         return Ok(new CommandResult
         {
             Success = false,
