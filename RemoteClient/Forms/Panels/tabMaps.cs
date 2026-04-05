@@ -182,7 +182,9 @@ namespace RemoteClient.Forms.Panels
             var item = _currentPlaylist[idx];
             _currentPlaylist.RemoveAt(idx);
             _currentPlaylist.Insert(idx - 1, item);
+            RenumberPlaylist();
             RefreshCurrentPlaylistGrid();
+            grid.ClearSelection();
             grid.Rows[idx - 1].Selected = true;
             IsEditMode = true;
         }
@@ -196,7 +198,9 @@ namespace RemoteClient.Forms.Panels
             var item = _currentPlaylist[idx];
             _currentPlaylist.RemoveAt(idx);
             _currentPlaylist.Insert(idx + 1, item);
+            RenumberPlaylist();
             RefreshCurrentPlaylistGrid();
+            grid.ClearSelection();
             grid.Rows[idx + 1].Selected = true;
             IsEditMode = true;
         }
@@ -208,6 +212,14 @@ namespace RemoteClient.Forms.Panels
             RefreshCurrentPlaylistGrid();
         }
 
+        private void RenumberPlaylist()
+        {
+            for (int i = 0; i < _currentPlaylist.Count; i++)
+            {
+                _currentPlaylist[i].MapID = i + 1;
+            }
+        }
+        
         private void RandomizePlaylist()
         {
             if (_currentPlaylist.Count == 0)
@@ -226,12 +238,7 @@ namespace RemoteClient.Forms.Panels
                 _currentPlaylist[j] = temp;
             }
 
-            // Renumber MapIDs sequentially (1-based)
-            for (int i = 0; i < _currentPlaylist.Count; i++)
-            {
-                _currentPlaylist[i].MapID = i + 1;
-            }
-
+            RenumberPlaylist();
             RefreshCurrentPlaylistGrid();
             MessageBox.Show("Playlist randomized. Remember to save to apply changes.", "Randomized", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
