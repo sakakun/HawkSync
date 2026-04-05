@@ -31,8 +31,6 @@ namespace RemoteClient.Forms.Panels
 			// Lobby Server List
 			LoadLobbySettings();
 
-
-
 			ApiCore.OnSnapshotReceived += OnSnapshotReceived;
 
 		}

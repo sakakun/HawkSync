@@ -1,5 +1,4 @@
 ﻿﻿using BHD_ServerManager.Classes.GameManagement;
-using BHD_ServerManager.Classes.SupportClasses;
 using BHD_ServerManager.Forms;
 using HawkSyncShared;
 using HawkSyncShared.DTOs.tabPlayers;
@@ -472,7 +471,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
                 AppDebug.Log($"Babstats Import Response ({server.ProfileID}): {responseData}", AppDebug.LogLevel.Info);
-                AddStatsLogRowSafe(thisServer, DateTime.Now, responseData, server);
+                AddStatsLogRow(DateTime.UtcNow, responseData, server);
             }
         }
 
@@ -499,7 +498,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             {
                 string responseData = response.Replace("\r", "").Replace("\n", "").Trim();
                 AppDebug.Log($"Babstats Update Response ({server.ProfileID}): {responseData}", AppDebug.LogLevel.Info);
-                AddStatsLogRowSafe(thisServer, DateTime.Now, responseData, server);
+                AddStatsLogRow(DateTime.UtcNow, responseData, server);
             }
         }
 
@@ -522,7 +521,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
             try
             {
                 var response = await SendBabstatsData(POST_URL, DATA);
-                AddStatsLogRowSafe(thisServer, DateTime.Now, "Report Sent.");
+                AddStatsLogRow(DateTime.UtcNow, $"[{server.ProfileID}] Report Sent.");
                 if (!string.IsNullOrEmpty(response))
                 {
                     AppDebug.Log($"Babstats Report Response: {response}", AppDebug.LogLevel.Info);
@@ -531,7 +530,7 @@ namespace BHD_ServerManager.Classes.InstanceManagers
                     {
                         chatInstanceManager.SendChatMessage(message.Trim(), 8, 55);
 					}
-                    AddStatsLogRowSafe(thisServer, DateTime.Now, "Announcements Made.");
+                    AddStatsLogRow(DateTime.UtcNow, $"[{server.ProfileID}] Announcements Made.");
                     return response;
                 }
             }
@@ -612,96 +611,37 @@ namespace BHD_ServerManager.Classes.InstanceManagers
 
         // --- UI THREAD-SAFE HELPERS ---
 
-        private static void AddStatsLogRowSafe(ServerManagerUI thisServer, DateTime dateTime, string message)
+        private static void AddStatsLogRow(DateTime dateTime, string message, BabstatsServerSettings? server = null)
         {
-            var logRecord = new StatReportObject
-                {
-                    ReportDate = dateTime,
-                    ReportContent = message
-                };
 
-            string dateTimeString = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-
-            CommonCore.instanceStats!.WebStatsLog.Add(logRecord);
-            CommonCore.instanceStats.TrimWebStatsLog();
-
-            if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
-            {
-                thisServer.StatsTab.dg_statsLog.Invoke(new Action(() =>
-                {
-                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message);
-                    ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
-                }));
-            }
-            else
-            {
-                thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, message);
-                ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
-            }
-        }
-
-        private static void AddStatsLogRowSafe(ServerManagerUI thisServer, DateTime dateTime, string message, BabstatsServerSettings server)
-        {
-            ArgumentNullException.ThrowIfNull(server);
-
-            string serverLabel = string.IsNullOrWhiteSpace(server.DisplayName)
-                ? server.ProfileID
-                : server.DisplayName;
-
-            string scopedMessage = string.IsNullOrWhiteSpace(serverLabel)
-                ? message
-                : $"[{serverLabel}] {message}";
-
-            var logRecord = new StatReportObject
+            var logRecord = new StatReportObject()
             {
                 ReportDate = dateTime,
-                ReportContent = scopedMessage,
-                BabstatsServerID = server.BabstatsServerID,
-                BabstatsServerName = serverLabel
+                ReportContent = message
             };
 
-            string dateTimeString = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            if (null != server)
+            {
+                
+                string serverLabel = string.IsNullOrWhiteSpace(server.DisplayName)
+                    ? server.ProfileID
+                    : server.DisplayName;
+
+                string scopedMessage = string.IsNullOrWhiteSpace(serverLabel)
+                    ? message
+                    : $"[{serverLabel}] {message}";
+
+                
+                logRecord.ReportContent = scopedMessage;
+                logRecord.BabstatsServerID = server.BabstatsServerID;
+                logRecord.BabstatsServerName = serverLabel;
+            }
 
             CommonCore.instanceStats!.WebStatsLog.Add(logRecord);
             CommonCore.instanceStats.TrimWebStatsLog();
 
-            if (thisServer.StatsTab.dg_statsLog.InvokeRequired)
-            {
-                thisServer.StatsTab.dg_statsLog.Invoke(new Action(() =>
-                {
-                    thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, scopedMessage);
-                    ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
-                }));
-            }
-            else
-            {
-                thisServer.StatsTab.dg_statsLog.Rows.Add(dateTimeString, scopedMessage);
-                ApplySortToStatsLog(thisServer.StatsTab.dg_statsLog);
-            }
-        }
+            instanceStats.ForceUIUpdate = true;
 
-        private static void ApplySortToStatsLog(DataGridView grid)
-        {
-            if (grid.Rows.Count == 0)
-                return;
-
-            var sortColumn = grid.SortedColumn;
-            var sortOrder = grid.SortOrder;
-
-            if (sortColumn == null || sortOrder == SortOrder.None)
-            {
-                if (grid.Columns.Count > 0)
-                {
-                    grid.Sort(grid.Columns[0], System.ComponentModel.ListSortDirection.Descending);
-                }
-            }
-            else
-            {
-                var direction = sortOrder == SortOrder.Ascending 
-                    ? System.ComponentModel.ListSortDirection.Ascending 
-                    : System.ComponentModel.ListSortDirection.Descending;
-                grid.Sort(sortColumn, direction);
-            }
         }
 
     }

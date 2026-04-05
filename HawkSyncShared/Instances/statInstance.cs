@@ -51,29 +51,6 @@ namespace HawkSyncShared.Instances
                 .ThenBy(s => s.LobbyServerID);
 		}
 
-		/// <summary>
-		/// Ensure runtime state entries exist for all configured servers.
-		/// Call after loading/reloading server list from DB.
-		/// </summary>
-		public void EnsureBabstatsRuntimeState()
-        {
-            var validIds = new HashSet<int>(BabstatsServers.Select(s => s.BabstatsServerID));
-
-            foreach (var server in BabstatsServers)
-            {
-                if (!BabstatsServerState.ContainsKey(server.BabstatsServerID))
-                {
-                    BabstatsServerState[server.BabstatsServerID] = new BabstatsServerRuntimeState();
-                }
-            }
-
-            var staleIds = BabstatsServerState.Keys.Where(id => !validIds.Contains(id)).ToList();
-            foreach (var staleId in staleIds)
-            {
-                BabstatsServerState.Remove(staleId);
-            }
-        }
-
         /// <summary>
         /// Get or create runtime state for a Babstats server id.
         /// </summary>
@@ -90,7 +67,7 @@ namespace HawkSyncShared.Instances
 
         public void TrimWebStatsLog()
         {
-            var cutoff = DateTime.Now.AddHours(-1);
+            var cutoff = DateTime.UtcNow.AddHours(-1);
             WebStatsLog.RemoveAll(e => e.ReportDate < cutoff);
         }
 

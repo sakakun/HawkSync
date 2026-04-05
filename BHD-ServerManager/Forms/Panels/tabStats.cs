@@ -51,6 +51,7 @@ namespace BHD_ServerManager.Forms.Panels
                 babstatsFormReset();
                 babstatsButtonsReset();
                 LoadWebStatsSettings();
+                
 				// Lobby Tab
                 lobbyAction_ResetForm();
                 lobbyAction_ButtonReset();
@@ -63,6 +64,7 @@ namespace BHD_ServerManager.Forms.Panels
                 instanceStats.ForceUIUpdate = false;
                 LoadWebStatsSettings();
                 LoadLobbySettings();
+                LoadLogs();
             }
         }
 
@@ -142,6 +144,24 @@ namespace BHD_ServerManager.Forms.Panels
             }
         }
 
+        public void LoadLogs()
+        {
+            dg_statsLog.Rows.Clear();
+
+            var theLogs = instanceStats!.WebStatsLog;
+
+            foreach (var log in theLogs)
+            {
+                DataGridViewRow newRow = new DataGridViewRow();
+                newRow.Cells[0].Value = log.ReportDate;
+                newRow.Cells[1].Value = log.ReportContent;
+
+                dg_statsLog.Rows.Add(newRow);
+            }
+            
+            dg_statsLog.Sort(dg_statsLog.Columns[0], ListSortDirection.Descending);
+        }
+        
         // --- Event Handlers ---
         private async void OnTestBabstatConnectionClick(object sender, EventArgs e)
         {
