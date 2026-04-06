@@ -78,31 +78,47 @@ public partial class PlayerCardV2 : UserControl
     
     private void PlayerCardTicker()
     {
-
-        if (!IsHandleCreated)
-            return;
-        
-        // Does playerInstance.PlayerList has a key with same value of playerSlot
-        if (!playerInstance!.PlayerList.ContainsKey(_playerSlot))
+        try
         {
-            BeginInvoke(ResetCard);
-            return;
-        }
+            // Read non-UI state on the ticker thread (safe)
+            bool shouldBeVisible = CommonCore.theInstance!.instanceStatus != InstanceStatus.OFFLINE &&
+                                   _playerSlot <= CommonCore.theInstance.gameMaxSlots;
 
-        // Check to see if data is old.
-        PlayerObject _playerData = playerInstance.PlayerList[_playerSlot];
-        if (DateTime.Now - _playerData.PlayerLastSeen > TimeSpan.FromSeconds(5))
-        {
-            BeginInvoke(ResetCard);
-            return;
+            if (!playerInstance!.PlayerList.ContainsKey(_playerSlot))
+            {
+                BeginInvoke(() =>
+                {
+                    Visible = shouldBeVisible;
+                    ResetCard();
+                });
+                return;
+            }
+
+            PlayerObject _playerData = playerInstance.PlayerList[_playerSlot];
+            if (DateTime.Now - _playerData.PlayerLastSeen > TimeSpan.FromSeconds(5))
+            {
+                BeginInvoke(() =>
+                {
+                    Visible = shouldBeVisible;
+                    ResetCard();
+                });
+                return;
+            }
+
+            // Update Player Data (plain object assignment, not UI — safe on ticker thread)
+            playerData = _playerData;
+
+            // Marshal all UI updates to the UI thread
+            BeginInvoke(() =>
+            {
+                Visible = shouldBeVisible;
+                RunSafe(UpdatePlayerCard);
+            });
         }
-        
-        // Update Player Data
-        playerData = _playerData;
-        
-        // Invoke Begin
-        BeginInvoke(() => RunSafe(UpdatePlayerCard));
-        
+        catch (Exception ex)
+        {
+            AppDebug.Log("Error in PlayerCardTicker", AppDebug.LogLevel.Error, ex);
+        }
     }
     
     private async Task UpdatePlayerCard()

@@ -419,10 +419,14 @@ namespace ServerManager.Forms.Panels
 		{
 			if (theInstanceManager.ValidateGameServerPath() && theInstance?.instanceStatus == InstanceStatus.OFFLINE)
 			{
-				if (StartServer.startGame())
+				// Run on background thread to prevent UI lockup
+				Task.Run(async () =>
 				{
-					ServerMemory.ReadMemoryServerStatus();
-				}
+					if (StartServer.startGame())
+					{
+						await Task.Run(() => ServerMemory.ReadMemoryServerStatus());
+					}
+				});
 			}
 			else
 			{

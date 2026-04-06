@@ -36,11 +36,7 @@ public partial class tabPlayers : UserControl
             playerCard.Dock = DockStyle.Fill;
             playerCard.Margin = new Padding(0);
             playerCard.Padding = new Padding(0);
-            playerCard.ToggleVisibility(i < theInstance!.gameMaxSlots + 1);
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                playerCard.ToggleVisibility(true);
-            }
+            playerCard.Visible = false;
 
             PlayerCards[i] = playerCard;
             PlayerCards[i].StartTicker(); // Call after Name is set

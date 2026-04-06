@@ -1,14 +1,10 @@
 ﻿using ServerManager.Forms.SubPanels;
-using HawkSyncShared;
-using HawkSyncShared.Instances;
 using System.ComponentModel;
 
 namespace ServerManager.Forms.Panels
 {
     public partial class tabPlayers : UserControl
     {
-        private theInstance?        theInstance         => CommonCore.theInstance;
-
         private readonly Dictionary<int, PlayerCardV2> PlayerCards = new Dictionary<int, PlayerCardV2>();
         
         private static bool IsDesignTime =>
@@ -36,14 +32,9 @@ namespace ServerManager.Forms.Panels
                 playerCard.Dock = DockStyle.Fill;
                 playerCard.Margin = new Padding(0);
                 playerCard.Padding = new Padding(0);
-                playerCard.ToggleVisibility(i < theInstance!.gameMaxSlots + 1);
-                if (System.Diagnostics.Debugger.IsAttached)
-                {
-                    playerCard.ToggleVisibility(true);
-                }
+                playerCard.Visible = false;
 
                 PlayerCards[i] = playerCard;
-                PlayerCards[i].StartTicker(); // Call after Name is set
             }
         }
         
@@ -62,7 +53,14 @@ namespace ServerManager.Forms.Panels
             for (int i = 0; i < 50; i++)
             {
                 PlayerTable.Controls.Add(PlayerCards[i + 1], i / 10, i % 10);
+                
             }
+            
+            for (int i = 1; i < 51; i++)
+            {
+                PlayerCards[i].StartTicker();
+            }
+            
         }
         
     }

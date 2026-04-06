@@ -7,6 +7,7 @@ using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabGameplay;
 using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.Instances;
+using HawkSyncShared.SupportClasses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -494,45 +495,43 @@ public class GamePlayController : ControllerBase
     {
         if(!HasPermission("gameplay")) return Forbid();
 
-        bool success = false;
-        string message = string.Empty;
-        try
+        var instance = CommonCore.theInstance;
+        if (instance != null && instance.instanceStatus != InstanceStatus.OFFLINE)
         {
-            var instance = CommonCore.theInstance;
-            if (instance != null && instance.instanceStatus != InstanceStatus.OFFLINE)
-            {
-                message = "Server is already running.";
-                return Ok(new CommandResult { Success = false, Message = message });
-            }
-            if (!theInstanceManager.ValidateGameServerPath())
-            {
-                message = "Invalid game server path. Please configure the server path in Profile settings.";
-                return Ok(new CommandResult { Success = false, Message = message });
-            }
-            bool started = Classes.GameManagement.StartServer.startGame();
-            if (started)
-            {
-                ServerMemory.ReadMemoryServerStatus();
-                success = true;
-                message = "Game server started successfully.";
-                return Ok(new CommandResult { Success = success, Message = message });
-            }
-            else
-            {
-                message = "Failed to start game server. Check server logs for details.";
-                return Ok(new CommandResult { Success = false, Message = message });
-            }
+            return Ok(new CommandResult { Success = false, Message = "Server is already running." });
         }
-        catch (Exception ex)
+    
+        if (!theInstanceManager.ValidateGameServerPath())
         {
-            message = $"Error starting server: {ex.Message}";
-            return Ok(new CommandResult { Success = false, Message = message });
+            return Ok(new CommandResult { Success = false, Message = "Invalid game server path." });
         }
-        finally
+
+        // Fire and forget on background thread - return immediately to prevent timeout
+        _ = Task.Run(() =>
         {
-            LogGamePlayAction("StartServer", "Started game server", success, message);
-        }
+            try
+            {
+                bool started = Classes.GameManagement.StartServer.startGame();
+                if (started)
+                {
+                    ServerMemory.ReadMemoryServerStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                AppDebug.Log("Error starting server in background", AppDebug.LogLevel.Error, ex);
+            }
+        });
+
+        // Return success immediately without waiting
+        LogGamePlayAction("StartServer", "Started game server", true, "Game server startup initiated.");
+        return Ok(new CommandResult 
+        { 
+            Success = true, 
+            Message = "Game server startup initiated. Status will update automatically." 
+        });
     }
+
 
     /// <summary>
     /// Stop the game server
