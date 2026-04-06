@@ -1,4 +1,5 @@
-﻿using ServerManager.Forms.SubPanels;
+﻿using HawkSyncShared;
+using ServerManager.Forms.SubPanels;
 using System.ComponentModel;
 
 namespace ServerManager.Forms.Panels
@@ -17,10 +18,9 @@ namespace ServerManager.Forms.Panels
             if (IsDesignTime)
                 return;
             
-            // Generate Cards
             generateCardData();
             PopulateCards();
-            
+            StartSingleTicker();
         }
 
         private void generateCardData()
@@ -38,14 +38,12 @@ namespace ServerManager.Forms.Panels
             }
         }
         
-        // --- Generate Init. Cards ---
         private void PopulateCards()
         {
             TableLayoutPanel PlayerTable = playerTable;
             
             PlayerTable.Controls.Clear();
 
-            // Configure PlayerCards1: 5 columns x 10 rows = 50 cards
             PlayerTable.ColumnCount = 5;
             PlayerTable.RowCount = 10;
             PlayerTable.Padding = new Padding(0, 0, 0, 0);
@@ -53,15 +51,38 @@ namespace ServerManager.Forms.Panels
             for (int i = 0; i < 50; i++)
             {
                 PlayerTable.Controls.Add(PlayerCards[i + 1], i / 10, i % 10);
-                
             }
-            
-            for (int i = 1; i < 51; i++)
-            {
-                PlayerCards[i].StartTicker();
-            }
-            
+            // No per-card StartTicker() here anymore
         }
-        
+
+        private void StartSingleTicker()
+        {
+            CommonCore.Ticker!.Start("TabPlayers_Cards", 1000, TickAllCards);
+        }
+
+        /// <summary>
+        /// Called from a background timer thread once per second.
+        /// Posts a single BeginInvoke to the UI thread to update all cards.
+        /// </summary>
+        private void TickAllCards()
+        {
+            if (IsDisposed || !IsHandleCreated) return;
+
+            BeginInvoke(UpdateAllCards);
+        }
+
+        /// <summary>
+        /// Runs on the UI thread. Iterates all cards and updates each one synchronously.
+        /// </summary>
+        private void UpdateAllCards()
+        {
+            
+            if(!Visible) return; // Skip updates if the tab isn't visible
+            
+            foreach (var card in PlayerCards.Values)
+            {
+                card.UpdateCard();
+            }
+        }
     }
 }

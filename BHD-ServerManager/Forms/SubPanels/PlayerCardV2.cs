@@ -13,6 +13,7 @@ using System.ComponentModel;
 public partial class PlayerCardV2 : UserControl
 {
     private int _playerSlot;
+    private bool _isUpdating;
 
     private PlayerObject                playerData      { get; set; } = new PlayerObject();
     private string                      CountryCode     { get; set; } = string.Empty;
@@ -48,11 +49,6 @@ public partial class PlayerCardV2 : UserControl
         
     }
 
-    public void StartTicker()
-    {
-        CommonCore.Ticker!.Start($"Ticker_{Name}", 1000, PlayerCardTicker);
-    }
-    
     private void RunSafe(Func<Task> action)
     {
         _ = RunSafeInternal(action);
@@ -60,6 +56,8 @@ public partial class PlayerCardV2 : UserControl
 
     private async Task RunSafeInternal(Func<Task> action)
     {
+        _isUpdating = true;
+
         try
         {
             await action();
@@ -74,75 +72,124 @@ public partial class PlayerCardV2 : UserControl
                 MessageBoxIcon.Error
             );
         }
+        finally
+        {
+            _isUpdating = false;
+        }
+        
     }
-    
-    private void PlayerCardTicker()
+
+    /// <summary>
+    /// Called from tabPlayers on the UI thread, once per second.
+    /// Contains the same logic as the old PlayerCardTicker but without BeginInvoke
+    /// since tabPlayers already marshalled the call to the UI thread.
+    /// </summary>
+    public void UpdateCard()
     {
         try
         {
-            // Read non-UI state on the ticker thread (safe)
             bool shouldBeVisible = CommonCore.theInstance!.instanceStatus != InstanceStatus.OFFLINE &&
                                    _playerSlot <= CommonCore.theInstance.gameMaxSlots;
 
             if (!playerInstance!.PlayerList.ContainsKey(_playerSlot))
             {
-                BeginInvoke(() =>
-                {
-                    Visible = shouldBeVisible;
-                    ResetCard();
-                });
+                Visible = shouldBeVisible;
+                ResetCard();
                 return;
             }
 
             PlayerObject _playerData = playerInstance.PlayerList[_playerSlot];
             if (DateTime.Now - _playerData.PlayerLastSeen > TimeSpan.FromSeconds(5))
             {
-                BeginInvoke(() =>
-                {
-                    Visible = shouldBeVisible;
-                    ResetCard();
-                });
+                Visible = shouldBeVisible;
+                ResetCard();
                 return;
             }
 
-            // Update Player Data (plain object assignment, not UI — safe on ticker thread)
             playerData = _playerData;
-
-            // Marshal all UI updates to the UI thread
-            BeginInvoke(() =>
-            {
-                Visible = shouldBeVisible;
+            Visible = shouldBeVisible;
+            
+            if(!_isUpdating)
                 RunSafe(UpdatePlayerCard);
-            });
+            
         }
         catch (Exception ex)
         {
-            AppDebug.Log("Error in PlayerCardTicker", AppDebug.LogLevel.Error, ex);
+            AppDebug.Log("Error in PlayerCard UpdateCard", AppDebug.LogLevel.Error, ex);
         }
     }
     
     private async Task UpdatePlayerCard()
     {
-        // Decode Base64 and interpret as Windows-1252
         byte[] decodedBytes = Convert.FromBase64String(playerData.PlayerNameBase64);
         string decodedPlayerName = Encoding.GetEncoding("Windows-1252").GetString(decodedBytes);
-        
+    
         label_dataPlayerNameRole.UseCompatibleTextRendering = true;
         label_dataPlayerNameRole.Text = decodedPlayerName;
-
         label_dataIPinfo.Text = playerData.PlayerIPAddress;
-            
-        // Update icon based on proxy detection and team
-        await UpdatePlayerIconAsync(playerData.PlayerIPAddress, playerData.PlayerTeam);
-        await UpdateCountryDataAsync(playerData.PlayerIPAddress);
-            
+
+        // Single proxy check — result shared between icon and country updates
+        ProxyCheckResult? proxyResult = await FetchProxyResultAsync(playerData.PlayerIPAddress);
+
+        UpdatePlayerIcon(proxyResult, playerData.PlayerTeam);
+        await UpdateCountryDataAsync(proxyResult);
+
         contextMenu.Items[0].Text = decodedPlayerName;
         contextMenu.Items[1].Text = $"Ping: {playerData.PlayerPing} ms";
-
         player_Tooltip.SetToolTip(this, $"Ping: {playerData.PlayerPing} ms");
         playerContextMenuIcon.Visible = true;
     }
 
+    /// <summary>
+    /// Single point of truth for the proxy API call.
+    /// Returns null if proxy checks are disabled, the IP is invalid, or the call fails.
+    /// </summary>
+    private async Task<ProxyCheckResult?> FetchProxyResultAsync(string ipAddress)
+    {
+        if (!theInstance!.proxyCheckEnabled || !ProxyCheckManager.IsInitialized)
+            return null;
+
+        if (!IPAddress.TryParse(ipAddress, out IPAddress? ip))
+            return null;
+
+        try
+        {
+            var result = await ProxyCheckManager.CheckIPAsync(ip);
+            return result.Success ? result : null;
+        }
+        catch (Exception ex)
+        {
+            AppDebug.Log("Error fetching proxy result", AppDebug.LogLevel.Error, ex);
+            return null;
+        }
+    }
+    
+    /// <summary>
+    /// Synchronous — no API call, just applies the already-fetched result to the icon.
+    /// </summary>
+    private void UpdatePlayerIcon(ProxyCheckResult? proxyResult, int team)
+    {
+        bool isProxy = proxyResult != null && (proxyResult.IsProxy || proxyResult.IsVpn || proxyResult.IsTor);
+        playerData.IsProxyDetected = isProxy;
+
+        if (isProxy)
+        {
+            playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonCircleExclamation;
+            playerTeamIcon.IconColor = Color.Orange;
+        }
+        else
+        {
+            playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonHiking;
+            playerTeamIcon.IconColor = team switch
+            {
+                1 => Color.Blue,
+                2 => Color.Red,
+                3 => Color.Gold,
+                4 => Color.Violet,
+                _ => Color.Black
+            };
+        }
+    }
     private void BuildContextMenu(ContextMenuStrip cardMenu)
     {
         cardMenu.Items.Clear();
@@ -172,7 +219,23 @@ public partial class PlayerCardV2 : UserControl
         cardMenu.Items.Add(godModeCommand);
         cardMenu.Items.Add(switchTeamCommand);
     }
-    
+    /// <summary>
+    /// Uses the already-fetched proxy result for the country code — no second API call.
+    /// </summary>
+    private async Task UpdateCountryDataAsync(ProxyCheckResult? proxyResult)
+    {
+        string code = proxyResult?.CountryCode ?? string.Empty;
+
+        if (proxyResult != null)
+            playerData.CountryCode = code;
+
+        // Only update flag if country code actually changed
+        if (code != CountryCode)
+        {
+            CountryCode = code;
+            await UpdateCountryFlagAsync(code);
+        }
+    }
     private void ResetCard()
     {
         playerData = new PlayerObject
@@ -211,15 +274,6 @@ public partial class PlayerCardV2 : UserControl
         BuildContextMenu(contextMenu);
         
         playerContextMenuIcon.Visible = false;        
-    }
-
-    public void ToggleVisibility(bool toggle)
-    {
-        if (Visible == toggle)
-            return;
-
-        ResetCard();
-        Visible = toggle;
     }
     
     // ================================================================================
@@ -619,93 +673,6 @@ public partial class PlayerCardV2 : UserControl
     // ================================================================================
     // PROXY/VPN DETECTION METHODS
     // ================================================================================
-
-    /// <summary>
-    /// Check if player's IP is flagged as proxy/VPN/TOR
-    /// </summary>
-    private async Task<bool> IsProxyDetectedAsync(string ipAddress)
-    {
-        try
-        {
-            // Check if proxy detection is enabled
-            if (!theInstance!.proxyCheckEnabled || !ProxyCheckManager.IsInitialized)
-                return false;
-
-            if (!IPAddress.TryParse(ipAddress, out IPAddress? ip))
-                return false;
-
-            var result = await ProxyCheckManager.CheckIPAsync(ip);
-            
-            if (result.Success)
-            {
-                // Check if any proxy/VPN/TOR flag is set
-                return result.IsProxy || result.IsVpn || result.IsTor;
-            }
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            AppDebug.Log($"Error checking proxy status", AppDebug.LogLevel.Error, ex);
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// Update player icon based on team and proxy status
-    /// </summary>
-    private async Task UpdatePlayerIconAsync(string ipAddress, int team)
-    {
-        playerData.IsProxyDetected = await IsProxyDetectedAsync(ipAddress);
-
-        if (playerData.IsProxyDetected)
-        {
-            // Show warning icon for proxy/VPN/TOR
-            playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonCircleExclamation;
-            playerTeamIcon.IconColor = Color.Orange;
-        }
-        else
-        {
-            // Show default team icon
-            playerTeamIcon.IconChar = FontAwesome.Sharp.IconChar.PersonHiking;
-            playerTeamIcon.IconColor = team switch
-            {
-                1 => Color.Blue,
-                2 => Color.Red,
-                3 => Color.Gold,
-                4 => Color.Violet,
-                _ => Color.Black
-            };
-        }
-    }
-
-    /// <summary>
-    /// Fetch and update country code and flag for new player
-    /// </summary>
-    private async Task UpdateCountryDataAsync(string ipAddress)
-    {
-        string? code = string.Empty;
-        
-        if (theInstance!.proxyCheckEnabled && ProxyCheckManager.IsInitialized)
-        {
-            if (IPAddress.TryParse(ipAddress, out IPAddress? ip))
-            {
-                var result = await ProxyCheckManager.CheckIPAsync(ip);
-                if (result.Success)
-                {
-                    code = result.CountryCode;
-                    playerData.CountryCode = code;
-                }
-            }
-        }
-
-        // Only update flag if country code changed
-        if (code != CountryCode && code != null)
-        {
-            CountryCode = code;
-            await UpdateCountryFlagAsync(code);
-        }
-    }
 
     /// <summary>
     /// Update country flag based on ISO code
