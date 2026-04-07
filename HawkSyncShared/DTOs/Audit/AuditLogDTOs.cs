@@ -104,5 +104,6 @@ public static class AuditAction
     public const string Disconnect = "Disconnect";
     public const string Start = "Start";
     public const string Stop = "Stop";
+    public const string PathTraversalBlocked = "PathTraversalBlocked";
 }
 

@@ -15,6 +15,8 @@ namespace ServerManager.API.Controllers;
 [Authorize]
 public class FileSystemController : ControllerBase
 {
+    private static readonly char[] _dirSeparators = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+
     /// <summary>
     /// Get list of available drives
     /// </summary>
@@ -24,17 +26,21 @@ public class FileSystemController : ControllerBase
         if(!HasPermission("profile")) return Forbid();
         try
         {
-            var drives = DriveInfo.GetDrives()
-                .Where(d => d.IsReady)
-                .Select(d => d.Name)
-                .ToList();
+            if (!TryGetServerRootPath(out var serverRootPath, out var errorMessage))
+            {
+                return Ok(new DirectoryListingResponse
+                {
+                    Success = false,
+                    Message = errorMessage
+                });
+            }
 
             return Ok(new DirectoryListingResponse
             {
                 Success = true,
-                Message = "Drives retrieved successfully",
-                Drives = drives,
-                CurrentPath = string.Empty,
+                Message = "Server root retrieved successfully",
+                Drives = new List<string> { serverRootPath },
+                CurrentPath = serverRootPath,
                 Entries = new List<FileSystemEntry>()
             });
         }
@@ -58,13 +64,28 @@ public class FileSystemController : ControllerBase
 
         try
         {
-            // Default to drives if no path specified
-            if (string.IsNullOrWhiteSpace(request.Path))
+            if (!TryGetServerRootPath(out var serverRootPath, out var errorMessage))
             {
-                return GetDrives();
+                return Ok(new DirectoryListingResponse
+                {
+                    Success = false,
+                    Message = errorMessage
+                });
             }
 
-            var dirInfo = new DirectoryInfo(request.Path);
+            // Default to server root if no path is specified.
+            var requestedPath = string.IsNullOrWhiteSpace(request.Path) ? serverRootPath : request.Path;
+            if (!TryResolvePathUnderRoot(serverRootPath, requestedPath!, allowAbsoluteInput: true, out var resolvedDirectoryPath))
+            {
+                LogPathTraversalBlocked("ListDirectory", requestedPath!);
+                return Ok(new DirectoryListingResponse
+                {
+                    Success = false,
+                    Message = "Access denied: path must be within the configured server path"
+                });
+            }
+
+            var dirInfo = new DirectoryInfo(resolvedDirectoryPath);
 
             if (!dirInfo.Exists)
             {
@@ -135,11 +156,11 @@ public class FileSystemController : ControllerBase
 
             // Get parent directory
             string? parentPath = dirInfo.Parent?.FullName;
-
-            var drives = DriveInfo.GetDrives()
-                .Where(d => d.IsReady)
-                .Select(d => d.Name)
-                .ToList();
+            if (!string.IsNullOrEmpty(parentPath) &&
+                !IsPathUnderRoot(serverRootPath, parentPath))
+            {
+                parentPath = null;
+            }
 
             return Ok(new DirectoryListingResponse
             {
@@ -148,7 +169,7 @@ public class FileSystemController : ControllerBase
                 CurrentPath = dirInfo.FullName,
                 ParentPath = parentPath,
                 Entries = entries.OrderBy(e => !e.IsDirectory).ThenBy(e => e.Name).ToList(),
-                Drives = drives
+                Drives = new List<string> { serverRootPath }
             });
         }
         catch (UnauthorizedAccessException)
@@ -179,6 +200,15 @@ public class FileSystemController : ControllerBase
 
         try
         {
+            if (!TryGetServerRootPath(out var serverRootPath, out var errorMessage))
+            {
+                return Ok(new CommandResult
+                {
+                    Success = false,
+                    Message = errorMessage
+                });
+            }
+
             if (string.IsNullOrWhiteSpace(request.Path))
             {
                 return Ok(new CommandResult
@@ -188,7 +218,17 @@ public class FileSystemController : ControllerBase
                 });
             }
 
-            bool exists = Directory.Exists(request.Path);
+            if (!TryResolvePathUnderRoot(serverRootPath, request.Path, allowAbsoluteInput: true, out var resolvedPath))
+            {
+                LogPathTraversalBlocked("ValidatePath", request.Path);
+                return Ok(new CommandResult
+                {
+                    Success = false,
+                    Message = "Access denied: path must be within the configured server path"
+                });
+            }
+
+            bool exists = Directory.Exists(resolvedPath);
 
             return Ok(new CommandResult
             {
@@ -327,7 +367,13 @@ public class FileSystemController : ControllerBase
             }
 
             // Handle individual files
-            var destPath = Path.Combine(theInstance.profileServerPath, fileName);
+            if (!TryResolvePathUnderRoot(theInstance.profileServerPath, fileName, allowAbsoluteInput: false, out var destPath))
+            {
+                LogPathTraversalBlocked("UploadFile", fileName);
+                message = "Access denied: destination must be within the configured server path";
+                return Ok(new FileOperationResponse { Success = false, Message = message });
+            }
+
             using (var stream = new FileStream(destPath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
@@ -367,7 +413,12 @@ public class FileSystemController : ControllerBase
                 return BadRequest(message);
             }
 
-            var filePath = Path.Combine(theInstance.profileServerPath, fileName);
+            if (!TryResolvePathUnderRoot(theInstance.profileServerPath, fileName, allowAbsoluteInput: false, out var filePath))
+            {
+                LogPathTraversalBlocked("DownloadFile", fileName);
+                message = "Access denied: file path must be within the configured server path";
+                return BadRequest(message);
+            }
         
             if (!System.IO.File.Exists(filePath))
             {
@@ -461,7 +512,13 @@ public class FileSystemController : ControllerBase
 
             foreach (var fileName in request.FileNames)
             {
-                var filePath = Path.Combine(theInstance.profileServerPath, fileName);
+                if (!TryResolvePathUnderRoot(theInstance.profileServerPath, fileName, allowAbsoluteInput: false, out var filePath))
+                {
+                    LogPathTraversalBlocked("DeleteFiles", fileName);
+                    message = $"Access denied for '{fileName}': path must be within the configured server path";
+                    return Ok(new FileOperationResponse { Success = false, Message = message });
+                }
+
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
@@ -500,7 +557,18 @@ public class FileSystemController : ControllerBase
                 var extension = Path.GetExtension(entry.Name).ToLower();
                 if (allowedExtensions.Contains(extension))
                 {
-                    var destFile = Path.Combine(destinationPath, entry.Name);
+                    if (!TryResolvePathUnderRoot(destinationPath, entry.FullName, allowAbsoluteInput: false, out var destFile))
+                    {
+                        LogPathTraversalBlocked("ExtractZipFile", entry.FullName);
+                        continue;
+                    }
+
+                    var parentDir = Path.GetDirectoryName(destFile);
+                    if (!string.IsNullOrEmpty(parentDir))
+                    {
+                        Directory.CreateDirectory(parentDir);
+                    }
+
                     entry.ExtractToFile(destFile, overwrite: true);
                     extractedCount++;
                 }
@@ -514,6 +582,89 @@ public class FileSystemController : ControllerBase
     {
         var permissions = User.FindAll("permission").Select(c => c.Value).ToList();
         return permissions.Contains(permission);
+    }
+
+    private bool TryGetServerRootPath(out string serverRootPath, out string errorMessage)
+    {
+        serverRootPath = string.Empty;
+        errorMessage = string.Empty;
+
+        var theInstance = CommonCore.theInstance;
+        if (theInstance == null || string.IsNullOrWhiteSpace(theInstance.profileServerPath))
+        {
+            errorMessage = "Server path is not configured";
+            return false;
+        }
+
+        serverRootPath = Path.GetFullPath(theInstance.profileServerPath);
+        if (!Directory.Exists(serverRootPath))
+        {
+            errorMessage = $"Directory not found: {serverRootPath}";
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool TryResolvePathUnderRoot(string serverRootPath, string inputPath, bool allowAbsoluteInput, out string resolvedPath)
+    {
+        resolvedPath = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(serverRootPath) || string.IsNullOrWhiteSpace(inputPath))
+        {
+            return false;
+        }
+
+        var candidatePath = allowAbsoluteInput && Path.IsPathRooted(inputPath)
+            ? inputPath
+            : Path.Combine(serverRootPath, inputPath);
+
+        try
+        {
+            var candidateFullPath = Path.GetFullPath(candidatePath);
+            if (!IsPathUnderRoot(serverRootPath, candidateFullPath))
+            {
+                return false;
+            }
+
+            resolvedPath = candidateFullPath;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool IsPathUnderRoot(string serverRootPath, string candidatePath)
+    {
+        var normalizedRoot = Path.GetFullPath(serverRootPath).TrimEnd(_dirSeparators);
+        var normalizedCandidate = Path.GetFullPath(candidatePath).TrimEnd(_dirSeparators);
+
+        if (normalizedCandidate.Equals(normalizedRoot, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var rootWithSeparator = normalizedRoot + Path.DirectorySeparatorChar;
+        return normalizedCandidate.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void LogPathTraversalBlocked(string operation, string attemptedPath)
+    {
+        DatabaseManager.LogAuditAction(
+            userId: null,
+            username: User.Identity?.Name ?? "Unknown",
+            category: AuditCategory.System,
+            actionType: AuditAction.PathTraversalBlocked,
+            description: $"Blocked path traversal attempt during {operation}",
+            targetType: "FileSystem",
+            targetId: null,
+            targetName: attemptedPath,
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            success: false,
+            errorMessage: "Requested path is outside the configured server path"
+        );
     }
 
     private void LogFileAction(string actionType, string fileName, bool success, string message)
