@@ -13,6 +13,10 @@ using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.SupportClasses;
 using Microsoft.AspNetCore.RateLimiting;
 
+// Token TTL — 8 hours is a reasonable balance between usability and exposure window.
+// Reducing from the original 24h means a stolen token is usable for at most 8h.
+// Explicit logout revokes the token immediately via the jti denylist.
+
 namespace ServerManager.API.Controllers;
 
 [ApiController]
@@ -106,6 +110,7 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim>
         {
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // unique token ID for revocation
             new Claim("userId", user.UserID.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim("username", user.Username)
@@ -120,7 +125,7 @@ public class AuthController : ControllerBase
             issuer: "BHD.ServerManager",
             audience: "BHD.RemoteClient",
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(24),
+            expires: DateTime.UtcNow.AddHours(8), // Reduced from 24h
             signingCredentials: credentials
         );
 
@@ -136,6 +141,17 @@ public class AuthController : ControllerBase
         {
             adminInstanceManager.RemoveSession(username);
         }
+
+        // Revoke the specific token so it cannot be reused before its natural expiry
+        var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+        var expClaim = User.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
+        if (!string.IsNullOrEmpty(jti) && long.TryParse(expClaim, out var expSeconds))
+        {
+            var utcExpiry = DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime;
+            TokenDenylistService.Revoke(jti, utcExpiry);
+            AppDebug.Log($"Token revoked for user '{username}' (jti: {jti})", AppDebug.LogLevel.Info);
+        }
+
         return Ok(new { Success = true, Message = "Logged out successfully" });
     }
 }

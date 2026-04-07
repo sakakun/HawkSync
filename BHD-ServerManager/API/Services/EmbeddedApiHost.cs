@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -110,6 +109,18 @@ public class EmbeddedApiHost
                                         context.HttpContext.Request.Path.StartsWithSegments("/hubs/server"))
                                     {
                                         context.Token = accessToken;
+                                    }
+                                    return Task.CompletedTask;
+                                },
+
+                                // Reject any token whose jti has been explicitly revoked (e.g., via logout)
+                                OnTokenValidated = context =>
+                                {
+                                    var jti = context.Principal?
+                                        .FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti)?.Value;
+                                    if (!string.IsNullOrEmpty(jti) && TokenDenylistService.IsRevoked(jti))
+                                    {
+                                        context.Fail("Token has been revoked.");
                                     }
                                     return Task.CompletedTask;
                                 }

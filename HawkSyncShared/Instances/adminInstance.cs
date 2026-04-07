@@ -11,10 +11,10 @@ public class adminInstance
 {
     // Cache of users (loaded from database)
     public List<UserDTO> Users { get; set; } = new();
-    
+
     // Session tracking
     public Dictionary<string, DateTime> ActiveSessions { get; set; } = new();
-    
+
     // Audit log
     public List<AdminAuditLog> AuditLog { get; set; } = new();
     public bool ForceUIUpdate = false;
