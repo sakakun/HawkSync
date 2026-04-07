@@ -365,7 +365,7 @@ public static class adminInstanceManager
 
     public static void RemoveSession(string username)
     {
-        if (adminInstance.ActiveSessions.Remove(username))
+        if (adminInstance.ActiveSessions.TryRemove(username, out _))
         {
             // Log Audit: Session Removed -> To database and in-memory log
             LogAudit("system", "SESSION_REMOVED", $"Session removed for user: {username}");

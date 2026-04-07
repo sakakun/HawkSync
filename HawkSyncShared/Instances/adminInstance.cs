@@ -1,4 +1,5 @@
-﻿using HawkSyncShared.DTOs.tabAdmin;
+﻿using System.Collections.Concurrent;
+using HawkSyncShared.DTOs.tabAdmin;
 
 namespace HawkSyncShared.Instances;
 
@@ -13,7 +14,7 @@ public class adminInstance
     public List<UserDTO> Users { get; set; } = new();
 
     // Session tracking
-    public Dictionary<string, DateTime> ActiveSessions { get; set; } = new();
+    public ConcurrentDictionary<string, DateTime> ActiveSessions { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     // Audit log
     public List<AdminAuditLog> AuditLog { get; set; } = new();
