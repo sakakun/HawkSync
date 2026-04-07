@@ -13,6 +13,7 @@ using System.ComponentModel;
 public partial class PlayerCardV2 : UserControl
 {
     private int _playerSlot;
+    private bool _isUpdating;
 
     private PlayerObject                playerData      { get; set; } = new PlayerObject();
     private string                      CountryCode     { get; set; } = string.Empty;
@@ -47,11 +48,6 @@ public partial class PlayerCardV2 : UserControl
         ResetCard();
         
     }
-
-    public void StartTicker()
-    {
-        CommonCore.Ticker!.Start($"Ticker_{Name}", 1000, PlayerCardTicker);
-    }
     
     private void RunSafe(Func<Task> action)
     {
@@ -60,6 +56,8 @@ public partial class PlayerCardV2 : UserControl
 
     private async Task RunSafeInternal(Func<Task> action)
     {
+        _isUpdating = true;
+
         try
         {
             await action();
@@ -74,50 +72,48 @@ public partial class PlayerCardV2 : UserControl
                 MessageBoxIcon.Error
             );
         }
+        finally
+        {
+            _isUpdating = false;
+        }
     }
     
-    private void PlayerCardTicker()
+    /// <summary>
+    /// Called from tabPlayers on the UI thread, once per second.
+    /// Contains the same logic as the old PlayerCardTicker but without BeginInvoke
+    /// since tabPlayers already marshalled the call to the UI thread.
+    /// </summary>
+    public void UpdateCard()
     {
         try
         {
-            // Read non-UI state on the ticker thread (safe)
             bool shouldBeVisible = CommonCore.theInstance!.instanceStatus != InstanceStatus.OFFLINE &&
                                    _playerSlot <= CommonCore.theInstance.gameMaxSlots;
 
             if (!playerInstance!.PlayerList.ContainsKey(_playerSlot))
             {
-                BeginInvoke(() =>
-                {
-                    Visible = shouldBeVisible;
-                    ResetCard();
-                });
+                Visible = shouldBeVisible;
+                ResetCard();
                 return;
             }
 
             PlayerObject _playerData = playerInstance.PlayerList[_playerSlot];
             if (DateTime.Now - _playerData.PlayerLastSeen > TimeSpan.FromSeconds(5))
             {
-                BeginInvoke(() =>
-                {
-                    Visible = shouldBeVisible;
-                    ResetCard();
-                });
+                Visible = shouldBeVisible;
+                ResetCard();
                 return;
             }
 
-            // Update Player Data (plain object assignment, not UI — safe on ticker thread)
             playerData = _playerData;
 
-            // Marshal all UI updates to the UI thread
-            BeginInvoke(() =>
-            {
-                Visible = shouldBeVisible;
+            Visible = shouldBeVisible;
+            if(!_isUpdating)
                 RunSafe(UpdatePlayerCard);
-            });
         }
         catch (Exception ex)
         {
-            AppDebug.Log("Error in PlayerCardTicker", AppDebug.LogLevel.Error, ex);
+            AppDebug.Log("Error in PlayerCard UpdateCard", AppDebug.LogLevel.Error, ex);
         }
     }
     

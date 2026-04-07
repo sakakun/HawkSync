@@ -1,15 +1,11 @@
 ﻿using RemoteClient.Forms.SubPanels;
 using HawkSyncShared;
-using HawkSyncShared.Instances;
 using System.ComponentModel;
 
 namespace RemoteClient.Forms.Panels;
 
 public partial class tabPlayers : UserControl
 {
-
-    private theInstance?        theInstance         => CommonCore.theInstance;
-
     private readonly Dictionary<int, PlayerCardV2> PlayerCards = new Dictionary<int, PlayerCardV2>();
         
     private static bool IsDesignTime =>
@@ -25,6 +21,7 @@ public partial class tabPlayers : UserControl
         // Generate Cards
         generateCardData();
         PopulateCards();
+        StartSingleTicker();
     }
 
     private void generateCardData()
@@ -39,7 +36,6 @@ public partial class tabPlayers : UserControl
             playerCard.Visible = false;
 
             PlayerCards[i] = playerCard;
-            PlayerCards[i].StartTicker(); // Call after Name is set
         }
     }
         
@@ -58,6 +54,37 @@ public partial class tabPlayers : UserControl
         for (int i = 0; i < 50; i++)
         {
             PlayerTable.Controls.Add(PlayerCards[i + 1], i / 10, i % 10);
+        }
+    }
+
+    private void StartSingleTicker()
+    {
+        CommonCore.Ticker!.Start("RemoteTabPlayers_Cards", 1000, TickAllCards);
+    }
+
+    /// <summary>
+    /// Called from a background timer thread once per second.
+    /// Posts a single BeginInvoke to the UI thread to update all cards.
+    /// </summary>
+    private void TickAllCards()
+    {
+        if (IsDisposed || !IsHandleCreated)
+            return;
+
+        BeginInvoke(UpdateAllCards);
+    }
+
+    /// <summary>
+    /// Runs on the UI thread. Iterates all cards and updates each one synchronously.
+    /// </summary>
+    private void UpdateAllCards()
+    {
+        if (!Visible)
+            return;
+
+        foreach (var card in PlayerCards.Values)
+        {
+            card.UpdateCard();
         }
     }
 
