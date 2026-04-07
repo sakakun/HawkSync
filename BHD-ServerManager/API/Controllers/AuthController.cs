@@ -11,6 +11,7 @@ using HawkSyncShared.DTOs.tabAdmin;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.SupportClasses;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ServerManager.API.Controllers;
 
@@ -19,6 +20,7 @@ namespace ServerManager.API.Controllers;
 public class AuthController : ControllerBase
 {
     [HttpPost("login")]
+    [EnableRateLimiting("LoginPolicy")]
     public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();

@@ -6,11 +6,13 @@ using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabBans;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ServerManager.API.Controllers;
 
 [ApiController]
 [Route("api/ban")]
+[Authorize]
 public class BanController : ControllerBase
 {
     [HttpPost("save-blacklist")]

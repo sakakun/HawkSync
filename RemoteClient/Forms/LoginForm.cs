@@ -7,6 +7,8 @@ namespace RemoteClient.Forms;
 public partial class LoginForm
 {
     private ApiClient? _apiClient;
+    private readonly System.Windows.Forms.Timer _cooldownTimer = new() { Interval = 1000 };
+    private DateTime? _cooldownUntilUtc;
 
     public string? JwtToken { get; private set; }
     public UserInfoDTO? User { get; private set; }
@@ -15,11 +17,18 @@ public partial class LoginForm
     public LoginForm()
     {
         InitializeComponent();
+        _cooldownTimer.Tick += CooldownTimer_Tick;
         LoadSavedSettings();
     }
 
     private async void BtnLogin_Click(object sender, EventArgs e)
     {
+        if (IsCooldownActive())
+        {
+            UpdateCooldownUi();
+            return;
+        }
+
         string serverUrl = txtServerUrl.Text.Trim();
         string username = txtUsername.Text.Trim();
         string password = txtPassword.Text;
@@ -82,11 +91,19 @@ public partial class LoginForm
             }
             else
             {
-                lblStatus.Text = "Login failed";
-                lblStatus.ForeColor = Color.Red;
+                if (response.RetryAfterSeconds is int retryAfterSeconds && retryAfterSeconds > 0)
+                {
+                    StartLoginCooldown(retryAfterSeconds);
+                }
+                else
+                {
+                    lblStatus.Text = "Login failed";
+                    lblStatus.ForeColor = Color.Red;
+                    SetControlsEnabled(true);
+                }
+
                 MessageBox.Show(response.Message, "Login Failed",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                SetControlsEnabled(true);
                 txtPassword.Clear();
                 txtPassword.Focus();
             }
@@ -99,6 +116,47 @@ public partial class LoginForm
                 "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             SetControlsEnabled(true);
         }
+    }
+
+    private bool IsCooldownActive()
+    {
+        return _cooldownUntilUtc.HasValue && _cooldownUntilUtc.Value > DateTime.UtcNow;
+    }
+
+    private void StartLoginCooldown(int retryAfterSeconds)
+    {
+        SetControlsEnabled(true);
+        _cooldownUntilUtc = DateTime.UtcNow.AddSeconds(Math.Max(1, retryAfterSeconds));
+        _cooldownTimer.Start();
+        UpdateCooldownUi();
+    }
+
+    private void CooldownTimer_Tick(object? sender, EventArgs e)
+    {
+        UpdateCooldownUi();
+    }
+
+    private void UpdateCooldownUi()
+    {
+        if (!IsCooldownActive())
+        {
+            _cooldownTimer.Stop();
+            _cooldownUntilUtc = null;
+            btnLogin.Enabled = true;
+
+            if (lblStatus.Text.StartsWith("Rate limited", StringComparison.OrdinalIgnoreCase))
+            {
+                lblStatus.Text = "Ready";
+                lblStatus.ForeColor = Color.Gray;
+            }
+
+            return;
+        }
+
+        var remainingSeconds = (int)Math.Ceiling((_cooldownUntilUtc!.Value - DateTime.UtcNow).TotalSeconds);
+        btnLogin.Enabled = false;
+        lblStatus.Text = $"Rate limited. Try again in {Math.Max(1, remainingSeconds)}s";
+        lblStatus.ForeColor = Color.DarkOrange;
     }
 
     private void BtnCancel_Click(object sender, EventArgs e)
@@ -162,6 +220,13 @@ public partial class LoginForm
         return Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "HawkSync", "client-settings.txt");
+    }
+
+    protected override void OnFormClosed(FormClosedEventArgs e)
+    {
+        _cooldownTimer.Stop();
+        _cooldownTimer.Dispose();
+        base.OnFormClosed(e);
     }
 
 }

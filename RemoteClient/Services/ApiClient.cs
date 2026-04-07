@@ -1,3 +1,4 @@
+using System.Net;
 using HawkSyncShared.DTOs.API;
 using RemoteClient.Services.Commands;
 using System.Net.Http.Headers;
@@ -77,18 +78,31 @@ public class ApiClient : IDisposable
             var request = new LoginRequest(username, password);
             var response = await _httpClient.PostAsJsonAsync("/api/auth/login", request);
 
-            if (!response.IsSuccessStatusCode)
+            // Handle rate limit explicitly
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
-                var error = await response.Content.ReadAsStringAsync();
+                int retryAfterSeconds = ParseRetryAfterSeconds(response) ?? 60;
+
                 return new LoginResponse
                 {
                     Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
+                    Message = $"Too many login attempts. Please wait {retryAfterSeconds} second(s) and try again.",
+                    RetryAfterSeconds = retryAfterSeconds
+                };
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Avoid dumping raw server payload to users
+                return new LoginResponse
+                {
+                    Success = false,
+                    Message = $"Login failed (HTTP {(int)response.StatusCode})."
                 };
             }
 
             var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            
+
             if (result?.Success == true && !string.IsNullOrEmpty(result.Token))
             {
                 JwtToken = result.Token;
@@ -100,10 +114,33 @@ public class ApiClient : IDisposable
         {
             return new LoginResponse { Success = false, Message = $"Connection failed: {ex.Message}" };
         }
+        catch (TaskCanceledException)
+        {
+            return new LoginResponse { Success = false, Message = "Request timed out. Please try again." };
+        }
         catch (Exception ex)
         {
             return new LoginResponse { Success = false, Message = $"Error: {ex.Message}" };
         }
+    }
+
+    private static int? ParseRetryAfterSeconds(HttpResponseMessage response)
+    {
+        var retryAfter = response.Headers.RetryAfter;
+        if (retryAfter == null) return null;
+
+        if (retryAfter.Delta.HasValue)
+        {
+            return Math.Max(1, (int)Math.Ceiling(retryAfter.Delta.Value.TotalSeconds));
+        }
+
+        if (retryAfter.Date.HasValue)
+        {
+            var seconds = (int)Math.Ceiling((retryAfter.Date.Value - DateTimeOffset.UtcNow).TotalSeconds);
+            return Math.Max(1, seconds);
+        }
+
+        return null;
     }
 
     // ================================================================================

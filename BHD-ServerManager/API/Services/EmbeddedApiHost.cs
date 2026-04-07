@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Http;
 using ServerManager.API.Hubs;
 
 namespace ServerManager.API.Services;
@@ -30,6 +33,59 @@ public class EmbeddedApiHost
                 {
                     services.AddControllers();
                     services.AddSignalR();
+
+                    // Rate limiting policy for login endpoint:
+                    // 5 attempts per minute per remote IP
+                    services.AddRateLimiter(options =>
+                    {
+                        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                        options.OnRejected = async (context, _) =>
+                        {
+                            context.HttpContext.Response.ContentType = "application/json";
+                            await context.HttpContext.Response.WriteAsync(
+                                "{\"success\":false,\"message\":\"Too many login attempts. Please wait 60 seconds and try again.\"}");
+                        };
+
+                        options.AddPolicy("LoginPolicy", httpContext =>
+                        {
+                            var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                            return RateLimitPartition.GetSlidingWindowLimiter(
+                                partitionKey,
+                                _ => new SlidingWindowRateLimiterOptions
+                                {
+                                    PermitLimit = 5,
+                                    Window = TimeSpan.FromMinutes(1),
+                                    SegmentsPerWindow = 6,
+                                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                                    QueueLimit = 0,
+                                    AutoReplenishment = true
+                                });
+                        });
+                        
+                        options.OnRejected = async (context, _) =>
+                        {
+                            var response = context.HttpContext.Response;
+                            response.StatusCode = StatusCodes.Status429TooManyRequests;
+                            response.ContentType = "application/json";
+                        
+                            // Use limiter metadata if available; fallback to 60 seconds.
+                            if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                            {
+                                var seconds = Math.Max(1, (int)Math.Ceiling(retryAfter.TotalSeconds));
+                                response.Headers["Retry-After"] = seconds.ToString();
+                            }
+                            else
+                            {
+                                response.Headers["Retry-After"] = "60";
+                            }
+                        
+                            await response.WriteAsync(
+                                "{\"success\":false,\"message\":\"Too many login attempts. Please wait before trying again.\"}");
+                        };
+                        
+                    });
 
                     services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         .AddJwtBearer(options =>
@@ -80,8 +136,13 @@ public class EmbeddedApiHost
                 {
                     app.UseCors("AllowAll");
                     app.UseRouting();
+
+                    // Must be after routing and before endpoint execution
+                    app.UseRateLimiter();
+
                     app.UseAuthentication();
                     app.UseAuthorization();
+
                     app.UseEndpoints(endpoints =>
                     {
                         endpoints.MapControllers();
@@ -92,7 +153,6 @@ public class EmbeddedApiHost
             .Build();
 
         _host.RunAsync(_cts.Token);
-        
     }
 
     /// <summary>
