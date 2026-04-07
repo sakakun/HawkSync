@@ -3,6 +3,7 @@ using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.Audit;
 using HawkSyncShared.DTOs.tabProfile;
+using HawkSyncShared.SupportClasses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -46,10 +47,12 @@ public class FileSystemController : ControllerBase
         }
         catch (Exception ex)
         {
+            AppDebug.Log("Error retrieving drives", AppDebug.LogLevel.Error, ex);
+            Response.Headers["X-Trace-Id"] = HttpContext.TraceIdentifier;
             return Ok(new DirectoryListingResponse
             {
                 Success = false,
-                Message = $"Error retrieving drives: {ex.Message}"
+                Message = "An unexpected error occurred while retrieving drives."
             });
         }
     }
@@ -182,10 +185,12 @@ public class FileSystemController : ControllerBase
         }
         catch (Exception ex)
         {
+            AppDebug.Log("Error listing directory", AppDebug.LogLevel.Error, ex);
+            Response.Headers["X-Trace-Id"] = HttpContext.TraceIdentifier;
             return Ok(new DirectoryListingResponse
             {
                 Success = false,
-                Message = $"Error listing directory: {ex.Message}"
+                Message = "An unexpected error occurred while listing the directory."
             });
         }
     }
@@ -238,10 +243,12 @@ public class FileSystemController : ControllerBase
         }
         catch (Exception ex)
         {
+            AppDebug.Log("Error validating path", AppDebug.LogLevel.Error, ex);
+            Response.Headers["X-Trace-Id"] = HttpContext.TraceIdentifier;
             return Ok(new CommandResult
             {
                 Success = false,
-                Message = $"Error validating path: {ex.Message}"
+                Message = "An unexpected error occurred while validating the path."
             });
         }
 
@@ -276,7 +283,7 @@ public class FileSystemController : ControllerBase
                 return Ok(new FileListResponse
                 {
                     Success = false,
-                    Message = $"Directory not found: {theInstance.profileServerPath}"
+                    Message = "Directory not found"   // do not echo back server path
                 });
             }
 
@@ -305,10 +312,12 @@ public class FileSystemController : ControllerBase
         }
         catch (Exception ex)
         {
+            AppDebug.Log("Error retrieving files", AppDebug.LogLevel.Error, ex);
+            Response.Headers["X-Trace-Id"] = HttpContext.TraceIdentifier;
             return Ok(new FileListResponse
             {
                 Success = false,
-                Message = $"Error retrieving files: {ex.Message}"
+                Message = "An unexpected error occurred while retrieving files."
             });
         }
     }
@@ -337,7 +346,7 @@ public class FileSystemController : ControllerBase
 
             if (!Directory.Exists(theInstance.profileServerPath))
             {
-                message = $"Directory not found: {theInstance.profileServerPath}";
+                message = "Directory not found";   // do not echo back server path
                 return Ok(new FileOperationResponse { Success = false, Message = message });
             }
 
@@ -385,7 +394,9 @@ public class FileSystemController : ControllerBase
         }
         catch (Exception ex)
         {
-            message = $"Error uploading file: {ex.Message}";
+            AppDebug.Log($"Error uploading file '{fileName}'", AppDebug.LogLevel.Error, ex);
+            Response.Headers["X-Trace-Id"] = HttpContext.TraceIdentifier;
+            message = "An unexpected error occurred while uploading the file.";
             return Ok(new FileOperationResponse { Success = false, Message = message });
         }
         finally
@@ -447,7 +458,9 @@ public class FileSystemController : ControllerBase
         }
         catch (Exception ex)
         {
-            message = $"Error downloading file: {ex.Message}";
+            AppDebug.Log($"Error downloading file '{fileName}'", AppDebug.LogLevel.Error, ex);
+            Response.Headers["X-Trace-Id"] = HttpContext.TraceIdentifier;
+            message = "An unexpected error occurred while downloading the file.";
             return BadRequest(message);
         }
         finally
@@ -532,7 +545,9 @@ public class FileSystemController : ControllerBase
         }
         catch (Exception ex)
         {
-            message = $"Error deleting files: {ex.Message}";
+            AppDebug.Log($"Error deleting files '{fileNames}'", AppDebug.LogLevel.Error, ex);
+            Response.Headers["X-Trace-Id"] = HttpContext.TraceIdentifier;
+            message = "An unexpected error occurred while deleting files.";
             return Ok(new FileOperationResponse { Success = false, Message = message });
         }
         finally
@@ -599,7 +614,7 @@ public class FileSystemController : ControllerBase
         serverRootPath = Path.GetFullPath(theInstance.profileServerPath);
         if (!Directory.Exists(serverRootPath))
         {
-            errorMessage = $"Directory not found: {serverRootPath}";
+            errorMessage = "Directory not found";   // do not echo back server path
             return false;
         }
 
@@ -672,7 +687,7 @@ public class FileSystemController : ControllerBase
         DatabaseManager.LogAuditAction(
             userId: null,
             username: User.Identity?.Name ?? "Unknown",
-            category: AuditCategory.System, // or AuditCategory.Profile if you have one for file ops
+            category: AuditCategory.System,
             actionType: actionType,
             description: $"{actionType}: {fileName}",
             targetType: "File",

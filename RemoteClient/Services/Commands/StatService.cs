@@ -19,111 +19,95 @@ public class StatService
     public async Task<CommandResult> SaveBabstatsServersAsync(BabstatsServerSettings server)
     {
         var request = new BabstatsServerRequest(server);
-
         try
         {
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/babstats/servers/save", request);
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] SaveBabstatsServers → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
-
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] SaveBabstatsServers error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
     /// <summary>
-    /// Save all Babstats servers to the server.
+    /// Add a Babstats server.
     /// </summary>
     public async Task<CommandResult> AddBabstatsServersAsync(BabstatsServerSettings server)
     {
         var request = new BabstatsServerRequest(server);
-
         try
         {
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/babstats/servers/add", request);
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] AddBabstatsServers → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
-
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] AddBabstatsServers error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
     /// <summary>
-    /// Save all Babstats servers to the server.
+    /// Remove a Babstats server.
     /// </summary>
     public async Task<CommandResult> RemoveBabstatsServersAsync(int serverID)
     {
-
         try
         {
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/babstats/servers/remove", serverID);
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] RemoveBabstatsServers → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
-
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] RemoveBabstatsServers error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
     /// <summary>
-    /// Save all Babstats servers to the server.
+    /// Clear Babstats announcements.
     /// </summary>
     public async Task<CommandResult> ClearBabstatsAnnoucementsAsync()
     {
         try
         {
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/babstats/servers/clearAnnoucements", true);
-            
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] ClearBabstatsAnnoucements → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
-
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] ClearBabstatsAnnoucements error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
@@ -138,117 +122,102 @@ public class StatService
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/babstats/validate", request);
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] ValidateWebStatsConnection → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] ValidateWebStatsConnection error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
     /// <summary>
-    /// Saves the specified lobby server settings asynchronously to the backend service.
+    /// Saves the specified lobby server settings asynchronously.
     /// </summary>
-    /// <remarks>If the backend service returns an error or an exception occurs during the request, the
-    /// returned CommandResult will indicate failure and include an error message.</remarks>
-    /// <param name="server">The lobby server settings to be saved. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a CommandResult indicating whether
-    /// the save operation was successful and any related message.</returns>
     public async Task<CommandResult> SaveLobbyServersAsync(LobbyServerSettings server)
     {
         var request = new LobbyServerRequest(server);
-
         try
         {
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/lobby/servers/save", request);
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] SaveLobbyServers → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
-
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] SaveLobbyServers error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
     /// <summary>
     /// Asynchronously adds a new lobby server using the specified server settings.
     /// </summary>
-    /// <param name="server">The settings for the lobby server to add. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a CommandResult indicating whether
-    /// the server was added successfully and any related message.</returns>
     public async Task<CommandResult> AddLobbyServersAsync(LobbyServerSettings server)
     {
         var request = new LobbyServerRequest(server);
-
         try
         {
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/lobby/servers/add", request);
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] AddLobbyServers → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
-
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] AddLobbyServers error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
     /// <summary>
     /// Removes a lobby server with the specified server identifier asynchronously.
     /// </summary>
-    /// <param name="serverID">The unique identifier of the lobby server to remove.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a CommandResult indicating whether
-    /// the removal was successful and includes any relevant messages.</returns>
     public async Task<CommandResult> RemoveLobbyServersAsync(int serverID)
     {
-
         try
         {
             var response = await _apiClient._httpClient.PostAsJsonAsync("/api/stats/lobby/servers/remove", serverID);
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StatService] RemoveLobbyServers → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
-
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[StatService] RemoveLobbyServers error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
+    private static string GetFriendlyHttpError(System.Net.HttpStatusCode code) => code switch
+    {
+        System.Net.HttpStatusCode.Unauthorized    => "Authentication required. Please log in again.",
+        System.Net.HttpStatusCode.Forbidden       => "You do not have permission to perform this action.",
+        System.Net.HttpStatusCode.NotFound        => "The requested resource was not found.",
+        System.Net.HttpStatusCode.BadRequest      => "The request was invalid. Please check your input.",
+        System.Net.HttpStatusCode.TooManyRequests => "Too many requests. Please wait and try again.",
+        _ when (int)code >= 500                   => "A server error occurred. Please try again later.",
+        _                                         => $"Request failed ({(int)code})."
+    };
 }

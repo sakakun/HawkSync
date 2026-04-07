@@ -29,7 +29,7 @@ public class GamePlayService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error getting gameplay settings: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[GamePlayService] GetGamePlaySettings error: {ex}");
             return null;
         }
     }
@@ -53,22 +53,25 @@ public class GamePlayService
         
             if (!response.IsSuccessStatusCode)
             {
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[GamePlayService] ValidateGamePlaySettings → {(int)response.StatusCode}: {body}");
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Errors = new List<string> { $"HTTP {response.StatusCode}" }
+                    Errors = new List<string> { GetFriendlyHttpError(response.StatusCode) }
                 };
             }
 
             var result = await response.Content.ReadFromJsonAsync<ValidationResult>();
-            return result ?? new ValidationResult { IsValid = false, Errors = new List<string> { "Empty response" } };
+            return result ?? new ValidationResult { IsValid = false, Errors = new List<string> { "Empty response from server." } };
         }
         catch (Exception ex)
         {
-            return new ValidationResult 
-            { 
-                IsValid = false, 
-                Errors = new List<string> { ex.Message } 
+            System.Diagnostics.Debug.WriteLine($"[GamePlayService] ValidateGamePlaySettings error: {ex}");
+            return new ValidationResult
+            {
+                IsValid = false,
+                Errors = new List<string> { "An unexpected error occurred. Please try again." }
             };
         }
     }
@@ -100,11 +103,11 @@ public class GamePlayService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error exporting gameplay settings: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[GamePlayService] ExportGamePlaySettings error: {ex}");
             return new GamePlaySettingsExportResponse
             {
                 Success = false,
-                Message = $"Error: {ex.Message}"
+                Message = "An unexpected error occurred. Please try again."
             };
         }
     }
@@ -121,23 +124,18 @@ public class GamePlayService
 
             if (!response.IsSuccessStatusCode)
             {
-                return new CommandResult
-                {
-                    Success = false,
-                    Message = $"HTTP {response.StatusCode}"
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[GamePlayService] ImportGamePlaySettings → {(int)response.StatusCode}: {body}");
+                return new CommandResult { Success = false, Message = GetFriendlyHttpError(response.StatusCode) };
             }
 
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
         }
         catch (Exception ex)
         {
-            return new CommandResult
-            {
-                Success = false,
-                Message = $"Error: {ex.Message}"
-            };
+            System.Diagnostics.Debug.WriteLine($"[GamePlayService] ImportGamePlaySettings error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
     /// <summary>
@@ -163,5 +161,16 @@ public class GamePlayService
     {
         return await _apiClient.SendCommandAsync("/api/gameplay/toggle-match-state", new { });
     }
+
+    private static string GetFriendlyHttpError(System.Net.HttpStatusCode code) => code switch
+    {
+        System.Net.HttpStatusCode.Unauthorized    => "Authentication required. Please log in again.",
+        System.Net.HttpStatusCode.Forbidden       => "You do not have permission to perform this action.",
+        System.Net.HttpStatusCode.NotFound        => "The requested resource was not found.",
+        System.Net.HttpStatusCode.BadRequest      => "The request was invalid. Please check your input.",
+        System.Net.HttpStatusCode.TooManyRequests => "Too many requests. Please wait and try again.",
+        _ when (int)code >= 500                   => "A server error occurred. Please try again later.",
+        _                                         => $"Request failed ({(int)code})."
+    };
 
 }

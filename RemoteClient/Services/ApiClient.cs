@@ -108,19 +108,22 @@ public class ApiClient : IDisposable
                 JwtToken = result.Token;
             }
 
-            return result ?? new LoginResponse { Success = false, Message = "Empty response" };
-        }
-        catch (HttpRequestException ex)
-        {
-            return new LoginResponse { Success = false, Message = $"Connection failed: {ex.Message}" };
+            return result ?? new LoginResponse { Success = false, Message = "Empty response from server." };
         }
         catch (TaskCanceledException)
         {
             return new LoginResponse { Success = false, Message = "Request timed out. Please try again." };
         }
+        catch (HttpRequestException ex)
+        {
+            // Log socket/TLS detail privately; surface only a friendly message
+            System.Diagnostics.Debug.WriteLine($"[ApiClient] LoginAsync connection error: {ex}");
+            return new LoginResponse { Success = false, Message = "Could not reach the server. Check your connection." };
+        }
         catch (Exception ex)
         {
-            return new LoginResponse { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[ApiClient] LoginAsync unexpected error: {ex}");
+            return new LoginResponse { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
 
@@ -172,21 +175,48 @@ public class ApiClient : IDisposable
 
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
+                // Log raw body for diagnostics; never surface it to the user
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[ApiClient] {endpoint} → {(int)response.StatusCode}: {body}");
                 return new CommandResult
                 {
                     Success = false,
-                    Message = $"HTTP {response.StatusCode}: {error}"
+                    Message = GetFriendlyHttpError(response.StatusCode)
                 };
             }
 
             var result = await response.Content.ReadFromJsonAsync<CommandResult>();
-            return result ?? new CommandResult { Success = false, Message = "Empty response" };
+            return result ?? new CommandResult { Success = false, Message = "Empty response from server." };
+        }
+        catch (TaskCanceledException)
+        {
+            return new CommandResult { Success = false, Message = "Request timed out. Please try again." };
+        }
+        catch (HttpRequestException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ApiClient] {endpoint} connection error: {ex}");
+            return new CommandResult { Success = false, Message = "Could not reach the server. Check your connection." };
         }
         catch (Exception ex)
         {
-            return new CommandResult { Success = false, Message = $"Error: {ex.Message}" };
+            System.Diagnostics.Debug.WriteLine($"[ApiClient] {endpoint} unexpected error: {ex}");
+            return new CommandResult { Success = false, Message = "An unexpected error occurred. Please try again." };
         }
     }
+
+    /// <summary>
+    /// Maps an HTTP status code to a user-friendly error string.
+    /// Raw response bodies are never included — those are logged at the call site.
+    /// </summary>
+    private static string GetFriendlyHttpError(HttpStatusCode code) => code switch
+    {
+        HttpStatusCode.Unauthorized    => "Authentication required. Please log in again.",
+        HttpStatusCode.Forbidden       => "You do not have permission to perform this action.",
+        HttpStatusCode.NotFound        => "The requested resource was not found.",
+        HttpStatusCode.BadRequest      => "The request was invalid. Please check your input.",
+        HttpStatusCode.TooManyRequests => "Too many requests. Please wait and try again.",
+        _ when (int)code >= 500        => "A server error occurred. Please try again later.",
+        _                              => $"Request failed ({(int)code})."
+    };
 
 }

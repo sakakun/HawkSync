@@ -52,25 +52,39 @@ public class ProfileService
         
             if (!response.IsSuccessStatusCode)
             {
+                var body = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[ProfileService] ValidateProfileSettings → {(int)response.StatusCode}: {body}");
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Errors = new List<string> { $"HTTP {response.StatusCode}" }
+                    Errors = new List<string> { GetFriendlyHttpError(response.StatusCode) }
                 };
             }
 
             var result = await response.Content.ReadFromJsonAsync<ValidationResult>();
-            return result ?? new ValidationResult { IsValid = false, Errors = new List<string> { "Empty response" } };
+            return result ?? new ValidationResult { IsValid = false, Errors = new List<string> { "Empty response from server." } };
         }
         catch (Exception ex)
         {
-            return new ValidationResult 
-            { 
-                IsValid = false, 
-                Errors = new List<string> { ex.Message } 
+            System.Diagnostics.Debug.WriteLine($"[ProfileService] ValidateProfileSettings error: {ex}");
+            return new ValidationResult
+            {
+                IsValid = false,
+                Errors = new List<string> { "An unexpected error occurred. Please try again." }
             };
         }
     }
+
+    private static string GetFriendlyHttpError(System.Net.HttpStatusCode code) => code switch
+    {
+        System.Net.HttpStatusCode.Unauthorized    => "Authentication required. Please log in again.",
+        System.Net.HttpStatusCode.Forbidden       => "You do not have permission to perform this action.",
+        System.Net.HttpStatusCode.NotFound        => "The requested resource was not found.",
+        System.Net.HttpStatusCode.BadRequest      => "The request was invalid. Please check your input.",
+        System.Net.HttpStatusCode.TooManyRequests => "Too many requests. Please wait and try again.",
+        _ when (int)code >= 500                   => "A server error occurred. Please try again later.",
+        _                                         => $"Request failed ({(int)code})."
+    };
 
 
 }

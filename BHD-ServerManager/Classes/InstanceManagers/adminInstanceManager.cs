@@ -284,7 +284,8 @@ public static class adminInstanceManager
             {
                 AppDebug.Log($"Authentication failed: User disabled - {username}", AppDebug.LogLevel.Warning);
                 LogAudit(username, "LOGIN_FAILED", "Account disabled");
-                return (false, null, "This account has been disabled.");
+                // Return the same generic message as other failures — reason is in server log only
+                return (false, null, "Invalid username or password.");
             }
 
             bool passwordValid = BCrypt.Net.BCrypt.Verify(password, userRecord.PasswordHash);

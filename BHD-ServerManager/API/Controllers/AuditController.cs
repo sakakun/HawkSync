@@ -11,6 +11,12 @@ namespace ServerManager.API.Controllers;
 [Authorize]
 public class AuditController : ControllerBase
 {
+    // ── Query bounds ────────────────────────────────────────────────────────────
+    private const int LogsMaxRangeDays = 30;   // widest allowed date window for /logs
+    private const int LogsMaxLimit     = 500;  // hard page-size cap for /logs
+    private const int StatsMinHours    = 1;    // minimum window for /stats
+    private const int StatsMaxHours    = 168;  // maximum window for /stats (7 days)
+
     /// <summary>
     /// Get audit logs with optional filtering
     /// </summary>
@@ -24,7 +30,19 @@ public class AuditController : ControllerBase
         {
             // Default to last 24 hours if no dates specified
             var startDate = request.StartDate ?? DateTime.UtcNow.AddHours(-24);
-            var endDate = request.EndDate ?? DateTime.UtcNow;
+            var endDate   = request.EndDate   ?? DateTime.UtcNow;
+
+            // Guard: start must be before end
+            if (startDate >= endDate)
+                return BadRequest("StartDate must be earlier than EndDate.");
+
+            // Guard: prevent unbounded full-table scans
+            if ((endDate - startDate).TotalDays > LogsMaxRangeDays)
+                return BadRequest($"Date range cannot exceed {LogsMaxRangeDays} days.");
+
+            // Guard: cap page size server-side regardless of what the client sends
+            var limit = (request.Limit > 0 ? request.Limit : 100);
+            limit = Math.Min(limit, LogsMaxLimit);
 
             var (logs, totalCount) = DatabaseManager.GetAuditLogs(
                 startDate,
@@ -34,7 +52,7 @@ public class AuditController : ControllerBase
                 request.ActionTypeFilter,
                 request.TargetFilter,
                 request.SuccessOnly,
-                request.Limit,
+                limit,
                 request.Offset
             );
 
@@ -154,13 +172,18 @@ public class AuditController : ControllerBase
     }
 
     /// <summary>
-    /// Get audit log statistics for dashboard/summary
+    /// Get audit log statistics for dashboard/summary.
+    /// The <paramref name="hours"/> window is clamped to [<see cref="StatsMinHours"/>, <see cref="StatsMaxHours"/>].
     /// </summary>
     [HttpGet("stats")]
     public ActionResult<AuditStatsDTO> GetStats([FromQuery] int hours = 24)
     {
         if (!HasPermission("audit"))
             return Forbid();
+
+        // Guard: reject values outside the allowed window before touching the DB
+        if (hours < StatsMinHours || hours > StatsMaxHours)
+            return BadRequest($"'hours' must be between {StatsMinHours} and {StatsMaxHours}.");
 
         try
         {
