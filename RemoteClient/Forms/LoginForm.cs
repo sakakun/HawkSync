@@ -91,7 +91,7 @@ public partial class LoginForm
             }
             else
             {
-                if (response.RetryAfterSeconds is int retryAfterSeconds && retryAfterSeconds > 0)
+                if (response.RetryAfterSeconds is { } retryAfterSeconds && retryAfterSeconds > 0)
                 {
                     StartLoginCooldown(retryAfterSeconds);
                 }
