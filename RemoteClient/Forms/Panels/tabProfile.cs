@@ -1,13 +1,18 @@
-﻿using HawkSyncShared;
+﻿using System.ComponentModel;
+using HawkSyncShared;
 using HawkSyncShared.DTOs.API;
 using HawkSyncShared.DTOs.tabProfile;
 using HawkSyncShared.Instances;
 using RemoteClient.Core;
+using RemoteClient.Forms.SubPanels.tabProfile;
 
 namespace RemoteClient.Forms.Panels;
 
 public partial class tabProfile : UserControl
 {
+    
+    private FileManager FileManager = null!;
+    
     private theInstance theInstance => CommonCore.theInstance!;
 
 	// ================================================================================
@@ -20,10 +25,18 @@ public partial class tabProfile : UserControl
     private System.Windows.Forms.Timer? _inactivityTimer;
     private const int INACTIVITY_TIMEOUT_SECONDS = 120; // 2 minutes
 
+    private static bool IsDesignTime =>
+        LicenseManager.UsageMode == LicenseUsageMode.Designtime || System.Diagnostics.Process.GetCurrentProcess().ProcessName.Contains("devenv");
+    
     public tabProfile()
     {
         InitializeComponent();
-
+        
+        if (IsDesignTime)
+            return;
+        
+        groupBoxFileManager.Controls.Add(FileManager = new FileManager());
+        
         // Subscribe to server updates
         ApiCore.OnSnapshotReceived += OnSnapshotReceived;
 

@@ -78,9 +78,9 @@ public class FileSystemController : ControllerBase
 
             // Default to server root if no path is specified.
             var requestedPath = string.IsNullOrWhiteSpace(request.Path) ? serverRootPath : request.Path;
-            if (!TryResolvePathUnderRoot(serverRootPath, requestedPath!, allowAbsoluteInput: true, out var resolvedDirectoryPath))
+            if (!TryResolvePathUnderRoot(serverRootPath, requestedPath, allowAbsoluteInput: true, out var resolvedDirectoryPath))
             {
-                LogPathTraversalBlocked("ListDirectory", requestedPath!);
+                LogPathTraversalBlocked("ListDirectory", requestedPath);
                 return Ok(new DirectoryListingResponse
                 {
                     Success = false,
