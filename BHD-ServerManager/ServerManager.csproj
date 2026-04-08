@@ -35,6 +35,12 @@
     <Compile Update="Forms\SubPanels\PlayerCardV2.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="Forms\SubPanels\tabAdmin\tabAccounts.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabAdmin\tabAudit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
