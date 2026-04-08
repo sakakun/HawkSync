@@ -1,4 +1,6 @@
-﻿namespace ServerManager.Forms.Panels
+﻿using ServerManager.Forms.SubPanels.tabChat;
+
+namespace ServerManager.Forms.Panels
 {
     partial class tabChat
     {
@@ -40,7 +42,7 @@
 			comboBox_chatGroup = new ComboBox();
 			tb_chatMessage = new TextBox();
 			tabHistory = new TabPage();
-			chatHistory1 = new ServerManager.Forms.SubPanels.ChatHistory();
+			chatHistory1 = new ChatHistory();
 			tabAutoMessages = new TabPage();
 			tableLayoutPanel3 = new TableLayoutPanel();
 			dg_autoMessages = new DataGridView();
@@ -448,6 +450,6 @@
         private DataGridViewTextBoxColumn autoTrigger;
         private DataGridViewTextBoxColumn autoMessageText;
         private TabPage tabHistory;
-		private SubPanels.ChatHistory chatHistory1;
+		private ChatHistory chatHistory1;
 	}
 }

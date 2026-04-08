@@ -1,4 +1,6 @@
-﻿namespace RemoteClient.Forms.Panels
+﻿using RemoteClient.Forms.SubPanels.tabProfile;
+
+namespace RemoteClient.Forms.Panels
 {
     partial class tabProfile
     {
@@ -93,7 +95,7 @@
 			profileServerAttribute20 = new CheckBox();
 			profileServerAttribute21 = new CheckBox();
 			tabFileManager = new TabPage();
-			fileManager2 = new RemoteClient.Forms.SubPanels.FileManager();
+			fileManager2 = new FileManager();
 			panel1 = new Panel();
 			groupBoxLogs = new GroupBox();
 			tableLayoutPanelAuditLogs = new TableLayoutPanel();
@@ -1023,7 +1025,6 @@
 			// 
 			// panel1
 			// 
-			panel1.Controls.Add(groupBoxLogs);
 			panel1.Controls.Add(groupBox4);
 			panel1.Dock = DockStyle.Fill;
 			panel1.Location = new Point(3, 3);
@@ -1081,7 +1082,6 @@
 			btnAuditRefresh.TabIndex = 4;
 			btnAuditRefresh.Text = "🔍 Refresh";
 			btnAuditRefresh.UseVisualStyleBackColor = true;
-			btnAuditRefresh.Click += btnAuditRefresh_Click;
 			// 
 			// txtAuditUserFilter
 			// 
@@ -1090,7 +1090,6 @@
 			txtAuditUserFilter.PlaceholderText = "Filter by user...";
 			txtAuditUserFilter.Size = new Size(120, 23);
 			txtAuditUserFilter.TabIndex = 3;
-			txtAuditUserFilter.TextChanged += txtAuditUserFilter_TextChanged;
 			// 
 			// lblAuditUserFilter
 			// 
@@ -1110,7 +1109,6 @@
 			cbAuditCategoryFilter.Name = "cbAuditCategoryFilter";
 			cbAuditCategoryFilter.Size = new Size(100, 23);
 			cbAuditCategoryFilter.TabIndex = 1;
-			cbAuditCategoryFilter.SelectedIndexChanged += cbAuditCategoryFilter_SelectedIndexChanged;
 			// 
 			// lblAuditCategory
 			// 
@@ -1206,10 +1204,10 @@
 			// groupBox4
 			// 
 			groupBox4.Controls.Add(tableLayoutPanel4);
-			groupBox4.Dock = DockStyle.Bottom;
-			groupBox4.Location = new Point(0, 358);
+			groupBox4.Dock = DockStyle.Fill;
+			groupBox4.Location = new Point(0, 0);
 			groupBox4.Name = "groupBox4";
-			groupBox4.Size = new Size(512, 58);
+			groupBox4.Size = new Size(512, 416);
 			groupBox4.TabIndex = 2;
 			groupBox4.TabStop = false;
 			groupBox4.Text = "Controls";
@@ -1376,7 +1374,7 @@
         private CheckBox checkBox_enableRemote;
         public NumericUpDown num_remotePort;
         private TabPage tabFileManager;
-        private SubPanels.FileManager fileManager2;
+        private FileManager fileManager2;
         private TableLayoutPanel tableLayoutPanelAuditLogs;
         private Panel panelAuditFilters;
         private Label lblAuditCategory;

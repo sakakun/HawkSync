@@ -1,4 +1,4 @@
-﻿namespace RemoteClient.Forms.SubPanels
+﻿namespace RemoteClient.Forms.SubPanels.tabProfile
 {
     partial class FileManager
     {

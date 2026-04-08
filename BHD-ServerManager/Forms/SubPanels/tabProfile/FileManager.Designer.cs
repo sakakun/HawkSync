@@ -1,4 +1,4 @@
-﻿namespace ServerManager.Forms.SubPanels
+﻿namespace ServerManager.Forms.SubPanels.tabProfile
 {
     partial class FileManager
     {
@@ -22,79 +22,82 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
-            listViewFiles = new ListView();
-            columnFileName = new ColumnHeader();
-            columnFileSize = new ColumnHeader();
-            columnLastModified = new ColumnHeader();
-            tableLayoutPanel1 = new TableLayoutPanel();
-            btnRefresh = new Button();
-            btnUpload = new Button();
-            btnDownload = new Button();
-            btnDelete = new Button();
-            openFileDialog = new OpenFileDialog();
-            saveFileDialog = new SaveFileDialog();
+            listViewFiles = new System.Windows.Forms.ListView();
+            columnFileName = new System.Windows.Forms.ColumnHeader();
+            columnFileSize = new System.Windows.Forms.ColumnHeader();
+            columnLastModified = new System.Windows.Forms.ColumnHeader();
+            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            btnRefresh = new System.Windows.Forms.Button();
+            btnUpload = new System.Windows.Forms.Button();
+            btnDownload = new System.Windows.Forms.Button();
+            btnDelete = new System.Windows.Forms.Button();
+            openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
             // listViewFiles
             // 
-            listViewFiles.Columns.AddRange(new ColumnHeader[] { columnFileName, columnFileSize, columnLastModified });
-            listViewFiles.Dock = DockStyle.Fill;
+            listViewFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnFileName, columnFileSize, columnLastModified });
+            listViewFiles.Dock = System.Windows.Forms.DockStyle.Fill;
             listViewFiles.FullRowSelect = true;
-            listViewFiles.Location = new Point(0, 0);
+            listViewFiles.Location = new System.Drawing.Point(0, 0);
             listViewFiles.Name = "listViewFiles";
-            listViewFiles.Size = new Size(434, 343);
+            listViewFiles.Size = new System.Drawing.Size(512, 310);
             listViewFiles.TabIndex = 0;
             listViewFiles.UseCompatibleStateImageBehavior = false;
-            listViewFiles.View = View.Details;
+            listViewFiles.View = System.Windows.Forms.View.Details;
             listViewFiles.SelectedIndexChanged += ListViewFiles_SelectedIndexChanged;
             // 
             // columnFileName
             // 
+            columnFileName.Name = "columnFileName";
             columnFileName.Text = "File Name";
-            columnFileName.Width = 200;
+            columnFileName.Width = 232;
             // 
             // columnFileSize
             // 
+            columnFileSize.Name = "columnFileSize";
             columnFileSize.Text = "Size";
-            columnFileSize.Width = 100;
+            columnFileSize.Width = 110;
             // 
             // columnLastModified
             // 
+            columnLastModified.Name = "columnLastModified";
             columnLastModified.Text = "Last Modified";
-            columnLastModified.Width = 130;
+            columnLastModified.Width = 152;
             // 
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 4;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             tableLayoutPanel1.Controls.Add(btnRefresh, 0, 0);
             tableLayoutPanel1.Controls.Add(btnUpload, 1, 0);
             tableLayoutPanel1.Controls.Add(btnDownload, 2, 0);
             tableLayoutPanel1.Controls.Add(btnDelete, 3, 0);
-            tableLayoutPanel1.Dock = DockStyle.Bottom;
-            tableLayoutPanel1.Location = new Point(0, 343);
+            tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            tableLayoutPanel1.Location = new System.Drawing.Point(0, 310);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(434, 45);
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel1.Size = new System.Drawing.Size(512, 45);
             tableLayoutPanel1.TabIndex = 1;
             // 
             // btnRefresh
             // 
-            btnRefresh.Dock = DockStyle.Fill;
-            btnRefresh.Location = new Point(3, 3);
+            btnRefresh.Dock = System.Windows.Forms.DockStyle.Fill;
+            btnRefresh.Location = new System.Drawing.Point(3, 3);
             btnRefresh.Name = "btnRefresh";
-            btnRefresh.Size = new Size(102, 39);
+            btnRefresh.Size = new System.Drawing.Size(122, 39);
             btnRefresh.TabIndex = 0;
             btnRefresh.Text = "Refresh";
             btnRefresh.UseVisualStyleBackColor = true;
@@ -102,10 +105,10 @@
             // 
             // btnUpload
             // 
-            btnUpload.Dock = DockStyle.Fill;
-            btnUpload.Location = new Point(111, 3);
+            btnUpload.Dock = System.Windows.Forms.DockStyle.Fill;
+            btnUpload.Location = new System.Drawing.Point(131, 3);
             btnUpload.Name = "btnUpload";
-            btnUpload.Size = new Size(102, 39);
+            btnUpload.Size = new System.Drawing.Size(122, 39);
             btnUpload.TabIndex = 1;
             btnUpload.Text = "Upload";
             btnUpload.UseVisualStyleBackColor = true;
@@ -113,11 +116,11 @@
             // 
             // btnDownload
             // 
-            btnDownload.Dock = DockStyle.Fill;
+            btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             btnDownload.Enabled = false;
-            btnDownload.Location = new Point(219, 3);
+            btnDownload.Location = new System.Drawing.Point(259, 3);
             btnDownload.Name = "btnDownload";
-            btnDownload.Size = new Size(102, 39);
+            btnDownload.Size = new System.Drawing.Size(122, 39);
             btnDownload.TabIndex = 2;
             btnDownload.Text = "Download";
             btnDownload.UseVisualStyleBackColor = true;
@@ -125,11 +128,11 @@
             // 
             // btnDelete
             // 
-            btnDelete.Dock = DockStyle.Fill;
+            btnDelete.Dock = System.Windows.Forms.DockStyle.Fill;
             btnDelete.Enabled = false;
-            btnDelete.Location = new Point(327, 3);
+            btnDelete.Location = new System.Drawing.Point(387, 3);
             btnDelete.Name = "btnDelete";
-            btnDelete.Size = new Size(104, 39);
+            btnDelete.Size = new System.Drawing.Size(122, 39);
             btnDelete.TabIndex = 3;
             btnDelete.Text = "Delete";
             btnDelete.UseVisualStyleBackColor = true;
@@ -137,7 +140,7 @@
             // 
             // openFileDialog
             // 
-            openFileDialog.Filter = "All Supported Files|*.bms;*.mis;*.til;*.zip|Map Files|*.bms;*.mis;*.til|Zip Files|*.zip|All Files|*.*";
+            openFileDialog.Filter = ("All Supported Files|*.bms;*.mis;*.til;*.zip|Map Files|*.bms;*.mis;*.til|Zip Files" + "|*.zip|All Files|*.*");
             openFileDialog.Multiselect = true;
             openFileDialog.Title = "Select Files to Upload";
             // 
@@ -148,27 +151,27 @@
             // 
             // FileManager
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             Controls.Add(listViewFiles);
             Controls.Add(tableLayoutPanel1);
-            MaximumSize = new Size(434, 388);
-            MinimumSize = new Size(434, 388);
-            Name = "FileManager";
-            Size = new Size(434, 388);
+            Margin = new System.Windows.Forms.Padding(0);
+            MaximumSize = new System.Drawing.Size(512, 355);
+            MinimumSize = new System.Drawing.Size(512, 355);
+            Size = new System.Drawing.Size(512, 355);
             tableLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
-        private ListView listViewFiles;
+        private System.Windows.Forms.ListView listViewFiles;
         private ColumnHeader columnFileName;
         private ColumnHeader columnFileSize;
         private ColumnHeader columnLastModified;
-        private TableLayoutPanel tableLayoutPanel1;
-        private Button btnRefresh;
-        private Button btnUpload;
-        private Button btnDownload;
-        private Button btnDelete;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Button btnRefresh;
+        private System.Windows.Forms.Button btnUpload;
+        private System.Windows.Forms.Button btnDownload;
+        private System.Windows.Forms.Button btnDelete;
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
 

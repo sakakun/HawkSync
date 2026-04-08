@@ -19,6 +19,7 @@ namespace RemoteClient.Forms.Panels
         public tabBans()
         {
             InitializeComponent();
+            
             // Initialize Forms
             InitializeBlacklistForm();
             InitializeWhitelistForm();

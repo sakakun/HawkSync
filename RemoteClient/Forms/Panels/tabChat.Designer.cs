@@ -1,4 +1,6 @@
-﻿namespace RemoteClient.Forms.Panels
+﻿using RemoteClient.Forms.SubPanels.tabChat;
+
+namespace RemoteClient.Forms.Panels
 {
     partial class tabChat
     {
@@ -55,7 +57,7 @@
 			dg_slapMessages = new DataGridView();
 			slapMessageID = new DataGridViewTextBoxColumn();
 			slapMessages = new DataGridViewTextBoxColumn();
-			chatHistory1 = new RemoteClient.Forms.SubPanels.ChatHistory();
+			chatHistory1 = new ChatHistory();
 			chat_TabControl.SuspendLayout();
 			tabChatMessages.SuspendLayout();
 			tableLayoutPanel1.SuspendLayout();
@@ -443,6 +445,6 @@
         private DataGridViewTextBoxColumn autoTrigger;
         private DataGridViewTextBoxColumn autoMessageText;
 		private TabPage tabChatHistory;
-		private SubPanels.ChatHistory chatHistory1;
+		private ChatHistory chatHistory1;
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using RemoteClient.Core;
 
-namespace RemoteClient.Forms.SubPanels
+namespace RemoteClient.Forms.SubPanels.tabProfile
 {
     public partial class FileManager : UserControl
     {

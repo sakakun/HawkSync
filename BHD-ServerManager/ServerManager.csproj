@@ -32,13 +32,19 @@
     <EmbeddedResource Remove="Classes\GameManagement\ServerMemory\**" />
     <None Remove="API\Controllers\Admin\**" />
     <None Remove="Classes\GameManagement\ServerMemory\**" />
-    <Compile Update="Forms\SubPanels\PlayerCardV2.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Update="Forms\SubPanels\tabAdmin\tabAccounts.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Forms\SubPanels\tabAdmin\tabAudit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabChat\ChatHistory.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabPlayers\PlayerCardV2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabProfile\FileManager.cs">
       <SubType>UserControl</SubType>
     </Compile>
   </ItemGroup>

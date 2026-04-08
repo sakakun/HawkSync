@@ -1,9 +1,9 @@
-﻿using System.IO.Compression;
+﻿using System.ComponentModel;
+using System.IO.Compression;
 using HawkSyncShared;
 using HawkSyncShared.Instances;
-using System.ComponentModel;
 
-namespace ServerManager.Forms.SubPanels
+namespace ServerManager.Forms.SubPanels.tabProfile
 {
     public partial class FileManager : UserControl
     {

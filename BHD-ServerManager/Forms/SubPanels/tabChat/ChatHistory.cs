@@ -1,9 +1,9 @@
-﻿using HawkSyncShared.Instances;
+﻿using System.ComponentModel;
+using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using ServerManager.Classes.SupportClasses;
-using System.ComponentModel;
 
-namespace ServerManager.Forms.SubPanels
+namespace ServerManager.Forms.SubPanels.tabChat
 {
     public partial class ChatHistory : UserControl
     {

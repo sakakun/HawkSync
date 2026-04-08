@@ -15,7 +15,19 @@
     <Compile Remove="Databases\**" />
     <EmbeddedResource Remove="Databases\**" />
     <None Remove="Databases\**" />
-    <Compile Update="Forms\SubPanels\PlayerCardV2.cs">
+    <Compile Update="Forms\SubPanels\tabChat\ChatHistory.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabProfile\FileManager.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabPlayer\PlayerCardV2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabAdmin\tabAudit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Forms\SubPanels\tabAdmin\tabAccounts.cs">
       <SubType>UserControl</SubType>
     </Compile>
   </ItemGroup>

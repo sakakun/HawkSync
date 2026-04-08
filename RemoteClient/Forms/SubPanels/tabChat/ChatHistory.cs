@@ -2,7 +2,7 @@
 using RemoteClient.Core;
 using RemoteClient.Services.Commands;
 
-namespace RemoteClient.Forms.SubPanels
+namespace RemoteClient.Forms.SubPanels.tabChat
 {
 	public partial class ChatHistory : UserControl
 	{

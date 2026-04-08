@@ -1,6 +1,6 @@
-﻿namespace ServerManager.Forms.SubPanels
+﻿namespace RemoteClient.Forms.SubPanels.tabChat
 {
-    partial class ChatHistory
+partial class ChatHistory
     {
         /// <summary> 
         /// Required designer variable.

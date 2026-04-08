@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace RemoteClient.Forms.SubPanels;
+namespace ServerManager.Forms.SubPanels.tabPlayers;
 
 partial class PlayerCardV2
 {

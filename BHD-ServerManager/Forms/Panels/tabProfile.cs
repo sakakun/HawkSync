@@ -5,11 +5,15 @@ using HawkSyncShared.Instances;
 using HawkSyncShared.SupportClasses;
 using UserControl = System.Windows.Forms.UserControl;
 using System.ComponentModel;
+using ServerManager.Forms.SubPanels.tabProfile;
 
 namespace ServerManager.Forms.Panels
 {
 	public partial class tabProfile : UserControl
 	{
+
+		private FileManager FileManager = null!;
+		
 		// --- Instance Objects ---
 		private theInstance? theInstance => CommonCore.theInstance;
 
@@ -23,7 +27,9 @@ namespace ServerManager.Forms.Panels
 			
 			if (IsDesignTime)
 				return;
-
+			
+			groupBoxFileManager.Controls.Add(FileManager = new FileManager());
+			
 			// Initialize the profile tab with current settings
 			Profile_LoadSettings();
 
