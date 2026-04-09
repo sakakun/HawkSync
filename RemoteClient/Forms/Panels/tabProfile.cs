@@ -11,8 +11,6 @@ namespace RemoteClient.Forms.Panels;
 public partial class tabProfile : UserControl
 {
     
-    private FileManager FileManager = null!;
-    
     private theInstance theInstance => CommonCore.theInstance!;
 
 	// ================================================================================
@@ -35,7 +33,7 @@ public partial class tabProfile : UserControl
         if (IsDesignTime)
             return;
         
-        groupBoxFileManager.Controls.Add(FileManager = new FileManager());
+        groupBoxFileManager.Controls.Add(new FileManager());
         
         // Subscribe to server updates
         ApiCore.OnSnapshotReceived += OnSnapshotReceived;

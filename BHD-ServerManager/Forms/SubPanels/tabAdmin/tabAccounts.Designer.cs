@@ -419,7 +419,7 @@ partial class tabAccounts
         groupBox3.Text = "Permissions";
         // 
         // tableLayoutPanel4
-        // 
+        //
         tableLayoutPanel4.ColumnCount = 3;
         tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.333332F));
         tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.333332F));
@@ -443,9 +443,9 @@ partial class tabAccounts
         tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.333332F));
         tableLayoutPanel4.Size = new System.Drawing.Size(384, 92);
         tableLayoutPanel4.TabIndex = 0;
-        // 
+        //
         // checkBox_permAudit
-        // 
+        //
         checkBox_permAudit.AutoSize = true;
         checkBox_permAudit.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permAudit.Location = new System.Drawing.Point(258, 62);
@@ -455,9 +455,9 @@ partial class tabAccounts
         checkBox_permAudit.TabIndex = 8;
         checkBox_permAudit.Text = "Audit";
         checkBox_permAudit.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permUsers
-        // 
+        //
         checkBox_permUsers.AutoSize = true;
         checkBox_permUsers.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permUsers.Location = new System.Drawing.Point(132, 62);
@@ -467,9 +467,9 @@ partial class tabAccounts
         checkBox_permUsers.TabIndex = 7;
         checkBox_permUsers.Text = "Users";
         checkBox_permUsers.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permStats
-        // 
+        //
         checkBox_permStats.AutoSize = true;
         checkBox_permStats.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permStats.Location = new System.Drawing.Point(6, 62);
@@ -479,9 +479,9 @@ partial class tabAccounts
         checkBox_permStats.TabIndex = 6;
         checkBox_permStats.Text = "Stats";
         checkBox_permStats.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permBans
-        // 
+        //
         checkBox_permBans.AutoSize = true;
         checkBox_permBans.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permBans.Location = new System.Drawing.Point(258, 34);
@@ -491,7 +491,7 @@ partial class tabAccounts
         checkBox_permBans.TabIndex = 5;
         checkBox_permBans.Text = "Bans";
         checkBox_permBans.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permChat
         // 
         checkBox_permChat.AutoSize = true;
@@ -503,9 +503,9 @@ partial class tabAccounts
         checkBox_permChat.TabIndex = 4;
         checkBox_permChat.Text = "Chat";
         checkBox_permChat.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permPlayers
-        // 
+        //
         checkBox_permPlayers.AutoSize = true;
         checkBox_permPlayers.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permPlayers.Location = new System.Drawing.Point(6, 34);
@@ -515,9 +515,9 @@ partial class tabAccounts
         checkBox_permPlayers.TabIndex = 3;
         checkBox_permPlayers.Text = "Players";
         checkBox_permPlayers.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permMaps
-        // 
+        //
         checkBox_permMaps.AutoSize = true;
         checkBox_permMaps.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permMaps.Location = new System.Drawing.Point(258, 6);
@@ -527,9 +527,9 @@ partial class tabAccounts
         checkBox_permMaps.TabIndex = 2;
         checkBox_permMaps.Text = "Maps";
         checkBox_permMaps.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permGamePlay
-        // 
+        //
         checkBox_permGamePlay.AutoSize = true;
         checkBox_permGamePlay.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permGamePlay.Location = new System.Drawing.Point(132, 6);
@@ -539,9 +539,9 @@ partial class tabAccounts
         checkBox_permGamePlay.TabIndex = 1;
         checkBox_permGamePlay.Text = "Gameplay";
         checkBox_permGamePlay.UseVisualStyleBackColor = true;
-        // 
+        //
         // checkBox_permProfile
-        // 
+        //
         checkBox_permProfile.AutoSize = true;
         checkBox_permProfile.Dock = System.Windows.Forms.DockStyle.Fill;
         checkBox_permProfile.Location = new System.Drawing.Point(6, 6);

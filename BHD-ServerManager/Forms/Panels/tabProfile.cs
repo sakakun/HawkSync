@@ -11,7 +11,7 @@ namespace ServerManager.Forms.Panels
 {
 	public partial class tabProfile : UserControl
 	{
-
+	
 		private FileManager FileManager = null!;
 		
 		// --- Instance Objects ---

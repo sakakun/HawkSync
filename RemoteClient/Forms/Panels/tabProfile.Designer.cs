@@ -31,17 +31,15 @@ namespace RemoteClient.Forms.Panels
 		private void InitializeComponent()
 		{
 			tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			panelLeft = new System.Windows.Forms.Panel();
+			groupBoxFileManager = new System.Windows.Forms.GroupBox();
+			panelRight = new System.Windows.Forms.Panel();
+			groupBox4 = new System.Windows.Forms.GroupBox();
+			tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+			btn_resetProfile = new System.Windows.Forms.Button();
+			btn_saveProfile = new System.Windows.Forms.Button();
 			profileFileManagers = new System.Windows.Forms.TabControl();
 			tabProfilePage1 = new System.Windows.Forms.TabPage();
-			groupBox8 = new System.Windows.Forms.GroupBox();
-			tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
-			num_PlayerIdleLimit = new System.Windows.Forms.NumericUpDown();
-			label_idleLimit = new System.Windows.Forms.Label();
-			checkBox_enableKickIdle = new System.Windows.Forms.CheckBox();
-			cb_enableMaxCheck = new System.Windows.Forms.CheckBox();
-			cb_enableMinCheck = new System.Windows.Forms.CheckBox();
-			num_maxPing = new System.Windows.Forms.NumericUpDown();
-			num_minPing = new System.Windows.Forms.NumericUpDown();
 			groupBox7 = new System.Windows.Forms.GroupBox();
 			tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
 			cb_localPlay = new System.Windows.Forms.CheckBox();
@@ -92,22 +90,25 @@ namespace RemoteClient.Forms.Panels
 			profileServerAttribute19 = new System.Windows.Forms.CheckBox();
 			profileServerAttribute20 = new System.Windows.Forms.CheckBox();
 			profileServerAttribute21 = new System.Windows.Forms.CheckBox();
-			panel1 = new System.Windows.Forms.Panel();
-			groupBoxFileManager = new System.Windows.Forms.GroupBox();
-			groupBox4 = new System.Windows.Forms.GroupBox();
-			tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
-			btn_resetProfile = new System.Windows.Forms.Button();
-			btn_saveProfile = new System.Windows.Forms.Button();
+			tabProfilePage3 = new System.Windows.Forms.TabPage();
+			groupBox8 = new System.Windows.Forms.GroupBox();
+			tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
+			num_PlayerIdleLimit = new System.Windows.Forms.NumericUpDown();
+			label_idleLimit = new System.Windows.Forms.Label();
+			checkBox_enableKickIdle = new System.Windows.Forms.CheckBox();
+			cb_enableMaxCheck = new System.Windows.Forms.CheckBox();
+			cb_enableMinCheck = new System.Windows.Forms.CheckBox();
+			num_maxPing = new System.Windows.Forms.NumericUpDown();
+			num_minPing = new System.Windows.Forms.NumericUpDown();
 			folderProfileBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
 			openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			tableLayoutPanel1.SuspendLayout();
+			panelLeft.SuspendLayout();
+			panelRight.SuspendLayout();
+			groupBox4.SuspendLayout();
+			tableLayoutPanel4.SuspendLayout();
 			profileFileManagers.SuspendLayout();
 			tabProfilePage1.SuspendLayout();
-			groupBox8.SuspendLayout();
-			tableLayoutPanel7.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).BeginInit();
-			((System.ComponentModel.ISupportInitialize)num_maxPing).BeginInit();
-			((System.ComponentModel.ISupportInitialize)num_minPing).BeginInit();
 			groupBox7.SuspendLayout();
 			tableLayoutPanel6.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)num_remotePort).BeginInit();
@@ -121,9 +122,12 @@ namespace RemoteClient.Forms.Panels
 			tableLayoutPanel2.SuspendLayout();
 			groupBox3.SuspendLayout();
 			tableAtributes.SuspendLayout();
-			panel1.SuspendLayout();
-			groupBox4.SuspendLayout();
-			tableLayoutPanel4.SuspendLayout();
+			tabProfilePage3.SuspendLayout();
+			groupBox8.SuspendLayout();
+			tableLayoutPanel7.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).BeginInit();
+			((System.ComponentModel.ISupportInitialize)num_maxPing).BeginInit();
+			((System.ComponentModel.ISupportInitialize)num_minPing).BeginInit();
 			SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -131,8 +135,8 @@ namespace RemoteClient.Forms.Panels
 			tableLayoutPanel1.ColumnCount = 2;
 			tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.623188F));
 			tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.376812F));
-			tableLayoutPanel1.Controls.Add(profileFileManagers, 1, 0);
-			tableLayoutPanel1.Controls.Add(panel1, 0, 0);
+			tableLayoutPanel1.Controls.Add(panelLeft, 0, 0);
+			tableLayoutPanel1.Controls.Add(panelRight, 1, 0);
 			tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -141,147 +145,112 @@ namespace RemoteClient.Forms.Panels
 			tableLayoutPanel1.Size = new System.Drawing.Size(966, 422);
 			tableLayoutPanel1.TabIndex = 0;
 			// 
+			// panelLeft
+			// 
+			panelLeft.Controls.Add(groupBoxFileManager);
+			panelLeft.Dock = System.Windows.Forms.DockStyle.Fill;
+			panelLeft.Location = new System.Drawing.Point(3, 3);
+			panelLeft.Name = "panelLeft";
+			panelLeft.Size = new System.Drawing.Size(512, 416);
+			panelLeft.TabIndex = 1;
+			// 
+			// groupBoxFileManager
+			// 
+			groupBoxFileManager.Dock = System.Windows.Forms.DockStyle.Fill;
+			groupBoxFileManager.Location = new System.Drawing.Point(0, 0);
+			groupBoxFileManager.Name = "groupBoxFileManager";
+			groupBoxFileManager.Size = new System.Drawing.Size(512, 416);
+			groupBoxFileManager.TabIndex = 3;
+			groupBoxFileManager.TabStop = false;
+			groupBoxFileManager.Text = "File Manager";
+			// 
+			// panelRight
+			// 
+			panelRight.Controls.Add(groupBox4);
+			panelRight.Controls.Add(profileFileManagers);
+			panelRight.Dock = System.Windows.Forms.DockStyle.Fill;
+			panelRight.Location = new System.Drawing.Point(521, 3);
+			panelRight.Name = "panelRight";
+			panelRight.Size = new System.Drawing.Size(442, 416);
+			panelRight.TabIndex = 2;
+			// 
+			// groupBox4
+			// 
+			groupBox4.Controls.Add(tableLayoutPanel4);
+			groupBox4.Dock = System.Windows.Forms.DockStyle.Bottom;
+			groupBox4.Location = new System.Drawing.Point(0, 358);
+			groupBox4.Name = "groupBox4";
+			groupBox4.Padding = new System.Windows.Forms.Padding(0);
+			groupBox4.Size = new System.Drawing.Size(442, 58);
+			groupBox4.TabIndex = 2;
+			groupBox4.TabStop = false;
+			groupBox4.Text = "Controls";
+			// 
+			// tableLayoutPanel4
+			// 
+			tableLayoutPanel4.ColumnCount = 5;
+			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			tableLayoutPanel4.Controls.Add(btn_resetProfile, 1, 0);
+			tableLayoutPanel4.Controls.Add(btn_saveProfile, 0, 0);
+			tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+			tableLayoutPanel4.Location = new System.Drawing.Point(0, 16);
+			tableLayoutPanel4.Margin = new System.Windows.Forms.Padding(0);
+			tableLayoutPanel4.Name = "tableLayoutPanel4";
+			tableLayoutPanel4.RowCount = 1;
+			tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			tableLayoutPanel4.Size = new System.Drawing.Size(442, 42);
+			tableLayoutPanel4.TabIndex = 0;
+			// 
+			// btn_resetProfile
+			// 
+			btn_resetProfile.Dock = System.Windows.Forms.DockStyle.Fill;
+			btn_resetProfile.Location = new System.Drawing.Point(91, 3);
+			btn_resetProfile.Name = "btn_resetProfile";
+			btn_resetProfile.Size = new System.Drawing.Size(82, 36);
+			btn_resetProfile.TabIndex = 1;
+			btn_resetProfile.Text = "Reset";
+			btn_resetProfile.UseVisualStyleBackColor = true;
+			btn_resetProfile.Click += BtnReset_Click;
+			// 
+			// btn_saveProfile
+			// 
+			btn_saveProfile.Dock = System.Windows.Forms.DockStyle.Fill;
+			btn_saveProfile.Location = new System.Drawing.Point(3, 3);
+			btn_saveProfile.Name = "btn_saveProfile";
+			btn_saveProfile.Size = new System.Drawing.Size(82, 36);
+			btn_saveProfile.TabIndex = 0;
+			btn_saveProfile.Text = "Save";
+			btn_saveProfile.UseVisualStyleBackColor = true;
+			btn_saveProfile.Click += BtnSave_Click;
+			// 
 			// profileFileManagers
 			// 
 			profileFileManagers.Controls.Add(tabProfilePage1);
 			profileFileManagers.Controls.Add(tabProfilePage2);
-			profileFileManagers.Dock = System.Windows.Forms.DockStyle.Fill;
-			profileFileManagers.Location = new System.Drawing.Point(521, 3);
+			profileFileManagers.Controls.Add(tabProfilePage3);
+			profileFileManagers.Dock = System.Windows.Forms.DockStyle.Top;
+			profileFileManagers.Location = new System.Drawing.Point(0, 0);
 			profileFileManagers.Name = "profileFileManagers";
 			profileFileManagers.SelectedIndex = 0;
-			profileFileManagers.Size = new System.Drawing.Size(442, 416);
+			profileFileManagers.Size = new System.Drawing.Size(442, 359);
 			profileFileManagers.TabIndex = 0;
 			// 
 			// tabProfilePage1
 			// 
-			tabProfilePage1.Controls.Add(groupBox8);
 			tabProfilePage1.Controls.Add(groupBox7);
 			tabProfilePage1.Controls.Add(groupBox6);
 			tabProfilePage1.Location = new System.Drawing.Point(4, 24);
 			tabProfilePage1.Name = "tabProfilePage1";
 			tabProfilePage1.Padding = new System.Windows.Forms.Padding(3);
-			tabProfilePage1.Size = new System.Drawing.Size(434, 388);
+			tabProfilePage1.Size = new System.Drawing.Size(434, 331);
 			tabProfilePage1.TabIndex = 0;
 			tabProfilePage1.Text = "Profile Information";
 			tabProfilePage1.UseVisualStyleBackColor = true;
-			// 
-			// groupBox8
-			// 
-			groupBox8.Controls.Add(tableLayoutPanel7);
-			groupBox8.Dock = System.Windows.Forms.DockStyle.Bottom;
-			groupBox8.Location = new System.Drawing.Point(3, 306);
-			groupBox8.Name = "groupBox8";
-			groupBox8.Size = new System.Drawing.Size(428, 79);
-			groupBox8.TabIndex = 2;
-			groupBox8.TabStop = false;
-			groupBox8.Text = "Misc Restrictions";
-			// 
-			// tableLayoutPanel7
-			// 
-			tableLayoutPanel7.ColumnCount = 4;
-			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-			tableLayoutPanel7.Controls.Add(num_PlayerIdleLimit, 3, 1);
-			tableLayoutPanel7.Controls.Add(label_idleLimit, 2, 1);
-			tableLayoutPanel7.Controls.Add(checkBox_enableKickIdle, 2, 0);
-			tableLayoutPanel7.Controls.Add(cb_enableMaxCheck, 0, 1);
-			tableLayoutPanel7.Controls.Add(cb_enableMinCheck, 0, 0);
-			tableLayoutPanel7.Controls.Add(num_maxPing, 1, 1);
-			tableLayoutPanel7.Controls.Add(num_minPing, 1, 0);
-			tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
-			tableLayoutPanel7.Location = new System.Drawing.Point(3, 19);
-			tableLayoutPanel7.Name = "tableLayoutPanel7";
-			tableLayoutPanel7.RowCount = 2;
-			tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			tableLayoutPanel7.Size = new System.Drawing.Size(422, 57);
-			tableLayoutPanel7.TabIndex = 0;
-			// 
-			// num_PlayerIdleLimit
-			// 
-			num_PlayerIdleLimit.Location = new System.Drawing.Point(361, 31);
-			num_PlayerIdleLimit.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
-			num_PlayerIdleLimit.Name = "num_PlayerIdleLimit";
-			num_PlayerIdleLimit.Size = new System.Drawing.Size(58, 23);
-			num_PlayerIdleLimit.TabIndex = 13;
-			num_PlayerIdleLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			// 
-			// label_idleLimit
-			// 
-			label_idleLimit.AutoSize = true;
-			label_idleLimit.Dock = System.Windows.Forms.DockStyle.Fill;
-			label_idleLimit.Location = new System.Drawing.Point(277, 28);
-			label_idleLimit.Name = "label_idleLimit";
-			label_idleLimit.Size = new System.Drawing.Size(78, 29);
-			label_idleLimit.TabIndex = 12;
-			label_idleLimit.Text = "Idle Limit";
-			label_idleLimit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// checkBox_enableKickIdle
-			// 
-			checkBox_enableKickIdle.AutoSize = true;
-			checkBox_enableKickIdle.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			tableLayoutPanel7.SetColumnSpan(checkBox_enableKickIdle, 2);
-			checkBox_enableKickIdle.Dock = System.Windows.Forms.DockStyle.Fill;
-			checkBox_enableKickIdle.Location = new System.Drawing.Point(277, 3);
-			checkBox_enableKickIdle.Name = "checkBox_enableKickIdle";
-			checkBox_enableKickIdle.Size = new System.Drawing.Size(142, 22);
-			checkBox_enableKickIdle.TabIndex = 10;
-			checkBox_enableKickIdle.Text = "Kick Idle Players";
-			checkBox_enableKickIdle.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			checkBox_enableKickIdle.UseVisualStyleBackColor = true;
-			// 
-			// cb_enableMaxCheck
-			// 
-			cb_enableMaxCheck.AutoSize = true;
-			cb_enableMaxCheck.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			cb_enableMaxCheck.Dock = System.Windows.Forms.DockStyle.Fill;
-			cb_enableMaxCheck.Location = new System.Drawing.Point(3, 31);
-			cb_enableMaxCheck.Name = "cb_enableMaxCheck";
-			cb_enableMaxCheck.Size = new System.Drawing.Size(205, 23);
-			cb_enableMaxCheck.TabIndex = 8;
-			cb_enableMaxCheck.Text = "Enable Required Max Ping";
-			cb_enableMaxCheck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			cb_enableMaxCheck.UseVisualStyleBackColor = true;
-			// 
-			// cb_enableMinCheck
-			// 
-			cb_enableMinCheck.AutoSize = true;
-			cb_enableMinCheck.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			cb_enableMinCheck.Dock = System.Windows.Forms.DockStyle.Fill;
-			cb_enableMinCheck.Location = new System.Drawing.Point(3, 3);
-			cb_enableMinCheck.Name = "cb_enableMinCheck";
-			cb_enableMinCheck.Size = new System.Drawing.Size(205, 22);
-			cb_enableMinCheck.TabIndex = 7;
-			cb_enableMinCheck.Text = "Enable Required Min Ping";
-			cb_enableMinCheck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			cb_enableMinCheck.UseVisualStyleBackColor = true;
-			// 
-			// num_maxPing
-			// 
-			num_maxPing.Dock = System.Windows.Forms.DockStyle.Fill;
-			num_maxPing.Enabled = false;
-			num_maxPing.Location = new System.Drawing.Point(214, 31);
-			num_maxPing.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
-			num_maxPing.Name = "num_maxPing";
-			num_maxPing.Size = new System.Drawing.Size(57, 23);
-			num_maxPing.TabIndex = 6;
-			num_maxPing.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			num_maxPing.Value = new decimal(new int[] { 9999, 0, 0, 0 });
-			// 
-			// num_minPing
-			// 
-			num_minPing.Dock = System.Windows.Forms.DockStyle.Fill;
-			num_minPing.Enabled = false;
-			num_minPing.Location = new System.Drawing.Point(214, 3);
-			num_minPing.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
-			num_minPing.Name = "num_minPing";
-			num_minPing.Size = new System.Drawing.Size(57, 23);
-			num_minPing.TabIndex = 5;
-			num_minPing.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			num_minPing.Value = new decimal(new int[] { 9999, 0, 0, 0 });
 			// 
 			// groupBox7
 			// 
@@ -537,7 +506,7 @@ namespace RemoteClient.Forms.Panels
 			tabProfilePage2.Location = new System.Drawing.Point(4, 24);
 			tabProfilePage2.Margin = new System.Windows.Forms.Padding(0);
 			tabProfilePage2.Name = "tabProfilePage2";
-			tabProfilePage2.Size = new System.Drawing.Size(434, 388);
+			tabProfilePage2.Size = new System.Drawing.Size(434, 331);
 			tabProfilePage2.TabIndex = 1;
 			tabProfilePage2.Text = "Start Modifiers";
 			tabProfilePage2.UseVisualStyleBackColor = true;
@@ -646,7 +615,7 @@ namespace RemoteClient.Forms.Panels
 			// 
 			groupBox3.Controls.Add(tableAtributes);
 			groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
-			groupBox3.Location = new System.Drawing.Point(0, 176);
+			groupBox3.Location = new System.Drawing.Point(0, 119);
 			groupBox3.Name = "groupBox3";
 			groupBox3.Size = new System.Drawing.Size(434, 212);
 			groupBox3.TabIndex = 4;
@@ -977,78 +946,134 @@ namespace RemoteClient.Forms.Panels
 			profileServerAttribute21.Text = "/LOADBAR";
 			profileServerAttribute21.UseVisualStyleBackColor = true;
 			// 
-			// panel1
+			// tabProfilePage3
 			// 
-			panel1.Controls.Add(groupBoxFileManager);
-			panel1.Controls.Add(groupBox4);
-			panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			panel1.Location = new System.Drawing.Point(3, 3);
-			panel1.Name = "panel1";
-			panel1.Size = new System.Drawing.Size(512, 416);
-			panel1.TabIndex = 1;
+			tabProfilePage3.Controls.Add(groupBox8);
+			tabProfilePage3.Location = new System.Drawing.Point(4, 24);
+			tabProfilePage3.Name = "tabProfilePage3";
+			tabProfilePage3.Padding = new System.Windows.Forms.Padding(3);
+			tabProfilePage3.Size = new System.Drawing.Size(434, 331);
+			tabProfilePage3.TabIndex = 2;
+			tabProfilePage3.Text = "Misc";
+			tabProfilePage3.UseVisualStyleBackColor = true;
 			// 
-			// groupBoxFileManager
+			// groupBox8
 			// 
-			groupBoxFileManager.Dock = System.Windows.Forms.DockStyle.Fill;
-			groupBoxFileManager.Location = new System.Drawing.Point(0, 0);
-			groupBoxFileManager.Name = "groupBoxFileManager";
-			groupBoxFileManager.Size = new System.Drawing.Size(512, 358);
-			groupBoxFileManager.TabIndex = 3;
-			groupBoxFileManager.TabStop = false;
-			groupBoxFileManager.Text = "File Manager";
+			groupBox8.Controls.Add(tableLayoutPanel7);
+			groupBox8.Dock = System.Windows.Forms.DockStyle.Top;
+			groupBox8.Location = new System.Drawing.Point(3, 3);
+			groupBox8.Name = "groupBox8";
+			groupBox8.Size = new System.Drawing.Size(428, 79);
+			groupBox8.TabIndex = 2;
+			groupBox8.TabStop = false;
+			groupBox8.Text = "Restrictions";
 			// 
-			// groupBox4
+			// tableLayoutPanel7
 			// 
-			groupBox4.Controls.Add(tableLayoutPanel4);
-			groupBox4.Dock = System.Windows.Forms.DockStyle.Bottom;
-			groupBox4.Location = new System.Drawing.Point(0, 358);
-			groupBox4.Name = "groupBox4";
-			groupBox4.Size = new System.Drawing.Size(512, 58);
-			groupBox4.TabIndex = 2;
-			groupBox4.TabStop = false;
-			groupBox4.Text = "Controls";
+			tableLayoutPanel7.ColumnCount = 4;
+			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+			tableLayoutPanel7.Controls.Add(num_PlayerIdleLimit, 3, 1);
+			tableLayoutPanel7.Controls.Add(label_idleLimit, 2, 1);
+			tableLayoutPanel7.Controls.Add(checkBox_enableKickIdle, 2, 0);
+			tableLayoutPanel7.Controls.Add(cb_enableMaxCheck, 0, 1);
+			tableLayoutPanel7.Controls.Add(cb_enableMinCheck, 0, 0);
+			tableLayoutPanel7.Controls.Add(num_maxPing, 1, 1);
+			tableLayoutPanel7.Controls.Add(num_minPing, 1, 0);
+			tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+			tableLayoutPanel7.Location = new System.Drawing.Point(3, 19);
+			tableLayoutPanel7.Name = "tableLayoutPanel7";
+			tableLayoutPanel7.RowCount = 2;
+			tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			tableLayoutPanel7.Size = new System.Drawing.Size(422, 57);
+			tableLayoutPanel7.TabIndex = 0;
 			// 
-			// tableLayoutPanel4
+			// num_PlayerIdleLimit
 			// 
-			tableLayoutPanel4.ColumnCount = 5;
-			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			tableLayoutPanel4.Controls.Add(btn_resetProfile, 1, 0);
-			tableLayoutPanel4.Controls.Add(btn_saveProfile, 0, 0);
-			tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-			tableLayoutPanel4.Location = new System.Drawing.Point(3, 19);
-			tableLayoutPanel4.Margin = new System.Windows.Forms.Padding(0);
-			tableLayoutPanel4.Name = "tableLayoutPanel4";
-			tableLayoutPanel4.RowCount = 1;
-			tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			tableLayoutPanel4.Size = new System.Drawing.Size(506, 36);
-			tableLayoutPanel4.TabIndex = 0;
+			num_PlayerIdleLimit.Location = new System.Drawing.Point(361, 31);
+			num_PlayerIdleLimit.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
+			num_PlayerIdleLimit.Name = "num_PlayerIdleLimit";
+			num_PlayerIdleLimit.Size = new System.Drawing.Size(58, 23);
+			num_PlayerIdleLimit.TabIndex = 13;
+			num_PlayerIdleLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
-			// btn_resetProfile
+			// label_idleLimit
 			// 
-			btn_resetProfile.Dock = System.Windows.Forms.DockStyle.Fill;
-			btn_resetProfile.Location = new System.Drawing.Point(104, 3);
-			btn_resetProfile.Name = "btn_resetProfile";
-			btn_resetProfile.Size = new System.Drawing.Size(95, 30);
-			btn_resetProfile.TabIndex = 1;
-			btn_resetProfile.Text = "Reset";
-			btn_resetProfile.UseVisualStyleBackColor = true;
-			btn_resetProfile.Click += BtnReset_Click;
+			label_idleLimit.AutoSize = true;
+			label_idleLimit.Dock = System.Windows.Forms.DockStyle.Fill;
+			label_idleLimit.Location = new System.Drawing.Point(277, 28);
+			label_idleLimit.Name = "label_idleLimit";
+			label_idleLimit.Size = new System.Drawing.Size(78, 29);
+			label_idleLimit.TabIndex = 12;
+			label_idleLimit.Text = "Idle Limit";
+			label_idleLimit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// btn_saveProfile
+			// checkBox_enableKickIdle
 			// 
-			btn_saveProfile.Dock = System.Windows.Forms.DockStyle.Fill;
-			btn_saveProfile.Location = new System.Drawing.Point(3, 3);
-			btn_saveProfile.Name = "btn_saveProfile";
-			btn_saveProfile.Size = new System.Drawing.Size(95, 30);
-			btn_saveProfile.TabIndex = 0;
-			btn_saveProfile.Text = "Save";
-			btn_saveProfile.UseVisualStyleBackColor = true;
-			btn_saveProfile.Click += BtnSave_Click;
+			checkBox_enableKickIdle.AutoSize = true;
+			checkBox_enableKickIdle.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			tableLayoutPanel7.SetColumnSpan(checkBox_enableKickIdle, 2);
+			checkBox_enableKickIdle.Dock = System.Windows.Forms.DockStyle.Fill;
+			checkBox_enableKickIdle.Location = new System.Drawing.Point(277, 3);
+			checkBox_enableKickIdle.Name = "checkBox_enableKickIdle";
+			checkBox_enableKickIdle.Size = new System.Drawing.Size(142, 22);
+			checkBox_enableKickIdle.TabIndex = 10;
+			checkBox_enableKickIdle.Text = "Kick Idle Players";
+			checkBox_enableKickIdle.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			checkBox_enableKickIdle.UseVisualStyleBackColor = true;
+			// 
+			// cb_enableMaxCheck
+			// 
+			cb_enableMaxCheck.AutoSize = true;
+			cb_enableMaxCheck.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			cb_enableMaxCheck.Dock = System.Windows.Forms.DockStyle.Fill;
+			cb_enableMaxCheck.Location = new System.Drawing.Point(3, 31);
+			cb_enableMaxCheck.Name = "cb_enableMaxCheck";
+			cb_enableMaxCheck.Size = new System.Drawing.Size(205, 23);
+			cb_enableMaxCheck.TabIndex = 8;
+			cb_enableMaxCheck.Text = "Enable Required Max Ping";
+			cb_enableMaxCheck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			cb_enableMaxCheck.UseVisualStyleBackColor = true;
+			// 
+			// cb_enableMinCheck
+			// 
+			cb_enableMinCheck.AutoSize = true;
+			cb_enableMinCheck.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			cb_enableMinCheck.Dock = System.Windows.Forms.DockStyle.Fill;
+			cb_enableMinCheck.Location = new System.Drawing.Point(3, 3);
+			cb_enableMinCheck.Name = "cb_enableMinCheck";
+			cb_enableMinCheck.Size = new System.Drawing.Size(205, 22);
+			cb_enableMinCheck.TabIndex = 7;
+			cb_enableMinCheck.Text = "Enable Required Min Ping";
+			cb_enableMinCheck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			cb_enableMinCheck.UseVisualStyleBackColor = true;
+			// 
+			// num_maxPing
+			// 
+			num_maxPing.Dock = System.Windows.Forms.DockStyle.Fill;
+			num_maxPing.Enabled = false;
+			num_maxPing.Location = new System.Drawing.Point(214, 31);
+			num_maxPing.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+			num_maxPing.Name = "num_maxPing";
+			num_maxPing.Size = new System.Drawing.Size(57, 23);
+			num_maxPing.TabIndex = 6;
+			num_maxPing.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			num_maxPing.Value = new decimal(new int[] { 9999, 0, 0, 0 });
+			// 
+			// num_minPing
+			// 
+			num_minPing.Dock = System.Windows.Forms.DockStyle.Fill;
+			num_minPing.Enabled = false;
+			num_minPing.Location = new System.Drawing.Point(214, 3);
+			num_minPing.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+			num_minPing.Name = "num_minPing";
+			num_minPing.Size = new System.Drawing.Size(57, 23);
+			num_minPing.TabIndex = 5;
+			num_minPing.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			num_minPing.Value = new decimal(new int[] { 9999, 0, 0, 0 });
 			// 
 			// openFileDialog1
 			// 
@@ -1061,14 +1086,12 @@ namespace RemoteClient.Forms.Panels
 			Controls.Add(tableLayoutPanel1);
 			Size = new System.Drawing.Size(966, 422);
 			tableLayoutPanel1.ResumeLayout(false);
+			panelLeft.ResumeLayout(false);
+			panelRight.ResumeLayout(false);
+			groupBox4.ResumeLayout(false);
+			tableLayoutPanel4.ResumeLayout(false);
 			profileFileManagers.ResumeLayout(false);
 			tabProfilePage1.ResumeLayout(false);
-			groupBox8.ResumeLayout(false);
-			tableLayoutPanel7.ResumeLayout(false);
-			tableLayoutPanel7.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).EndInit();
-			((System.ComponentModel.ISupportInitialize)num_maxPing).EndInit();
-			((System.ComponentModel.ISupportInitialize)num_minPing).EndInit();
 			groupBox7.ResumeLayout(false);
 			tableLayoutPanel6.ResumeLayout(false);
 			tableLayoutPanel6.PerformLayout();
@@ -1087,19 +1110,27 @@ namespace RemoteClient.Forms.Panels
 			groupBox3.ResumeLayout(false);
 			tableAtributes.ResumeLayout(false);
 			tableAtributes.PerformLayout();
-			panel1.ResumeLayout(false);
-			groupBox4.ResumeLayout(false);
-			tableLayoutPanel4.ResumeLayout(false);
+			tabProfilePage3.ResumeLayout(false);
+			groupBox8.ResumeLayout(false);
+			tableLayoutPanel7.ResumeLayout(false);
+			tableLayoutPanel7.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)num_PlayerIdleLimit).EndInit();
+			((System.ComponentModel.ISupportInitialize)num_maxPing).EndInit();
+			((System.ComponentModel.ISupportInitialize)num_minPing).EndInit();
 			ResumeLayout(false);
 		}
+
+		private System.Windows.Forms.Panel panelRight;
+
+		private System.Windows.Forms.TabPage tabProfilePage3;
 
 		private System.Windows.Forms.GroupBox groupBoxFileManager;
 
 		#endregion
 
-		private TableLayoutPanel tableLayoutPanel1;
-        private TabControl profileFileManagers;
-        private TabPage tabProfilePage1;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TabControl profileFileManagers;
+        private System.Windows.Forms.TabPage tabProfilePage1;
         private TabPage tabProfilePage2;
         private System.Windows.Forms.Button btn_resetProfile;
         private System.Windows.Forms.Button btn_saveProfile;
@@ -1108,38 +1139,38 @@ namespace RemoteClient.Forms.Panels
         private Button btn_profileBrowse2;
         private FolderBrowserDialog folderProfileBrowserDialog;
         private OpenFileDialog openFileDialog1;
-        private GroupBox groupBox3;
-        private TableLayoutPanel tableAtributes;
-        public CheckBox profileServerAttribute01;
-        public CheckBox profileServerAttribute02;
-        public CheckBox profileServerAttribute03;
-        public CheckBox profileServerAttribute04;
-        public CheckBox profileServerAttribute05;
-        public CheckBox profileServerAttribute06;
-        public CheckBox profileServerAttribute07;
-        public CheckBox profileServerAttribute08;
-        public CheckBox profileServerAttribute09;
-        public CheckBox profileServerAttribute10;
-        public CheckBox profileServerAttribute11;
-        public CheckBox profileServerAttribute12;
-        public CheckBox profileServerAttribute13;
-        public CheckBox profileServerAttribute14;
-        public CheckBox profileServerAttribute15;
-        public CheckBox profileServerAttribute16;
-        public CheckBox profileServerAttribute17;
-        public CheckBox profileServerAttribute18;
-        public CheckBox profileServerAttribute19;
-        public CheckBox profileServerAttribute20;
-        public CheckBox profileServerAttribute21;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TableLayoutPanel tableAtributes;
+        private System.Windows.Forms.CheckBox profileServerAttribute01;
+        private System.Windows.Forms.CheckBox profileServerAttribute02;
+        private System.Windows.Forms.CheckBox profileServerAttribute03;
+        private System.Windows.Forms.CheckBox profileServerAttribute04;
+        private System.Windows.Forms.CheckBox profileServerAttribute05;
+        private System.Windows.Forms.CheckBox profileServerAttribute06;
+        private System.Windows.Forms.CheckBox profileServerAttribute07;
+        private System.Windows.Forms.CheckBox profileServerAttribute08;
+        private System.Windows.Forms.CheckBox profileServerAttribute09;
+        private System.Windows.Forms.CheckBox profileServerAttribute10;
+        private System.Windows.Forms.CheckBox profileServerAttribute11;
+        private System.Windows.Forms.CheckBox profileServerAttribute12;
+        private System.Windows.Forms.CheckBox profileServerAttribute13;
+        private System.Windows.Forms.CheckBox profileServerAttribute14;
+        private System.Windows.Forms.CheckBox profileServerAttribute15;
+        private System.Windows.Forms.CheckBox profileServerAttribute16;
+        private System.Windows.Forms.CheckBox profileServerAttribute17;
+        private System.Windows.Forms.CheckBox profileServerAttribute18;
+        private System.Windows.Forms.CheckBox profileServerAttribute19;
+        private System.Windows.Forms.CheckBox profileServerAttribute20;
+        private System.Windows.Forms.CheckBox profileServerAttribute21;
         private GroupBox groupBox1;
         private TableLayoutPanel tableLayoutPanel3;
         private TextBox tb_modFile;
         private GroupBox groupBox2;
         private TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panelLeft;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
-        private GroupBox groupBox8;
+        private System.Windows.Forms.GroupBox groupBox8;
         private GroupBox groupBox7;
         private GroupBox groupBox6;
         private TableLayoutPanel tableLayoutPanel5;
@@ -1155,17 +1186,17 @@ namespace RemoteClient.Forms.Panels
         private System.Windows.Forms.TextBox tb_serverPassword;
         public CheckBox cb_requireNova;
         public CheckBox cb_serverDedicated;
-        private TableLayoutPanel tableLayoutPanel7;
-        public NumericUpDown num_maxPing;
-        public CheckBox cb_enableMinCheck;
-        public CheckBox cb_enableMaxCheck;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+        private System.Windows.Forms.NumericUpDown num_maxPing;
+        private System.Windows.Forms.CheckBox cb_enableMinCheck;
+        private System.Windows.Forms.CheckBox cb_enableMaxCheck;
         private System.Windows.Forms.NumericUpDown num_minPing;
         private CheckBox checkBox_enableRemote;
         private System.Windows.Forms.NumericUpDown num_remotePort;
         public CheckBox cb_localPlay;
-		private CheckBox checkBox_enableKickIdle;
-		private Label label_idleLimit;
-		private NumericUpDown num_PlayerIdleLimit;
+		private System.Windows.Forms.CheckBox checkBox_enableKickIdle;
+		private System.Windows.Forms.Label label_idleLimit;
+		private System.Windows.Forms.NumericUpDown num_PlayerIdleLimit;
 	}
 }
 

@@ -1,5 +1,4 @@
-﻿using RemoteClient.Forms.SubPanels;
-using HawkSyncShared;
+﻿using HawkSyncShared;
 using System.ComponentModel;
 using RemoteClient.Forms.SubPanels.tabPlayer;
 
